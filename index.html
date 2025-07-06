@@ -963,20 +963,6 @@ h1 .lock-icon {
     function closeModal() {
       document.getElementById("noticeModal").style.display = "none";
     }
-
-    // Disable right-click and inspect
-    document.addEventListener("contextmenu", (e) => e.preventDefault());
-
-    document.onkeydown = function (e) {
-      if (
-        e.key === "F12" ||
-        (e.ctrlKey && e.shiftKey && ["I", "C", "J"].includes(e.key.toUpperCase())) ||
-        (e.ctrlKey && e.key.toUpperCase() === "U")
-      ) {
-        alert("Inspect is disabled.");
-        return false;
-      }
-    };
     
       const hamburger = document.getElementById('hamburger');
   const sidebar = document.getElementById('sidebar');
