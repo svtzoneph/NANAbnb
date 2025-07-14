@@ -932,23 +932,6 @@ h1 .lock-icon {
 
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
-
-  auth.onAuthStateChanged(user => {
-    if (!user) {
-      // User not logged in — block access
-      document.body.innerHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; text-align: center; padding: 30px;">
-          <h1 style="font-size: 2em; margin-bottom: 20px;">🚫 404 — Page Not Found</h1>
-          <p style="font-size: 1.1em; margin-bottom: 30px;">You must be logged in to access this content.</p>
-          <button onclick="window.location.href='index.html'" style="padding: 10px 20px; background: #ff5e5e; color: white; border: none; border-radius: 6px; font-size: 1em; cursor: pointer;">Go to Login</button>
-        </div>
-      `;
-    } else {
-      // Logged in — show content
-      document.getElementById("sidebar").style.display = "block";
-      document.getElementById("videoRow").style.display = "flex";
-    }
-  });
 </script>
   
   <script>
@@ -1065,4 +1048,4 @@ h1 .lock-icon {
 </script>
   
 </body>
-</html> can you make the direct link block 
+</html> 
