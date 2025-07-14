@@ -407,7 +407,6 @@ h1 .lock-icon {
 </div>
 
 <h1>🔒 NANA bnb with SEVENTEEN Vault</h1>
-
 <div style="height: 2px; background: linear-gradient(to right, #ccc, #eee, #ccc); margin: 20px 0;"></div>
  <h1>EPISODE 1</h1>
 <div class="video-row">
@@ -915,6 +914,7 @@ h1 .lock-icon {
 </div>
 
 
+
   <!-- Modal -->
   <div class="modal-overlay" id="noticeModal">
     <div class="modal">
@@ -962,7 +962,7 @@ h1 .lock-icon {
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; text-align: center; padding: 30px;">
           <h1 style="font-size: 2em; margin-bottom: 20px;">🚫 404 — Page Not Found</h1>
           <p style="font-size: 1.1em; margin-bottom: 30px;">You must be logged in to access this content.</p>
-          <button onclick="window.location.href='login.html'" style="padding: 10px 20px; background: #ff5e5e; color: white; border: none; border-radius: 6px; font-size: 1em; cursor: pointer;">Go to Login</button>
+          <button onclick="window.location.href='index.html'" style="padding: 10px 20px; background: #ff5e5e; color: white; border: none; border-radius: 6px; font-size: 1em; cursor: pointer;">Go to Login</button>
         </div>
       `;
     } else {
@@ -1070,15 +1070,21 @@ h1 .lock-icon {
   </script>
   
   <script>
-  if (window.top === window) {
-    // Not embedded in your site
-    const allowedHost = location.hostname.includes("https://nana-bnb-svt.vercel.app/"); // replace with your domain
-    if (!allowedHost) {
-      document.write(`<h1 style="color:white;text-align:center;margin-top:20%;">🚫 Direct Access Blocked</h1>`);
-      throw new Error("Blocked direct access.");
-    }
+  // Allow access only if referred from index.html
+  const allowedReferrer = location.origin + '/index.html';
+  const currentReferrer = document.referrer;
+
+  if (!currentReferrer || !currentReferrer.includes(allowedReferrer)) {
+    document.body.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; text-align: center; padding: 30px;">
+        <h1 style="font-size: 2em; margin-bottom: 20px;">🚫 Access Denied</h1>
+        <p style="font-size: 1.1em; margin-bottom: 30px;">This page must be accessed from the main page (index.html).</p>
+        <button onclick="window.location.href='index.html'" style="padding: 10px 20px; background: #ff5e5e; color: white; border: none; border-radius: 6px; font-size: 1em; cursor: pointer;">Go to Homepage</button>
+      </div>
+    `;
+    throw new Error("Blocked direct or unauthorized access.");
   }
 </script>
   
 </body>
-</html>
+</html> can you make the direct link block 
