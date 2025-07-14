@@ -938,14 +938,41 @@ h1 .lock-icon {
     
     
     // Show modal on page load
-    window.onload = () => {
-      document.getElementById("noticeModal").style.display = "flex";
-      document.getElementById("videoRow").style.display = "flex"; // Show videos since no password now
-    };
+   window.onload = () => {
+  // Show modal
+  const modal = document.getElementById('noticeModal');
+  const closeBtn = document.getElementById('closeModalBtn');
+  if (modal && closeBtn) {
+    modal.style.display = 'flex';
+    closeBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+  }
 
-    function closeModal() {
-      document.getElementById("noticeModal").style.display = "none";
-    }
+  // Initial state
+  const sidebar = document.getElementById("sidebar");
+  const videoRow = document.getElementById("videoRow");
+  if (sidebar && videoRow) {
+    sidebar.style.display = "none";
+    videoRow.style.display = "none";
+  }
+
+  // Hamburger toggle
+  const hamburger = document.getElementById('hamburger');
+  if (hamburger && sidebar) {
+    hamburger.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      sidebar.setAttribute('aria-hidden', sidebar.classList.contains('active') ? 'false' : 'true');
+    });
+
+    hamburger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        hamburger.click();
+      }
+    });
+  }
+};
     
       const hamburger = document.getElementById('hamburger');
   const sidebar = document.getElementById('sidebar');
@@ -963,27 +990,6 @@ h1 .lock-icon {
     }
   });
   
-  async function hashPassword(password) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
- async function checkPassword() {
-  const input = document.getElementById("passwordInput").value.trim();
-  const hash = await hashPassword(input);
-  const correctHash = "d19ad6055148b64c351dcb2d308d331bfa4099a17c4da3072e30d9cf3e7e27dc";
-
-  if (hash === correctHash) {
-    document.getElementById("lockscreen").style.display = "none";
-    document.getElementById("sidebar").style.display = "block";
-    document.getElementById("videoRow").style.display = "flex";
-  } else {
-    document.getElementById("errorMsg").style.display = "block";
-  }
-}
 
   window.onload = () => {
     document.getElementById("sidebar").style.display = "none";
