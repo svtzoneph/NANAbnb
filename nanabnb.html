@@ -934,9 +934,10 @@ h1 .lock-icon {
   const auth = firebase.auth();
 
   window.onload = () => {
+    const videoRow = document.getElementById("videoRow");
     const sidebar = document.getElementById("sidebar");
     const hamburger = document.getElementById("hamburger");
-    const videoRow = document.getElementById("videoRow");
+    
 
     // Hide elements on load
     if (sidebar) {
