@@ -253,19 +253,24 @@
 <script>
   document.querySelectorAll("a.category-link").forEach(link => {
     const href = link.getAttribute("href");
+
     if (
-      href.includes("index.html") ||
       href.includes("home.html") ||
       href.includes("nanabnb.html") ||
       href.includes("hxwfanconcert.html") ||
-      href.includes("seventeenholiday.html") // ✅ NEW PAGE
+      href.includes("seventeenholiday.html")
     ) {
-      link.addEventListener("click", () => {
+      link.addEventListener("click", function (e) {
+        e.preventDefault(); // stop immediate navigation
         sessionStorage.setItem("fromHeader", "true");
+        setTimeout(() => {
+          window.location.href = href; // go to the page after setting session
+        }, 50);
       });
     }
   });
 </script>
+
 
 </body>
 </html>
