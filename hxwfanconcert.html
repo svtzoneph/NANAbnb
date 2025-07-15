@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hoshi x Woozi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+    margin: 0;
+    background: #111;
+    font-family: Arial, sans-serif;
+    color: white;
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  header {
+      padding: 12px 20px;
+      background: #181818;
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid #2a2a2a;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    header::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-link {
+      padding: 8px 16px;
+      background: #272727;
+      color: white;
+      border-radius: 20px;
+      font-size: 14px;
+      text-decoration: none;
+      flex: 0 0 auto;
+      transition: background 0.3s;
+    }
+
+    .category-link:hover {
+      background: #3c3c3c;
+    }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://uploads.onecompiler.io/43ddry4jt/43qexcqnw/HOSHI%20X%20WOOZI%20FAN%20CONCERT%20\'WARNING\'%20IN%20SEOUL%20DAY%201-Cover.jpg') no-repeat center center / cover;
+    filter: blur(5px) brightness(1);
+    z-index: -1;
+  }
+
+  .code-verify {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+    border-radius: 12px;
+    margin: auto;
+    max-width: 90%;
+  }
+
+  input[type="text"] {
+    padding: 12px;
+    font-size: 16px;
+    margin: 10px;
+    width: 260px;
+    border-radius: 8px;
+    border: none;
+    text-align: center;
+  }
+
+  button {
+    padding: 10px 24px;
+    font-size: 16px;
+    border-radius: 6px;
+    background-color: #00c9a7;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  .video-container {
+    display: none;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    text-align: center;
+    border-radius: 12px;
+  }
+
+  h2.title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #ff4d4d;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+}
+  .videos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 40px;
+    justify-content: center;
+  }
+
+  .video-box {
+    width: 100%;
+  }
+
+  .player {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #000; /* ✅ FIX: Prevent body blur from leaking into player */
+  }
+
+  .video-label {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #ccc;
+  }
+
+  @media (max-width: 600px) {
+    .videos {
+      grid-template-columns: 1fr;
+    }
+  }
+  </style>
+</head>
+<body>
+  
+   <!-- Scrollable Header -->
+  <header id="scrollHeader">
+    <a class="category-link" href="index.html">Home</a>
+    <a class="category-link" href="nanabnb.html">NANA BNB</a>
+    <a class="category-link" href="hxwfanconcert.html">HXW FAN CONCERT</a>
+    <a class="category-link" href="#">SEVENTEEN HOLIDAY</a>
+    <a class="category-link" href="#">2018 JAPAN ARENA TOUR</a>
+    <a class="category-link" href="#">17 JAPAN CONCERT Say the name</a>
+    <a class="category-link" href="#">SOON </a>
+    <a class="category-link" href="#">SOON</a>
+    <a class="category-link" href="#">SOON</a>
+  </header>
+
+<!-- Access Code Prompt -->
+<div class="code-verify" id="codePrompt">
+  <h2>🔐 Enter Access Code</h2>
+  <input type="text" id="codeInput" placeholder="Enter code..." />
+  <button onclick="verifyCode()">Unlock</button>
+  <p id="errorMsg" style="color: red; display: none;">Incorrect code. Please try again.</p>
+</div>
+
+<!-- Video Content -->
+<div class="video-container" id="videoPage">
+  <h2 class="title">HOSHI X WOOZI FAN CONCERT 'WARNING' IN SEOUL</h2>
+  <div class="videos">
+    <div class="video-box">
+      <div id="player1" class="player"></div>
+      <h4 class="video-label">DAY 1 HOSHI X WOOZI FAN CONCERT 'WARNING' IN SEOUL</h4>
+    </div>
+    <div class="video-box">
+      <div id="player2" class="player"></div>
+      <h4 class="video-label">DAY 2 HOSHI X WOOZI FAN CONCERT 'WARNING' IN SEOUL</h4>
+    </div>
+    <div class="video-box">
+      <div id="player3" class="player"></div>
+      <h4 class="video-label">DAY 3 HOSHI X WOOZI FAN CONCERT 'WARNING' IN SEOUL</h4>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+    authDomain: "tvnstream-b4497.firebaseapp.com",
+    databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+    projectId: "tvnstream-b4497",
+    storageBucket: "tvnstream-b4497.appspot.com",
+    messagingSenderId: "308384754214",
+    appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+    measurementId: "G-VFNH70R4D9"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  function verifyCode() {
+    const input = document.getElementById("codeInput").value.trim();
+    const errorMsg = document.getElementById("errorMsg");
+
+    db.ref("Access/code").once("value").then(snapshot => {
+      const correctCode = snapshot.val();
+      if (input === correctCode) {
+        localStorage.setItem("verified", "true");
+        showVideoPage();
+      } else {
+        errorMsg.style.display = "block";
+      }
+    });
+  }
+
+ function showVideoPage() {
+  document.getElementById("codePrompt").style.display = "none";
+  document.getElementById("videoPage").style.display = "block";
+
+  // Clappr video players with MUX .m3u8 links and poster images
+  new Clappr.Player({
+    parentId: "#player1",
+    source: "https://stream.mux.com/2GHnJggdVWILlC3e4L00ehLFfqyqo00NEl3cwv7lIlsvA.m3u8",
+    poster: "https://image.mux.com/02VxvV67lkg02QavjOCKbdszCLj6VZ02GSIwcKlBKxhbJw/thumbnail.png?time=1",
+    autoPlay: false,
+    width: "100%",
+    height: "100%",
+  });
+
+  new Clappr.Player({
+    parentId: "#player2",
+    source: "https://stream.mux.com/02VxvV67lkg02QavjOCKbdszCLj6VZ02GSIwcKlBKxhbJw.m3u8",
+    poster: "https://image.mux.com/02VxvV67lkg02QavjOCKbdszCLj6VZ02GSIwcKlBKxhbJw/thumbnail.png?time=1",
+    autoPlay: false,
+    width: "100%",
+    height: "100%",
+  });
+
+  new Clappr.Player({
+    parentId: "#player3",
+    source: "https://stream.mux.com/J8TNm5ChmaHP3mE84YH02JN19L12ARy01EnRbD9ejEuNg.m3u8", // Duplicate for demo; replace with different one if needed
+    poster: "https://image.mux.com/02VxvV67lkg02QavjOCKbdszCLj6VZ02GSIwcKlBKxhbJw/thumbnail.png?time=1",
+    autoPlay: false,
+    width: "100%",
+    height: "100%",
+  });
+}
+
+  // Auto-load if already verified
+  window.onload = function () {
+    if (localStorage.getItem("verified") === "true") {
+      showVideoPage();
+    }
+  };
+</script>
+
+<script>
+  // Only allow access if user came from one of the header links
+  const allowedPages = [
+    location.origin + '/index.html',
+    location.origin + '/nanabnb.html',
+    location.origin + '/hxwfanconcert.html'
+    // Add more allowed referrers if needed
+  ];
+
+  const referrer = document.referrer;
+
+  const isAllowed = allowedPages.some(url => referrer.includes(url));
+
+  if (!isAllowed) {
+    document.body.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; text-align: center; padding: 30px;">
+        <h1 style="font-size: 2em; margin-bottom: 20px;">🚫 Access Denied</h1>
+        <p style="font-size: 1.1em; margin-bottom: 30px;">You can only access this page through the site navigation.</p>
+        <button onclick="window.location.href='index.html'" style="padding: 10px 20px; background: #ff5e5e; color: white; border: none; border-radius: 6px; font-size: 1em; cursor: pointer;">Go to Login</button>
+      </div>
+    `;
+    throw new Error("Blocked direct or unauthorized access.");
+  }
+</script>
+
+<script>// Scroll header on mouse wheel
+    const header = document.getElementById('scrollHeader');
+    header.addEventListener('wheel', (e) => {
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      header.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
+    });
+    </script>
+
+</body>
+</html>
