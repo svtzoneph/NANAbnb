@@ -265,23 +265,6 @@
 
 
 <script>
-  document.querySelectorAll("a.category-link").forEach(link => {
-    const href = link.getAttribute("href");
-    if (
-      href.includes("index.html") ||
-      href.includes("home.html") ||
-      href.includes("nanabnb.html") ||
-      href.includes("hxwfanconcert.html") ||
-      href.includes("seventeenholiday.html") // ✅ NEW PAGE
-    ) {
-      link.addEventListener("click", () => {
-        sessionStorage.setItem("fromHeader", "true");
-      });
-    }
-  });
-</script>
-
-<script>
   if (sessionStorage.getItem("fromHeader") !== "true") {
     document.body.innerHTML = `
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; text-align: center; padding: 30px;">
