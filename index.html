@@ -250,18 +250,11 @@
     });
   </script>
   
- <script>
+<script>
   document.querySelectorAll("a.category-link").forEach(link => {
     const href = link.getAttribute("href");
-
-    const protectedPages = [
-      "index.html",
-      "home.html",
-      "nanabnb.html",
-      "hxwfanconcert.html",
-      "seventeenholiday.html"
-    ];
-
+    const protectedPages = ["home.html", "nanabnb.html", "hxwfanconcert.html", "seventeenholiday.html"];
+    
     if (protectedPages.includes(href)) {
       link.addEventListener("click", function (e) {
         e.preventDefault();
