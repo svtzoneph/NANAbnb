@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Home | YourTube</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+      overflow-x: hidden;
+      font-size: 16px;
+    }
+
+    header {
+      padding: 12px 20px;
+      background: #181818;
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid #2a2a2a;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    header::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-link {
+      padding: 8px 16px;
+      background: #272727;
+      color: white;
+      border-radius: 20px;
+      font-size: 14px;
+      text-decoration: none;
+      flex: 0 0 auto;
+      transition: background 0.3s;
+    }
+
+    .category-link:hover {
+      background: #3c3c3c;
+    }
+
+    .hero-section {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      background: #111;
+    }
+
+    .hero-left, .hero-right {
+      flex: 1 1 50%;
+      min-width: 300px;
+      padding: 40px 30px;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-left h1 {
+      font-size: clamp(24px, 6vw, 38px);
+      margin-bottom: 20px;
+    }
+
+    .hero-left p {
+      font-size: clamp(14px, 4vw, 18px);
+      color: #ccc;
+      margin-bottom: 20px;
+    }
+
+    .hero-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .main-image {
+      width: 100%;
+      height: 400px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .main-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumbnail-row {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+      scroll-behavior: smooth;
+    }
+
+    .thumbnail-row::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .thumbnail-row::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 10px;
+    }
+
+    .thumb-box {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      flex: 0 0 auto;
+      background: #1b1b1b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border 0.3s ease;
+    }
+
+    .thumb-box.active,
+    .thumb-box:hover {
+      border-color: #ffc107;
+    }
+
+    .thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .thumb-box.active .thumb,
+    .thumb-box:hover .thumb {
+      opacity: 1;
+    }
+
+    .container {
+      width: 100%;
+      padding: 0 15px 60px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .accordion {
+      background: #1c1c1c;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .accordion-header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      background: #222;
+    }
+
+    .accordion-header h3 {
+      margin: 0;
+      font-size: clamp(14px, 4vw, 18px);
+      color: #ffcc00;
+    }
+
+    .arrow {
+      transition: transform 0.3s ease;
+      font-size: 16px;
+    }
+
+    .accordion.open .arrow {
+      transform: rotate(90deg);
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: scaleY(0.95);
+      padding: 0 20px;
+      transition: max-height 0.5s ease, opacity 0.4s ease, transform 0.4s ease, padding 0.3s ease;
+      background: #121212;
+    }
+
+    .accordion.open .accordion-content {
+      padding: 16px 20px;
+      max-height: 400px;
+      opacity: 1;
+      transform: scaleY(1);
+    }
+    
+
+   .accordion-content p {
+  margin: 0;
+  line-height: 1.6;
+  font-size: clamp(12px, 2.5vw, 14px);
+  color: #ccc;
+}
+
+    @media (max-width: 768px) {
+  .hero-section {
+    flex-direction: column;
+  }
+
+  .hero-left, .hero-right {
+    padding: 20px 15px;
+  }
+
+  .hero-left h1 {
+    font-size: clamp(20px, 5vw, 28px);
+    margin-bottom: 20px;
+  }
+
+  .hero-left p {
+    font-size: clamp(13px, 4vw, 16px);
+    margin-bottom: 12px;
+  }
+
+  .main-image {
+    height: auto;
+    max-height: 250px;
+  }
+
+  .thumb-box {
+    width: 60px;
+    height: 60px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .container {
+    padding: 0 10px 40px;
+  }
+}
+
+@media (max-width: 420px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .accordion-header h3 {
+    font-size: 12.5px;
+  }
+
+  .hero-left p {
+    font-size: 14px;
+  }
+
+  .thumb-box {
+    width: 50px;
+    height: 50px;
+  }
+}
+    @media (max-width: 420px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .accordion-header h3 {
+        font-size: 13px;
+      }
+    }
+    
+.main-image img {
+  opacity: 1;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.main-image img.fade-out {
+  opacity: 0;
+}
+
+.accordion-content.scrollable {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-right: 10px;
+}
+
+.accordion-content.scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.accordion-content.scrollable::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 10px;
+}
+  </style>
+</head>
+<body>
+
+  <!-- Scrollable Header -->
+  <header id="scrollHeader">
+    <a class="category-link" href="index.html">Home</a>
+    <a class="category-link" href="nanabnb.html">NANA BNB</a>
+    <a class="category-link" href="hxwfanconcert.html">HXW FAN CONCERT</a>
+    <a class="category-link" href="#">SEVENTEEN HOLIDAY</a>
+    <a class="category-link" href="#">2018 JAPAN ARENA TOUR</a>
+    <a class="category-link" href="#">17 JAPAN CONCERT Say the name</a>
+    <a class="category-link" href="#">SOON </a>
+    <a class="category-link" href="#">SOON</a>
+    <a class="category-link" href="#">SOON</a>
+  </header>
+
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-left">
+      <h1>🎬 Welcome to Zone Vault</h1>
+      <p>Watch, Enjoy, and Stay Private!</p>
+      <p>Enjoy exclusive content in a private, full-featured layout. Don’t forget to read the rules — respect and privacy keep this community safe.</p>
+    </div>
+   
+   
+    <div class="hero-right">
+      <div class="main-image">
+        <img id="mainDisplay" src="https://uploads.onecompiler.io/432zqmf3k/43qqmajhe/image01.jpg" alt="Main">
+      </div>
+      <div class="thumbnail-row" id="thumbScroll">
+        <div class="thumb-box active" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43qqmajhe/image01.jpg" class="thumb">
+        </div>
+        <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43qqmajhe/HOSHI%20X%20WOOZI%20FAN%20CONCERT%20'WARNING'%20IN%20SEOUL%20DAY%201-Cover.jpg" class="thumb">
+        </div>
+        <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43qqmajhe/download.webp" class="thumb">
+        </div>
+        <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/43ddry4jt/43qqwfsgp/Screenshot%202025-07-15%20154034.png" class="thumb">
+        </div>
+        <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43qqmajhe/Screenshot%202025-07-15%20153643.png" class="thumb">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accordion Section -->
+  <div class="container">
+    <div class="grid">
+      <div class="accordion">
+        <div class="accordion-header">
+          <h3>Rules</h3>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="accordion-content">
+         <p>
+• Do not share or repost any content or links outside this site.<br>
+• No screenshots, screen recording, or reuploads of any content.<br>
+• Leaking content will lead to a permanent ban without warning.<br>
+• Access is for approved users only — do not share your login info or account.<br>
+</p>
+<p> <strong>Violation of any rule will result in immediate removal and permanent ban.</strong><br></p>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header">
+          <h3>Announcements</h3>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="accordion-content">
+        <p></p>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header">
+          <h3>Notes</h3>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="accordion-content">
+          <p>• This platform is for private viewing.<br>• Sharing links outside may lead to takedown.<br>• Content is time-limited and might expire.</p>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header">
+          <h3>Vault Help</h3>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="accordion-content scrollable">
+          <p><strong>Q: Who can access the content?</strong><br>
+  A: Only paid members or approved joiners can view the exclusive content inside the site.</p>
+
+  <p><strong>Q: Can I share my account with someone else?</strong><br>
+  A: No. Account sharing is strictly prohibited and will result in a permanent ban.</p>
+
+  <p><strong>Q: Is it okay to repost or reupload the videos?</strong><br>
+  A: Absolutely not. All content is private. No screenshots, screen recordings, or reposts are allowed.</p>
+
+  <p><strong>Q: What happens if someone breaks the rules?</strong><br>
+  A: Any violation will lead to immediate removal and a permanent ban, with no warnings.</p>
+
+  <p><strong>Q: Can I request specific SEVENTEEN content?</strong><br>
+  A: You may send a request, but approval depends on the admin and content availability.</p>
+  
+  <p><strong>Q: Where can I get the access code?</strong><br>
+  A: The access code is shared by the admin through email, DM, or after payment confirmation.
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Accordion toggle
+    document.querySelectorAll('.accordion-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const acc = header.parentElement;
+        const open = acc.classList.contains('open');
+        document.querySelectorAll('.accordion').forEach(a => a.classList.remove('open'));
+        if (!open) acc.classList.add('open');
+      });
+    });
+
+    // Thumbnail switching
+    const thumbnailBoxes = document.querySelectorAll('.thumb-box');
+    const mainImage = document.getElementById('mainDisplay');
+    let current = 0;
+
+  function switchImage(box) {
+  const img = box.querySelector('img');
+  
+  mainImage.classList.add('fade-out');
+
+  setTimeout(() => {
+    mainImage.src = img.src;
+    mainImage.classList.remove('fade-out');
+  }, 500); // Adjust timing to match CSS transition
+
+  thumbnailBoxes.forEach(b => b.classList.remove('active'));
+  box.classList.add('active');
+  current = Array.from(thumbnailBoxes).indexOf(box);
+}
+    setInterval(() => {
+      current = (current + 1) % thumbnailBoxes.length;
+      switchImage(thumbnailBoxes[current]);
+    }, 5000);
+
+    // Scroll header on mouse wheel
+    const header = document.getElementById('scrollHeader');
+    header.addEventListener('wheel', (e) => {
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      header.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
+    });
+  </script>
+
+</body>
+</html>
