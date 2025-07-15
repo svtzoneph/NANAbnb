@@ -281,18 +281,23 @@
 </script>
 
 <script>
-  const allowedReferrers = [
-    location.origin + '/index.html',
-    location.origin + '/home.html',
-    location.origin + '/nanabnb.html',
-    location.origin + '/hxwfanconcert.html',
-    location.origin + '/svtholiday.html'
+  const allowedPaths = [
+    '/index.html',
+    '/home.html',
+    '/nanabnb.html',
+    '/hxwfanconcert.html',
+    '/svtholiday.html'
   ];
 
-  const cameFromAllowedPage = allowedReferrers.some(ref => document.referrer.includes(ref));
+  const referrer = document.referrer;
+  const refPath = new URL(referrer, location.origin).pathname;
 
-  if (!cameFromAllowedPage) {
-    // Show a custom Access Denied message overlay
+  console.log('Referrer:', referrer);
+  console.log('Path:', refPath);
+
+  const allowed = allowedPaths.includes(refPath);
+
+  if (!allowed) {
     const modal = document.createElement('div');
     modal.id = 'accessDeniedModal';
     modal.innerHTML = `
@@ -300,7 +305,7 @@
         <strong>🚫 Access Denied</strong><br><br>
         You cannot access this page directly.<br>
         Please go through the homepage or allowed pages.<br><br>
-        Redirecting to homepage...
+        Redirecting to login page...
       </div>
     `;
     document.body.appendChild(modal);
