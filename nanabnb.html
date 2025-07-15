@@ -1052,20 +1052,26 @@ h1 .lock-icon {
     '/svtholiday.html'
   ];
 
-  const referrer = document.referrer;
   const currentPage = window.location.pathname;
+
+  // 1. Check if user already has internalAccess flag
+  const hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+
+  // 2. Check if user came from one of the allowed pages
+  const referrer = document.referrer;
   const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
 
-  console.log('Current Page:', currentPage);
-  console.log('Referrer Path:', refPath);
+  // 3. If came from allowed page, give internalAccess
+  if (cameFromAllowedPage) {
+    sessionStorage.setItem('internalAccess', 'true');
+  }
 
-  const isFromAllowedPage = refPath && allowedPaths.includes(refPath);
-  const isDirectAccessToIndex = currentPage === '/index.html' && !refPath;
-
-  // Allow if:
-  // 1. Referrer is from allowed paths
-  // 2. It's the index page and accessed directly
-  if (!isFromAllowedPage && !isDirectAccessToIndex) {
+  // 4. Allow access if:
+  // - already has internalAccess OR
+  // - current page is index.html (entry point)
+  const isIndexPage = currentPage === '/index.html';
+  if (!hasInternalAccess && !isIndexPage) {
     const modal = document.createElement('div');
     modal.id = 'accessDeniedModal';
     modal.style = `
@@ -1096,6 +1102,7 @@ h1 .lock-icon {
     }, 3000);
   }
 </script>
+
 
 <script>// Scroll header on mouse wheel
     const header = document.getElementById('scrollHeader');
