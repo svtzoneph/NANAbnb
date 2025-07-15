@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>NANA bnb</title>
+  <title>Zone Vault</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
@@ -73,7 +73,7 @@
 <body>
   <div class="container">
     <div id="auth-section">
-      <h2>NANA bnb with SEVENTEEN</h2>
+      <h2>Zone Vault</h2>
       <input type="email" id="email" placeholder="Email" required />
       <input type="password" id="password" placeholder="Password" required />
       <button onclick="login()">🔐 Login</button>
@@ -99,7 +99,7 @@
     </div>
 
     <div id="approved" class="hidden">
-      <h3>✅ Approved! Redirecting to Video</h3>
+      <h3>✅ Approved! Redirecting to Home</h3>
     </div>
   </div>
 
@@ -212,7 +212,7 @@
             // ✅ Session marker + redirect to stream
             sessionStorage.setItem("fromIndex", "true");
             setTimeout(() => {
-              window.location.href = "nanabnb.html";
+              window.location.href = "home.html";
             }, 1500);
           } else if (data.status === "pending") {
             show("waiting");
