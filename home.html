@@ -316,7 +316,7 @@
 
   <!-- Scrollable Header -->
   <header id="scrollHeader">
-    <a class="category-link" href="index.html">Home</a>
+    <a class="category-link" href="home.html">Home</a>
     <a class="category-link" href="nanabnb.html">NANA BNB</a>
     <a class="category-link" href="hxwfanconcert.html">HXW FAN CONCERT</a>
     <a class="category-link" href="#">SEVENTEEN HOLIDAY</a>
@@ -472,6 +472,37 @@
       header.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
     });
   </script>
+
+<script>
+  document.querySelectorAll("a.category-link").forEach(link => {
+    const href = link.getAttribute("href");
+    if (
+      href.includes("home.html") ||
+      href.includes("nanabnb.html") ||
+      href.includes("hxwfanconcert.html") ||
+      href.includes("seventeenholiday.html") // ✅ NEW PAGE
+    ) {
+      link.addEventListener("click", () => {
+        sessionStorage.setItem("fromHeader", "true");
+      });
+    }
+  });
+</script>
+
+<script>
+  if (sessionStorage.getItem("fromHeader") !== "true") {
+    document.body.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; text-align: center; padding: 30px;">
+        <h1 style="font-size: 2em; margin-bottom: 20px;">🚫 Access Denied</h1>
+        <p style="font-size: 1.1em; margin-bottom: 30px;">You can only access this page through the site navigation.</p>
+        <button onclick="window.location.href='index.html'" style="padding: 10px 20px; background: #ff5e5e; color: white; border: none; border-radius: 6px; font-size: 1em; cursor: pointer;">Go to Home</button>
+      </div>
+    `;
+    throw new Error("Blocked direct or unauthorized access.");
+  } else {
+    sessionStorage.removeItem("fromHeader");
+  }
+</script>
 
 </body>
 </html>
