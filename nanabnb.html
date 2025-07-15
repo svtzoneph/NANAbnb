@@ -16,8 +16,45 @@
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 20px;
+  padding-top: 65px; /* space for the fixed header */
 }
 
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 12px 20px;
+  background: #181818;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+  border-bottom: 1px solid #2a2a2a;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+header::-webkit-scrollbar {
+  display: none;
+}
+
+    .category-link {
+      padding: 8px 16px;
+      background: #272727;
+      color: white;
+      border-radius: 20px;
+      font-size: 14px;
+      text-decoration: none;
+      flex: 0 0 auto;
+      transition: background 0.3s;
+    }
+
+    .category-link:hover {
+      background: #3c3c3c;
+    }
+    
 h1 {
   text-align: center;
   font-weight: bold;
@@ -193,8 +230,8 @@ h1 .lock-icon {
       /* Hamburger button */
 #hamburger {
   position: fixed; /* <--- key change */
-  top: 10px;
-  left: 10px;
+  top: 70px;
+  left: 15px;
   width: 30px;
   height: 25px;
   cursor: pointer;
@@ -202,6 +239,7 @@ h1 .lock-icon {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  
 }
   #hamburger div {
     background: white;
@@ -226,6 +264,7 @@ h1 .lock-icon {
   transition: transform 0.3s ease;
   z-index: 1050;
   overflow-y: auto; /* <-- added for scroll */
+    padding-top: 65px; /* space for the fixed header */
 }
 
   /* Move heading down */
@@ -293,6 +332,7 @@ h1 .lock-icon {
     max-width: 300px;   /* max width for small phones */
     padding: 15px;
     font-size: 16px;    /* slightly bigger for tap targets */
+      padding-top: 60px; /* space for the fixed header */
   }
 
   #sidebar h2 {
@@ -313,8 +353,8 @@ h1 .lock-icon {
   #hamburger {
     width: 30px;
     height: 25px;
-    top: 20px;
-    left: 20px;
+    top: 70px;
+    left: 25px;
   }
 
   #hamburger div {
@@ -391,10 +431,27 @@ h1 .lock-icon {
         width: 200px;
         padding-top: 60px;
       }
+      
+      @media (max-width: 768px) {
+  body {
+    padding: 70px 10px 20px; /* Top padding for fixed header, smaller side padding */
+  }
   </style>
 </head>
 <body>
 
+  <!-- Scrollable Header -->
+  <header id="scrollHeader">
+    <a class="category-link" href="index.html">Home</a>
+    <a class="category-link" href="nanabnb.html">NANA BNB</a>
+    <a class="category-link" href="hxwfanconcert.html">HXW FAN CONCERT</a>
+    <a class="category-link" href="#">SEVENTEEN HOLIDAY</a>
+    <a class="category-link" href="#">2018 JAPAN ARENA TOUR</a>
+    <a class="category-link" href="#">17 JAPAN CONCERT Say the name</a>
+    <a class="category-link" href="#">SOON </a>
+    <a class="category-link" href="#">SOON</a>
+    <a class="category-link" href="#">SOON</a>
+  </header>
 
 <!-- Hamburger icon -->
 <div id="hamburger" aria-label="Toggle sidebar" role="button" tabindex="0">
@@ -403,7 +460,7 @@ h1 .lock-icon {
   <div></div>
 </div>
 
-<h1>🔒 NANA bnb with SEVENTEEN Vault</h1>
+<h1> NANA bnb with SEVENTEEN</h1>
 
 <div style="height: 2px; background: linear-gradient(to right, #ccc, #eee, #ccc); margin: 20px 0;"></div>
  <h1>EPISODE 1</h1>
@@ -910,6 +967,7 @@ h1 .lock-icon {
 </div>
 </div>
 
+
    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
   <script src="https://unpkg.com/videojs-http-source-selector/dist/videojs-http-source-selector.min.js"></script>
   
@@ -971,10 +1029,10 @@ h1 .lock-icon {
     }
   };
 </script>
-  
-  <script>
+
+<script>
   // Allow access only if referred from index.html
-  const allowedReferrer = location.origin + '/index.html';
+  const allowedReferrer = location.origin + '/https://onecompiler.com/html/43qqmajhe';
   const currentReferrer = document.referrer;
 
   if (!currentReferrer || !currentReferrer.includes(allowedReferrer)) {
@@ -982,12 +1040,22 @@ h1 .lock-icon {
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; text-align: center; padding: 30px;">
         <h1 style="font-size: 2em; margin-bottom: 20px;">🚫 Access Denied</h1>
         <p style="font-size: 1.1em; margin-bottom: 30px;">You must be logged in to access this content..</p>
-        <button onclick="window.location.href='index.html'" style="padding: 10px 20px; background: #ff5e5e; color: white; border: none; border-radius: 6px; font-size: 1em; cursor: pointer;">Go to Login</button>
+        <button onclick="window.location.href='https://onecompiler.com/html/43qqmajhe'" style="padding: 10px 20px; background: #ff5e5e; color: white; border: none; border-radius: 6px; font-size: 1em; cursor: pointer;">Go to Login</button>
       </div>
     `;
     throw new Error("Blocked direct or unauthorized access.");
   }
 </script>
+
+<script>// Scroll header on mouse wheel
+    const header = document.getElementById('scrollHeader');
+    header.addEventListener('wheel', (e) => {
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      header.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
+    });
+    </script>
+    
   
 </body>
 </html> 
