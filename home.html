@@ -316,7 +316,8 @@
 
   <!-- Scrollable Header -->
   <header id="scrollHeader">
-    <a class="category-link" href="index.html">Home</a>
+    <a class="category-link" href="index.html">Login</a>
+    <a class="category-link" href="Home.html">Home</a>
     <a class="category-link" href="nanabnb.html">NANA BNB</a>
     <a class="category-link" href="hxwfanconcert.html">HXW FAN CONCERT</a>
     <a class="category-link" href="#">SEVENTEEN HOLIDAY</a>
@@ -472,8 +473,8 @@
       header.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
     });
   </script>
-
-<script>
+  
+  <script>
   // Only allow access if user came from one of the header links
   const allowedPages = [
     location.origin + '/index.html',
@@ -491,7 +492,7 @@
     document.body.innerHTML = `
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; text-align: center; padding: 30px;">
         <h1 style="font-size: 2em; margin-bottom: 20px;">🚫 Access Denied</h1>
-        <p style="font-size: 1.1em; margin-bottom: 30px;">You can only access this page through the site navigation.</p>
+        <p style="font-size: 1.1em; margin-bottom: 30px;">You can only access this page after you login and approved by the admin.</p>
         <button onclick="window.location.href='index.html'" style="padding: 10px 20px; background: #ff5e5e; color: white; border: none; border-radius: 6px; font-size: 1em; cursor: pointer;">Go to Login</button>
       </div>
     `;
@@ -499,15 +500,6 @@
   }
 </script>
 
-
-<script>// Scroll header on mouse wheel
-    const header = document.getElementById('scrollHeader');
-    header.addEventListener('wheel', (e) => {
-      if (e.deltaY === 0) return;
-      e.preventDefault();
-      header.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
-    });
-    </script>
 
 </body>
 </html>
