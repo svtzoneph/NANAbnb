@@ -249,5 +249,23 @@
       }
     });
   </script>
+
+<script>
+  document.querySelectorAll("a.category-link").forEach(link => {
+    const href = link.getAttribute("href");
+    if (
+      href.includes("index.html") ||
+      href.includes("home.html") ||
+      href.includes("nanabnb.html") ||
+      href.includes("hxwfanconcert.html") ||
+      href.includes("seventeenholiday.html") // ✅ NEW PAGE
+    ) {
+      link.addEventListener("click", () => {
+        sessionStorage.setItem("fromHeader", "true");
+      });
+    }
+  });
+</script>
+
 </body>
 </html>
