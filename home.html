@@ -491,7 +491,14 @@
   }
 </script>
 
-
+<script>// Scroll header on mouse wheel
+    const header = document.getElementById('scrollHeader');
+    header.addEventListener('wheel', (e) => {
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      header.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
+    });
+    </script>
 
 </body>
 </html>
