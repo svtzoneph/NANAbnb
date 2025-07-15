@@ -254,18 +254,21 @@
   document.querySelectorAll("a.category-link").forEach(link => {
     const href = link.getAttribute("href");
 
-    if (
-      href.includes("home.html") ||
-      href.includes("nanabnb.html") ||
-      href.includes("hxwfanconcert.html") ||
-      href.includes("seventeenholiday.html")
-    ) {
+    // Ilagay dito lahat ng gusto mong i-protect na pages
+    const protectedPages = [
+      "home.html",
+      "nanabnb.html",
+      "hxwfanconcert.html",
+      "seventeenholiday.html"
+    ];
+
+    if (protectedPages.includes(href)) {
       link.addEventListener("click", function (e) {
-        e.preventDefault(); // stop immediate navigation
+        e.preventDefault(); // block default link behavior
         sessionStorage.setItem("fromHeader", "true");
         setTimeout(() => {
-          window.location.href = href; // go to the page after setting session
-        }, 50);
+          window.location.href = href;
+        }, 50); // slight delay para sure na masave yung flag
       });
     }
   });
