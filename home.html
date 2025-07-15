@@ -2,295 +2,477 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Zone Vault</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js"></script>
-    <link rel="icon" type="image/jpg" href="favicon.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Home | Zone Vault</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1c1c1c, #3e3e3e);
-      color: white;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-    .container {
-      background: #222;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      width: 90%;
-      max-width: 420px;
-    }
-    h2, h3 {
-      text-align: center;
-      margin: 10px 0;
-    }
-    input, button {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 5px;
+    * {
       box-sizing: border-box;
     }
-    input {
-      background: #333;
-      color: white;
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+      overflow-x: hidden;
+      font-size: 16px;
     }
-    input::placeholder {
-      color: #aaa;
+
+    header {
+      padding: 12px 20px;
+      background: #181818;
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid #2a2a2a;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
-    button {
-      background-color: #1db954;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background-color: #17a246;
-    }
-    .google-btn {
-      background-color: #db4437;
-    }
-    .google-btn:hover {
-      background-color: #c53727;
-    }
-    .hidden {
+
+    header::-webkit-scrollbar {
       display: none;
     }
+
+    .category-link {
+      padding: 8px 16px;
+      background: #272727;
+      color: white;
+      border-radius: 20px;
+      font-size: 14px;
+      text-decoration: none;
+      flex: 0 0 auto;
+      transition: background 0.3s;
+    }
+
+    .category-link:hover {
+      background: #3c3c3c;
+    }
+
+    .hero-section {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      background: #111;
+    }
+
+    .hero-left, .hero-right {
+      flex: 1 1 50%;
+      min-width: 300px;
+      padding: 40px 30px;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-left h1 {
+      font-size: clamp(40px, 9vw, 34px);
+      margin-bottom: 50px;
+      align-items: center;
+    }
+
+    .hero-left p {
+      font-size: clamp(14px, 6vw, 18px);
+      color: #ccc;
+      margin-bottom: 100px;
+    }
+
+    .hero-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .main-image {
+      width: 100%;
+      height: 400px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .main-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumbnail-row {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+      scroll-behavior: smooth;
+    }
+
+    .thumbnail-row::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .thumbnail-row::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 10px;
+    }
+
+    .thumb-box {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      flex: 0 0 auto;
+      background: #1b1b1b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border 0.3s ease;
+    }
+
+    .thumb-box.active,
+    .thumb-box:hover {
+      border-color: #ffc107;
+    }
+
+    .thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .thumb-box.active .thumb,
+    .thumb-box:hover .thumb {
+      opacity: 1;
+    }
+
+    .container {
+      width: 100%;
+      padding: 0 15px 60px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .accordion {
+      background: #1c1c1c;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .accordion-header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      background: #222;
+    }
+
+    .accordion-header h3 {
+      margin: 0;
+      font-size: clamp(14px, 4vw, 18px);
+      color: #ffcc00;
+    }
+
+    .arrow {
+      transition: transform 0.3s ease;
+      font-size: 16px;
+    }
+
+    .accordion.open .arrow {
+      transform: rotate(90deg);
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: scaleY(0.95);
+      padding: 0 20px;
+      transition: max-height 0.5s ease, opacity 0.4s ease, transform 0.4s ease, padding 0.3s ease;
+      background: #121212;
+    }
+
+    .accordion.open .accordion-content {
+      padding: 16px 20px;
+      max-height: 400px;
+      opacity: 1;
+      transform: scaleY(1);
+    }
+    
+
+   .accordion-content p {
+  margin: 0;
+  line-height: 1.6;
+  font-size: clamp(12px, 2.5vw, 14px);
+  color: #ccc;
+}
+
+    @media (max-width: 768px) {
+  .hero-section {
+    flex-direction: column;
+  }
+
+  .hero-left, .hero-right {
+    padding: 20px 15px;
+  }
+
+  .hero-left h1 {
+    font-size: clamp(20px, 5vw, 28px);
+    margin-bottom: 20px;
+  }
+
+  .hero-left p {
+    font-size: clamp(13px, 4vw, 16px);
+    margin-bottom: 12px;
+  }
+
+  .main-image {
+    height: auto;
+    max-height: 250px;
+  }
+
+  .thumb-box {
+    width: 60px;
+    height: 60px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .container {
+    padding: 0 10px 40px;
+  }
+}
+
+@media (max-width: 420px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .accordion-header h3 {
+    font-size: 12.5px;
+  }
+
+  .hero-left p {
+    font-size: 14px;
+  }
+
+  .thumb-box {
+    width: 50px;
+    height: 50px;
+  }
+}
+    @media (max-width: 420px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .accordion-header h3 {
+        font-size: 13px;
+      }
+    }
+    
+.main-image img {
+  opacity: 1;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.main-image img.fade-out {
+  opacity: 0;
+}
+
+.accordion-content.scrollable {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-right: 10px;
+}
+
+.accordion-content.scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.accordion-content.scrollable::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 10px;
+}
   </style>
 </head>
 <body>
-  <div class="container">
-    <div id="auth-section">
-      <h2>Zone Vault</h2>
-      <input type="email" id="email" placeholder="Email" required />
-      <input type="password" id="password" placeholder="Password" required />
-      <button onclick="login()">🔐 Login</button>
-      <button onclick="register()">📝 Register</button>
-    </div>
 
-    <div id="verify-section" class="hidden">
-      <h3>📧 Please verify your email.</h3>
-      <p>We sent a verification link in your email.</p>
-      <button onclick="reloadAndCheck()">🔄 Reload & Check</button>
-    </div>
+  <!-- Scrollable Header -->
+  <header id="scrollHeader">
+    <a class="category-link" href="index.html">Home</a>
+    <a class="category-link" href="nanabnb.html">NANA BNB</a>
+    <a class="category-link" href="hxwfanconcert.html">HXW FAN CONCERT</a>
+    <a class="category-link" href="#">SEVENTEEN HOLIDAY</a>
+    <a class="category-link" href="#">2018 JAPAN ARENA TOUR</a>
+    <a class="category-link" href="#">17 JAPAN CONCERT Say the name</a>
+    <a class="category-link" href="#">SOON </a>
+    <a class="category-link" href="#">SOON</a>
+    <a class="category-link" href="#">SOON</a>
+  </header>
 
-    <div id="form-section" class="hidden">
-      <h2>Request Access</h2>
-      <input type="text" id="name" placeholder="Telegram Username" required />
-      <input type="text" id="reason" placeholder="CODE" required />
-      <button onclick="submitRequest()">📩 Submit Request</button>
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-left">
+      <h1>Welcome to Zone Vault</h1>
+      <p>Watch, Enjoy, and Stay Private! Enjoy exclusive content in a private, full-featured layout. Don’t forget to read the rules.</p>
     </div>
-
-    <div id="waiting" class="hidden">
-      <h3>⏳ Waiting for admin approval...</h3>
-      <p>This page will redirect once approved.</p>
-    </div>
-
-    <div id="approved" class="hidden">
-      <h3>✅ Approved! Redirecting to Home</h3>
+   
+   
+    <div class="hero-right">
+      <div class="main-image">
+        <img id="mainDisplay" src="https://uploads.onecompiler.io/432zqmf3k/43qqmajhe/image01.jpg" alt="Main">
+      </div>
+      <div class="thumbnail-row" id="thumbScroll">
+        <div class="thumb-box active" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43qqmajhe/image01.jpg" class="thumb">
+        </div>
+        <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43qqmajhe/HOSHI%20X%20WOOZI%20FAN%20CONCERT%20'WARNING'%20IN%20SEOUL%20DAY%201-Cover.jpg" class="thumb">
+        </div>
+        <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43qqmajhe/download.webp" class="thumb">
+        </div>
+        <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/43ddry4jt/43qqwfsgp/Screenshot%202025-07-15%20154034.png" class="thumb">
+        </div>
+        <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43qqmajhe/Screenshot%202025-07-15%20153643.png" class="thumb">
+        </div>
+      </div>
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      createUserWithEmailAndPassword,
-      onAuthStateChanged,
-      sendEmailVerification,
-      signInWithPopup,
-      GoogleAuthProvider,
-      reload,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
-    import {
-      getDatabase,
-      ref,
-      set,
-      onValue
-    } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-      authDomain: "tvnstream-b4497.firebaseapp.com",
-      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-      projectId: "tvnstream-b4497",
-      storageBucket: "tvnstream-b4497.appspot.com",
-      messagingSenderId: "308384754214",
-      appId: "1:308384754214:web:2938e76cd29b288f75d4e7"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const provider = new GoogleAuthProvider();
-
-    let currentUid = null;
-
-    function show(id) {
-      document.querySelectorAll(".container > div").forEach(div => div.classList.add("hidden"));
-      document.getElementById(id).classList.remove("hidden");
-    }
-
-    window.login = function () {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      signInWithEmailAndPassword(auth, email, password)
-        .catch(e => alert("Login error: " + e.message));
-    };
-
-    window.register = function () {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      if (!email || !password) {
-        alert("Please enter email and password to register.");
-        return;
-      }
-
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCred) => {
-          sendEmailVerification(userCred.user).then(() => {
-            alert("✅ Verification email sent.");
-            show("verify-section");
-          });
-        })
-        .catch(e => alert("Registration error: " + e.message));
-    };
-
-    window.googleLogin = function () {
-      signInWithPopup(auth, provider)
-        .then(() => {
-          alert("✅ Google login successful!");
-        })
-        .catch((error) => {
-          alert("Google login error: " + error.message);
-        });
-    };
-
-    window.reloadAndCheck = function () {
-      const user = auth.currentUser;
-      if (user) {
-        reload(user).then(() => {
-          if (user.emailVerified) {
-            checkJoinRequest(user);
-          } else {
-            alert("❌ Email not verified yet.");
-          }
-        });
-      }
-    };
-
-    function checkJoinRequest(user) {
-      currentUid = user.uid;
-      const isGoogle = user.providerData.some(p => p.providerId === "google.com");
-
-      if (!user.emailVerified && !isGoogle) {
-        show("verify-section");
-        return;
-      }
-
-      const reqRef = ref(db, 'joinRequests/' + currentUid);
-      onValue(reqRef, snapshot => {
-        const data = snapshot.val();
-        if (data) {
-          if (data.status === "approved") {
-            show("approved");
-            // ✅ Session marker + redirect to stream
-            sessionStorage.setItem("fromIndex", "true");
-            setTimeout(() => {
-              window.location.href = "home.html";
-            }, 1500);
-          } else if (data.status === "pending") {
-            show("waiting");
-          } else if (data.status === "denied") {
-            alert("❌ Your request was denied.");
-            signOut(auth).then(() => show("auth-section"));
-          }
-        } else {
-          show("form-section");
-        }
-      });
-    }
-
-    window.submitRequest = function () {
-      const name = document.getElementById("name").value;
-      const reason = document.getElementById("reason").value;
-      if (!name || !reason) return alert("Please fill out all fields.");
-
-      const reqRef = ref(db, 'joinRequests/' + currentUid);
-      set(reqRef, {
-        name,
-        reason,
-        status: "pending"
-      }).then(() => show("waiting"));
-    };
-
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        reload(user).then(() => {
-          checkJoinRequest(user);
-        });
-      } else {
-        show("auth-section");
-      }
-    });
-  </script>
-  
-<script>
-  document.querySelectorAll("a.category-link").forEach(link => {
-    const href = link.getAttribute("href");
-    const protectedPages = ["home.html", "nanabnb.html", "hxwfanconcert.html", "seventeenholiday.html"];
-    
-    if (protectedPages.includes(href)) {
-      link.addEventListener("click", function (e) {
-        e.preventDefault();
-        sessionStorage.setItem("fromHeader", "true");
-        setTimeout(() => {
-          window.location.href = href;
-        }, 50);
-      });
-    }
-  });
-</script>
-
-<script>
-  if (sessionStorage.getItem("fromHeader") !== "true") {
-    document.body.innerHTML = `
-      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: white; text-align: center; padding: 30px;">
-        <h1 style="font-size: 2em; margin-bottom: 20px;">🚫 Access Denied</h1>
-        <p style="font-size: 1.1em; margin-bottom: 30px;">You can only access this page through the site navigation.</p>
-        <button onclick="window.location.href='index.html'" style="padding: 10px 20px; background: #ff5e5e; color: white; border: none; border-radius: 6px; font-size: 1em; cursor: pointer;">Go to Home</button>
+  <!-- Accordion Section -->
+  <div class="container">
+    <div class="grid">
+      <div class="accordion">
+        <div class="accordion-header">
+          <h3>Rules</h3>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="accordion-content">
+         <p>
+• Do not share or repost any content or links outside this site.<br>
+• No screenshots, screen recording, or reuploads of any content.<br>
+• Leaking content will lead to a permanent ban without warning.<br>
+• Access is for approved users only — do not share your login info or account.<br>
+</p>
+<p> <strong>Violation of any rule will result in immediate removal and permanent ban.</strong><br></p>
+        </div>
       </div>
-    `;
-    throw new Error("Blocked direct or unauthorized access.");
-  } else {
-    sessionStorage.removeItem("fromHeader");
-  }
-</script>
+      <div class="accordion">
+        <div class="accordion-header">
+          <h3>Announcements</h3>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="accordion-content">
+        <p></p>
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header">
+          <h3>Notes</h3>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="accordion-content">
+         <p>
+• This platform is for private viewing only.<br>
+• Sharing links outside may lead to takedown or bans.<br>
+• All content is <strong>lifetime access</strong> — this means you can watch the content anytime, forever, with no expiration, as long as your account and this website stays active.
+</p>
 
-<script>// Scroll header on mouse wheel
+        </div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-header">
+          <h3>Vault Help</h3>
+          <span class="arrow">▶</span>
+        </div>
+        <div class="accordion-content scrollable">
+          <p><strong>Q: Who can access the content?</strong><br>
+  A: Only paid members or approved joiners can view the exclusive content inside the site.</p>
+
+  <p><strong>Q: Can I share my account with someone else?</strong><br>
+  A: No. Account sharing is strictly prohibited and will result in a permanent ban.</p>
+
+  <p><strong>Q: Is it okay to repost or reupload the videos?</strong><br>
+  A: Absolutely not. All content is private. No screenshots, screen recordings, or reposts are allowed.</p>
+
+  <p><strong>Q: What happens if someone breaks the rules?</strong><br>
+  A: Any violation will lead to immediate removal and a permanent ban, with no warnings.</p>
+
+  <p><strong>Q: Can I request specific SEVENTEEN content?</strong><br>
+  A: You may send a request, but approval depends on the admin and content availability.</p>
+  
+  <p><strong>Q: Where can I get the access code?</strong><br>
+  A: The access code is shared by the admin through email, DM, or after payment confirmation.
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Accordion toggle
+    document.querySelectorAll('.accordion-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const acc = header.parentElement;
+        const open = acc.classList.contains('open');
+        document.querySelectorAll('.accordion').forEach(a => a.classList.remove('open'));
+        if (!open) acc.classList.add('open');
+      });
+    });
+
+    // Thumbnail switching
+    const thumbnailBoxes = document.querySelectorAll('.thumb-box');
+    const mainImage = document.getElementById('mainDisplay');
+    let current = 0;
+
+  function switchImage(box) {
+  const img = box.querySelector('img');
+  
+  mainImage.classList.add('fade-out');
+
+  setTimeout(() => {
+    mainImage.src = img.src;
+    mainImage.classList.remove('fade-out');
+  }, 500); // Adjust timing to match CSS transition
+
+  thumbnailBoxes.forEach(b => b.classList.remove('active'));
+  box.classList.add('active');
+  current = Array.from(thumbnailBoxes).indexOf(box);
+}
+    setInterval(() => {
+      current = (current + 1) % thumbnailBoxes.length;
+      switchImage(thumbnailBoxes[current]);
+    }, 5000);
+
+    // Scroll header on mouse wheel
     const header = document.getElementById('scrollHeader');
     header.addEventListener('wheel', (e) => {
       if (e.deltaY === 0) return;
       e.preventDefault();
       header.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
     });
-    </script>
-    
-  
+  </script>
+
+
 </body>
 </html>
