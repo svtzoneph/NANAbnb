@@ -236,20 +236,21 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  function verifyCode() {
-    const input = document.getElementById("codeInput").value.trim();
-    const errorMsg = document.getElementById("errorMsg");
+function verifyCode() {
+  const input = document.getElementById("codeInput").value.trim();
+  const errorMsg = document.getElementById("errorMsg");
 
-    db.ref("svtholiday/code").once("value").then(snapshot => {
-      const correctCode = snapshot.val();
-      if (input === correctCode) {
-        localStorage.setItem("verified", "true");
-        showVideoPage();
-      } else {
-        errorMsg.style.display = "block";
-      }
-    });
-  }
+  db.ref("svtholiday/code").once("value").then(snapshot => {
+    const correctCode = snapshot.val();
+    if (input === correctCode) {
+      localStorage.setItem("access_svtholiday", "true");
+      showVideoPage();
+    } else {
+      errorMsg.style.display = "block";
+    }
+  });
+}
+
 
   function showVideoPage() {
     document.getElementById("codePrompt").style.display = "none";
