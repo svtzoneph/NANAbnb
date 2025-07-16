@@ -184,40 +184,35 @@
         .catch(e => alert("Registration error: " + e.message));
     };
 
-    window.googleLogin = async function () {
-      try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        currentUid = user.uid;
+   window.googleLogin = async function () {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    currentUid = user.uid;
 
-        const reqRef = ref(db, 'joinRequests/' + currentUid);
-        const snapshot = await get(reqRef);
+    const reqRef = ref(db, 'joinRequests/' + currentUid);
+    const snapshot = await get(reqRef);
 
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          if (data.status === "approved") {
-            sessionStorage.setItem("fromIndex", "true");
-            show("approved");
-            setTimeout(() => window.location.href = "home.html", 1500);
-          } else {
-            alert("Your request status is: " + data.status);
-          }
-        } else {
-          // Auto-create approved request
-          await set(reqRef, {
-            name: user.displayName || "Google User",
-            email: user.email,
-            reason: "Auto-approved",
-            status: "approved"
-          });
-          sessionStorage.setItem("fromIndex", "true");
-          show("approved");
-          setTimeout(() => window.location.href = "home.html", 1500);
-        }
-      } catch (error) {
-        alert("Google login error: " + error.message);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      if (data.status === "approved") {
+        sessionStorage.setItem("fromIndex", "true");
+        show("approved");
+        setTimeout(() => window.location.href = "home.html", 1500);
+      } else if (data.status === "pending") {
+        show("waiting");
+      } else if (data.status === "denied") {
+        alert("❌ Your request was denied.");
+        signOut(auth).then(() => show("auth-section"));
       }
-    };
+    } else {
+      // Don't auto-approve. Show form instead.
+      show("form-section");
+    }
+  } catch (error) {
+    alert("Google login error: " + error.message);
+  }
+};
 
     window.reloadAndCheck = function () {
       const user = auth.currentUser;
