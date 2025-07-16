@@ -184,6 +184,7 @@
         })
         .catch(e => alert("Registration error: " + e.message));
     };
+
 window.googleLogin = function () {
   signInWithPopup(auth, provider)
     .then((result) => {
@@ -192,36 +193,38 @@ window.googleLogin = function () {
 
       const reqRef = ref(db, 'joinRequests/' + currentUid);
 
-      // Automatically approve Google users
-      set(reqRef, {
-        name: user.displayName || "Google User",
-        reason: "Auto-approved via Google",
-        status: "approved"
-      }).then(() => {
-        show("approved");
-        sessionStorage.setItem("fromIndex", "true");
-        setTimeout(() => {
-          window.location.href = "home.html";
-        }, 1500);
-      });
+      // Check if the joinRequest already exists
+      onValue(reqRef, (snapshot) => {
+        const data = snapshot.val();
+
+        // ✅ If already approved, redirect
+        if (data && data.status === "approved") {
+          show("approved");
+          sessionStorage.setItem("fromIndex", "true");
+          setTimeout(() => {
+            window.location.href = "home.html";
+          }, 1500);
+        } else {
+          // 🟡 If not approved yet, auto-save the data
+          set(reqRef, {
+            name: user.displayName || "Google User",
+            email: user.email,
+            reason: "Auto-approved via Google",
+            status: "approved"
+          }).then(() => {
+            show("approved");
+            sessionStorage.setItem("fromIndex", "true");
+            setTimeout(() => {
+              window.location.href = "home.html";
+            }, 1500);
+          });
+        }
+      }, { onlyOnce: true });
     })
     .catch((error) => {
       alert("Google login error: " + error.message);
     });
 };
-
-    window.reloadAndCheck = function () {
-      const user = auth.currentUser;
-      if (user) {
-        reload(user).then(() => {
-          if (user.emailVerified) {
-            checkJoinRequest(user);
-          } else {
-            alert("❌ Email not verified yet.");
-          }
-        });
-      }
-    };
 
     function checkJoinRequest(user) {
       currentUid = user.uid;
