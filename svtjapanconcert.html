@@ -177,7 +177,7 @@ header::-webkit-scrollbar {
     const input = document.getElementById("codeInput").value.trim();
     const errorMsg = document.getElementById("errorMsg");
 
-    db.ref("seventeencon2/code").once("value").then(snapshot => {
+    db.ref("svtcon2/code").once("value").then(snapshot => {
       const correctCode = snapshot.val();
       if (input === correctCode) {
         localStorage.setItem("verified_mcd", "true");
