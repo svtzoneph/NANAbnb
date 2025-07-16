@@ -210,19 +210,19 @@
   const db = firebase.database();
 
   function verifyCode() {
-    const input = document.getElementById("codeInput").value.trim();
-    const errorMsg = document.getElementById("errorMsg");
+  const input = document.getElementById("codeInput").value.trim();
+  const errorMsg = document.getElementById("errorMsg");
 
-    db.ref("Access/code").once("value").then(snapshot => {
-      const correctCode = snapshot.val();
-      if (input === correctCode) {
-        localStorage.setItem("verified", "true");
-        showVideoPage();
-      } else {
-        errorMsg.style.display = "block";
-      }
-    });
-  }
+  db.ref("hxwfanconcert/code").once("value").then(snapshot => {
+    const correctCode = snapshot.val();
+    if (input === correctCode) {
+      localStorage.setItem("access_hxwfanconcert", "true");
+      showVideoPage();
+    } else {
+      errorMsg.style.display = "block";
+    }
+  });
+}
 
  function showVideoPage() {
   document.getElementById("codePrompt").style.display = "none";
@@ -257,12 +257,11 @@
   });
 }
 
-  // Auto-load if already verified
-  window.onload = function () {
-   if (localStorage.getItem("access_hxwfanconcert") === "true") {
-  showVideoPage();
-}
-  };
+ window.onload = function () {
+  if (localStorage.getItem("access_hxwfanconcert") === "true") {
+    showVideoPage();
+  }
+};
 </script>
 
 <script>
