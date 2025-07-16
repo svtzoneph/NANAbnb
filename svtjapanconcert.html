@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>17 JAPAN CONCERT Say the name #SEVENTEEN</title>
+  <title>M COUNTDOWN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -16,6 +16,42 @@
       font-family: Arial, sans-serif;
       color: white;
       overflow-x: hidden;
+    }
+    
+    header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 12px 20px;
+  background: #181818;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+  border-bottom: 1px solid #2a2a2a;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+header::-webkit-scrollbar {
+  display: none;
+}
+
+    .category-link {
+      padding: 8px 16px;
+      background: #272727;
+      color: white;
+      border-radius: 20px;
+      font-size: 14px;
+      text-decoration: none;
+      flex: 0 0 auto;
+      transition: background 0.3s;
+    }
+
+    .category-link:hover {
+      background: #3c3c3c;
     }
 
     .code-verify {
@@ -94,6 +130,19 @@
   </style>
 </head>
 <body>
+  
+   <header id="scrollHeader">
+    <a class="category-link" href="index.html">LOGIN</a>
+    <a class="category-link" href="home.html">HOME</a>
+    <a class="category-link" href="nanabnb.html">NANA BNB</a>
+    <a class="category-link" href="hxwfanconcert.html">HXW FAN CONCERT</a>
+    <a class="category-link" href="#">SEVENTEEN HOLIDAY</a>
+    <a class="category-link" href="arenatour.html">2018 JAPAN ARENA TOUR</a>
+    <a class="category-link" href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
+    <a class="category-link" href="#">SOON </a>
+    <a class="category-link" href="#">SOON</a>
+    <a class="category-link" href="#">SOON</a>
+  </header>
 
 <!-- Access Code UI -->
 <div class="code-verify" id="codePrompt">
