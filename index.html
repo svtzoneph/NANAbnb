@@ -8,7 +8,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js"></script>
-    <link rel="icon" type="image/jpg" href="favicon.jpg">
+  <link rel="icon" type="image/jpg" href="favicon.jpg">
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -72,8 +72,6 @@
 </head>
 <body>
 
-  <body>
-
   <div class="container">
     <div id="auth-section">
       <h2>Zone Vault</h2>
@@ -81,12 +79,12 @@
       <input type="password" id="password" placeholder="Password" required />
       <button onclick="login()">🔐 Login</button>
       <button onclick="register()">📝 Register</button>
-      <button class="google-btn" onclick="googleLogin()">🔐 Sign in with Google</button> <!-- ✅ ADDED -->
+      <button class="google-btn" onclick="googleLogin()">🔐 Sign in with Google</button>
     </div>
 
     <div id="verify-section" class="hidden">
       <h3>📧 Please verify your email.</h3>
-      <p>We sent a verification link in your email.</p>
+      <p>We sent a verification link to your email.</p>
       <button onclick="reloadAndCheck()">🔄 Reload & Check</button>
     </div>
 
@@ -124,7 +122,8 @@
       getDatabase,
       ref,
       set,
-      onValue
+      get,
+      child
     } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
 
     const firebaseConfig = {
@@ -185,66 +184,65 @@
         .catch(e => alert("Registration error: " + e.message));
     };
 
-window.googleLogin = function () {
-  signInWithPopup(auth, provider)
-    .then((result) => {
-      const user = result.user;
-      currentUid = user.uid;
+    window.googleLogin = async function () {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        currentUid = user.uid;
 
-      const reqRef = ref(db, 'joinRequests/' + currentUid);
+        const reqRef = ref(db, 'joinRequests/' + currentUid);
+        const snapshot = await get(reqRef);
 
-      // Check if the joinRequest already exists
-      onValue(reqRef, (snapshot) => {
-        const data = snapshot.val();
-
-        // ✅ If already approved, redirect
-        if (data && data.status === "approved") {
-          show("approved");
-          sessionStorage.setItem("fromIndex", "true");
-          setTimeout(() => {
-            window.location.href = "home.html";
-          }, 1500);
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          if (data.status === "approved") {
+            sessionStorage.setItem("fromIndex", "true");
+            show("approved");
+            setTimeout(() => window.location.href = "home.html", 1500);
+          } else {
+            alert("Your request status is: " + data.status);
+          }
         } else {
-          // 🟡 If not approved yet, auto-save the data
-          set(reqRef, {
+          // Auto-create approved request
+          await set(reqRef, {
             name: user.displayName || "Google User",
             email: user.email,
-            reason: "Auto-approved via Google",
+            reason: "Auto-approved",
             status: "approved"
-          }).then(() => {
-            show("approved");
-            sessionStorage.setItem("fromIndex", "true");
-            setTimeout(() => {
-              window.location.href = "home.html";
-            }, 1500);
           });
+          sessionStorage.setItem("fromIndex", "true");
+          show("approved");
+          setTimeout(() => window.location.href = "home.html", 1500);
         }
-      }, { onlyOnce: true });
-    })
-    .catch((error) => {
-      alert("Google login error: " + error.message);
-    });
-};
+      } catch (error) {
+        alert("Google login error: " + error.message);
+      }
+    };
+
+    window.reloadAndCheck = function () {
+      const user = auth.currentUser;
+      if (user) {
+        reload(user).then(() => {
+          if (user.emailVerified) {
+            checkJoinRequest(user);
+          } else {
+            alert("❌ Email not verified yet.");
+          }
+        });
+      }
+    };
 
     function checkJoinRequest(user) {
       currentUid = user.uid;
-      const isGoogle = user.providerData.some(p => p.providerId === "google.com");
-
-      if (!user.emailVerified && !isGoogle) {
-        show("verify-section");
-        return;
-      }
-
       const reqRef = ref(db, 'joinRequests/' + currentUid);
-      onValue(reqRef, snapshot => {
+
+      get(reqRef).then(snapshot => {
         const data = snapshot.val();
         if (data) {
           if (data.status === "approved") {
             show("approved");
             sessionStorage.setItem("fromIndex", "true");
-            setTimeout(() => {
-              window.location.href = "home.html";
-            }, 1500);
+            setTimeout(() => window.location.href = "home.html", 1500);
           } else if (data.status === "pending") {
             show("waiting");
           } else if (data.status === "denied") {
