@@ -213,10 +213,10 @@
   const input = document.getElementById("codeInput").value.trim();
   const errorMsg = document.getElementById("errorMsg");
 
-  db.ref("hxwfanconcert/code").once("value").then(snapshot => {
+  db.ref("Access/code").once("value").then(snapshot => {
     const correctCode = snapshot.val();
     if (input === correctCode) {
-      localStorage.setItem("access_hxwfanconcert", "true");
+      localStorage.setItem("access_Access", "true");
       showVideoPage();
     } else {
       errorMsg.style.display = "block";
@@ -258,7 +258,7 @@
 }
 
  window.onload = function () {
-  if (localStorage.getItem("access_hxwfanconcert") === "true") {
+  if (localStorage.getItem("access_Access") === "true") {
     showVideoPage();
   }
 };
