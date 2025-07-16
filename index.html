@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Zone Vault</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js"></script>
@@ -121,7 +122,8 @@
       getDatabase,
       ref,
       set,
-      onValue
+      get,
+      child
     } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
 
     const firebaseConfig = {
@@ -182,17 +184,35 @@
         .catch(e => alert("Registration error: " + e.message));
     };
 
-    window.googleLogin = async function () {
-      try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        currentUid = user.uid;
+   window.googleLogin = async function () {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    currentUid = user.uid;
 
-        checkJoinRequest(user);
-      } catch (error) {
-        alert("Google login error: " + error.message);
+    const reqRef = ref(db, 'joinRequests/' + currentUid);
+    const snapshot = await get(reqRef);
+
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      if (data.status === "approved") {
+        sessionStorage.setItem("fromIndex", "true");
+        show("approved");
+        setTimeout(() => window.location.href = "home.html", 1500);
+      } else if (data.status === "pending") {
+        show("waiting");
+      } else if (data.status === "denied") {
+        alert("❌ Your request was denied.");
+        signOut(auth).then(() => show("auth-section"));
       }
-    };
+    } else {
+      // Don't auto-approve. Show form instead.
+      show("form-section");
+    }
+  } catch (error) {
+    alert("Google login error: " + error.message);
+  }
+};
 
     window.reloadAndCheck = function () {
       const user = auth.currentUser;
@@ -211,7 +231,7 @@
       currentUid = user.uid;
       const reqRef = ref(db, 'joinRequests/' + currentUid);
 
-      onValue(reqRef, (snapshot) => {
+      get(reqRef).then(snapshot => {
         const data = snapshot.val();
         if (data) {
           if (data.status === "approved") {
@@ -255,4 +275,4 @@
   </script>
 
 </body>
-</html>
+</html> 
