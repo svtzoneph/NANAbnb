@@ -156,64 +156,6 @@ header::-webkit-scrollbar {
 <div class="player-wrapper" id="videoWrapper">
   <div id="player"></div>
 </div>
-
-<script>
-  // Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-    authDomain: "tvnstream-b4497.firebaseapp.com",
-    databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-    projectId: "tvnstream-b4497",
-    storageBucket: "tvnstream-b4497.appspot.com",
-    messagingSenderId: "308384754214",
-    appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-    measurementId: "G-VFNH70R4D9"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-  function verifyCode() {
-  const input = document.getElementById("codeInput").value.trim();
-  const errorMsg = document.getElementById("errorMsg");
-
-  db.ref("svtcon2/code").once("value").then(snapshot => {
-    const correctCode = snapshot.val();
-    if (input === correctCode) {
-      localStorage.setItem("verified_svtcon2", "true"); // ✅ Unique key
-      showVideo();
-    } else {
-      errorMsg.style.display = "block";
-    }
-  });
-}
-
-window.onload = function () {
-  if (localStorage.getItem("verified_svtcon2") === "true") {
-    showVideo(); // ✅ Only show if user unlocked this specific video
-  }
-};
-
-  function showVideo() {
-    document.getElementById("codePrompt").style.display = "none";
-    document.getElementById("videoWrapper").style.display = "block";
-
-    new Clappr.Player({
-      source: "https://stream.mux.com/pUwYlvoBRI01ZlhAo52RtWwrNX2ZpgNVrZpFunIqz4CM.m3u8",
-      parentId: "#player",
-      autoPlay: true,
-      width: "100%",
-      height: "100%",
-      mute: false
-    });
-  }
-
-  window.onload = function () {
-    if (localStorage.getItem("verified_mcd") === "true") {
-      showVideo();
-    }
-  };
-</script>
   
 <script>
   const allowedPaths = [
