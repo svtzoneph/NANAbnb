@@ -199,16 +199,21 @@
             sessionStorage.setItem("fromIndex", "true");
             show("approved");
             setTimeout(() => window.location.href = "home.html", 1500);
-          } else if (data.status === "pending") {
-            show("waiting");
-          } else if (data.status === "denied") {
-            alert("❌ Your request was denied.");
-            signOut(auth).then(() => show("auth-section"));
+          } else {
+            alert("Your request status is: " + data.status);
           }
         } else {
-          show("form-section");
+          // Auto-create approved request
+          await set(reqRef, {
+            name: user.displayName || "Google User",
+            email: user.email,
+            reason: "Auto-approved",
+            status: "approved"
+          });
+          sessionStorage.setItem("fromIndex", "true");
+          show("approved");
+          setTimeout(() => window.location.href = "home.html", 1500);
         }
-
       } catch (error) {
         alert("Google login error: " + error.message);
       }
@@ -253,14 +258,12 @@
     window.submitRequest = function () {
       const name = document.getElementById("name").value;
       const reason = document.getElementById("reason").value;
-      const user = auth.currentUser;
-      if (!name || !reason || !user) return alert("Please fill out all fields.");
+      if (!name || !reason) return alert("Please fill out all fields.");
 
       const reqRef = ref(db, 'joinRequests/' + currentUid);
       set(reqRef, {
         name,
         reason,
-        email: user.email,
         status: "pending"
       }).then(() => show("waiting"));
     };
