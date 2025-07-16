@@ -173,21 +173,6 @@ header::-webkit-scrollbar {
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  function verifyCode() {
-    const input = document.getElementById("codeInput").value.trim();
-    const errorMsg = document.getElementById("errorMsg");
-
-    db.ref("seventeencon1/code").once("value").then(snapshot => {
-      const correctCode = snapshot.val();
-      if (input === correctCode) {
-        localStorage.setItem("verified_mcd", "true");
-        showVideo();
-      } else {
-        errorMsg.style.display = "block";
-      }
-    });
-  }
-
   function showVideo() {
     document.getElementById("codePrompt").style.display = "none";
     document.getElementById("videoWrapper").style.display = "block";
