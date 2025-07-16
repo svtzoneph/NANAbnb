@@ -174,19 +174,25 @@ header::-webkit-scrollbar {
   const db = firebase.database();
 
   function verifyCode() {
-    const input = document.getElementById("codeInput").value.trim();
-    const errorMsg = document.getElementById("errorMsg");
+  const input = document.getElementById("codeInput").value.trim();
+  const errorMsg = document.getElementById("errorMsg");
 
-    db.ref("svtcon2/code").once("value").then(snapshot => {
-      const correctCode = snapshot.val();
-      if (input === correctCode) {
-        localStorage.setItem("verified_mcd", "true");
-        showVideo();
-      } else {
-        errorMsg.style.display = "block";
-      }
-    });
+  db.ref("svtcon2/code").once("value").then(snapshot => {
+    const correctCode = snapshot.val();
+    if (input === correctCode) {
+      localStorage.setItem("verified_svtcon2", "true"); // ✅ Unique key
+      showVideo();
+    } else {
+      errorMsg.style.display = "block";
+    }
+  });
+}
+
+window.onload = function () {
+  if (localStorage.getItem("verified_svtcon2") === "true") {
+    showVideo(); // ✅ Only show if user unlocked this specific video
   }
+};
 
   function showVideo() {
     document.getElementById("codePrompt").style.display = "none";
