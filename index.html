@@ -72,6 +72,8 @@
 </head>
 <body>
 
+  <body>
+
   <div class="container">
     <div id="auth-section">
       <h2>Zone Vault</h2>
@@ -79,6 +81,7 @@
       <input type="password" id="password" placeholder="Password" required />
       <button onclick="login()">🔐 Login</button>
       <button onclick="register()">📝 Register</button>
+      <button class="google-btn" onclick="googleLogin()">🔐 Sign in with Google</button> <!-- ✅ ADDED -->
     </div>
 
     <div id="verify-section" class="hidden">
@@ -150,6 +153,16 @@
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       signInWithEmailAndPassword(auth, email, password)
+        .then((userCred) => {
+          const user = userCred.user;
+          reload(user).then(() => {
+            if (user.emailVerified || user.providerData.some(p => p.providerId === "google.com")) {
+              checkJoinRequest(user);
+            } else {
+              show("verify-section");
+            }
+          });
+        })
         .catch(e => alert("Login error: " + e.message));
     };
 
@@ -174,8 +187,9 @@
 
     window.googleLogin = function () {
       signInWithPopup(auth, provider)
-        .then(() => {
-          alert("✅ Google login successful!");
+        .then((result) => {
+          const user = result.user;
+          checkJoinRequest(user); // ✅ Immediately check join status
         })
         .catch((error) => {
           alert("Google login error: " + error.message);
@@ -210,7 +224,6 @@
         if (data) {
           if (data.status === "approved") {
             show("approved");
-            // ✅ Session marker + redirect to stream
             sessionStorage.setItem("fromIndex", "true");
             setTimeout(() => {
               window.location.href = "home.html";
