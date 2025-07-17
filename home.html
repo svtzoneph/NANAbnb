@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
  <link rel="icon" href="favicon-new.png" type="image/png" />
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2196f3">
   <title>Home | Zone Vault</title>
   <style>
     * {
@@ -544,6 +546,12 @@
       header.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
     });
     </script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
 
 </body>
 </html>
