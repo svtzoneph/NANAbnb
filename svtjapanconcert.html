@@ -13,6 +13,16 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2196f3">
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-1B2RJ659GL');
+</script>
+
   <style>
     body {
       margin: 0;
@@ -274,16 +284,6 @@ header::-webkit-scrollbar {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
   }
-</script>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-1B2RJ659GL');
 </script>
 
 </body>
