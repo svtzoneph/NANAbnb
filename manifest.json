@@ -2,7 +2,7 @@
   "name": "Zone Vault",
   "short_name": "Zone Vault",
   "start_url": "index.html",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2196f3",
   "icons": [
