@@ -201,6 +201,14 @@
       <div id="player3" class="player"></div>
       <h4 class="video-label">DAY 3 HOSHI X WOOZI FAN CONCERT 'WARNING' IN SEOUL</h4>
     </div>
+    <div class="video-box">
+      <div id="player4" class="player"></div>
+      <h4 class="video-label">DAY 2 HOSHI X WOOZI FAN CONCERT 'WARNING' IN SEOUL HOSHI CAM - NO SUB</h4>
+    </div>
+    <div class="video-box">
+      <div id="player5" class="player"></div>
+      <h4 class="video-label">DAY 2 HOSHI X WOOZI FAN CONCERT 'WARNING' IN SEOUL WOOZI CAM - NO SUB</h4>
+    </div>
   </div>
 </div>
 
@@ -266,6 +274,25 @@
     width: "100%",
     height: "100%",
   });
+  
+    new Clappr.Player({
+    parentId: "#player4",
+    source: "https://stream.mux.com/c5mtO32T6dbIf1elVD01xjyFnNHiPm3VCC01ZtnP3Y0200E.m3u8", // Duplicate for demo; replace with different one if needed
+    poster: "https://image.mux.com/02VxvV67lkg02QavjOCKbdszCLj6VZ02GSIwcKlBKxhbJw/thumbnail.png?time=1",
+    autoPlay: false,
+    width: "100%",
+    height: "100%",
+  });
+  
+    new Clappr.Player({
+    parentId: "#player5",
+    source: "https://stream.mux.com/BuLudv00Bi6neCAKxTo517rMpM13aZLz2VMrltkrJbIs.m3u8", // Duplicate for demo; replace with different one if needed
+    poster: "https://image.mux.com/02VxvV67lkg02QavjOCKbdszCLj6VZ02GSIwcKlBKxhbJw/thumbnail.png?time=1",
+    autoPlay: false,
+    width: "100%",
+    height: "100%",
+  });
+  
 }
 
  window.onload = function () {
