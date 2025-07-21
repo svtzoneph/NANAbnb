@@ -5,9 +5,7 @@
   <title>17 JAPAN CONCERT Say the name #SEVENTEEN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <!-- Firebase SDKs removed since verification is no longer needed -->
   
   <!-- Clappr -->
   <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
@@ -16,7 +14,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2196f3">
 
-  <!-- Google tag (gtag.js) -->
+  <!-- Google tag -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -71,7 +69,6 @@
     }
 
     .player-wrapper {
-      display: none;
       width: 100vw;
       height: 100vh;
       position: fixed;
@@ -84,22 +81,6 @@
     #player {
       width: 100%;
       height: 100%;
-    }
-
-    #errorMsg {
-      color: red;
-      margin-top: 10px;
-      display: none;
-    }
-
-    h2.title {
-      font-family: 'Poppins', sans-serif;
-      font-size: 32px;
-      font-weight: 700;
-      color: #ff4d4d;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-      margin-bottom: 30px;
-      letter-spacing: 1px;
     }
 
     @media (max-width: 600px) {
@@ -125,38 +106,13 @@
     <a class="category-link" href="#">SOON</a>
   </header>
 
-  <!-- Hidden video player -->
+  <!-- Video player -->
   <div class="player-wrapper" id="videoWrapper">
     <div id="player"></div>
   </div>
 
-  <!-- Optional verification UI -->
-  <div class="code-verify" id="codePrompt" style="display: none;">
-    <h2 class="title">Enter Access Code</h2>
-    <input type="text" id="accessCode" placeholder="Enter Code" />
-    <button onclick="verifyCode()">Verify</button>
-    <div id="errorMsg">Invalid access code.</div>
-  </div>
-
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-      authDomain: "tvnstream-b4497.firebaseapp.com",
-      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-      projectId: "tvnstream-b4497",
-      storageBucket: "tvnstream-b4497.appspot.com",
-      messagingSenderId: "308384754214",
-      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-      measurementId: "G-VFNH70R4D9"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    function showVideo() {
-      document.getElementById("codePrompt").style.display = "none";
-      document.getElementById("videoWrapper").style.display = "block";
-
+    window.onload = function () {
       new Clappr.Player({
         source: "https://stream.mux.com/pUwYlvoBRI01ZlhAo52RtWwrNX2ZpgNVrZpFunIqz4CM.m3u8",
         parentId: "#player",
@@ -165,31 +121,10 @@
         height: "100%",
         mute: false
       });
-    }
-
-    function verifyCode() {
-      const inputCode = document.getElementById("accessCode").value;
-      db.ref("accessCode").once("value").then(snapshot => {
-        const validCode = snapshot.val();
-        if (inputCode === validCode) {
-          localStorage.setItem("verified_mcd", "true");
-          showVideo();
-        } else {
-          document.getElementById("errorMsg").style.display = "block";
-        }
-      });
-    }
-
-    window.onload = function () {
-      if (localStorage.getItem("verified_mcd") === "true") {
-        showVideo();
-      } else {
-        document.getElementById("codePrompt").style.display = "flex";
-      }
     };
   </script>
 
-  <script>
+ <script>
     const allowedPaths = [
       '/index.html',
       '/home.html',
@@ -213,6 +148,7 @@
     }
 
     const isIndexPage = currentPage === '/index.html';
+
     if (!hasInternalAccess && !isIndexPage) {
       const modal = document.createElement('div');
       modal.id = 'accessDeniedModal';
@@ -246,7 +182,6 @@
   </script>
 
   <script>
-    // Horizontal scroll for header
     const header = document.getElementById('scrollHeader');
     header.addEventListener('wheel', (e) => {
       if (e.deltaY === 0) return;
