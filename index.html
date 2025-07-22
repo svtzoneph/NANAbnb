@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Zone Vault</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js"></script>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2196f3">
+  <link rel="icon" href="favicon-new.png" type="image/png" />
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-1B2RJ659GL');
+</script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1c1c1c, #3e3e3e);
+      color: white;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: #222;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      width: 90%;
+      max-width: 420px;
+    }
+    h2, h3 {
+      text-align: center;
+      margin: 10px 0;
+    }
+    input, button {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    input {
+      background: #333;
+      color: white;
+    }
+    input::placeholder {
+      color: #aaa;
+    }
+    button {
+      background-color: #1db954;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: #17a246;
+    }
+    .google-btn {
+      background-color: #db4437;
+    }
+    .google-btn:hover {
+      background-color: #c53727;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div id="auth-section">
+    <h2>Zone Vault</h2>
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <button onclick="login()">🔐 Login</button>
+    <button onclick="register()">📝 Register</button>
+    <button class="google-btn" onclick="googleLogin()">🔐 Sign in with Google</button>
+  </div>
+
+  <div id="verify-section" class="hidden">
+    <h3>📧 Please verify your email.</h3>
+    <p>We sent a verification link to your email.</p>
+    <button onclick="reloadAndCheck()">🔄 Reload & Check</button>
+  </div>
+
+  <div id="form-section" class="hidden">
+    <h2>Request Access</h2>
+    <input type="text" id="name" placeholder="Telegram Username" required />
+    <input type="text" id="reason" placeholder="CODE" required />
+    <button onclick="submitRequest()">📩 Submit Request</button>
+  </div>
+
+  <div id="waiting" class="hidden">
+    <h3>⏳ Waiting for admin approval...</h3>
+    <p>This page will redirect once approved.</p>
+  </div>
+
+  <div id="approved" class="hidden">
+    <h3>✅ Approved! Redirecting to Home</h3>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    onAuthStateChanged,
+    sendEmailVerification,
+    signInWithPopup,
+    GoogleAuthProvider,
+    reload,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
+  import {
+    getDatabase,
+    ref,
+    set,
+    get,
+    onValue
+  } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+    authDomain: "tvnstream-b4497.firebaseapp.com",
+    databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+    projectId: "tvnstream-b4497",
+    storageBucket: "tvnstream-b4497.appspot.com",
+    messagingSenderId: "308384754214",
+    appId: "1:308384754214:web:2938e76cd29b288f75d4e7"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+  const provider = new GoogleAuthProvider();
+  let currentUid = null;
+
+  function show(id) {
+    document.querySelectorAll(".container > div").forEach(div => div.classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
+  }
+
+  window.register = function () {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    if (!email || !password) return alert("Please enter email and password.");
+
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(userCred => {
+        sendEmailVerification(userCred.user).then(() => {
+          alert("✅ Verification email sent. Check your inbox.");
+          show("verify-section");
+        });
+      })
+      .catch(e => alert("Registration error: " + e.message));
+  };
+
+  window.login = function () {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then(userCred => {
+        const user = userCred.user;
+        reload(user).then(() => {
+          show("verify-section");
+        });
+      })
+      .catch(e => alert("Login error: " + e.message));
+  };
+
+  window.reloadAndCheck = function () {
+    const user = auth.currentUser;
+    if (user) {
+      reload(user).then(() => {
+        if (user.emailVerified) {
+          checkJoinRequest(user);
+        } else {
+          alert("❌ Your email is still not verified.");
+        }
+      });
+    }
+  };
+
+window.googleLogin = async function () {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    currentUid = user.uid;
+
+    const reqRef = ref(db, 'joinRequests/' + currentUid);
+    const snapshot = await get(reqRef);
+
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      if (data.status === "approved") {
+        sessionStorage.setItem("fromIndex", "true");
+        show("approved");
+        setTimeout(() => window.location.href = "home.html", 1500);
+      } else if (data.status === "pending") {
+        show("waiting");
+      } else if (data.status === "denied") {
+        alert("❌ Your request was denied.");
+        signOut(auth).then(() => show("auth-section"));
+      }
+    } else {
+      // Show the form so Google users can submit their join request manually
+      show("form-section");
+    }
+  } catch (error) {
+    alert("Google login error: " + error.message);
+  }
+};
+
+ function checkJoinRequest(user) {
+  currentUid = user.uid;
+  const reqRef = ref(db, 'joinRequests/' + currentUid);
+
+  // Always listen for changes to the request
+  onValue(reqRef, (snapshot) => {
+    const data = snapshot.val();
+    if (!data) {
+      show("form-section");
+    } else {
+      if (data.status === "approved") {
+        show("approved");
+        sessionStorage.setItem("fromIndex", "true");
+        setTimeout(() => window.location.href = "home.html", 1500);
+      } else if (data.status === "pending") {
+        show("waiting");
+      } else if (data.status === "denied") {
+        alert("❌ Your request was denied.");
+        signOut(auth).then(() => show("auth-section"));
+      }
+    }
+  });
+}
+
+window.submitRequest = function () {
+  const name = document.getElementById("name").value;
+  const reason = document.getElementById("reason").value;
+  const user = auth.currentUser;
+  if (!name || !reason) return alert("Please fill out all fields.");
+
+  const reqRef = ref(db, 'joinRequests/' + currentUid);
+  set(reqRef, {
+    name,
+    reason,
+    email: user.email,
+    provider: user.providerData[0]?.providerId || "password",
+    status: "pending"
+  }).then(() => show("waiting"));
+};
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      reload(user).then(() => {
+        if (user.emailVerified || user.providerData.some(p => p.providerId === "google.com")) {
+          checkJoinRequest(user);
+        } else {
+          show("verify-section");
+        }
+      });
+    } else {
+      show("auth-section");
+    }
+  });
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      // ✅ Detect updates
+      reg.onupdatefound = () => {
+        const newSW = reg.installing;
+        newSW.onstatechange = () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            // ✅ New version is ready → force reload
+            window.location.reload();
+          }
+        };
+      };
+    }).catch(err => {
+      console.error('Service Worker registration failed:', err);
+    });
+  }
+</script>
+
+</body>
+</html>
