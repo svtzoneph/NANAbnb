@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FOLLOW TOUR AGAIN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <!-- Clappr -->
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <link rel="icon" href="favicon-new.png" type="image/png" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2196f3">
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1B2RJ659GL');
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      font-family: Arial, sans-serif;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 12px 20px;
+      background: #181818;
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      white-space: nowrap;
+      border-bottom: 1px solid #2a2a2a;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    header::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-link {
+      padding: 8px 16px;
+      background: #272727;
+      color: white;
+      border-radius: 20px;
+      font-size: 14px;
+      text-decoration: none;
+      flex: 0 0 auto;
+      transition: background 0.3s;
+    }
+
+    .category-link:hover {
+      background: #3c3c3c;
+    }
+
+    .player-wrapper {
+      width: 100vw;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #000;
+      z-index: 1;
+    }
+
+    #player {
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (max-width: 600px) {
+      .videos {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header id="scrollHeader">
+    <a class="category-link" href="index.html">LOGIN</a>
+    <a class="category-link" href="home.html">HOME</a>
+    <a class="category-link" href="nanabnb.html">NANA BNB</a>
+    <a class="category-link" href="hxwfanconcert.html">HXW FAN CONCERT</a>
+    <a class="category-link" href="svtholiday.html">SEVENTEEN HOLIDAY</a>
+    <a class="category-link" href="arenatour.html">2018 JAPAN ARENA TOUR</a>
+    <a class="category-link" href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
+    <a class="category-link" href="touragain.html">FOLLOW TOUR DEISNEY+</a>
+    <a class="category-link" href="#">SOON</a>
+    <a class="category-link" href="#">SOON</a>
+  </header>
+
+  <!-- Video -->
+  <div class="player-wrapper" id="videoWrapper">
+    <div id="player"></div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+      authDomain: "tvnstream-b4497.firebaseapp.com",
+      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+      projectId: "tvnstream-b4497",
+      storageBucket: "tvnstream-b4497.appspot.com",
+      messagingSenderId: "308384754214",
+      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+      measurementId: "G-VFNH70R4D9"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    window.onload = function () {
+      new Clappr.Player({
+        source: "https://stream.mux.com/QSRxWZviCBnHBYNPPvr8ygSB01lVb2D5jDYrzXjWrFrk.m3u8",
+        parentId: "#player",
+        autoPlay: true,
+        width: "100%",
+        height: "100%",
+        mute: false
+      });
+    };
+  </script>
+
+  <script>
+    const allowedPaths = [
+      '/index.html',
+      '/home.html',
+      '/nanabnb.html',
+      '/hxwfanconcert.html',
+      '/svtholiday.html',
+      '/arenatour.html',
+      '/svtjapanconcert.html',
+      '/soon.html'
+    ];
+
+    const currentPage = window.location.pathname;
+    const hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+
+    const referrer = document.referrer;
+    const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
+    const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+
+    if (cameFromAllowedPage) {
+      sessionStorage.setItem('internalAccess', 'true');
+    }
+
+    const isIndexPage = currentPage === '/index.html';
+
+    if (!hasInternalAccess && !isIndexPage) {
+      const modal = document.createElement('div');
+      modal.id = 'accessDeniedModal';
+      modal.style = `
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.85);
+        color: white;
+        font-family: sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        text-align: center;
+        padding: 20px;
+      `;
+      modal.innerHTML = `
+        <div>
+          <strong style="font-size: 24px;">🚫 Access Denied</strong><br><br>
+          You cannot access this page directly.<br>
+          Please go through the homepage or allowed sections.<br><br>
+          <em>Redirecting to login page...</em>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 3000);
+    }
+  </script>
+
+  <script>
+    const header = document.getElementById('scrollHeader');
+    header.addEventListener('wheel', (e) => {
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      header.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
+    });
+  </script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      // ✅ Detect updates
+      reg.onupdatefound = () => {
+        const newSW = reg.installing;
+        newSW.onstatechange = () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            // ✅ New version is ready → force reload
+            window.location.reload();
+          }
+        };
+      };
+    }).catch(err => {
+      console.error('Service Worker registration failed:', err);
+    });
+  }
+</script>
+
+</body>
+</html>
