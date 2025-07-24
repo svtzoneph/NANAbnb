@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stylish Photo Gallery</title>
+
+  <!-- LightGallery CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/css/lightgallery-bundle.min.css" rel="stylesheet" />
+    <link rel="icon" href="favicon-new.png" type="image/png" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2196f3">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1B2RJ659GL');
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      font-family: Arial, sans-serif;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 12px 20px;
+      background: #181818;
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      white-space: nowrap;
+      border-bottom: 1px solid #2a2a2a;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    header::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-link {
+      padding: 8px 16px;
+      background: #272727;
+      color: white;
+      border-radius: 20px;
+      font-size: 14px;
+      text-decoration: none;
+      flex: 0 0 auto;
+      transition: background 0.3s;
+    }
+
+    .category-link:hover {
+      background: #3c3c3c;
+    }
+
+    h1 {
+      text-align: center;
+      color: #ff3366;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    .divider {
+      font-size: 1.1rem;
+      color: #ff6699;
+      margin: 2rem 0 1rem;
+      border-left: 4px solid #ff3366;
+      padding-left: 10px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .gallery a {
+      display: block;
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .gallery a img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .gallery a:hover img {
+      transform: scale(1.02);
+    }
+
+    .lg-backdrop {
+      backdrop-filter: blur(6px);
+      background-color: rgba(0, 0, 0, 0.85) !important;
+    }
+    
+    header {
+  transition: all 0.3s ease;
+}
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.3rem;
+      }
+
+      .gallery {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <header id="scrollHeader">
+    <a class="category-link" href="index.html">LOGIN</a>
+    <a class="category-link" href="home.html">HOME</a>
+    <a class="category-link" href="gallery.html">Gallery</a>
+    <a class="category-link" href="nanabnb.html">NANA BNB</a>
+    <a class="category-link" href="hxwfanconcert.html">HXW FAN CONCERT</a>
+    <a class="category-link" href="svtholiday.html">SEVENTEEN HOLIDAY</a>
+    <a class="category-link" href="arenatour.html">2018 JAPAN ARENA TOUR</a>
+    <a class="category-link" href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
+     <a class="category-link" href="touragain.html">FOLLOW TOUR DEISNEY+</a>
+    <a class="category-link" href="#">SOON</a>
+    <a class="category-link" href="#">SOON</a>
+  </header>
+
+
+  <h1>🖼️ My Stylish Photo Gallery</h1>
+
+ <div class="divider">HOSHI X WOOZI FAN CONCERT [WARNING]- SEOUL</div>
+<div id="lightgallery1" class="gallery">
+  <a href="https://raw.githubusercontent.com/svtzoneph/NANAbnb/main/images/hxw/1.png"
+     data-lg-size="768-1000"
+     data-download-url="https://raw.githubusercontent.com/svtzoneph/NANAbnb/main/images/hxw/1.png">
+    <img src="https://raw.githubusercontent.com/svtzoneph/NANAbnb/main/images/hxw/1.png" alt="HOSHI | Special Gift" />
+  </a>
+  <a href="https://raw.githubusercontent.com/svtzoneph/NANAbnb/main/images/hxw/1.png"
+     data-lg-size="768-1000"
+     data-download-url="https://raw.githubusercontent.com/svtzoneph/NANAbnb/main/images/hxw/1.png">
+    <img src="https://raw.githubusercontent.com/svtzoneph/NANAbnb/main/images/hxw/1.png" alt="WOOZI | Special Gift" />
+  </a>
+</div>
+
+<div class="divider">🎮 Roblox Screenshots</div>
+<div id="lightgallery2" class="gallery">
+  <a href="510ccf66-03bc-443a-b801-dd7503f2a9b40.png"
+     data-lg-size="768-1000"
+     data-download-url="510ccf66-03bc-443a-b801-dd7503f29b40.png">
+    <img src="510ccf66-03bc-443a-b801-dd7503f29b40.png" alt="Roblox Screenshot 1" />
+  </a>
+
+  <a href="Screenshot 2025-07-24 143437.png"
+     data-lg-size="617-1007"
+     data-download-url="Screenshot 2025-07-24 143437.png">
+    <img src="Screenshot 2025-07-24 143437.png" alt="Roblox Screenshot 2" />
+  </a>
+
+  <a href="Screenshot 2025-07-24 143437.png"
+     data-lg-size="617-1007"
+     data-download-url="Screenshot 2025-07-24 143437.png">
+    <img src="Screenshot 2025-07-24 143437.png" alt="Roblox Screenshot 3" />
+  </a>
+
+  <a href="Screenshot 2025-07-24 143437.png"
+     data-lg-size="617-1007"
+     data-download-url="Screenshot 2025-07-24 143437.png">
+    <img src="Screenshot 2025-07-24 143437.png" alt="Roblox Screenshot 4" />
+  </a>
+</div>
+
+
+  <!-- LightGallery JS -->
+  <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/lightgallery.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/plugins/thumbnail/lg-thumbnail.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/plugins/zoom/lg-zoom.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/plugins/download/lg-download.umd.min.js"></script>
+
+  <script>
+    lightGallery(document.getElementById('lightgallery1'), {
+      speed: 500,
+      thumbnail: true,
+      download: true,
+      zoom: true
+    });
+
+    lightGallery(document.getElementById('lightgallery2'), {
+      speed: 500,
+      thumbnail: true,
+      download: true,
+      zoom: true
+    });
+  </script>
+  
+    <script>
+    const header = document.getElementById('scrollHeader');
+    header.addEventListener('wheel', (e) => {
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      header.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
+    });
+  </script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      // ✅ Detect updates
+      reg.onupdatefound = () => {
+        const newSW = reg.installing;
+        newSW.onstatechange = () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            // ✅ New version is ready → force reload
+            window.location.reload();
+          }
+        };
+      };
+    }).catch(err => {
+      console.error('Service Worker registration failed:', err);
+    });
+  }
+</script>
+
+</body>
+</html>
