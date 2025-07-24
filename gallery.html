@@ -126,6 +126,38 @@
         gap: 8px;
       }
     }
+    
+    .lg-toolbar,
+.lg-prev,
+.lg-next,
+.lg-close {
+  z-index: 9999 !important;
+}
+
+.lg-toolbar .lg-download {
+  display: block !important;
+}
+
+.lg-outer .lg-thumb-outer {
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+@media (max-width: 480px) {
+  .lg-next,
+  .lg-prev,
+  .lg-toolbar {
+    font-size: 18px !important;
+    padding: 10px !important;
+  }
+
+  .lg-download,
+  .lg-close {
+    display: block !important;
+  }
+}
+
+    
   </style>
 </head>
 <body>
@@ -162,7 +194,7 @@
   </a>
 </div>
 
-<div class="divider">🎮 Roblox Screenshots</div>
+<div class="divider">SEVENTEEN 2025 JAPAN FAN MEETING 'HOLIDAY'</div>
 <div id="lightgallery2" class="gallery">
   <a href="510ccf66-03bc-443a-b801-dd7503f2a9b40.png"
      data-lg-size="768-1000"
@@ -197,19 +229,22 @@
   <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/plugins/download/lg-download.umd.min.js"></script>
 
   <script>
-    lightGallery(document.getElementById('lightgallery1'), {
-      speed: 500,
-      thumbnail: true,
-      download: true,
-      zoom: true
-    });
+   lightGallery(document.getElementById('lightgallery1'), {
+  speed: 500,
+  plugins: [lgThumbnail, lgZoom, lgDownload],
+  thumbnail: true,
+  download: true,
+  zoom: true
+});
 
-    lightGallery(document.getElementById('lightgallery2'), {
-      speed: 500,
-      thumbnail: true,
-      download: true,
-      zoom: true
-    });
+lightGallery(document.getElementById('lightgallery2'), {
+  speed: 500,
+  plugins: [lgThumbnail, lgZoom, lgDownload],
+  thumbnail: true,
+  download: true,
+  zoom: true
+});
+
   </script>
   
     <script>
