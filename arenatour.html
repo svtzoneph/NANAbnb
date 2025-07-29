@@ -4,93 +4,349 @@
   <meta charset="UTF-8" />
   <title>2018 JAPAN ARENA TOUR SVT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <!-- Clappr -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon-new.png" type="image/png" />
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#2196f3">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2196f3">
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-1B2RJ659GL');
-  </script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-1B2RJ659GL');
+</script>
 
   <style>
     body {
-      margin: 0;
-      background: #111;
-      font-family: Arial, sans-serif;
-      color: white;
-      overflow-x: hidden;
-    }
+    margin: 0;
+    background: #111;
+    font-family: Arial, sans-serif;
+    color: white;
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+ header {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center; /* vertically center all children */
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
 
-    header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      padding: 12px 20px;
-      background: #181818;
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      white-space: nowrap;
-      border-bottom: 1px solid #2a2a2a;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
+.header-links {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+  flex: 1;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
 
-    header::-webkit-scrollbar {
-      display: none;
-    }
+.header-links::-webkit-scrollbar {
+  display: none;
+}
 
-    .category-link {
-      padding: 8px 16px;
-      background: #272727;
-      color: white;
-      border-radius: 20px;
-      font-size: 14px;
-      text-decoration: none;
-      flex: 0 0 auto;
-      transition: background 0.3s;
-    }
+.header-logo {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center; /* center img vertically in logo box */
+}
 
-    .category-link:hover {
-      background: #3c3c3c;
-    }
+.header-logo img {
+  width: 60px;
+  height: auto;
+  display: block;
+}
+   .category-link {
+  padding: 8px 16px;
+  background: transparent;
+  color: #fff;
+  border-radius: 12px;
+  font-size: 14px;
+  text-decoration: none;
+  flex: 0 0 auto;
+  font-weight: bold;
+  transition: background 0.3s, color 0.3s;
+}
 
-    .player-wrapper {
-      width: 100vw;
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      left: 0;
-      background-color: #000;
-      z-index: 1;
-    }
+.category-link.flash {
+  background: #fff;
+  color: #000;
+  transition: background 0.6s ease, color 0.6s ease;
+}
 
-    #player {
-      width: 100%;
-      height: 100%;
-    }
+.category-link.active {
+  background: #fff;
+  color: #000;
+}
 
-    @media (max-width: 600px) {
-      .videos {
-        grid-template-columns: 1fr;
-      }
+header {
+  transition: transform 0.3s ease-in; /* hide quickly */
+}
+
+header.show {
+  transform: translateY(0);
+  transition: transform 0.6s ease-out; /* appear slowly */
+}
+
+header.hide {
+  transform: translateY(-100%);
+}
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: blur(7px) brightness(0.5);
+    z-index: -1;
+  }
+
+  .code-verify {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    margin: auto;
+    max-width: 90%;
+  }
+
+  input[type="text"] {
+    padding: 12px;
+    font-size: 16px;
+    margin: 10px;
+    width: 260px;
+    border-radius: 8px;
+    border: none;
+    text-align: center;
+  }
+
+  button {
+    padding: 10px 24px;
+    font-size: 16px;
+    border-radius: 6px;
+    background-color: #00c9a7;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+.video-container {
+  display: block; /* ✅ Change from 'none' to 'block' */
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
+  border-radius: 12px;
+}
+
+  h2.title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+}
+  .videos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 40px;
+    justify-content: center;
+  }
+
+  .video-box {
+    width: 100%;
+  }
+
+  .player {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #000; /* ✅ FIX: Prevent body blur from leaking into player */
+  }
+
+  .video-label {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #ccc;
+  }
+
+  @media (max-width: 600px) {
+    .videos {
+      grid-template-columns: 1fr;
     }
+  }
+  
+/* Sidebar Base */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 80%;
+  max-width: 300px;
+  height: 100vh; /* ✅ Full viewport height */
+  background: #111;
+  z-index: 9999;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: left 0.3s ease;
+  box-sizing: border-box;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar .close-btn {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.sidebar-nav a {
+  text-decoration: none;
+  color: white;
+  font-size: 14px; /* Smaller font size */
+  padding: 5px 0;
+  border-bottom: 1px solid #333;
+  font-weight: 500;
+}
+
+.sidebar-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid #333;
+}
+
+.sidebar-logo img {
+  width: 60px;
+  height: auto;
+}
+
+.sidebar-email a {
+  color: white;
+  font-size: 20px;
+  text-decoration: none;
+}
+
+.sidebar-email a:hover {
+  color: #2196f3;
+}
+
+ .sidebar-title {
+  font-size: 25px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+  
+  }
+
+/* Hide desktop header on mobile */
+#scrollHeader {
+  display: flex;
+}
+
+.mobile-header,
+.sidebar {
+  display: none;
+}
+
+/* Mobile responsive sidebar */
+@media (max-width: 768px) {
+  #scrollHeader {
+    display: none;
+  }
+  
+.mobile-header {
+  display: flex;
+  padding: 10px 20px;
+  align-items: center;
+  z-index: 1000;
+  background: transparent; /* ✅ Transparent */
+}
+
+  .hamburger {
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+
+.sidebar {
+  display: flex;
+}
+
+.sidebar-email img {
+  width: 30px;
+  height: 30px;
+}
+
+.sidebar-logo img {
+  width: 60px;
+  height: auto;
+}
+
+.sidebar-title {
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+
   </style>
 </head>
 <body>
+<!-- Mobile hamburger header -->
+<div class="mobile-header">
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+</div>
 
-  <header id="scrollHeader">
+<!-- Desktop header (scrollable) -->
+<header id="scrollHeader">
+  <div class="header-logo">
+    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+  </div>
+  <div class="header-links">
     <a class="category-link" href="index.html">LOGIN</a>
     <a class="category-link" href="home.html">HOME</a>
     <a class="category-link" href="gallery.html">GALLERY</a>
@@ -99,107 +355,77 @@
     <a class="category-link" href="svtholiday.html">SEVENTEEN HOLIDAY</a>
     <a class="category-link" href="arenatour.html">2018 JAPAN ARENA TOUR</a>
     <a class="category-link" href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
-     <a class="category-link" href="touragain.html">FOLLOW TOUR DEISNEY+</a>
-    <a class="category-link" href="#">SOON</a>
-    <a class="category-link" href="#">SOON</a>
-  </header>
-
-  <!-- Video -->
-  <div class="player-wrapper" id="videoWrapper">
-    <div id="player"></div>
+    <a class="category-link" href="touragain.html">FOLLOW TOUR DISNEY+</a>
   </div>
+</header>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-      authDomain: "tvnstream-b4497.firebaseapp.com",
-      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-      projectId: "tvnstream-b4497",
-      storageBucket: "tvnstream-b4497.appspot.com",
-      messagingSenderId: "308384754214",
-      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-      measurementId: "G-VFNH70R4D9"
-    };
+<!-- Sidebar for mobile -->
+<div id="mobileSidebar" class="sidebar">
+  <button class="close-btn" onclick="toggleSidebar()">✖</button>
+  
+  <!-- Sidebar Title -->
+  <div class="sidebar-title">Zone Vault</div>
 
-    firebase.initializeApp(firebaseConfig);
+  <nav class="sidebar-nav">
+    <a href="index.html">LOGIN</a>
+    <a href="home.html">HOME</a>
+    <a href="gallery.html">GALLERY</a>
+    <a href="nanabnb.html">NANA BNB</a>
+    <a href="hxwfanconcert.html">HXW FAN CONCERT</a>
+    <a href="svtholiday.html">SEVENTEEN HOLIDAY</a>
+    <a href="arenatour.html">2018 JAPAN ARENA TOUR</a>
+    <a href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
+    <a href="touragain.html">FOLLOW TOUR DISNEY+</a>
+  </nav>
 
-    window.onload = function () {
-      new Clappr.Player({
-        source: "https://stream.mux.com/iBdO47FxrLOaHnj1ne2DQ9i02EU301bj8JdJLIc97MP8Q.m3u8",
-        parentId: "#player",
-        autoPlay: true,
-        width: "100%",
-        height: "100%",
-        mute: false
-      });
-    };
-  </script>
+  <div class="sidebar-footer">
+    <!-- Logo Bottom Left -->
+    <div class="sidebar-logo">
+      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+    </div>
+    
+    <!-- Email Bottom Right -->
+    <div class="sidebar-email">
+      <a href="mailto:your@email.com" title="Send Email">
+        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
+      </a>
+    </div>
+  </div>
+</div>
 
-  <script>
-    const allowedPaths = [
-      '/index.html',
-      '/home.html',
-      '/nanabnb.html',
-      '/hxwfanconcert.html',
-      '/svtholiday.html',
-      '/arenatour.html',
-      '/svtjapanconcert.html',
-      '/soon.html'
-    ];
+<!-- Video Content -->
+<div class="video-container" id="videoPage">
+  <h2 class="title">SEVENTEEN 2018 JAPAN ARENA TOUR 'SVT'</h2>
+  <div class="videos">
+    <div class="video-box">
+      <div class="player" id="player1"></div> <!-- ✅ Needed for Clappr -->
+    </div>
+  </div>
+</div>
 
-    const currentPage = window.location.pathname;
-    const hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+<script>
+  new Clappr.Player({
+    parentId: "#player1",
+    source: "https://stream.mux.com/iBdO47FxrLOaHnj1ne2DQ9i02EU301bj8JdJLIc97MP8Q.m3u8",
+    poster: "https://uploads.onecompiler.io/43ddry4jt/43qqwfsgp/Screenshot%202025-07-15%20154034.png",
+    autoPlay: false,
+    width: "100%",
+    height: "100%",
+  });
+</script>
 
-    const referrer = document.referrer;
-    const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
-    const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
 
-    if (cameFromAllowedPage) {
-      sessionStorage.setItem('internalAccess', 'true');
-    }
 
-    const isIndexPage = currentPage === '/index.html';
 
-    if (!hasInternalAccess && !isIndexPage) {
-      const modal = document.createElement('div');
-      modal.id = 'accessDeniedModal';
-      modal.style = `
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0, 0, 0, 0.85);
-        color: white;
-        font-family: sans-serif;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        text-align: center;
-        padding: 20px;
-      `;
-      modal.innerHTML = `
-        <div>
-          <strong style="font-size: 24px;">🚫 Access Denied</strong><br><br>
-          You cannot access this page directly.<br>
-          Please go through the homepage or allowed sections.<br><br>
-          <em>Redirecting to login page...</em>
-        </div>
-      `;
-      document.body.appendChild(modal);
-
-      setTimeout(() => {
-        window.location.href = "index.html";
-      }, 3000);
-    }
-  </script>
-
-  <script>
-    const header = document.getElementById('scrollHeader');
-    header.addEventListener('wheel', (e) => {
-      if (e.deltaY === 0) return;
-      e.preventDefault();
-      header.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
-    });
-  </script>
+<script>// Scroll header on mouse wheel
+    // Scroll header on mouse wheel
+const linksContainer = document.querySelector('.header-links');
+linksContainer.addEventListener('wheel', (e) => {
+  if (e.deltaY === 0) return;
+  e.preventDefault();
+  linksContainer.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
+});
+    </script>
 
 <script>
   if ('serviceWorker' in navigator) {
@@ -219,6 +445,56 @@
     });
   }
 </script>
+
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('mobileSidebar');
+    sidebar.classList.toggle('open');
+  }
+</script>
+
+<script>
+  let lastScrollY = window.scrollY;
+  const scrollHeader = document.getElementById('scrollHeader');
+
+  window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY > lastScrollY && currentScrollY > 50) {
+      // Scroll Down → Hide header
+      scrollHeader.classList.add('hide');
+    } else {
+      // Scroll Up → Show header smoothly
+      scrollHeader.classList.remove('hide');
+    }
+
+    lastScrollY = currentScrollY;
+  });
+</script>
+
+<script>
+  const categoryLinks = document.querySelectorAll('.category-link');
+
+  categoryLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault(); // prevent immediate jump
+
+      // Remove flash class from all
+      categoryLinks.forEach(l => l.classList.remove('flash'));
+
+      // Add flash class to the clicked one
+      link.classList.add('flash');
+
+      // Remove it after a short delay (fade out effect)
+      setTimeout(() => {
+        link.classList.remove('flash');
+        // Redirect after animation (if it's a real page)
+        window.location.href = link.href;
+      }, 800); // adjust delay to match transition
+    });
+  });
+</script>
+
 
 </body>
 </html>
