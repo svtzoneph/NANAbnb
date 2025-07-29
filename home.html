@@ -457,13 +457,13 @@ header.hide {
     display: none;
   }
 
-  .mobile-header {
-    display: flex;
-    background: #181818;
-    padding: 10px 20px;
-    align-items: center;
-    z-index: 1000;
-  }
+.mobile-header {
+  display: flex;
+  padding: 10px 20px;
+  align-items: center;
+  z-index: 1000;
+  background: transparent; /* ✅ Transparent */
+}
 
   .hamburger {
     font-size: 24px;
@@ -473,25 +473,26 @@ header.hide {
     cursor: pointer;
   }
 
-  .sidebar {
-    display: flex;
-    
-    .sidebar-email img {
+.sidebar {
+  display: flex;
+}
+
+.sidebar-email img {
   width: 30px;
   height: 30px;
+}
 
 .sidebar-logo img {
   width: 60px;
   height: auto;
+}
 
- .sidebar-title {
+.sidebar-title {
   font-size: 30px;
   font-weight: bold;
   text-align: center;
   margin-bottom: 15px;
-  }
 }
-
 
   </style>
 </head>
@@ -835,7 +836,7 @@ linksContainer.addEventListener('wheel', (e) => {
   width: 100%;
   color: #ccc;
   text-align: center;
-  padding: 15px 15px;
+  padding: 10px 10px;
   font-size: 14px;
   line-height: 1.6;
   margin-top: 1px;
