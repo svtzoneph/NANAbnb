@@ -28,41 +28,80 @@
       overflow-x: hidden;
     }
 
-    header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      padding: 12px 20px;
-      background: #181818;
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      white-space: nowrap;
-      border-bottom: 1px solid #2a2a2a;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
+   header {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center; /* vertically center all children */
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
 
-    header::-webkit-scrollbar {
-      display: none;
-    }
+.header-links {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+  flex: 1;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
 
-    .category-link {
-      padding: 8px 16px;
-      background: #272727;
-      color: white;
-      border-radius: 20px;
-      font-size: 14px;
-      text-decoration: none;
-      flex: 0 0 auto;
-      transition: background 0.3s;
-    }
+.header-links::-webkit-scrollbar {
+  display: none;
+}
 
-    .category-link:hover {
-      background: #3c3c3c;
-    }
+.header-logo {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center; /* center img vertically in logo box */
+}
+
+.header-logo img {
+  width: 60px;
+  height: auto;
+  display: block;
+}
+   .category-link {
+  padding: 8px 16px;
+  background: transparent;
+  color: #fff;
+  border-radius: 12px;
+  font-size: 14px;
+  text-decoration: none;
+  flex: 0 0 auto;
+  font-weight: bold;
+  transition: background 0.3s, color 0.3s;
+}
+
+.category-link.flash {
+  background: #fff;
+  color: #000;
+  transition: background 0.6s ease, color 0.6s ease;
+}
+
+.category-link.active {
+  background: #fff;
+  color: #000;
+}
+
+header {
+  transition: transform 0.3s ease-in; /* hide quickly */
+}
+
+header.show {
+  transform: translateY(0);
+  transition: transform 0.6s ease-out; /* appear slowly */
+}
+
+header.hide {
+  transform: translateY(-100%);
+}
 
     h1 {
       text-align: center;
@@ -126,11 +165,153 @@
         gap: 8px;
       }
     }
+    
+    /* Sidebar Base */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 80%;
+  max-width: 300px;
+  height: 100vh; /* ✅ Full viewport height */
+  background: #111;
+  z-index: 9999;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: left 0.3s ease;
+  box-sizing: border-box;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar .close-btn {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.sidebar-nav a {
+  text-decoration: none;
+  color: white;
+  font-size: 14px; /* Smaller font size */
+  padding: 5px 0;
+  border-bottom: 1px solid #333;
+  font-weight: 500;
+}
+
+.sidebar-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid #333;
+}
+
+.sidebar-logo img {
+  width: 60px;
+  height: auto;
+}
+
+.sidebar-email a {
+  color: white;
+  font-size: 20px;
+  text-decoration: none;
+}
+
+.sidebar-email a:hover {
+  color: #2196f3;
+}
+
+ .sidebar-title {
+  font-size: 25px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+  
+  }
+
+/* Hide desktop header on mobile */
+#scrollHeader {
+  display: flex;
+}
+
+.mobile-header,
+.sidebar {
+  display: none;
+}
+
+/* Mobile responsive sidebar */
+@media (max-width: 768px) {
+  #scrollHeader {
+    display: none;
+  }
+  
+.mobile-header {
+  display: flex;
+  padding: 10px 20px;
+  align-items: center;
+  z-index: 1000;
+  background: transparent; /* ✅ Transparent */
+}
+
+  .hamburger {
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+
+.sidebar {
+  display: flex;
+}
+
+.sidebar-email img {
+  width: 30px;
+  height: 30px;
+}
+
+.sidebar-logo img {
+  width: 60px;
+  height: auto;
+}
+
+.sidebar-title {
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
   </style>
 </head>
 <body>
-  
-  <header id="scrollHeader">
+<!-- Mobile hamburger header -->
+<div class="mobile-header">
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+</div>
+
+<!-- Desktop header (scrollable) -->
+<header id="scrollHeader">
+  <div class="header-logo">
+    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+  </div>
+  <div class="header-links">
     <a class="category-link" href="index.html">LOGIN</a>
     <a class="category-link" href="home.html">HOME</a>
     <a class="category-link" href="gallery.html">GALLERY</a>
@@ -139,11 +320,43 @@
     <a class="category-link" href="svtholiday.html">SEVENTEEN HOLIDAY</a>
     <a class="category-link" href="arenatour.html">2018 JAPAN ARENA TOUR</a>
     <a class="category-link" href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
-     <a class="category-link" href="touragain.html">FOLLOW TOUR DEISNEY+</a>
-    <a class="category-link" href="#">SOON</a>
-    <a class="category-link" href="#">SOON</a>
-  </header>
+    <a class="category-link" href="touragain.html">FOLLOW TOUR DISNEY+</a>
+  </div>
+</header>
 
+<!-- Sidebar for mobile -->
+<div id="mobileSidebar" class="sidebar">
+  <button class="close-btn" onclick="toggleSidebar()">✖</button>
+  
+  <!-- Sidebar Title -->
+  <div class="sidebar-title">Zone Vault</div>
+
+  <nav class="sidebar-nav">
+    <a href="index.html">LOGIN</a>
+    <a href="home.html">HOME</a>
+    <a href="gallery.html">GALLERY</a>
+    <a href="nanabnb.html">NANA BNB</a>
+    <a href="hxwfanconcert.html">HXW FAN CONCERT</a>
+    <a href="svtholiday.html">SEVENTEEN HOLIDAY</a>
+    <a href="arenatour.html">2018 JAPAN ARENA TOUR</a>
+    <a href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
+    <a href="touragain.html">FOLLOW TOUR DISNEY+</a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <!-- Logo Bottom Left -->
+    <div class="sidebar-logo">
+      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+    </div>
+    
+    <!-- Email Bottom Right -->
+    <div class="sidebar-email">
+      <a href="mailto:your@email.com" title="Send Email">
+        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
+      </a>
+    </div>
+  </div>
+</div>
 
   <h1>GALLERY</h1>
 
@@ -285,6 +498,72 @@ lightGallery(document.getElementById('lightgallery2'), {
       header.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
     });
   </script>
+  
+  <script>
+  const allowedPaths = [
+    '/index.html',
+    '/home.html',
+    '/nanabnb.html',
+    '/hxwfanconcert.html',
+    '/svtholiday.html',
+    '/arenatour.html',
+    '/svtjapanconcert.html',
+    '/svtjapanconcert.html',
+    '/touragain.html',
+    '/gallery.html',
+    '/soon.html'
+  ];
+
+  const currentPage = window.location.pathname;
+
+  // 1. Check if user already has internalAccess flag
+  const hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+
+  // 2. Check if user came from one of the allowed pages
+  const referrer = document.referrer;
+  const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+
+  // 3. If came from allowed page, give internalAccess
+  if (cameFromAllowedPage) {
+    sessionStorage.setItem('internalAccess', 'true');
+  }
+
+  // 4. Allow access if:
+  // - already has internalAccess OR
+  // - current page is index.html (entry point)
+  const isIndexPage = currentPage === '/index.html';
+  if (!hasInternalAccess && !isIndexPage) {
+    const modal = document.createElement('div');
+    modal.id = 'accessDeniedModal';
+    modal.style = `
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      text-align: center;
+      padding: 20px;
+    `;
+    modal.innerHTML = `
+      <div>
+        <strong style="font-size: 24px;">🚫 Access Denied</strong><br><br>
+        You cannot access this page directly.<br>
+        Please go through the homepage or allowed sections.<br><br>
+        <em>Redirecting to login page...</em>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 3000);
+  }
+</script>
 
 <script>
   if ('serviceWorker' in navigator) {
@@ -304,6 +583,56 @@ lightGallery(document.getElementById('lightgallery2'), {
     });
   }
 </script>
+
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('mobileSidebar');
+    sidebar.classList.toggle('open');
+  }
+</script>
+
+<script>
+  let lastScrollY = window.scrollY;
+  const scrollHeader = document.getElementById('scrollHeader');
+
+  window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY > lastScrollY && currentScrollY > 50) {
+      // Scroll Down → Hide header
+      scrollHeader.classList.add('hide');
+    } else {
+      // Scroll Up → Show header smoothly
+      scrollHeader.classList.remove('hide');
+    }
+
+    lastScrollY = currentScrollY;
+  });
+</script>
+
+<script>
+  const categoryLinks = document.querySelectorAll('.category-link');
+
+  categoryLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault(); // prevent immediate jump
+
+      // Remove flash class from all
+      categoryLinks.forEach(l => l.classList.remove('flash'));
+
+      // Add flash class to the clicked one
+      link.classList.add('flash');
+
+      // Remove it after a short delay (fade out effect)
+      setTimeout(() => {
+        link.classList.remove('flash');
+        // Redirect after animation (if it's a real page)
+        window.location.href = link.href;
+      }, 800); // adjust delay to match transition
+    });
+  });
+</script>
+
 
 </body>
 </html>
