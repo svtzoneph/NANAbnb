@@ -4,82 +4,181 @@
   <meta charset="UTF-8" />
   <title>Zone Vault</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js"></script>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2196f3">
-  <link rel="icon" href="favicon-new.png" type="image/png" />
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  gtag('config', 'G-1B2RJ659GL');
-</script>
+  <!-- Manifest and Favicon -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="favicon-new.png" type="image/png">
+  <meta name="theme-color" content="#2196f3">
 
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1c1c1c, #3e3e3e);
-      color: white;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1B2RJ659GL');
+  </script>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-size: cover;
+    background-color: gray;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: white;
+  }
+
+  .container {
+    background: rgba(34, 34, 34, 0.85);
+    padding: 32px 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    width: 100%;
+    max-width: 420px;
+    backdrop-filter: blur(12px);
+    animation: fadeIn 0.6s ease-in-out;
+    margin: 16px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h2, h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+  }
+
+  input, button {
+    width: 100%;
+    padding: 14px 16px 14px 42px;
+    font-size: 16px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 8px;
+    box-sizing: border-box;
+    outline: none;
+    transition: 0.3s;
+  }
+
+  input {
+    background: #2c2c2c;
+    color: #fff;
+  }
+
+  input::placeholder {
+    color: #bbb;
+  }
+
+  button {
+    background-color: #1db954;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #17a246;
+  }
+
+  .google-btn {
+    background-color: #db4437;
+  }
+
+  .google-btn:hover {
+    background-color: #c53727;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .input-icon-group {
+    position: relative;
+  }
+
+  .input-icon-group i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  p {
+    font-size: 14px;
+    color: #ccc;
+    text-align: center;
+    margin-top: 6px;
+  }
+  
+  .button-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.button-row button {
+  flex: 1;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.google-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.google-btn img {
+  height: 20px;
+}
+
+  @media (max-width: 480px) {
     .container {
-      background: #222;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      width: 90%;
-      max-width: 420px;
+      padding: 24px 16px;
+      margin: 12px;
     }
+
     h2, h3 {
-      text-align: center;
-      margin: 10px 0;
+      font-size: 1.3rem;
     }
+
     input, button {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 5px;
-      box-sizing: border-box;
+      font-size: 15px;
+      padding: 12px 14px 12px 40px;
     }
-    input {
-      background: #333;
-      color: white;
+
+    .input-icon-group i {
+      font-size: 15px;
+      left: 12px;
     }
-    input::placeholder {
-      color: #aaa;
-    }
-    button {
-      background-color: #1db954;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background-color: #17a246;
-    }
-    .google-btn {
-      background-color: #db4437;
-    }
-    .google-btn:hover {
-      background-color: #c53727;
-    }
-    .hidden {
-      display: none;
-    }
+  }
+</style>
   </style>
 </head>
 <body>
@@ -87,12 +186,30 @@
 <div class="container">
   <div id="auth-section">
     <h2>Zone Vault</h2>
-    <input type="email" id="email" placeholder="Email" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <button onclick="login()">🔐 Login</button>
-    <button onclick="register()">📝 Register</button>
-    <button class="google-btn" onclick="googleLogin()">🔐 Sign in with Google</button>
+    <div class="input-icon-group">
+      <i class="fas fa-envelope"></i>
+      <input type="email" id="email" placeholder="Email" required />
+    </div>
+    <div class="input-icon-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" id="password" placeholder="Password" required />
+    </div>
+    
+      <div class="button-row">
+  <button onclick="login()">Login</button>
+  <button onclick="register()">Register</button>
+</div>
+<div class="google-wrapper">
+  <button class="google-btn" onclick="googleLogin()">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+    Sign in with Google
+  </button>
+</div>
+    
   </div>
+  
+
+
 
   <div id="verify-section" class="hidden">
     <h3>📧 Please verify your email.</h3>
@@ -102,8 +219,14 @@
 
   <div id="form-section" class="hidden">
     <h2>Request Access</h2>
-    <input type="text" id="name" placeholder="Telegram Username" required />
-    <input type="text" id="reason" placeholder="CODE" required />
+    <div class="input-icon-group">
+      <i class="fas fa-user"></i>
+      <input type="text" id="name" placeholder="Telegram Username" required />
+    </div>
+    <div class="input-icon-group">
+      <i class="fas fa-key"></i>
+      <input type="text" id="reason" placeholder="CODE" required />
+    </div>
     <button onclick="submitRequest()">📩 Submit Request</button>
   </div>
 
@@ -163,7 +286,6 @@
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     if (!email || !password) return alert("Please enter email and password.");
-
     createUserWithEmailAndPassword(auth, email, password)
       .then(userCred => {
         sendEmailVerification(userCred.user).then(() => {
@@ -177,13 +299,10 @@
   window.login = function () {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
-
     signInWithEmailAndPassword(auth, email, password)
       .then(userCred => {
         const user = userCred.user;
-        reload(user).then(() => {
-          show("verify-section");
-        });
+        reload(user).then(() => show("verify-section"));
       })
       .catch(e => alert("Login error: " + e.message));
   };
@@ -201,75 +320,69 @@
     }
   };
 
-window.googleLogin = async function () {
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
+  window.googleLogin = async function () {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      currentUid = user.uid;
+      const reqRef = ref(db, 'joinRequests/' + currentUid);
+      const snapshot = await get(reqRef);
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        if (data.status === "approved") {
+          sessionStorage.setItem("fromIndex", "true");
+          show("approved");
+          setTimeout(() => window.location.href = "home.html", 1500);
+        } else if (data.status === "pending") {
+          show("waiting");
+        } else if (data.status === "denied") {
+          alert("❌ Your request was denied.");
+          signOut(auth).then(() => show("auth-section"));
+        }
+      } else {
+        show("form-section");
+      }
+    } catch (error) {
+      alert("Google login error: " + error.message);
+    }
+  };
+
+  function checkJoinRequest(user) {
     currentUid = user.uid;
-
     const reqRef = ref(db, 'joinRequests/' + currentUid);
-    const snapshot = await get(reqRef);
-
-    if (snapshot.exists()) {
+    onValue(reqRef, (snapshot) => {
       const data = snapshot.val();
-      if (data.status === "approved") {
-        sessionStorage.setItem("fromIndex", "true");
-        show("approved");
-        setTimeout(() => window.location.href = "home.html", 1500);
-      } else if (data.status === "pending") {
-        show("waiting");
-      } else if (data.status === "denied") {
-        alert("❌ Your request was denied.");
-        signOut(auth).then(() => show("auth-section"));
+      if (!data) {
+        show("form-section");
+      } else {
+        if (data.status === "approved") {
+          show("approved");
+          sessionStorage.setItem("fromIndex", "true");
+          setTimeout(() => window.location.href = "home.html", 1500);
+        } else if (data.status === "pending") {
+          show("waiting");
+        } else if (data.status === "denied") {
+          alert("❌ Your request was denied.");
+          signOut(auth).then(() => show("auth-section"));
+        }
       }
-    } else {
-      // Show the form so Google users can submit their join request manually
-      show("form-section");
-    }
-  } catch (error) {
-    alert("Google login error: " + error.message);
+    });
   }
-};
 
- function checkJoinRequest(user) {
-  currentUid = user.uid;
-  const reqRef = ref(db, 'joinRequests/' + currentUid);
-
-  // Always listen for changes to the request
-  onValue(reqRef, (snapshot) => {
-    const data = snapshot.val();
-    if (!data) {
-      show("form-section");
-    } else {
-      if (data.status === "approved") {
-        show("approved");
-        sessionStorage.setItem("fromIndex", "true");
-        setTimeout(() => window.location.href = "home.html", 1500);
-      } else if (data.status === "pending") {
-        show("waiting");
-      } else if (data.status === "denied") {
-        alert("❌ Your request was denied.");
-        signOut(auth).then(() => show("auth-section"));
-      }
-    }
-  });
-}
-
-window.submitRequest = function () {
-  const name = document.getElementById("name").value;
-  const reason = document.getElementById("reason").value;
-  const user = auth.currentUser;
-  if (!name || !reason) return alert("Please fill out all fields.");
-
-  const reqRef = ref(db, 'joinRequests/' + currentUid);
-  set(reqRef, {
-    name,
-    reason,
-    email: user.email,
-    provider: user.providerData[0]?.providerId || "password",
-    status: "pending"
-  }).then(() => show("waiting"));
-};
+  window.submitRequest = function () {
+    const name = document.getElementById("name").value;
+    const reason = document.getElementById("reason").value;
+    const user = auth.currentUser;
+    if (!name || !reason) return alert("Please fill out all fields.");
+    const reqRef = ref(db, 'joinRequests/' + currentUid);
+    set(reqRef, {
+      name,
+      reason,
+      email: user.email,
+      provider: user.providerData[0]?.providerId || "password",
+      status: "pending"
+    }).then(() => show("waiting"));
+  };
 
   onAuthStateChanged(auth, user => {
     if (user) {
@@ -289,12 +402,10 @@ window.submitRequest = function () {
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').then(reg => {
-      // ✅ Detect updates
       reg.onupdatefound = () => {
         const newSW = reg.installing;
         newSW.onstatechange = () => {
           if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            // ✅ New version is ready → force reload
             window.location.reload();
           }
         };
