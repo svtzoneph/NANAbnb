@@ -339,6 +339,7 @@
     <a class="category-link" href="touragain.html">FOLLOW TOUR DISNEY+</a>
     <a class="category-link" href="#">SOON</a>
     <a class="category-link" href="#">SOON</a>
+    <span id="login-indicator" style="color: limegreen;">● Logged In</span>
   </header>
 
   <!-- Hero Section -->
@@ -605,6 +606,34 @@
       console.error('Service Worker registration failed:', err);
     });
   }
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+    authDomain: "tvnstream-b4497.firebaseapp.com",
+    projectId: "tvnstream-b4497",
+    appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, user => {
+    const indicator = document.getElementById("login-indicator");
+    if (user) {
+      // User is logged in
+      indicator.textContent = "● Logged In";
+      indicator.style.color = "limegreen";
+    } else {
+      // Not logged in
+      indicator.textContent = "● Not Logged In";
+      indicator.style.color = "gray";
+    }
+  });
 </script>
 
 </body>
