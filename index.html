@@ -233,6 +233,7 @@
   <div id="waiting" class="hidden">
     <h3>⏳ Waiting for admin approval...</h3>
     <p>This page will redirect once approved.</p>
+   <p>Message Hoskwi_17 on Telegram for fast approved</p>
   </div>
 
   <div id="approved" class="hidden">
@@ -358,7 +359,7 @@
         if (data.status === "approved") {
           show("approved");
           sessionStorage.setItem("fromIndex", "true");
-          setTimeout(() => window.location.href = "profile.html", 1500);
+          setTimeout(() => window.location.href = "home.html", 1500);
         } else if (data.status === "pending") {
           show("waiting");
         } else if (data.status === "denied") {
