@@ -63,10 +63,10 @@
       background: #b00610;
     }
     
-    header {
+header {
   padding: 12px 20px;
   display: flex;
-  align-items: center; /* vertically center all children */
+  align-items: center;
   gap: 10px;
   overflow-x: auto;
   white-space: nowrap;
@@ -75,8 +75,24 @@
   z-index: 100;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+ background: linear-gradient(to bottom, #1a1b1d, #2e2f31);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Elegant border */
+  backdrop-filter: blur(6px); /* Slight blur behind the header */
+  transition: transform 0.3s ease-in, background 0.4s ease-in-out;
 }
 
+/* Header show/hide animations */
+header.show {
+  transform: translateY(0);
+  transition: transform 0.6s ease-out;
+}
+
+header.hide {
+  transform: translateY(-100%);
+}
+
+/* Flex wrapper for links */
 .header-links {
   display: flex;
   gap: 10px;
@@ -87,22 +103,21 @@
   -webkit-overflow-scrolling: touch;
 }
 
-.header-links::-webkit-scrollbar {
-  display: none;
-}
-
 .header-logo {
   flex: 0 0 auto;
   display: flex;
-  align-items: center; /* center img vertically in logo box */
+  align-items: center;
 }
 
 .header-logo img {
   width: 60px;
   height: auto;
   display: block;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5)); /* Logo drop shadow */
 }
-   .category-link {
+
+/* Category links with hover animation and gradient highlight */
+.category-link {
   padding: 8px 16px;
   background: transparent;
   color: #fff;
@@ -111,31 +126,41 @@
   text-decoration: none;
   flex: 0 0 auto;
   font-weight: bold;
-  transition: background 0.3s, color 0.3s;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  position: relative;
 }
 
-.category-link.flash {
-  background: #fff;
-  color: #000;
-  transition: background 0.6s ease, color 0.6s ease;
+.category-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: -1;
 }
 
+.category-link:hover {
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.category-link:hover::before {
+  opacity: 1;
+}
+
+/* Active link style */
 .category-link.active {
   background: #fff;
   color: #000;
 }
 
-header {
-  transition: transform 0.3s ease-in; /* hide quickly */
-}
-
-header.show {
-  transform: translateY(0);
-  transition: transform 0.6s ease-out; /* appear slowly */
-}
-
-header.hide {
-  transform: translateY(-100%);
+/* Flash effect */
+.category-link.flash {
+  background: #fff;
+  color: #000;
+  transition: background 0.6s ease, color 0.6s ease;
 }
 
 .sidebar {
@@ -147,12 +172,41 @@ header.hide {
   width: 80%;
   max-width: 300px;
   height: 100%;
-  background: #111;
+  background: linear-gradient(to bottom, #232526, #414345);
+  backdrop-filter: blur(10px); /* Glassmorphism */
   z-index: 9999;
   padding: 20px;
   gap: 10px;
   transition: left 0.3s ease;
   justify-content: space-between;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6);
+    overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+  
+  /* ✅ Make only the link section scrollable */
+  max-height: 450px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Optional: prettier scrollbar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+.sidebar-nav:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.4);
 }
 
 .sidebar.open {
@@ -163,146 +217,120 @@ header.hide {
   align-self: flex-end;
   background: none;
   border: none;
-  font-size: 20px;
-  color: white;
+  font-size: 26px;
+  color: #fff;
   cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.sidebar .close-btn:hover {
+  transform: rotate(90deg);
+}
+
+.sidebar-title {
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  color: 	#f1f1f1; /* or #b490e5 */
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 10px;
 }
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   margin-top: 20px;
 }
 
 .sidebar-nav a {
   text-decoration: none;
-  color: white;
-  font-size: 14px; /* Smaller font size */
-  padding: 5px 0;
-  border-bottom: 1px solid #333;
+  color: #fff;
+  font-size: 15px;
   font-weight: 500;
+  padding: 10px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-nav a:hover {
+  background: rgba(255, 255, 255, 0.15);
+  padding-left: 20px;
 }
 
 .sidebar-footer {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   margin-top: auto;
   padding-top: 20px;
-  border-top: 1px solid #333;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .sidebar-logo img {
-  width: 60px;
+  width: 50px;
   height: auto;
 }
 
 .sidebar-email a {
   color: white;
-  font-size: 20px;
+  font-size: 18px;
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 .sidebar-email a:hover {
-  color: #2196f3;
+  color: #00bfff;
 }
 
- .sidebar-title {
-  font-size: 25px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 10px;
-  
-  }
-
-/* Hide desktop header on mobile */
-#scrollHeader {
-  display: flex;
-}
-
-.mobile-header,
-.sidebar {
+/* Mobile header & hamburger */
+.mobile-header {
   display: none;
 }
 
-/* Mobile responsive sidebar */
 @media (max-width: 768px) {
   #scrollHeader {
     display: none;
   }
 
-.mobile-header {
-  display: flex;
-  padding: 10px 20px;
-  align-items: center;
-  z-index: 1000;
-  background: transparent; /* ✅ Transparent */
-}
-
-.hamburger {
-  font-size: 24px;
-  color: white;
-  cursor: pointer;
-  background: none;
-  border: none;
-  outline: none;
-  margin-left: 6px; /* <-- This line adds the left margin */
-
-  /* Remove tap highlight and callout (mobile) */
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-
-  /* Prevent selection and other visual effects */
-  user-select: none;
-}
-.sidebar {
-  display: flex;
-}
-
-.sidebar-email img {
-  width: 30px;
-  height: 30px;
-}
-
-.sidebar-logo img {
-  width: 60px;
-  height: auto;
-}
-
-.sidebar-title {
-  font-size: 30px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 15px;
-}
-
-@media (max-width: 768px) {
-  .profile {
-    flex-direction: column;
+  .mobile-header {
+    display: flex;
+    padding: 10px 20px;
     align-items: center;
-    text-align: center;
+    justify-content: space-between;
+    background: transparent;
+    z-index: 1000;
   }
 
-  .profile img {
-    width: 80px;
-    height: 80px;
+  .hamburger {
+    font-size: 26px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
   }
 
-  .profile-info {
-    width: 100%;
+  .sidebar {
+    display: flex;
   }
 
-  .profile-info h2 {
-    font-size: 18px;
+  .sidebar-email img {
+    width: 30px;
+    height: 30px;
   }
-}
 
-@media (max-width: 768px) {
-  .profile img {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 10px;
+  .sidebar-logo img {
+    width: 60px;
+    height: auto;
+  }
+
+  .sidebar-title {
+    font-size: 30px;
+    margin-bottom: 15px;
   }
 }
   </style>
