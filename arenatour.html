@@ -26,10 +26,6 @@
   box-sizing: border-box;
 }
 
-    html, body {
-  height: 100%;
-}
-
 html, body {
   height: 100%;
 }
@@ -144,15 +140,16 @@ header.hide {
 }
 
   body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    filter: blur(7px) brightness(0.5);
-    z-index: -1;
-  }
+  content: "";
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: transparent; /* Add this */
+  filter: blur(7px) brightness(0.5);
+  z-index: -1;
+  pointer-events: none;
+}
 
   .code-verify {
     display: flex;
@@ -188,12 +185,43 @@ header.hide {
   }
 
 .video-container {
-  display: block; /* ✅ Change from 'none' to 'block' */
-  max-width: 1400px;
+  width: 100%;
+  max-width: 940px; /* ✅ Limit video size */
   margin: 0 auto;
-  padding: 40px 20px;
-  text-align: center;
-  border-radius: 12px;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.videos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.video-box {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  position: relative;
+}
+
+.player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #000;
+}
+
+/* Optional: Smaller text for small screens */
+@media screen and (max-width: 480px) {
+  .title {
+    font-size: 1rem;
+    text-align: center;
+  }
 }
 
   h2.title {
@@ -204,25 +232,15 @@ header.hide {
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
   margin-bottom: 30px;
   letter-spacing: 1px;
+  text-align: center;
 }
   .videos {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    display: flex;
     gap: 40px;
     justify-content: center;
   }
 
-  .video-box {
-    width: 100%;
-  }
 
-  .player {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border-radius: 10px;
-    overflow: hidden;
-    background-color: #000; /* ✅ FIX: Prevent body blur from leaking into player */
-  }
 
   .video-label {
     margin-top: 10px;
