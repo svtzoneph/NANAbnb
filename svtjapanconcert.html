@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>17 JAPAN CONCERT Say the name #SEVENTEEN</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="icon" href="favicon-new.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+ <link rel="icon" href="favicon-new.png" type="image/png" />
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2196f3">
-
+<meta name="description" content="Private SEVENTEEN streaming vault with lifetime access for approved members.">
+<meta name="keywords" content="SEVENTEEN, concert, vault, fanclub, exclusive, stream, archive">
+<meta property="og:title" content="Zone Vault - SEVENTEEN Exclusive Archive">
+<meta property="og:description" content="Private vault for SEVENTEEN concerts and shows. Members-only. No leaks allowed.">
+<meta property="og:image" content="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png">
+<meta property="og:type" content="website">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
 <script>
@@ -21,23 +21,20 @@
 
   gtag('config', 'G-1B2RJ659GL');
 </script>
+
+  <title>Home | Zone Vault</title>
   <style>
-   * {
-  box-sizing: border-box;
-}
-
-html, body {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(to bottom, #232526, #414345);
-  color: #d6b4fc; /* or #b490e5 */
-  overflow-x: hidden;
-  font-size: 16px;
-}
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(to bottom, #232526, #414345);
+      color: #d6b4fc; /* or #b490e5 */
+      overflow-x: hidden;
+      font-size: 16px;
+    }
 
 header {
   padding: 12px 20px;
@@ -139,99 +136,264 @@ header.hide {
   transition: background 0.6s ease, color 0.6s ease;
 }
 
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    filter: blur(7px) brightness(0.5);
-    z-index: -1;
-  }
-
-  .code-verify {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    text-align: center;
-    padding: 20px;
-    border-radius: 12px;
-    margin: auto;
-    max-width: 90%;
-  }
-
-  input[type="text"] {
-    padding: 12px;
-    font-size: 16px;
-    margin: 10px;
-    width: 260px;
-    border-radius: 8px;
-    border: none;
-    text-align: center;
-  }
-
-  button {
-    padding: 10px 24px;
-    font-size: 16px;
-    border-radius: 6px;
-    background-color: #00c9a7;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-
-.video-container {
-  display: block; /* ✅ Change from 'none' to 'block' */
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  text-align: center;
-  border-radius: 12px;
-}
-
-  h2.title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 32px;
-  font-weight: 700;
-  color: white;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-  margin-bottom: 30px;
-  letter-spacing: 1px;
-}
-  .videos {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 40px;
-    justify-content: center;
-  }
-
-  .video-box {
-    width: 100%;
-  }
-
-  .player {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border-radius: 10px;
-    overflow: hidden;
-    background-color: #000; /* ✅ FIX: Prevent body blur from leaking into player */
-  }
-
-  .video-label {
-    margin-top: 10px;
-    font-size: 16px;
-    color: #ccc;
-  }
-
-  @media (max-width: 600px) {
-    .videos {
-      grid-template-columns: 1fr;
+    .hero-section {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
     }
-  }
+
+    .hero-left, .hero-right {
+      flex: 1 1 50%;
+      min-width: 300px;
+      padding: 40px 30px;
+      background: transparent;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-left h1 {
+      font-size: clamp(40px, 9vw, 34px);
+      margin-bottom: 50px;
+      align-items: center;
+      color: 	#f1f1f1;
+    }
+
+    .hero-left p {
+      font-size: clamp(14px, 6vw, 18px);
+      color: 	#f1f1f1;
+      margin-bottom: 100px;
+    }
+
+    .hero-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .main-image {
+      width: 100%;
+      height: 400px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .main-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumbnail-row {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+      scroll-behavior: smooth;
+    }
+
+    .thumbnail-row::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .thumbnail-row::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 10px;
+    }
+
+ .thumb-box {
+  width: 60px;
+  height: 60px;
+  aspect-ratio: 1 / 1; /* square */
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #000;
+  background: #1b1b1b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border 0.3s ease, background-color 0.3s ease;
+}
+
+    .thumb-box.active,
+    .thumb-box:hover {
+      border-color: #ffc107;
+    }
+
+.thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+    .thumb-box.active .thumb,
+    .thumb-box:hover .thumb {
+      opacity: 1;
+    }
+
+    .container {
+      width: 100%;
+      padding: 0 15px 60px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .accordion {
+      background: transparent;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .accordion-header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      background: #222;
+    }
+
+    .accordion-header h3 {
+      margin: 0;
+      font-size: clamp(14px, 4vw, 18px);
+      color: 	#f1f1f1; /* or #b490e5 */
+    }
+
+    .arrow {
+      transition: transform 0.3s ease;
+      font-size: 16px;
+    }
+
+    .accordion.open .arrow {
+      transform: rotate(90deg);
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: scaleY(0.95);
+      padding: 0 20px;
+      transition: max-height 0.5s ease, opacity 0.4s ease, transform 0.4s ease, padding 0.3s ease;
+        background: transparent;
+    }
+
+    .accordion.open .accordion-content {
+      padding: 16px 20px;
+      max-height: 400px;
+      opacity: 1;
+      transform: scaleY(1);
+    }
     
+
+   .accordion-content p {
+  margin: 0;
+  line-height: 1.6;
+  font-size: clamp(12px, 2.5vw, 14px);
+  color: 	#f1f1f1;
+}
+
+    @media (max-width: 768px) {
+  .hero-section {
+    flex-direction: column;
+  }
+
+  .hero-left, .hero-right {
+    padding: 20px 15px;
+  }
+
+  .hero-left h1 {
+    font-size: clamp(30px, 5vw, 28px);
+    margin-bottom: 20px;
+  }
+
+  .hero-left p {
+    font-size: clamp(15px, 4vw, 16px);
+    margin-bottom: 12px;
+  }
+
+  .main-image {
+    height: auto;
+    max-height: 250px;
+  }
+
+  .thumb-box {
+    width: 60px;
+    height: 60px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .container {
+    padding: 0 10px 40px;
+  }
+}
+
+@media (max-width: 420px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .accordion-header h3 {
+    font-size: 12.5px;
+  }
+
+  .hero-left p {
+    font-size: 14px;
+  }
+
+  .thumb-box {
+    width: 50px;
+    height: 40px;
+  }
+}
+    @media (max-width: 420px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .accordion-header h3 {
+        font-size: 13px;
+      }
+    }
+    
+.main-image img {
+  opacity: 1;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.main-image img.fade-out {
+  opacity: 0;
+}
+
+.accordion-content.scrollable {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-right: 10px;
+}
+
+.accordion-content.scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.accordion-content.scrollable::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 10px;
+}
 
 .sidebar {
   display: flex;
@@ -467,28 +629,181 @@ header.hide {
   </div>
 </div>
 
-<!-- Video Content -->
-<div class="video-container" id="videoPage">
-  <h2 class="title">17 JAPAN CONCERT Say the name #SEVENTEEN</h2>
-  <div class="videos">
-    <div class="video-box">
-      <div class="player" id="player1"></div> <!-- ✅ Needed for Clappr -->
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-left">
+      <h1>Welcome to Zone Vault</h1>
+      <p>Watch, Enjoy, and Stay Private! Enjoy exclusive content in a private, full-featured layout. Don’t forget to read the rules.</p>
     </div>
+   
+   
+    <div class="hero-right">
+      <div class="main-image">
+        <img id="mainDisplay" src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/1.png" alt="Main">
+      </div>
+      <div class="thumbnail-row" id="thumbScroll">
+        <div class="thumb-box active" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/1.png" class="thumb">
+        </div>
+        <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/2.png" class="thumb">
+        </div>
+        <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/3.png" class="thumb">
+        </div>
+        <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/4.png" class="thumb">
+        </div>
+        <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/5.png" class="thumb">
+        </div>
+        <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/6.png" class="thumb">
+      </div>
+    </div>
+  </div>
+
+ <!-- Accordion Section -->
+<div class="container">
+  <div class="grid">
+    <div class="accordion">
+      <div class="accordion-header">
+        <h3>Rules</h3>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="accordion-content scrollable">
+        <p>
+          • Do not share or repost any content or links outside this site.<br>
+          • No screenshots, screen recording, or reuploads of any content.<br>
+          • Leaking content will lead to a permanent ban without warning.<br>
+          • Access is for approved users only — do not share your login info or account.<br>
+        </p>
+        <p><strong>Violation of any rule will result in immediate removal and permanent ban.</strong><br></p>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <div class="accordion-header">
+        <h3>Announcements</h3>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="accordion-content scrollable">
+        <h2 style="margin-top: 0;">📲 Want to Install the Zone Vault Website as an App?</h2>
+        <p>Here's the Step-by-Step:</p>
+        <ol>
+          <li>Open <strong>zonevault.site</strong> using <strong>Google Chrome</strong> on your phone</li>
+          <li>Wait for the website to fully load, then tap the <strong>three dots (⋮)</strong> in the upper-right corner of your browser</li>
+          <li>Select <strong>“Add to Home screen”</strong> then tap <strong>“Install”</strong></li>
+          <li>✅ Once installation is complete, Zone Vault will appear on your phone just like a regular app — no need to search in your browser again!</li>
+        </ol>
+        <p>🔐 <strong>Stay connected anytime, anywhere</strong> — access exclusive content in just one tap.</p>
+        <p>💬 <strong>Need help?</strong> Just visit the <a href="#vault-help" style="color:#4a6cff; text-decoration:underline;">Vault Help</a> section or <a href="mailto:zonevaultph@gmail.com" style="color:#4a6cff; text-decoration:underline;">email us</a> if you have any other questions.</p>
+      </div>
+    </div>
+
+    <div class="accordion">
+      <div class="accordion-header">
+        <h3>Notes</h3>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="accordion-content scrollable">
+        <p>
+          • This platform is for private viewing only.<br>
+          • Sharing links outside may lead to takedown or bans.<br>
+          • All content is <strong>lifetime access</strong> — this means you can watch the content anytime, forever, with no expiration, as long as your account and this website stays active.
+        </p>
+      </div>
+    </div>
+    
+    <div class="accordion">
+      <div class="accordion-header">
+        <h3>Vault Help</h3>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="accordion-content scrollable">
+        <p><strong>Q: Who can access the content?</strong><br>
+        A: Only paid members or approved joiners can view the exclusive content inside the site.</p>
+
+        <p><strong>Q: Can I share my account with someone else?</strong><br>
+        A: No. Account sharing is strictly prohibited and will result in a permanent ban.</p>
+
+        <p><strong>Q: Is it okay to repost or reupload the videos?</strong><br>
+        A: Absolutely not. All content is private. No screenshots, screen recordings, or reposts are allowed.</p>
+
+        <p><strong>Q: What happens if someone breaks the rules?</strong><br>
+        A: Any violation will lead to immediate removal and a permanent ban, with no warnings.</p>
+
+        <p><strong>Q: Can I request specific SEVENTEEN content?</strong><br>
+        A: You may send a request, but approval depends on the admin and content availability.</p>
+
+        <p><strong>Q: Where can I get the access code?</strong><br>
+        A: The access code is shared by the admin through email, DM, or after payment confirmation.</p>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<script>
-  new Clappr.Player({
-    parentId: "#player1",
-    source: "https://stream.mux.com/pUwYlvoBRI01ZlhAo52RtWwrNX2ZpgNVrZpFunIqz4CM.m3u8",
-    poster: "https://uploads.onecompiler.io/432zqmf3k/43qqmajhe/Screenshot%202025-07-15%20153643.png",
-    autoPlay: false,
-    width: "100%",
-    height: "100%",
-  });
-</script>
-
   <script>
+    // Accordion toggle
+    document.querySelectorAll('.accordion-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const acc = header.parentElement;
+        const open = acc.classList.contains('open');
+        document.querySelectorAll('.accordion').forEach(a => a.classList.remove('open'));
+        if (!open) acc.classList.add('open');
+      });
+    });
+
+    // Thumbnail switching
+   const thumbnailBoxes = document.querySelectorAll('.thumb-box');
+  const mainImage = document.getElementById('mainDisplay');
+  let current = 0;
+
+  // Extra hidden slides (these won't appear in thumbnail row)
+  const extraSlides = [
+   
+  ];
+
+  // Combined array for slideshow (visible + hidden)
+  const slideshowSources = [
+    ...Array.from(thumbnailBoxes).map(box => box.querySelector('img').src),
+    ...extraSlides
+  ];
+
+  function switchImageByIndex(index) {
+    const newSrc = slideshowSources[index];
+    mainImage.classList.add('fade-out');
+    setTimeout(() => {
+      mainImage.src = newSrc;
+      mainImage.classList.remove('fade-out');
+    }, 500);
+
+    // Highlight active thumbnail only if it's one of the original thumbs
+    thumbnailBoxes.forEach(b => b.classList.remove('active'));
+    if (index < thumbnailBoxes.length) {
+      thumbnailBoxes[index].classList.add('active');
+    }
+  }
+
+  setInterval(() => {
+    current = (current + 1) % slideshowSources.length;
+    switchImageByIndex(current);
+  }, 5000);
+
+  // Manual switch from visible thumbnail
+  function switchImage(box) {
+    const img = box.querySelector('img');
+    mainImage.classList.add('fade-out');
+    setTimeout(() => {
+      mainImage.src = img.src;
+      mainImage.classList.remove('fade-out');
+    }, 500);
+    thumbnailBoxes.forEach(b => b.classList.remove('active'));
+    box.classList.add('active');
+    current = slideshowSources.indexOf(img.src);
+  }
+
   // Scroll header on mouse wheel
 const linksContainer = document.querySelector('.header-links');
 linksContainer.addEventListener('wheel', (e) => {
@@ -590,6 +905,40 @@ linksContainer.addEventListener('wheel', (e) => {
     sidebar.classList.toggle('open');
   }
 </script>
+
+<!-- Fully Responsive Footer -->
+<footer style="
+  width: 100%;
+  color: #ccc;
+  padding: 40px 10px 30px; /* top, left/right, bottom padding */
+  font-size: 14px;
+  line-height: 1.6;
+  box-sizing: border-box;
+  position: relative;
+  margin-top: 10px; /* space above the footer */
+  margin-bottom: 20px; /* change this value to adjust bottom spacing */
+">
+  <div style="
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+    position: relative;
+  ">
+    <!-- Bottom border line, slightly lowered -->
+    <div style="
+      height: 1px;
+      background: #333;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      transform: translateY(-20px);
+    "></div>
+
+    <p style="margin: 30px 0 0;">&copy; 2025 <strong>Zone Vault</strong>. All rights reserved.</p>
+  </div>
+</footer>
 
 <script>
   let lastScrollY = window.scrollY;
