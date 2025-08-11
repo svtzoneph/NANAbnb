@@ -19,7 +19,7 @@
   <title>Profile | Zone Vault</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-    body { background: #000; color: #fff; }
+    body { background: linear-gradient(to bottom, #232526, #414345); color: #fff; }
     .container { max-width: 900px; margin: 40px auto; background: #111; border-radius: 12px; box-shadow: 0 0 20px rgba(255,255,255,0.05); padding: 30px; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .profile { display: flex; gap: 20px; align-items: center; }
@@ -30,7 +30,7 @@
       width: 100%;
       padding: 8px;
       margin-top: 8px;
-      background: #222;
+      background: linear-gradient(to bottom, #232526, #414345);
       color: white;
       border: 1px solid #444;
       border-radius: 6px;
@@ -400,8 +400,60 @@ header.hide {
     <div class="header">
       <h1>Member Profile</h1>
 
-    </div>
+<!-- Inside .header (right after <h1>Member Profile</h1>) -->
+<div style="position: relative;">
+  <button id="noticeBtn" style="
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    position: relative;
+    cursor: pointer;
+  " title="View Notices">
+    🔔
+    <span id="noticeCount" style="
+      position: absolute;
+      top: -6px;
+      right: -10px;
+      background: red;
+      color: white;
+      border-radius: 50%;
+      font-size: 12px;
+      padding: 2px 6px;
+      display: none;
+    ">0</span>
+  </button>
+</div>
 
+<!-- Notice Modal -->
+<div id="noticeModal" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+">
+  <div style="
+    background: #111;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80%;
+    overflow-y: auto;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  ">
+    <h2 style="margin-bottom: 10px;">📢 Notices</h2>
+    <div id="noticeList" style="margin-bottom: 15px;">Loading...</div>
+    <button onclick="document.getElementById('noticeModal').style.display='none'" style="
+      background: #e50914; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;
+    ">Close</button>
+  </div>
+</div>
+
+    </div>
     <div class="profile">
       <label for="picInput">
         <img id="profile-pic" src="https://via.placeholder.com/100" alt="Profile Picture" />
@@ -448,6 +500,78 @@ header.hide {
     const auth = firebase.auth();
     const db = firebase.database();
     const storage = firebase.storage();
+    const noticeBtn = document.getElementById("noticeBtn");
+document.addEventListener("DOMContentLoaded", () => {
+  const noticeBtn = document.getElementById("noticeBtn");
+  const noticeCount = document.getElementById("noticeCount");
+  const noticeModal = document.getElementById("noticeModal");
+  const noticeList = document.getElementById("noticeList");
+  const closeNoticeModal = document.getElementById("closeNoticeModal");
+
+  let unreadNotices = [];
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      const uid = user.uid;
+
+      db.ref("notices").on("value", snapshot => {
+        const allNotices = snapshot.val() || {};
+        let userNotices = [];
+
+        for (let id in allNotices) {
+          const n = allNotices[id];
+          if (n.to === uid || n.to === "ALL") {
+            userNotices.push({ id, ...n });
+          }
+        }
+
+        // Sort newest first
+        userNotices.sort((a, b) => b.timestamp - a.timestamp);
+
+        // Filter unread
+        unreadNotices = userNotices.filter(n => !n.read);
+
+        // Update unread badge
+        if (unreadNotices.length > 0) {
+          noticeCount.style.display = "inline-block";
+          noticeCount.textContent = unreadNotices.length;
+        } else {
+          noticeCount.style.display = "none";
+        }
+
+        // Render notices
+        if (userNotices.length > 0) {
+          noticeList.innerHTML = userNotices.map(n => `
+            <div style="background:#1a1a1a;padding:10px;margin-bottom:8px;border-radius:6px;border:1px solid #333;">
+              <strong>${n.title || "Notice"}</strong><br>
+              <small>${new Date(n.timestamp).toLocaleString()}</small>
+              <p style="margin-top:5px;">${n.message}</p>
+            </div>
+          `).join("");
+        } else {
+          noticeList.innerHTML = "<p>No notices.</p>";
+        }
+      });
+
+      // Open modal & mark as read
+      noticeBtn.addEventListener("click", () => {
+        noticeModal.style.display = "flex";
+
+        unreadNotices.forEach(n => {
+          db.ref(`notices/${n.id}/read`).set(true);
+        });
+
+        noticeCount.style.display = "none";
+      });
+
+      // Close modal
+      closeNoticeModal.addEventListener("click", () => {
+        noticeModal.style.display = "none";
+      });
+    }
+  });
+});
+
 
     auth.onAuthStateChanged(user => {
       if (user) {
@@ -631,20 +755,33 @@ linksContainer.addEventListener('wheel', (e) => {
 <footer style="
   width: 100%;
   color: #ccc;
-  text-align: center;
-  padding: 10px 10px;
+  padding: 40px 10px 30px; /* top, left/right, bottom padding */
   font-size: 14px;
   line-height: 1.6;
-  margin-top: 1px;
-  border-top: 1px solid #333;
   box-sizing: border-box;
+  position: relative;
+  margin-top: 10px; /* space above the footer */
+  margin-bottom: 20px; /* change this value to adjust bottom spacing */
 ">
   <div style="
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    text-align: center;
+    position: relative;
   ">
-    <p style="margin: 8px 0;">&copy; 2025 <strong>Zone Vault</strong>. All rights reserved.</p>
+    <!-- Bottom border line, slightly lowered -->
+    <div style="
+      height: 1px;
+      background: #333;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      transform: translateY(-20px);
+    "></div>
+
+    <p style="margin: 30px 0 0;">&copy; 2025 <strong>Zone Vault</strong>. All rights reserved.</p>
   </div>
 </footer>
 
@@ -689,6 +826,8 @@ linksContainer.addEventListener('wheel', (e) => {
     });
   });
 </script>
+
+
   
 </body>
 </html>
