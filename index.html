@@ -333,7 +333,7 @@
         if (data.status === "approved") {
           sessionStorage.setItem("fromIndex", "true");
           show("approved");
-          setTimeout(() => window.location.href = "home.html", 1500);
+          setTimeout(() => window.location.href = "home", 1500);
         } else if (data.status === "pending") {
           show("waiting");
         } else if (data.status === "denied") {
