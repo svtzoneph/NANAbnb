@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>17 JAPAN CONCERT Say the name #SEVENTEEN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon-new.png" type="image/png" />
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2196f3">
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-1B2RJ659GL');
+</script>
+  <style>
+   * {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(to bottom, #232526, #414345);
+  color: #d6b4fc; /* or #b490e5 */
+  overflow-x: hidden;
+  font-size: 16px;
+}
+
+header {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+ background: linear-gradient(to bottom, #1a1b1d, #2e2f31);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Elegant border */
+  backdrop-filter: blur(6px); /* Slight blur behind the header */
+  transition: transform 0.3s ease-in, background 0.4s ease-in-out;
+}
+
+/* Header show/hide animations */
+header.show {
+  transform: translateY(0);
+  transition: transform 0.6s ease-out;
+}
+
+header.hide {
+  transform: translateY(-100%);
+}
+
+/* Flex wrapper for links */
+.header-links {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+  flex: 1;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.header-logo {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.header-logo img {
+  width: 60px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5)); /* Logo drop shadow */
+}
+
+/* Category links with hover animation and gradient highlight */
+.category-link {
+  padding: 8px 16px;
+  background: transparent;
+  color: #fff;
+  border-radius: 12px;
+  font-size: 14px;
+  text-decoration: none;
+  flex: 0 0 auto;
+  font-weight: bold;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  position: relative;
+}
+
+.category-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: -1;
+}
+
+.category-link:hover {
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.category-link:hover::before {
+  opacity: 1;
+}
+
+/* Active link style */
+.category-link.active {
+  background: #fff;
+  color: #000;
+}
+
+/* Flash effect */
+.category-link.flash {
+  background: #fff;
+  color: #000;
+  transition: background 0.6s ease, color 0.6s ease;
+}
+
+  body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: transparent; /* Add this */
+  filter: blur(7px) brightness(0.5);
+  z-index: -1;
+  pointer-events: none;
+}
+
+  .code-verify {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    margin: auto;
+    max-width: 90%;
+  }
+
+  input[type="text"] {
+    padding: 12px;
+    font-size: 16px;
+    margin: 10px;
+    width: 260px;
+    border-radius: 8px;
+    border: none;
+    text-align: center;
+  }
+
+  button {
+    padding: 10px 24px;
+    font-size: 16px;
+    border-radius: 6px;
+    background-color: #00c9a7;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+.video-container {
+  width: 100%;
+  max-width: 940px; /* ✅ Limit video size */
+  margin: 0 auto;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.videos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.video-box {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  position: relative;
+}
+
+.player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #000;
+}
+
+/* Optional: Smaller text for small screens */
+@media screen and (max-width: 480px) {
+  .title {
+    font-size: 1rem;
+    text-align: center;
+  }
+}
+
+  h2.title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+  text-align: center;
+}
+  .videos {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+  }
+
+
+
+  .video-label {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #ccc;
+  }
+
+  @media (max-width: 600px) {
+    .videos {
+      grid-template-columns: 1fr;
+    }
+  }
+    
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 80%;
+  max-width: 300px;
+  height: 100%;
+  background: linear-gradient(to bottom, #232526, #414345);
+  backdrop-filter: blur(10px); /* Glassmorphism */
+  z-index: 9999;
+  padding: 20px;
+  gap: 10px;
+  transition: left 0.3s ease;
+  justify-content: space-between;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6);
+    overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+  
+  /* ✅ Make only the link section scrollable */
+  max-height: 450px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Optional: prettier scrollbar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+.sidebar-nav:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar .close-btn {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.sidebar .close-btn:hover {
+  transform: rotate(90deg);
+}
+
+.sidebar-title {
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  color: 	#f1f1f1; /* or #b490e5 */
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 10px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.sidebar-nav a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 10px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-nav a:hover {
+  background: rgba(255, 255, 255, 0.15);
+  padding-left: 20px;
+}
+
+.sidebar-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-logo img {
+  width: 50px;
+  height: auto;
+}
+
+.sidebar-email a {
+  color: white;
+  font-size: 18px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.sidebar-email a:hover {
+  color: #00bfff;
+}
+
+/* Mobile header & hamburger */
+.mobile-header {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  #scrollHeader {
+    display: none;
+  }
+
+  .mobile-header {
+    display: flex;
+    padding: 10px 9px;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    z-index: 1000;
+  }
+
+  .hamburger {
+    font-size: 26px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+
+  .sidebar {
+    display: flex;
+  }
+
+  .sidebar-email img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .sidebar-logo img {
+    width: 60px;
+    height: auto;
+  }
+
+  .sidebar-title {
+    font-size: 30px;
+    margin-bottom: 15px;
+  }
+}
+
+  </style>
+</head>
+<body>
+  
+<!-- Mobile hamburger header -->
+<div class="mobile-header">
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+</div>
+
+<!-- Desktop header (scrollable) -->
+<header id="scrollHeader">
+  <div class="header-logo">
+    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+  </div>
+  <div class="header-links">
+    <a class="category-link" href="index.html">LOGIN</a>
+    <a class="category-link" href="profile.html">PROFILE</a>
+    <a class="category-link" href="home.html">HOME</a>
+    <a class="category-link" href="gallery.html">GALLERY</a>
+    <a class="category-link" href="nanabnb.html">NANA BNB</a>
+    <a class="category-link" href="hxwfanconcert.html">HXW FAN CONCERT</a>
+    <a class="category-link" href="svtholiday.html">SEVENTEEN HOLIDAY</a>
+    <a class="category-link" href="arenatour.html">2018 JAPAN ARENA TOUR</a>
+    <a class="category-link" href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
+    <a class="category-link" href="touragain.html">FOLLOW TOUR DISNEY+</a>
+  </div>
+</header>
+
+<!-- Sidebar for mobile -->
+<div id="mobileSidebar" class="sidebar">
+  <button class="close-btn" onclick="toggleSidebar()">✖</button>
+  
+  <!-- Sidebar Title -->
+  <div class="sidebar-title">Zone Vault</div>
+
+  <nav class="sidebar-nav">
+    <a href="index.html">LOGIN</a>
+    <a href="profile.html">PROFILE</a>
+    <a href="home.html">HOME</a>
+    <a href="gallery.html">GALLERY</a>
+    <a href="nanabnb.html">NANA BNB</a>
+    <a href="hxwfanconcert.html">HXW FAN CONCERT</a>
+    <a href="svtholiday.html">SEVENTEEN HOLIDAY</a>
+    <a href="arenatour.html">2018 JAPAN ARENA TOUR</a>
+    <a href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
+    <a href="touragain.html">FOLLOW TOUR DISNEY+</a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <!-- Logo Bottom Left -->
+    <div class="sidebar-logo">
+      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+    </div>
+    
+    <!-- Email Bottom Right -->
+    <div class="sidebar-email">
+      <a href="mailto:your@email.com" title="Send Email">
+        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Video Content -->
+<div class="video-container" id="videoPage">
+  <h2 class="title">PLEASE BACK LATER!</h2>
+  <div class="videos">
+    <div class="video-box">
+      <div class="player" id="player1"></div> <!-- ✅ Needed for Clappr -->
+    </div>
+  </div>
+</div>
+
+<script>
+  new Clappr.Player({
+    parentId: "#player1",
+    source: "",
+    poster: "https://uploads.onecompiler.io/432zqmf3k/43qqmajhe/Screenshot%202025-07-15%20153643.png",
+    autoPlay: false,
+    width: "100%",
+    height: "100%",
+  });
+</script>
+  <script>
+  // Scroll header on mouse wheel
+const linksContainer = document.querySelector('.header-links');
+linksContainer.addEventListener('wheel', (e) => {
+  if (e.deltaY === 0) return;
+  e.preventDefault();
+  linksContainer.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
+});
+</script>
+  
+<script>
+  const allowedPaths = [
+    '/index.html',
+    '/home.html',
+    '/nanabnb.html',
+    '/hxwfanconcert.html',
+    '/svtholiday.html',
+    '/arenatour.html',
+    '/svtjapanconcert.html',
+    '/svtjapanconcert.html',
+    '/touragain.html',
+    '/gallery.html',
+    '/profile.html',
+    '/soon.html'
+  ];
+
+  const currentPage = window.location.pathname;
+
+  // 1. Check if user already has internalAccess flag
+  const hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+
+  // 2. Check if user came from one of the allowed pages
+  const referrer = document.referrer;
+  const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+
+  // 3. If came from allowed page, give internalAccess
+  if (cameFromAllowedPage) {
+    sessionStorage.setItem('internalAccess', 'true');
+  }
+
+  // 4. Allow access if:
+  // - already has internalAccess OR
+  // - current page is index.html (entry point)
+  const isIndexPage = currentPage === '/index.html';
+  if (!hasInternalAccess && !isIndexPage) {
+    const modal = document.createElement('div');
+    modal.id = 'accessDeniedModal';
+    modal.style = `
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      text-align: center;
+      padding: 20px;
+    `;
+    modal.innerHTML = `
+      <div>
+        <strong style="font-size: 24px;">🚫 Access Denied</strong><br><br>
+        You cannot access this page directly.<br>
+        Please go through the homepage or allowed sections.<br><br>
+        <em>Redirecting to login page...</em>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 3000);
+  }
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      // ✅ Detect updates
+      reg.onupdatefound = () => {
+        const newSW = reg.installing;
+        newSW.onstatechange = () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            // ✅ New version is ready → force reload
+            window.location.reload();
+          }
+        };
+      };
+    }).catch(err => {
+      console.error('Service Worker registration failed:', err);
+    });
+  }
+</script>
+
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('mobileSidebar');
+    sidebar.classList.toggle('open');
+  }
+</script>
+
+<script>
+  let lastScrollY = window.scrollY;
+  const scrollHeader = document.getElementById('scrollHeader');
+
+  window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY > lastScrollY && currentScrollY > 50) {
+      // Scroll Down → Hide header
+      scrollHeader.classList.add('hide');
+    } else {
+      // Scroll Up → Show header smoothly
+      scrollHeader.classList.remove('hide');
+    }
+
+    lastScrollY = currentScrollY;
+  });
+</script>
+
+<script>
+  const categoryLinks = document.querySelectorAll('.category-link');
+
+  categoryLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault(); // prevent immediate jump
+
+      // Remove flash class from all
+      categoryLinks.forEach(l => l.classList.remove('flash'));
+
+      // Add flash class to the clicked one
+      link.classList.add('flash');
+
+      // Remove it after a short delay (fade out effect)
+      setTimeout(() => {
+        link.classList.remove('flash');
+        // Redirect after animation (if it's a real page)
+        window.location.href = link.href;
+      }, 800); // adjust delay to match transition
+    });
+  });
+</script>
+
+<script>
+  const sidebarNav = document.querySelector('.sidebar-nav');
+
+  sidebarNav.addEventListener('wheel', function (e) {
+    const isAtTop = sidebarNav.scrollTop === 0;
+    const isAtBottom = sidebarNav.scrollHeight - sidebarNav.scrollTop === sidebarNav.clientHeight;
+
+    if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+      e.preventDefault(); // Prevent page scroll when at the edges
+    }
+  }, { passive: false });
+</script>
+
+</body>
+</html> 
