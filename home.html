@@ -569,6 +569,37 @@ header.hide {
     margin-bottom: 15px;
   }
 }
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Search bar styling */
+.header-search {
+  display: flex;
+  align-items: center;
+}
+
+.header-search input {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  outline: none;
+}
+
+.header-search button {
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  margin-left: 5px;
+  cursor: pointer;
+}
+.header-search button:hover {
+  background: #555;
+}
 
   </style>
 </head>
@@ -581,16 +612,28 @@ header.hide {
 
 <!-- Desktop header (scrollable) -->
 <header id="scrollHeader">
-  <div class="header-logo">
-    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+  <div class="header-left">
+    <!-- Logo -->
+    <div class="header-logo">
+      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+    </div>
+
+    <!-- Search bar -->
+    <form id="searchForm" class="header-search">
+      <input type="text" id="searchInput" placeholder="Search videos..." />
+      <button type="submit">🔍</button>
+    </form>
   </div>
+
+  <!-- Navigation links -->
   <div class="header-links">
     <a class="category-link" href="index.html">LOGIN</a>
     <a class="category-link" href="profile.html">PROFILE</a>
     <a class="category-link" href="home.html">HOME</a>
     <a class="category-link" href="gallery.html">GALLERY</a>
     <a class="category-link" href="nanabnb.html">NANA BNB</a>
-    <a class="category-link" href="hxwfanconcert.html">HXW FAN CONCERT</a>
+    <a class="category-link" href="hxwfanconcert.html">HXW IN SEOUL</a>
+    <a class="category-link" href="hxwfanconcert.html">HXW IN GWANGJU</a>
     <a class="category-link" href="svtholiday.html">SEVENTEEN HOLIDAY</a>
     <a class="category-link" href="arenatour.html">2018 JAPAN ARENA TOUR</a>
     <a class="category-link" href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
@@ -997,6 +1040,45 @@ linksContainer.addEventListener('wheel', (e) => {
       e.preventDefault(); // Prevent page scroll when at the edges
     }
   }, { passive: false });
+</script>
+
+<script>
+const videos = [
+  { name: "NANA BNB", url: "nanabnb.html" },
+  { name: "HXW IN SEOUL", "HXW", url: "hxwfanconcert.html" },
+  { name: "HXW IN GWANGJU", url: "hxwingwangju.html" },
+  { name: "SEVENTEEN HOLIDAY", url: "svtholiday.html" },
+  { name: "2018 JAPAN ARENA TOUR", url: "arenatour.html" },
+  { name: "17 JAPAN CONCERT", url: "svtjapanconcert.html" },
+  { name: "FOLLOW TOUR DISNEY+", url: "touragain.html" }
+];
+
+// Handle search form submit
+document.getElementById("searchForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  searchVideo();
+});
+
+function searchVideo() {
+  const input = document.getElementById("searchInput").value.trim().toLowerCase();
+
+  // Find video by partial match (case-insensitive)
+  const result = videos.find(v => v.name.toLowerCase().includes(input));
+
+  if (result) {
+    window.location.href = result.url; // redirect to the page
+  } else {
+    alert("No matching video found.");
+  }
+}
+
+// Optional: allow pressing Enter without submit button
+document.getElementById("searchInput").addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    searchVideo();
+  }
+});
 </script>
 
 </body>
