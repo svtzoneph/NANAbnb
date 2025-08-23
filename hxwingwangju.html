@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>17 JAPAN CONCERT Say the name #SEVENTEEN</title>
+  <title>Hoshi x Woozi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -21,23 +21,20 @@
 
   gtag('config', 'G-1B2RJ659GL');
 </script>
+
+  <title>Home | Zone Vault</title>
   <style>
-   * {
-  box-sizing: border-box;
-}
-
-html, body {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(to bottom, #232526, #414345);
-  color: #d6b4fc; /* or #b490e5 */
-  overflow-x: hidden;
-  font-size: 16px;
-}
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(to bottom, #232526, #414345);
+      color: #d6b4fc; /* or #b490e5 */
+      overflow-x: hidden;
+      font-size: 16px;
+    }
 
 header {
   padding: 12px 20px;
@@ -139,17 +136,79 @@ header.hide {
   transition: background 0.6s ease, color 0.6s ease;
 }
 
-  body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  background: transparent; /* Add this */
-  filter: blur(7px) brightness(0.5);
-  z-index: -1;
-  pointer-events: none;
+  h1 {
+      text-align: center;
+      color: #ff3366;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    .divider {
+      font-size: 1.1rem;
+      color: #ff6699;
+      margin: 2rem 0 1rem;
+      border-left: 4px solid #ff3366;
+      padding-left: 10px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .gallery a {
+      display: block;
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .gallery a img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .gallery a:hover img {
+      transform: scale(1.02);
+    }
+
+    .lg-backdrop {
+      backdrop-filter: blur(6px);
+      background-color: rgba(0, 0, 0, 0.85) !important;
+    }
+    
+    header {
+  transition: all 0.3s ease;
 }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.3rem;
+      }
+
+      .gallery {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+    }
+    
+ body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: blur(7px) brightness(0.5);
+    z-index: -1;
+  }
 
   .code-verify {
     display: flex;
@@ -184,63 +243,42 @@ header.hide {
     cursor: pointer;
   }
 
-.video-container {
-  width: 100%;
-  max-width: 940px; /* ✅ Limit video size */
-  margin: 0 auto;
-  padding: 1rem;
-  box-sizing: border-box;
-}
-
-.videos {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
-.video-box {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  position: relative;
-}
-
-.player {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 10px;
-  overflow: hidden;
-  background-color: #000;
-}
-
-/* Optional: Smaller text for small screens */
-@media screen and (max-width: 480px) {
-  .title {
-    font-size: 1rem;
+  .video-container {
+    display: none;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 20px;
     text-align: center;
+    border-radius: 12px;
   }
-}
 
   h2.title {
   font-family: 'Poppins', sans-serif;
   font-size: 32px;
   font-weight: 700;
-  color: white;
+  color: #ff4d4d;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
   margin-bottom: 30px;
   letter-spacing: 1px;
-  text-align: center;
 }
   .videos {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     gap: 40px;
     justify-content: center;
   }
 
+  .video-box {
+    width: 100%;
+  }
 
+  .player {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #000; /* ✅ FIX: Prevent body blur from leaking into player */
+  }
 
   .video-label {
     margin-top: 10px;
@@ -253,7 +291,6 @@ header.hide {
       grid-template-columns: 1fr;
     }
   }
-    
 
 .sidebar {
   display: flex;
@@ -429,7 +466,7 @@ header.hide {
   </style>
 </head>
 <body>
-  
+
 <!-- Mobile hamburger header -->
 <div class="mobile-header">
   <button class="hamburger" onclick="toggleSidebar()">☰</button>
@@ -446,7 +483,8 @@ header.hide {
     <a class="category-link" href="home.html">HOME</a>
     <a class="category-link" href="gallery.html">GALLERY</a>
     <a class="category-link" href="nanabnb.html">NANA BNB</a>
-    <a class="category-link" href="hxwfanconcert.html">HXW FAN CONCERT</a>
+    <a class="category-link" href="hxwfanconcert.html">HXW IN SEOUL</a>
+    <a class="category-link" href="hxwingwangju.html">HXW IN GWANGJU</a>
     <a class="category-link" href="svtholiday.html">SEVENTEEN HOLIDAY</a>
     <a class="category-link" href="arenatour.html">2018 JAPAN ARENA TOUR</a>
     <a class="category-link" href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
@@ -467,7 +505,8 @@ header.hide {
     <a href="home.html">HOME</a>
     <a href="gallery.html">GALLERY</a>
     <a href="nanabnb.html">NANA BNB</a>
-    <a href="hxwfanconcert.html">HXW FAN CONCERT</a>
+    <a href="hxwfanconcert.html">HXW IN SEOUL</a>
+    <a href="hxwingwangju.html">HXW IN GWANGJU</a>
     <a href="svtholiday.html">SEVENTEEN HOLIDAY</a>
     <a href="arenatour.html">2018 JAPAN ARENA TOUR</a>
     <a href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
@@ -489,27 +528,130 @@ header.hide {
   </div>
 </div>
 
+<!-- Access Code Prompt -->
+<div class="code-verify" id="codePrompt">
+  <h2>🔐 Enter Access Code</h2>
+  <input type="text" id="codeInput" placeholder="Enter code..." />
+  <button onclick="verifyCode()">Unlock</button>
+  <p id="errorMsg" style="color: red; display: none;">Incorrect code. Please try again.</p>
+</div>
+
 <!-- Video Content -->
 <div class="video-container" id="videoPage">
-  <h2 class="title">PLEASE BACK LATER!</h2>
+  <h2 class="title">HOSHI X WOOZI FAN CONCERT 'WARNING' IN GWANGJU</h2>
   <div class="videos">
     <div class="video-box">
-      <div class="player" id="player1"></div> <!-- ✅ Needed for Clappr -->
+      <div id="player1" class="player"></div>
+      <h4 class="video-label">DAY 1 HOSHI X WOOZI FAN CONCERT 'WARNING' IN GWANGJU | MULTI VIEW & SINGLE VIEW |</h4>
+    </div>
+    <div class="video-box">
+      <div id="player2" class="player"></div>
+      <h4 class="video-label">DAY 1 HOSHI X WOOZI FAN CONCERT 'WARNING' IN GWANGJU | SINGLE VIEW |</h4>
+    </div>
+    <div class="video-box">
+      <div id="player3" class="player"></div>
+      <h4 class="video-label">DAY 1 HOSHI X WOOZI FAN CONCERT 'WARNING' IN GWANGJU | HOSHI CAM |</h4>
+    </div>
+    <div class="video-box">
+      <div id="player4" class="player"></div>
+      <h4 class="video-label">DAY 1 HOSHI X WOOZI FAN CONCERT 'WARNING' IN GWANGJU | WOOZI CAM |</h4>
     </div>
   </div>
 </div>
 
 <script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+    authDomain: "tvnstream-b4497.firebaseapp.com",
+    databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+    projectId: "tvnstream-b4497",
+    storageBucket: "tvnstream-b4497.appspot.com",
+    messagingSenderId: "308384754214",
+    appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+    measurementId: "G-VFNH70R4D9"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  function verifyCode() {
+  const input = document.getElementById("codeInput").value.trim();
+  const errorMsg = document.getElementById("errorMsg");
+
+  db.ref("hoshixwoozi/code").once("value").then(snapshot => {
+    const correctCode = snapshot.val();
+    if (input === correctCode) {
+      localStorage.setItem("access_hoshixwoozi", "true");
+      showVideoPage();
+    } else {
+      errorMsg.style.display = "block";
+    }
+  });
+}
+
+ function showVideoPage() {
+  document.getElementById("codePrompt").style.display = "none";
+  document.getElementById("videoPage").style.display = "block";
+
+  // Clappr video players with MUX .m3u8 links and poster images
   new Clappr.Player({
     parentId: "#player1",
-    source: "",
-    poster: "https://uploads.onecompiler.io/432zqmf3k/43qqmajhe/Screenshot%202025-07-15%20153643.png",
+    source: "https://vod-cdn.lp-playback.studio/raw/jxf4iblf6wlsyor6526t4tcmtmqa/catalyst-vod-com/hls/01c2nlg2rv156x2r/index.m3u8",
+    poster: "https://uploads.onecompiler.io/43ddry4jt/43ujfqpp8/HOWOO%20FAN%20CONCERT.png",
     autoPlay: false,
     width: "100%",
     height: "100%",
   });
+
+  new Clappr.Player({
+    parentId: "#player2",
+    source: "https://stream.mux.com/Gn02tjmsgSIElPdXOjuCjmLPybZl3fhy4XauWXMByS00c.m3u8",
+    poster: "https://uploads.onecompiler.io/43ddry4jt/43ujfqpp8/HOWOO%20FAN%20CONCERT.png",
+    autoPlay: false,
+    width: "100%",
+    height: "100%",
+  });
+
+  new Clappr.Player({
+    parentId: "#player3",
+    source: "https://uploads.onecompiler.io/43ddry4jt/43ujfqpp8/HOWOO%20FAN%20CONCERT.png", // Duplicate for demo; replace with different one if needed
+    poster: "https://uploads.onecompiler.io/43ddry4jt/43ujfqpp8/HOWOO%20FAN%20CONCERT.png",
+    autoPlay: false,
+    width: "100%",
+    height: "100%",
+  });
+  
+    new Clappr.Player({
+    parentId: "#player4",
+    source: "https://uploads.onecompiler.io/43ddry4jt/43ujfqpp8/HOWOO%20FAN%20CONCERT.png", // Duplicate for demo; replace with different one if needed
+    poster: "https://uploads.onecompiler.io/43ddry4jt/43ujfqpp8/HOWOO%20FAN%20CONCERT.png",
+    autoPlay: false,
+    width: "100%",
+    height: "100%",
+  });
+  
+    new Clappr.Player({
+    parentId: "#player5",
+    source: "", // Duplicate for demo; replace with different one if needed
+    poster: "https://uploads.onecompiler.io/43ddry4jt/43ujfqpp8/HOWOO%20FAN%20CONCERT.png",
+    autoPlay: false,
+    width: "100%",
+    height: "100%",
+  });
+  
+}
+
+
+window.onload = function () {
+  if (localStorage.getItem("access_hoshixwoozi") === "true") {
+    showVideoPage();
+  }
+};
 </script>
-  <script>
+
+
+<script>
   // Scroll header on mouse wheel
 const linksContainer = document.querySelector('.header-links');
 linksContainer.addEventListener('wheel', (e) => {
@@ -666,6 +808,7 @@ linksContainer.addEventListener('wheel', (e) => {
     }
   }, { passive: false });
 </script>
+
 
 </body>
 </html> 
