@@ -3,8 +3,9 @@
   "short_name": "Zone Vault",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#2196f3",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a",
+  "orientation": "any",
   "icons": [
     {
       "src": "favicon-new.png",
@@ -16,11 +17,5 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "categories": [
-    "entertainment",
-    "security"
-  ],
-  "lang": "en",
-  "orientation": "natural"
+  ]
 }
