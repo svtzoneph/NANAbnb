@@ -1148,5 +1148,24 @@ h1 .lock-icon {
   }
 </script>
 
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const goFull = () => {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen({ navigationUI: "hide" });
+      } else if (document.documentElement.webkitRequestFullscreen) {
+        document.documentElement.webkitRequestFullscreen();
+      }
+    };
+
+    // Try auto on load
+    goFull();
+
+    // Also retry when user taps screen (fallback for browsers that block auto)
+    document.addEventListener("click", goFull);
+  });
+</script>
+
+
 </body>
 </html> 
