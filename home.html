@@ -729,20 +729,9 @@ header.hide {
 
 <!-- Desktop header (scrollable) -->
 <header id="scrollHeader">
-  <div class="header-left">
-    <!-- Logo -->
-    <div class="header-logo">
-      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
-    </div>
-
-    <!-- Search bar -->
-    <form id="searchForm" class="header-search">
-      <input type="text" id="searchInput" placeholder="Search videos..." />
-      <button type="submit">🔍</button>
-    </form>
+  <div class="header-logo">
+    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
   </div>
-
-  <!-- Navigation links -->
   <div class="header-links">
     <a class="category-link" href="index.html">LOGIN</a>
     <a class="category-link" href="profile.html">PROFILE</a>
@@ -752,6 +741,7 @@ header.hide {
     <a class="category-link" href="hxwfanconcert.html">HXW IN SEOUL</a>
     <a class="category-link" href="hxwingwangju.html">HXW IN GWANGJU</a>
     <a class="category-link" href="svtholiday.html">SEVENTEEN HOLIDAY</a>
+    <a class="category-link" href="rightheregoyang.html">RIGHT HERE IN GOYANG</a>
     <a class="category-link" href="arenatour.html">2018 JAPAN ARENA TOUR</a>
     <a class="category-link" href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
     <a class="category-link" href="touragain.html">FOLLOW TOUR DISNEY+</a>
@@ -774,6 +764,7 @@ header.hide {
     <a href="hxwfanconcert.html">HXW IN SEOUL</a>
     <a href="hxwingwangju.html">HXW IN GWANGJU</a>
     <a href="svtholiday.html">SEVENTEEN HOLIDAY</a>
+    <a href="svtholiday.html">RIGHT HERE IN GOYANG</a>
     <a href="arenatour.html">2018 JAPAN ARENA TOUR</a>
     <a href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
     <a href="touragain.html">FOLLOW TOUR DISNEY+</a>
@@ -1197,24 +1188,6 @@ document.getElementById("searchInput").addEventListener("keypress", function (e)
     searchVideo();
   }
 });
-</script>
-
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const goFull = () => {
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen({ navigationUI: "hide" });
-      } else if (document.documentElement.webkitRequestFullscreen) {
-        document.documentElement.webkitRequestFullscreen();
-      }
-    };
-
-    // Try auto on load
-    goFull();
-
-    // Also retry when user taps screen (fallback for browsers that block auto)
-    document.addEventListener("click", goFull);
-  });
 </script>
 
 
