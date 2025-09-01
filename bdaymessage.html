@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portrait Video Player</title>
+   <link rel="icon" href="favicon-new.png" type="image/png" />
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2196f3">
+<meta name="description" content="Private SEVENTEEN streaming vault with lifetime access for approved members.">
+<meta name="keywords" content="SEVENTEEN, concert, vault, fanclub, exclusive, stream, archive">
+<meta property="og:title" content="Zone Vault - SEVENTEEN Exclusive Archive">
+<meta property="og:description" content="Private vault for SEVENTEEN concerts and shows. Members-only. No leaks allowed.">
+<meta property="og:image" content="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png">
+<meta property="og:type" content="website">
 
   <!-- Plyr CSS -->
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
@@ -118,7 +127,6 @@
 
  <script>
   const allowedPaths = [
-    '/index.html',
     '/home.html',
     '/nanabnb.html',
     '/hxwfanconcert.html',
@@ -150,7 +158,7 @@
   // 4. Allow access if:
   // - already has internalAccess OR
   // - current page is index.html (entry point)
-  const isIndexPage = currentPage === '/index.html';
+  const isIndexPage = currentPage === '/home.html';
   if (!hasInternalAccess && !isIndexPage) {
     const modal = document.createElement('div');
     modal.id = 'accessDeniedModal';
@@ -178,11 +186,29 @@
     document.body.appendChild(modal);
 
     setTimeout(() => {
-      window.location.href = "index.html";
+      window.location.href = "home.html";
     }, 3000);
   }
 </script>
 
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      // ✅ Detect updates
+      reg.onupdatefound = () => {
+        const newSW = reg.installing;
+        newSW.onstatechange = () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            // ✅ New version is ready → force reload
+            window.location.reload();
+          }
+        };
+      };
+    }).catch(err => {
+      console.error('Service Worker registration failed:', err);
+    });
+  }
+</script>
 
 </body>
 </html>
