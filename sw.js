@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zonevault-v71'; // ⬅ Change this on every update
+const CACHE_NAME = 'zonevault-v72'; // ⬅ Change this on every update
 
 const urlsToCache = [
   './',
@@ -8,7 +8,9 @@ const urlsToCache = [
   './hxwfanconcert.html',
   './svtholiday.html',
   './arenatour.html',
-  './svtjapanconcert.html'
+  './svtjapanconcert.html',
+  './rightheregoyang.html',
+  './bdaymessage'
 ];
 
 // Install: cache the new version
