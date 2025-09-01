@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portrait Video Player</title>
+  <title>BIRTHDAY MESSAGE</title>
    <link rel="icon" href="favicon-new.png" type="image/png" />
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2196f3">
@@ -85,7 +85,7 @@
 
   <div class="video-wrapper">
     <video id="player" playsinline muted autoplay controls>
-      <source src="https://stream.mux.com/gXX02Sdi7Kl101HOgU8edmskFElsZ7bJUInZ4XtreFBPk.m3u8" type="application/x-mpegURL" />
+      <source src="https://stream.mux.com/INEFsp1goWj551V6oHZD727I3nI89KFhSV1itAZtTGU.m3u8" type="application/x-mpegURL" />
     </video>
   </div>
 
@@ -112,10 +112,10 @@
     const player = new Plyr(video, {
       ratio: '9:16',
       autoplay: true,
-      muted: true, // autoplay works if muted
+      muted: false, // autoplay works if muted
       clickToPlay: true,
       controls: [
-        'play', 'current-time'
+        'play', 'current-time', 'mute'
       ]
     });
 
@@ -124,6 +124,7 @@
       console.log("Autoplay blocked by browser. User interaction required.");
     });
   </script>
+
 
 <script>
   if ('serviceWorker' in navigator) {
