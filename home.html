@@ -649,25 +649,24 @@ header.hide {
     word-break: break-word;
   }
 
-  /* Button */
-  #noticeBox button {
-    margin-top: 15px;
-    padding: 10px;
-    border: none;
+  #noticeBox button,
+  #noticeBox .btn-link {
     background: black;
     color: white;
-    border-radius: 8px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 12px;
-    font-weight: bold;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
     transition: background 0.3s;
-    width: 100%;
-    max-width: 200px;
-  }
-  #noticeBox button:hover {
-    background: #555555;
   }
 
+  #noticeBox button:hover,
+  #noticeBox .btn-link:hover {
+    background: #0056b3;
+  }
   /* Responsive for phones */
   @media (max-width: 480px) {
     #noticeBox h3 {
@@ -677,8 +676,9 @@ header.hide {
       font-size: 12px;
       line-height: 1.4;
     }
-    #noticeBox button {
-      font-size: 12px;
+    #noticeBox button
+    #noticeBox .btn-link{
+      font-size: 10px;
       padding: 8px;
     }
   }
@@ -697,9 +697,14 @@ header.hide {
       <br><br>
       Thank you for your understanding and cooperation.
     </p>
-    <button onclick="closeNotice()">I Understand</button>
+
+    <div class="btn-group">
+      <button onclick="closeNotice()">I Understand</button>
+      <a href="bdaymessage.html" target="_blank" class="btn-link">Hoshi Bday Message</a>
+    </div>
   </div>
 </div>
+
 
 <script>
   // Show notice only if not already seen in this session
