@@ -423,29 +423,31 @@ function showVideoPage() {
   document.getElementById("codePrompt").style.display = "none";
   document.getElementById("videoPage").style.display = "block";
 
-  // Dynamically add the BoxCast script
+  // Only add the BoxCast script if not already added
   if (!document.getElementById("boxcast-script")) {
     const js = document.createElement('script');
     js.src = '//js.boxcast.com/v3.min.js';
-    js.id = "boxcast-script";
+    js.id = 'boxcast-script';
     js.charset = 'utf-8';
     js.onload = function() {
+      // Load the BoxCast channel after script is ready
       boxcast.noConflict()('#boxcast-widget-pwsspvj1iuuvzoecx026').loadChannel('pwsspvj1iuuvzoecx026', {
-        "showTitle":1,
-        "showDescription":1,
-        "showHighlights":1,
-        "showRelated":true,
-        "defaultVideo":"next",
-        "playInline":false,
-        "dvr":true,
-        "market":"smb",
-        "showCountdown":true,
-        "showDonations":false,
-        "showDocuments":true,
-        "showIndex":true,
-        "showChat":true,
-        "hidePreBroadcastTextOverlay":false,
-        "layout":"playlist-to-right"
+        "showTitle": 1,
+        "showDescription": 1,
+        "showHighlights": 1,
+        "showRelated": true,
+        "defaultVideo": "next",
+        "playInline": false,
+        "dvr": false,
+        "market": "smb",
+        "showCountdown": true,
+        "showDonations": false,
+        "showDocuments": true,
+        "showIndex": true,
+        "showChat": true,
+        "hidePreBroadcastTextOverlay": false,
+        "layout": "playlist-to-right",
+        "applyBrandColor": false
       });
     };
     document.body.appendChild(js);
