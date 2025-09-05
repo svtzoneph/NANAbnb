@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BoxCast Embed — Player</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box; /* ensures padding/border doesn't overflow */
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden; /* remove scrolling */
+      font-family: Inter, system-ui, Segoe UI, Roboto, 'Helvetica Neue', Arial;
+    }
+
+    :root {
+      --bg-dark:#0b0b0f;
+      --card-dark:#0f1720;
+      --text-dark:#e6eef8;
+      --btn-bg-dark:#1a1a2e;
+      --btn-hover-dark:#27293d;
+
+      --bg-light:#f6f8fb;
+      --card-light:#ffffff;
+      --text-light:#0b1220;
+      --btn-bg-light:#e0e0e0;
+      --btn-hover-light:#cfcfcf;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .page {
+      width: 100%;
+      max-width: 900px;
+      padding: 12px; /* optional padding inside page */
+    }
+
+    header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:12px;
+    }
+
+    header h1 {
+      font-size:18px;
+    }
+
+    .controls {
+      display:flex;
+      gap:8px;
+    }
+
+    .btn {
+      background: var(--btn-bg-dark);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-dark);
+      padding: 8px 12px;
+      border-radius:8px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:4px;
+      font-weight:500;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: var(--btn-hover-dark);
+    }
+
+    .btn.active {
+      transform: scale(1.05);
+    }
+
+    .video-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
+      padding:11px;
+      border-radius:11px;
+      box-shadow:0 6px 24px rgba(2,6,23,0.6);
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-top: 56.25%; /* 16:9 */
+      overflow: hidden;
+      border-radius:8px;
+    }
+
+    .video-wrapper iframe {
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      border:0;
+    }
+
+    .meta {
+      margin-top:10px;
+      font-size:13px;
+      opacity:0.85;
+    }
+
+    .footer {
+      margin-top:14px;
+      font-size:12px;
+      opacity:0.6;
+    }
+
+    /* Light theme */
+    .light body {
+      background: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    .light .btn {
+      background: var(--btn-bg-light);
+      color: var(--text-light);
+    }
+
+    .light .btn:hover {
+      background: var(--btn-hover-light);
+    }
+
+    @media (max-width:520px){
+      header h1{font-size:15px}
+      .btn{padding:6px 8px}
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>Zone Vault Live</h1>
+      <div class="controls">
+        <button id="toggleTheme" class="btn">🌙 Toggle Theme</button>
+      </div>
+    </header>
+
+    <div class="video-card">
+      <div class="video-wrapper">
+        <iframe id="boxcastFrame"
+          src="https://boxcast.tv/view-embed/pwsspvj1iuuvzoecx026?showTitle=0&showDescription=0&showHighlights=0&showRelated=0&defaultVideo=next&playInline=0&dvr=0&market=smb&showCountdown=0&showDonations=0&showDocuments=0&showIndex=0&showChat=0&hidePreBroadcastTextOverlay=0&autoplay=1"
+          allowfullscreen
+          allow="autoplay; fullscreen">
+        </iframe>
+      </div>
+
+      <div class="meta">
+        <strong>LIVE:</strong> TEST RUN 
+      </div>
+
+      <div class="footer"><br>This page is currently a test run and is not fully finalized yet.</div>
+    </div>
+  </div>
+
+  <script>
+    const toggleThemeBtn = document.getElementById('toggleTheme');
+    const htmlEl = document.documentElement;
+
+    toggleThemeBtn.addEventListener('click', () => {
+      htmlEl.classList.toggle('light');
+      toggleThemeBtn.classList.toggle('active');
+      toggleThemeBtn.innerText = htmlEl.classList.contains('light') ? '☀️ Light Theme' : '🌙 Dark Theme';
+    });
+
+    const iframe = document.getElementById('boxcastFrame');
+    window.addEventListener('message', (ev)=>{
+      try{
+        const data = typeof ev.data === 'string' ? JSON.parse(ev.data) : ev.data;
+        if(data && data.action === 'setSrc' && data.src) iframe.src = data.src;
+      }catch(e){}
+    });
+  </script>
+  
+    <script>
+  const allowedPaths = [
+    '/index.html',
+    '/home.html',
+    '/nanabnb.html',
+    '/hxwfanconcert.html',
+    '/svtholiday.html',
+    '/arenatour.html',
+    '/svtjapanconcert.html',
+    '/svtjapanconcert.html',
+    '/touragain.html',
+    '/gallery.html',
+    '/profile.html',
+    '/soon.html'
+  ];
+
+  const currentPage = window.location.pathname;
+
+  // 1. Check if user already has internalAccess flag
+  const hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+
+  // 2. Check if user came from one of the allowed pages
+  const referrer = document.referrer;
+  const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+
+  // 3. If came from allowed page, give internalAccess
+  if (cameFromAllowedPage) {
+    sessionStorage.setItem('internalAccess', 'true');
+  }
+
+  // 4. Allow access if:
+  // - already has internalAccess OR
+  // - current page is index.html (entry point)
+  const isIndexPage = currentPage === '/index.html';
+  if (!hasInternalAccess && !isIndexPage) {
+    const modal = document.createElement('div');
+    modal.id = 'accessDeniedModal';
+    modal.style = `
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      text-align: center;
+      padding: 20px;
+    `;
+    modal.innerHTML = `
+      <div>
+        <strong style="font-size: 24px;">🚫 Access Denied</strong><br><br>
+        You cannot access this page directly.<br>
+        Please go through the homepage or allowed sections.<br><br>
+        <em>Redirecting to login page...</em>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 3000);
+  }
+</script>
+
+  
+</body>
+</html>
