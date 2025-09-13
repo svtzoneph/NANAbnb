@@ -433,18 +433,50 @@ header.hide {
     document.getElementById("codePrompt").style.display = "none";
     document.getElementById("videoPage").style.display = "block";
 
+    // Inject the BoxCast container
+    const container = document.createElement("div");
+    container.id = "boxcast-widget-wtwxmv4h3q0lcpfmzfxl";
+    document.getElementById("videoPage").appendChild(container);
+
+    // Load BoxCast script only once
     if (!document.getElementById("boxcast-script")) {
-      const js = document.createElement('script');
-      js.src = 'https://js.boxcast.com/v3.min.js';
-      js.id = 'boxcast-script';
-      js.charset = 'utf-8';
-      js.onload = function() {
-        boxcast.noConflict()('#boxcast-widget-wtwxmv4h3q0lcpfmzfxl').loadChannel('wtwxmv4h3q0lcpfmzfxl', {
+      const js = document.createElement("script");
+      js.src = "//js.boxcast.com/v3.min.js";
+      js.id = "boxcast-script";
+      js.charset = "utf-8";
+      js.onload = function () {
+        boxcast.noConflict()("#boxcast-widget-wtwxmv4h3q0lcpfmzfxl").loadChannel(
+          "wtwxmv4h3q0lcpfmzfxl",
+          {
+            showTitle: 1,
+            showDescription: 1,
+            showHighlights: 1,
+            showRelated: false,
+            defaultVideo: "next",
+            playInline: false,
+            dvr: false,
+            market: "smb",
+            showCountdown: true,
+            showDonations: false,
+            showDocuments: true,
+            showIndex: true,
+            showChat: true,
+            hidePreBroadcastTextOverlay: false,
+            layout: "playlist-to-right"
+          }
+        );
+      };
+      document.body.appendChild(js);
+    } else {
+      // Script already loaded → just load channel
+      boxcast.noConflict()("#boxcast-widget-wtwxmv4h3q0lcpfmzfxl").loadChannel(
+        "wtwxmv4h3q0lcpfmzfxl",
+        {
           showTitle: 1,
           showDescription: 1,
           showHighlights: 1,
           showRelated: false,
-          defaultVideo: "next", // try "past" if you want last broadcast
+          defaultVideo: "next",
           playInline: false,
           dvr: false,
           market: "smb",
@@ -454,16 +486,14 @@ header.hide {
           showIndex: true,
           showChat: true,
           hidePreBroadcastTextOverlay: false,
-          layout: "playlist-to-right",
-          applyBrandColor: false
-        });
-      };
-      document.body.appendChild(js);
+          layout: "playlist-to-right"
+        }
+      );
     }
   }
 
   // Run access check on page load
-  window.addEventListener("load", function() {
+  window.addEventListener("load", function () {
     if (localStorage.getItem("access_Access") === "true") {
       showVideoPage();
     }
@@ -482,7 +512,7 @@ linksContainer.addEventListener('wheel', (e) => {
 });
 </script>
   
-  <script>
+<script>
   const allowedPaths = [
     '/index.html',
     '/home.html',
