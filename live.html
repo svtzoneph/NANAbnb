@@ -434,16 +434,16 @@ function showVideoPage() {
   // Only add the BoxCast script if not already added
   if (!document.getElementById("boxcast-script")) {
     const js = document.createElement('script');
-    js.src = '//js.boxcast.com/v3.min.js';
+  js.src = '//js.boxcast.com/v3.min.js';
     js.id = 'boxcast-script';
     js.charset = 'utf-8';
     js.onload = function() {
       // Load the BoxCast channel after script is ready
-      boxcast.noConflict()('#boxcast-widget-pwsspvj1iuuvzoecx026').loadChannel('pwsspvj1iuuvzoecx026', {
+      boxcast.noConflict()('#boxcast-widget-wtwxmv4h3q0lcpfmzfxl').loadChannel('wtwxmv4h3q0lcpfmzfxl', {
         "showTitle": 1,
         "showDescription": 1,
         "showHighlights": 1,
-        "showRelated": true,
+        "showRelated": false,
         "defaultVideo": "next",
         "playInline": false,
         "dvr": false,
