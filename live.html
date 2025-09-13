@@ -412,63 +412,64 @@ header.hide {
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
+  // Verify input code against Firebase
   function verifyCode() {
-  const input = document.getElementById("codeInput").value.trim();
-  const errorMsg = document.getElementById("errorMsg");
+    const input = document.getElementById("codeInput").value.trim();
+    const errorMsg = document.getElementById("errorMsg");
 
-  db.ref("Access/code").once("value").then(snapshot => {
-    const correctCode = snapshot.val();
-    if (input === correctCode) {
-      localStorage.setItem("access_Access", "true");
+    db.ref("Access/code").once("value").then(snapshot => {
+      const correctCode = snapshot.val();
+      if (input === correctCode) {
+        localStorage.setItem("access_Access", "true");
+        showVideoPage();
+      } else {
+        errorMsg.style.display = "block";
+      }
+    });
+  }
+
+  // Show video page + load BoxCast
+  function showVideoPage() {
+    document.getElementById("codePrompt").style.display = "none";
+    document.getElementById("videoPage").style.display = "block";
+
+    if (!document.getElementById("boxcast-script")) {
+      const js = document.createElement('script');
+      js.src = 'https://js.boxcast.com/v3.min.js';
+      js.id = 'boxcast-script';
+      js.charset = 'utf-8';
+      js.onload = function() {
+        boxcast.noConflict()('#boxcast-widget-wtwxmv4h3q0lcpfmzfxl').loadChannel('wtwxmv4h3q0lcpfmzfxl', {
+          showTitle: 1,
+          showDescription: 1,
+          showHighlights: 1,
+          showRelated: false,
+          defaultVideo: "next", // try "past" if you want last broadcast
+          playInline: false,
+          dvr: false,
+          market: "smb",
+          showCountdown: true,
+          showDonations: false,
+          showDocuments: true,
+          showIndex: true,
+          showChat: true,
+          hidePreBroadcastTextOverlay: false,
+          layout: "playlist-to-right",
+          applyBrandColor: false
+        });
+      };
+      document.body.appendChild(js);
+    }
+  }
+
+  // Run access check on page load
+  window.addEventListener("load", function() {
+    if (localStorage.getItem("access_Access") === "true") {
       showVideoPage();
-    } else {
-      errorMsg.style.display = "block";
     }
   });
-}
-
-function showVideoPage() {
-  document.getElementById("codePrompt").style.display = "none";
-  document.getElementById("videoPage").style.display = "block";
-
-  // Only add the BoxCast script if not already added
-  if (!document.getElementById("boxcast-script")) {
-    const js = document.createElement('script');
-  js.src = '//js.boxcast.com/v3.min.js';
-    js.id = 'boxcast-script';
-    js.charset = 'utf-8';
-    js.onload = function() {
-      // Load the BoxCast channel after script is ready
-      boxcast.noConflict()('#boxcast-widget-wtwxmv4h3q0lcpfmzfxl').loadChannel('wtwxmv4h3q0lcpfmzfxl', {
-        "showTitle": 1,
-        "showDescription": 1,
-        "showHighlights": 1,
-        "showRelated": false,
-        "defaultVideo": "next",
-        "playInline": false,
-        "dvr": false,
-        "market": "smb",
-        "showCountdown": true,
-        "showDonations": false,
-        "showDocuments": true,
-        "showIndex": true,
-        "showChat": true,
-        "hidePreBroadcastTextOverlay": false,
-        "layout": "playlist-to-right",
-        "applyBrandColor": false
-      });
-    };
-    document.body.appendChild(js);
-  }
-}
-
-// Check access on page load
-window.onload = function () {
-  if (localStorage.getItem("access_Access") === "true") {
-    showVideoPage();
-  }
-};
 </script>
+
 
 
 <script>
