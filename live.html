@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Hoshi x Woozi</title>
+  <title>SEVENTEEN [NEW_] WORLD TOUR</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2196f3">
 
-  <meta name="apple-mobile-web-app-title" content="Zone Vault">
+<meta name="apple-mobile-web-app-title" content="Zone Vault">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1a1a">
@@ -20,7 +20,10 @@
 <link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
 <link rel="apple-touch-startup-image" href="splash.png">
 
-<!-- Google tag (gtag.js) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.min.js"></script>
+
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -30,7 +33,6 @@
   gtag('config', 'G-1B2RJ659GL');
 </script>
 
-  <title>Home | Zone Vault</title>
   <style>
     * {
       box-sizing: border-box;
@@ -38,11 +40,13 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(to bottom, #232526, #414345);
+      background: black;
       color: #d6b4fc; /* or #b490e5 */
       overflow-x: hidden;
       font-size: 16px;
     }
+    
+    
 
 header {
   padding: 12px 20px;
@@ -62,6 +66,7 @@ header {
   backdrop-filter: blur(6px); /* Slight blur behind the header */
   transition: transform 0.3s ease-in, background 0.4s ease-in-out;
 }
+
 /* Header show/hide animations */
 header.show {
   transform: translateY(0);
@@ -143,6 +148,161 @@ header.hide {
   transition: background 0.6s ease, color 0.6s ease;
 }
 
+  h1 {
+      text-align: center;
+      color: #ff3366;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    .divider {
+      font-size: 1.1rem;
+      color: #ff6699;
+      margin: 2rem 0 1rem;
+      border-left: 4px solid #ff3366;
+      padding-left: 10px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .gallery a {
+      display: block;
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .gallery a img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .gallery a:hover img {
+      transform: scale(1.02);
+    }
+
+    .lg-backdrop {
+      backdrop-filter: blur(6px);
+      background-color: rgba(0, 0, 0, 0.85) !important;
+    }
+    
+    header {
+  transition: all 0.3s ease;
+}
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.3rem;
+      }
+
+      .gallery {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+    }
+    
+ body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: blur(7px) brightness(0.5);
+    z-index: -1;
+  }
+
+  .code-verify {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    margin: auto;
+    max-width: 90%;
+  }
+
+  input[type="text"] {
+    padding: 12px;
+    font-size: 16px;
+    margin: 10px;
+    width: 260px;
+    border-radius: 8px;
+    border: none;
+    text-align: center;
+  }
+
+  button {
+    padding: 10px 24px;
+    font-size: 16px;
+    border-radius: 6px;
+    background-color: #00c9a7;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  .video-container {
+    display: none;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    text-align: center;
+    border-radius: 12px;
+  }
+
+  h2.title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #d9d9d9;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+}
+  .videos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 40px;
+    justify-content: center;
+  }
+
+  .video-box {
+    width: 100%;
+  }
+
+  .player {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #000; 
+  }
+
+  .video-label {
+    margin-top: 10px;
+    font-size: 17px;
+    color: #ccc;
+  }
+
+  @media (max-width: 600px) {
+    .videos {
+      grid-template-columns: 1fr;
+    }
+  }
 
 .sidebar {
   display: flex;
@@ -154,7 +314,7 @@ header.hide {
   max-width: 300px;
   height: 100%;
   background: linear-gradient(to bottom, #232526, #414345);
-  backdrop-filter: blur(10px); /* Glassmorphism */
+  backdrop-filter: blur(10px);
   z-index: 9999;
   padding: 20px;
   gap: 10px;
@@ -172,13 +332,13 @@ header.hide {
   gap: 12px;
   margin-top: 20px;
   
-  /* ✅ Make only the link section scrollable */
+
   max-height: 450px;
   overflow-y: auto;
   padding-right: 5px;
 }
 
-/* Optional: prettier scrollbar */
+
 .sidebar-nav::-webkit-scrollbar {
   width: 6px;
 }
@@ -212,7 +372,7 @@ header.hide {
   font-size: 26px;
   font-weight: 700;
   text-align: center;
-  color: 	#f1f1f1; /* or #b490e5 */
+  color: 	#f1f1f1; 
   margin-bottom: 20px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -268,7 +428,7 @@ header.hide {
   color: #00bfff;
 }
 
-/* Mobile header & hamburger */
+
 .mobile-header {
   display: none;
 }
@@ -315,10 +475,83 @@ header.hide {
   }
 }
 
+:root {
+  --plyr-color-main: #d9d9d9;
+}
+
+.plyr__control {
+  background-color: #d9d9d9 !important; 
+  color: #000 !important;               
+}
+
+
+h2.title {
+  background: #000; 
+  padding: 12px 20px; 
+  border-radius: 8px; 
+  display: inline-block; 
+}
+
+
+.player {
+  background: #000 !important; 
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+
+.plyr {
+  background: #000 !important; 
+}
+
+@media screen and (max-width: 480px) {
+  .plyr__controls .plyr__control {
+    padding: 1px 2px;   
+    margin: 1.5px;         
+    font-size: 7px;      
+  }
+
+  .plyr__progress {
+    height: 15px;        
+  }
+
+  .plyr__control.plyr__play-large {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .plyr__controls .plyr__control {
+    padding: 6px 10px;  
+    margin: 1px;        
+    font-size: 14px;     
+  }
+
+  .plyr__progress {
+    height: 4px;       
+  }
+
+  .plyr__control.plyr__play-large {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+#watermark {
+  animation: moveWatermark 30s linear infinite;
+}
+
+@keyframes moveWatermark {
+  0% { bottom: 10px; right: 10px; }
+  50% { bottom: 50%; right: 50%; }
+  100% { bottom: 10px; right: 10px; }
+}
+
   </style>
 </head>
 <body>
-  
+
 <!-- Mobile hamburger header -->
 <div class="mobile-header">
   <button class="hamburger" onclick="toggleSidebar()">☰</button>
@@ -385,8 +618,7 @@ header.hide {
     </div>
   </div>
 </div>
-  
-<!-- Access Code Prompt -->
+
 <div class="code-verify" id="codePrompt">
   <h2>🔐 Enter Access Code</h2>
   <input type="text" id="codeInput" placeholder="Enter code..." />
@@ -394,14 +626,69 @@ header.hide {
   <p id="errorMsg" style="color: red; display: none;">Incorrect code. Please try again.</p>
 </div>
 
-<!-- Video container (hidden by default) -->
-<div id="videoPage" style="display:none; padding: 20px;">
-  <div id="boxcast-widget-pwsspvj1iuuvzoecx026"></div>
+<div class="video-container" id="videoPage" style="display:none; width: 100%; max-width: 800px; margin: 0 auto; padding: 10px; box-sizing: border-box;">
+  <div class="video-box" style="position: relative; width: 100%;">
+
+    <!-- Video player -->
+    <video id="player1" class="player" playsinline controls 
+      poster="https://uploads.onecompiler.io/43ddry4jt/43wkywbqe/Screenshot%202025-09-13%2021-01-14.png"
+      style="width: 100%; height: auto; display: block;"></video>
+
+    <!-- Watermark overlay (on video) -->
+    <div id="watermark" style="
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      color: rgba(255,255,255,0.5);
+      font-size: 18px;
+      font-weight: bold;
+      pointer-events: none;
+      z-index: 9999;
+      user-select: none;
+      animation: moveWatermark 30s linear infinite;
+    ">Loading...</div>
+
+  </div>
+
+  <!-- Video title below video -->
+  <div id="videoTitle" style="
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    text-align: left;
+  ">DAY 2 SEVENTEEN [NEW_] WORLD TOUR IN INCHEON</div>
 </div>
 
+<style>
+  /* Responsive adjustments for phones */
+  @media (max-width: 480px) {
+    #videoTitle {
+      font-size: 14px;
+    }
+    #watermark {
+      font-size: 10px;
+      bottom: 5px;
+      right: 5px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    #videoTitle {
+      font-size: 12px;
+    }
+    #watermark {
+      font-size: 9px;
+    }
+  }
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
 <script>
-  // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
     authDomain: "tvnstream-b4497.firebaseapp.com",
@@ -416,98 +703,148 @@ header.hide {
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  // Verify input code against Firebase
   function verifyCode() {
     const input = document.getElementById("codeInput").value.trim();
     const errorMsg = document.getElementById("errorMsg");
 
-    db.ref("Access/code").once("value").then(snapshot => {
+    db.ref("newworldtour/code").once("value").then(snapshot => {
       const correctCode = snapshot.val();
       if (input === correctCode) {
-        localStorage.setItem("access_Access", "true");
-        showVideoPage();
+        localStorage.setItem("access_newworldtour", "true");
+        localStorage.setItem("access_newworldtour_code", input);
+
+        // Fetch UID for watermark
+        db.ref("newworldtour/users/" + input).once("value").then(userSnap => {
+          const uid = userSnap.val()?.uid || "Guest";
+          document.getElementById("watermark").innerText = uid;
+          showVideoPage();
+        });
+
       } else {
         errorMsg.style.display = "block";
       }
     });
   }
 
-  // Show video page + load BoxCast
   function showVideoPage() {
     document.getElementById("codePrompt").style.display = "none";
-    document.getElementById("videoPage").style.display = "block";
+    const videoPage = document.getElementById("videoPage");
+    videoPage.style.display = "block";
 
-    // Inject the BoxCast container
-    const container = document.createElement("div");
-    container.id = "boxcast-widget-wtwxmv4h3q0lcpfmzfxl";
-    document.getElementById("videoPage").appendChild(container);
+    const video = document.getElementById("player1");
+    const watermark = document.getElementById("watermark");
+    const streamUrl = "https://play.boxcast.com/p/sveto5rucylklx5rykvk/v/all-ext.m3u8?Expires=2147483647&Signature=doPVpVABz0z0ZqS6VDaCTDY2jYjWyDiahRxqGU70mMBxlYAYF2Nz4oDIjsSALPiNVh5bttEHcZzx4vQSwsYBrzh16zF-R2JvhC5fPNAY7qal-rDLYcXPX5J6Ryigp~xF4GtoDCWKT0Q2F4VnsyM7hzDcU7HDxwn4f9mcB45cqaVA2XoVjHUCUSaIGDe99BaPD7eAbfQi4B-55kW-bdO2M3fe0ehJDWBID3pnrRT1MoWA0E9JiQBSFGvZLFCrr6ooPCW1ZbRvbwFnI-gKap1Fx9WilljjrmsqcT9K5VaCPHHlng1uLe1M9za3WVWXJkTbTH0wdCMWC-cKSF34yqxNPA__&Key-Pair-Id=APKAJ7GUCBQUK6NTWZCA";
 
-    // Load BoxCast script only once
-    if (!document.getElementById("boxcast-script")) {
-      const js = document.createElement("script");
-      js.src = "//js.boxcast.com/v3.min.js";
-      js.id = "boxcast-script";
-      js.charset = "utf-8";
-      js.onload = function () {
-        boxcast.noConflict()("#boxcast-widget-wtwxmv4h3q0lcpfmzfxl").loadChannel(
-          "wtwxmv4h3q0lcpfmzfxl",
-          {
-            showTitle: 1,
-            showDescription: 1,
-            showHighlights: 1,
-            showRelated: false,
-            defaultVideo: "next",
-            playInline: false,
-            dvr: false,
-            market: "smb",
-            showCountdown: true,
-            showDonations: false,
-            showDocuments: true,
-            showIndex: true,
-            showChat: true,
-            hidePreBroadcastTextOverlay: false,
-            layout: "playlist-to-right"
+    if (Hls.isSupported()) {
+      const hls = new Hls({ capLevelToPlayerSize: true, maxLoadingDelay: 4 });
+      hls.loadSource(streamUrl);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        const availableQualities = hls.levels.map(l => l.height).sort((a,b)=>b-a);
+        const player = new Plyr(video, {
+          autoplay: true,
+          seekTime: 10,
+          controls: ["play-large","play","mute","volume","current-time","duration","captions","settings","pip","airplay","fullscreen"],
+          settings: ['quality','speed','captions'],
+          quality: {
+            default: availableQualities[0],
+            options: availableQualities,
+            forced: true,
+            onChange: (newQuality) => {
+              const levelIndex = hls.levels.findIndex(l => l.height === newQuality);
+              hls.currentLevel = levelIndex;
+            }
           }
-        );
-      };
-      document.body.appendChild(js);
-    } else {
-      // Script already loaded → just load channel
-      boxcast.noConflict()("#boxcast-widget-wtwxmv4h3q0lcpfmzfxl").loadChannel(
-        "wtwxmv4h3q0lcpfmzfxl",
-        {
-          showTitle: 1,
-          showDescription: 1,
-          showHighlights: 1,
-          showRelated: false,
-          defaultVideo: "next",
-          playInline: false,
-          dvr: false,
-          market: "smb",
-          showCountdown: true,
-          showDonations: false,
-          showDocuments: true,
-          showIndex: true,
-          showChat: true,
-          hidePreBroadcastTextOverlay: false,
-          layout: "playlist-to-right"
-        }
-      );
+        });
+        
+
+        // Ensure watermark stays visible in fullscreen
+        const updateWatermarkPosition = () => {
+          const fsContainer = video.closest('.plyr__video-wrapper') || document.body;
+          if (!fsContainer.contains(watermark)) fsContainer.appendChild(watermark);
+          watermark.style.position = 'absolute';
+          watermark.style.top = '10px';
+          watermark.style.left = '10px';
+          watermark.style.zIndex = 9999;
+        };
+
+        player.on('enterfullscreen', updateWatermarkPosition);
+        player.on('exitfullscreen', () => {
+          // Move watermark back to original container
+          document.getElementById("videoPage").appendChild(watermark);
+          watermark.style.position = 'absolute';
+          watermark.style.top = '10px';
+          watermark.style.left = '10px';
+        });
+      });
+    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      video.src = streamUrl;
+      const player = new Plyr(video);
     }
   }
 
-  // Run access check on page load
-  window.addEventListener("load", function () {
-    if (localStorage.getItem("access_Access") === "true") {
+  // Auto-show video if already verified
+  window.onload = () => {
+    if (localStorage.getItem("access_newworldtour") === "true") {
       showVideoPage();
+
+      // Set watermark for returning users
+      const code = localStorage.getItem("access_newworldtour_code");
+      if (code) {
+        db.ref("newworldtour/users/" + code).once("value").then(userSnap => {
+          const uid = userSnap.val()?.uid || "Guest";
+          document.getElementById("watermark").innerText = uid;
+        });
+      }
     }
-  });
+  };
+</script>
+
+<style>
+#watermark {
+  position: absolute;
+  font-weight: bold;
+  font-size: 16px;
+  color: rgba(255,255,255,0.5);
+  pointer-events: none;
+  z-index: 9999;
+  user-select: none;
+}
+</style>
+
+<script>
+function moveWatermarkRandomly() {
+  const watermark = document.getElementById("watermark");
+  const videoBox = document.querySelector(".video-box"); // container
+
+  if (!watermark || !videoBox) return;
+
+  const boxWidth = videoBox.clientWidth;
+  const boxHeight = videoBox.clientHeight;
+  const wmWidth = watermark.offsetWidth;
+  const wmHeight = watermark.offsetHeight;
+
+  // Random position inside container
+  const left = Math.random() * (boxWidth - wmWidth);
+  const top = Math.random() * (boxHeight - wmHeight);
+
+  watermark.style.left = left + "px";
+  watermark.style.top = top + "px";
+}
+
+// Initial placement 
+moveWatermarkRandomly();
+
+// Move every 4–5 minutes (random interval)
+setInterval(() => {
+  moveWatermarkRandomly();
+}, 4 * 60 * 1000 + Math.random() * 60 * 1000); // 4–5 minutes
 </script>
 
 
 
+
 <script>
-  // Scroll header on mouse wheel
 const linksContainer = document.querySelector('.header-links');
 linksContainer.addEventListener('wheel', (e) => {
   if (e.deltaY === 0) return;
@@ -515,7 +852,83 @@ linksContainer.addEventListener('wheel', (e) => {
   linksContainer.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
 });
 </script>
-  
+
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      reg.onupdatefound = () => {
+        const newSW = reg.installing;
+        newSW.onstatechange = () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            window.location.reload();
+          }
+        };
+      };
+    }).catch(err => {
+      console.error('Service Worker registration failed:', err);
+    });
+  }
+</script>
+
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('mobileSidebar');
+    sidebar.classList.toggle('open');
+  }
+</script>
+
+<script>
+  let lastScrollY = window.scrollY;
+  const scrollHeader = document.getElementById('scrollHeader');
+
+  window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY > lastScrollY && currentScrollY > 50) {
+      scrollHeader.classList.add('hide');
+    } else {
+      scrollHeader.classList.remove('hide');
+    }
+
+    lastScrollY = currentScrollY;
+  });
+</script>
+
+<script>
+  const categoryLinks = document.querySelectorAll('.category-link');
+
+  categoryLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      categoryLinks.forEach(l => l.classList.remove('flash'));
+
+      link.classList.add('flash');
+
+      setTimeout(() => {
+        link.classList.remove('flash');
+
+        window.location.href = link.href;
+      }, 800); 
+    });
+  });
+</script>
+
+<script>
+  const sidebarNav = document.querySelector('.sidebar-nav');
+
+  sidebarNav.addEventListener('wheel', function (e) {
+    const isAtTop = sidebarNav.scrollTop === 0;
+    const isAtBottom = sidebarNav.scrollHeight - sidebarNav.scrollTop === sidebarNav.clientHeight;
+
+    if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+</script>
+
 <script>
   const allowedPaths = [
     '/index.html',
@@ -582,121 +995,6 @@ linksContainer.addEventListener('wheel', (e) => {
     }, 3000);
   }
 </script>
-
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      // ✅ Detect updates
-      reg.onupdatefound = () => {
-        const newSW = reg.installing;
-        newSW.onstatechange = () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            // ✅ New version is ready → force reload
-            window.location.reload();
-          }
-        };
-      };
-    }).catch(err => {
-      console.error('Service Worker registration failed:', err);
-    });
-  }
-</script>
-
-<script>
-  function toggleSidebar() {
-    const sidebar = document.getElementById('mobileSidebar');
-    sidebar.classList.toggle('open');
-  }
-</script>
-
-<script>
-  let lastScrollY = window.scrollY;
-  const scrollHeader = document.getElementById('scrollHeader');
-
-  window.addEventListener('scroll', () => {
-    const currentScrollY = window.scrollY;
-
-    if (currentScrollY > lastScrollY && currentScrollY > 50) {
-      // Scroll Down → Hide header
-      scrollHeader.classList.add('hide');
-    } else {
-      // Scroll Up → Show header smoothly
-      scrollHeader.classList.remove('hide');
-    }
-
-    lastScrollY = currentScrollY;
-  });
-</script>
-
-<script>
-  const categoryLinks = document.querySelectorAll('.category-link');
-
-  categoryLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault(); // prevent immediate jump
-
-      // Remove flash class from all
-      categoryLinks.forEach(l => l.classList.remove('flash'));
-
-      // Add flash class to the clicked one
-      link.classList.add('flash');
-
-      // Remove it after a short delay (fade out effect)
-      setTimeout(() => {
-        link.classList.remove('flash');
-        // Redirect after animation (if it's a real page)
-        window.location.href = link.href;
-      }, 800); // adjust delay to match transition
-    });
-  });
-</script>
-
-<script>
-  const sidebarNav = document.querySelector('.sidebar-nav');
-
-  sidebarNav.addEventListener('wheel', function (e) {
-    const isAtTop = sidebarNav.scrollTop === 0;
-    const isAtBottom = sidebarNav.scrollHeight - sidebarNav.scrollTop === sidebarNav.clientHeight;
-
-    if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
-      e.preventDefault(); // Prevent page scroll when at the edges
-    }
-  }, { passive: false });
-</script>
-
-<!-- Fully Responsive Footer -->
-<footer style="
-  width: 100%;
-  color: #ccc;
-  padding: 40px 10px 30px; /* top, left/right, bottom padding */
-  font-size: 14px;
-  line-height: 1.6;
-  box-sizing: border-box;
-  position: relative;
-  margin-top: 10px; /* space above the footer */
-  margin-bottom: 20px; /* change this value to adjust bottom spacing */
-">
-  <div style="
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    text-align: center;
-    position: relative;
-  ">
-    <!-- Bottom border line, slightly lowered -->
-    <div style="
-      height: 1px;
-      background: #333;
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      transform: translateY(-20px);
-    "></div>
-
-    <p style="margin: 30px 0 0;">&copy; 2025 <strong>Zone Vault</strong>. All rights reserved.</p>
-  </div>
-</footer>
 
 </body>
 </html> 
