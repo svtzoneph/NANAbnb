@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SEVENTEEN [NEW_] WORLD TOUR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon-new.png" type="image/png" />
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2196f3">
+
+<meta name="apple-mobile-web-app-title" content="Zone Vault">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a1a">
+<link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
+<link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
+<link rel="apple-touch-startup-image" href="splash.png">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.min.js"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-1B2RJ659GL');
+</script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(to bottom, #232526, #414345);
+      color: #d6b4fc; /* or #b490e5 */
+      overflow-x: hidden;
+      font-size: 16px;
+    }
+
+header {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+ background: linear-gradient(to bottom, #1a1b1d, #2e2f31);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Elegant border */
+  backdrop-filter: blur(6px); /* Slight blur behind the header */
+  transition: transform 0.3s ease-in, background 0.4s ease-in-out;
+}
+
+/* Header show/hide animations */
+header.show {
+  transform: translateY(0);
+  transition: transform 0.6s ease-out;
+}
+
+header.hide {
+  transform: translateY(-100%);
+}
+
+/* Flex wrapper for links */
+.header-links {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+  flex: 1;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.header-logo {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.header-logo img {
+  width: 60px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5)); /* Logo drop shadow */
+}
+
+/* Category links with hover animation and gradient highlight */
+.category-link {
+  padding: 8px 16px;
+  background: transparent;
+  color: #fff;
+  border-radius: 12px;
+  font-size: 14px;
+  text-decoration: none;
+  flex: 0 0 auto;
+  font-weight: bold;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  position: relative;
+}
+
+.category-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: -1;
+}
+
+.category-link:hover {
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.category-link:hover::before {
+  opacity: 1;
+}
+
+/* Active link style */
+.category-link.active {
+  background: #fff;
+  color: #000;
+}
+
+/* Flash effect */
+.category-link.flash {
+  background: #fff;
+  color: #000;
+  transition: background 0.6s ease, color 0.6s ease;
+}
+
+  h1 {
+      text-align: center;
+      color: #ff3366;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    .divider {
+      font-size: 1.1rem;
+      color: #ff6699;
+      margin: 2rem 0 1rem;
+      border-left: 4px solid #ff3366;
+      padding-left: 10px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .gallery a {
+      display: block;
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .gallery a img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .gallery a:hover img {
+      transform: scale(1.02);
+    }
+
+    .lg-backdrop {
+      backdrop-filter: blur(6px);
+      background-color: rgba(0, 0, 0, 0.85) !important;
+    }
+    
+    header {
+  transition: all 0.3s ease;
+}
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.3rem;
+      }
+
+      .gallery {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+    }
+    
+ body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: blur(7px) brightness(0.5);
+    z-index: -1;
+  }
+
+  .code-verify {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    margin: auto;
+    max-width: 90%;
+  }
+
+  input[type="text"] {
+    padding: 12px;
+    font-size: 16px;
+    margin: 10px;
+    width: 260px;
+    border-radius: 8px;
+    border: none;
+    text-align: center;
+  }
+
+  button {
+    padding: 10px 24px;
+    font-size: 16px;
+    border-radius: 6px;
+    background-color: #00c9a7;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  .video-container {
+    display: none;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    text-align: center;
+    border-radius: 12px;
+  }
+
+  h2.title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #d9d9d9;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+}
+  .videos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 40px;
+    justify-content: center;
+  }
+
+  .video-box {
+    width: 100%;
+  }
+
+  .player {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #000; 
+  }
+
+  .video-label {
+    margin-top: 10px;
+    font-size: 17px;
+    color: #ccc;
+  }
+
+  @media (max-width: 600px) {
+    .videos {
+      grid-template-columns: 1fr;
+    }
+  }
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 80%;
+  max-width: 300px;
+  height: 100%;
+  background: linear-gradient(to bottom, #232526, #414345);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  padding: 20px;
+  gap: 10px;
+  transition: left 0.3s ease;
+  justify-content: space-between;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6);
+    overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+  
+
+  max-height: 450px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+.sidebar-nav:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar .close-btn {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.sidebar .close-btn:hover {
+  transform: rotate(90deg);
+}
+
+.sidebar-title {
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  color: 	#f1f1f1; 
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 10px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.sidebar-nav a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 10px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-nav a:hover {
+  background: rgba(255, 255, 255, 0.15);
+  padding-left: 20px;
+}
+
+.sidebar-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-logo img {
+  width: 50px;
+  height: auto;
+}
+
+.sidebar-email a {
+  color: white;
+  font-size: 18px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.sidebar-email a:hover {
+  color: #00bfff;
+}
+
+
+.mobile-header {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  #scrollHeader {
+    display: none;
+  }
+
+  .mobile-header {
+    display: flex;
+    padding: 10px 9px;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    z-index: 1000;
+  }
+
+  .hamburger {
+    font-size: 26px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+
+  .sidebar {
+    display: flex;
+  }
+
+  .sidebar-email img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .sidebar-logo img {
+    width: 60px;
+    height: auto;
+  }
+
+  .sidebar-title {
+    font-size: 30px;
+    margin-bottom: 15px;
+  }
+}
+
+:root {
+  --plyr-color-main: #d9d9d9;
+}
+
+.plyr__control {
+  background-color: #d9d9d9 !important; 
+  color: #000 !important;               
+}
+
+
+h2.title {
+  background: #000; 
+  padding: 12px 20px; 
+  border-radius: 8px; 
+  display: inline-block; 
+}
+
+
+.player {
+  background: #000 !important; 
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+
+.plyr {
+  background: #000 !important; 
+}
+
+@media screen and (max-width: 480px) {
+  .plyr__controls .plyr__control {
+    padding: 1px 2px;   
+    margin: 1.5px;         
+    font-size: 7px;      
+  }
+
+  .plyr__progress {
+    height: 15px;        
+  }
+
+  .plyr__control.plyr__play-large {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .plyr__controls .plyr__control {
+    padding: 6px 10px;  
+    margin: 1px;        
+    font-size: 14px;     
+  }
+
+  .plyr__progress {
+    height: 4px;       
+  }
+
+  .plyr__control.plyr__play-large {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+  </style>
+</head>
+<body>
+
+<!-- Mobile hamburger header -->
+<div class="mobile-header">
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+</div>
+
+<!-- Desktop header (scrollable) -->
+<header id="scrollHeader">
+  <div class="header-logo">
+    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+  </div>
+  <div class="header-links">
+    <a class="category-link" href="index.html">LOGIN</a>
+    <a class="category-link" href="profile.html">PROFILE</a>
+    <a class="category-link" href="home.html">HOME</a>
+    <a class="category-link" href="gallery.html">GALLERY</a>
+    <a class="category-link" href="nanabnb.html">NANA BNB</a>
+    <a class="category-link" href="newtour.html">SEVENTEEN NEW_ WOLRD TOUR</a>
+    <a class="category-link" href="hxwfanconcert.html">HXW IN SEOUL</a>
+    <a class="category-link" href="hxwingwangju.html">HXW IN GWANGJU</a>
+    <a class="category-link" href="svtholiday.html">SEVENTEEN HOLIDAY</a>
+    <a class="category-link" href="rightheregoyang.html">RIGHT HERE IN GOYANG</a>
+    <a class="category-link" href="arenatour.html">2018 JAPAN ARENA TOUR</a>
+    <a class="category-link" href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
+    <a class="category-link" href="touragain.html">FOLLOW TOUR DISNEY+</a>
+  </div>
+</header>
+
+<!-- Sidebar for mobile -->
+<div id="mobileSidebar" class="sidebar">
+  <button class="close-btn" onclick="toggleSidebar()">✖</button>
+  
+  <!-- Sidebar Title -->
+  <div class="sidebar-title">Zone Vault</div>
+
+  <nav class="sidebar-nav">
+    <a href="index.html">LOGIN</a>
+    <a href="profile.html">PROFILE</a>
+    <a href="home.html">HOME</a>
+    <a href="gallery.html">GALLERY</a>
+    <a href="nanabnb.html">NANA BNB</a>
+    <a href="newtour.html">SEVENTEEN NEW_ WORLD TOUR</a>
+    <a href="hxwfanconcert.html">HXW IN SEOUL</a>
+    <a href="hxwingwangju.html">HXW IN GWANGJU</a>
+    <a href="svtholiday.html">SEVENTEEN HOLIDAY</a>
+    <a href="rightheregoyang.html">RIGHT HERE IN GOYANG</a>
+    <a href="arenatour.html">2018 JAPAN ARENA TOUR</a>
+    <a href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
+    <a href="touragain.html">FOLLOW TOUR DISNEY+</a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <!-- Logo Bottom Left -->
+    <div class="sidebar-logo">
+      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+    </div>
+    
+    <!-- Email Bottom Right -->
+    <div class="sidebar-email">
+      <a href="mailto:your@email.com" title="Send Email">
+        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="code-verify" id="codePrompt">
+  <h2>🔐 Enter Access Code</h2>
+  <input type="text" id="codeInput" placeholder="Enter code..." />
+  <button onclick="verifyCode()">Unlock</button>
+  <p id="errorMsg" style="color: red; display: none;">Incorrect code. Please try again.</p>
+</div>
+
+<div class="video-container" id="videoPage">
+  <h2 class="title">SEVENTEEN [NEW_] WORLD TOUR IN INCHEON</h2>
+  <div class="videos">
+     <div class="video-box">
+       <video id="player1" class="player" playsinline controls poster="https://uploads.onecompiler.io/43ddry4jt/43wkywbqe/Screenshot%202025-09-13%2021-01-14.png"></video>
+       <h4 class="video-label">DAY 1 SEVENTEEN [NEW_] WORLD TOUR IN INCHEON |SINGLE VIEW|</h4>
+     </div>
+     
+     <div class="video-box">
+       <video id="player1.1" class="player" playsinline controls poster="https://uploads.onecompiler.io/43ddry4jt/43wkywbqe/Screenshot%202025-09-13%2021-01-14.png"></video>
+       <h4 class="video-label">DAY 1 SEVENTEEN [NEW_] WORLD TOUR IN INCHEON |CAM 2|</h4>
+     </div>
+     
+     <div class="video-box">
+       <video id="player1.2" class="player" playsinline controls poster="https://uploads.onecompiler.io/43ddry4jt/43wkywbqe/Screenshot%202025-09-13%2021-01-14.png"></video>
+       <h4 class="video-label">DAY 1 SEVENTEEN [NEW_] WORLD TOUR IN INCHEON |CAM 3|</h4>
+     </div>
+     
+     <div class="video-box">
+       <video id="player2" class="player" playsinline controls poster="https://uploads.onecompiler.io/43ddry4jt/43wkywbqe/Screenshot%202025-09-13%2021-01-14.png"></video>
+      <h4 class="video-label">DAY 2 SEVENTEEN [NEW_] WORLD TOUR IN INCHEON |SINGLE VIEW|</h4>
+     </div>
+  </div>
+</div>
+
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+    authDomain: "tvnstream-b4497.firebaseapp.com",
+    databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+    projectId: "tvnstream-b4497",
+    storageBucket: "tvnstream-b4497.appspot.com",
+    messagingSenderId: "308384754214",
+    appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+    measurementId: "G-VFNH70R4D9"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+
+  function verifyCode() {
+    const input = document.getElementById("codeInput").value.trim();
+    const errorMsg = document.getElementById("errorMsg");
+
+    db.ref("newworldtour/code").once("value").then(snapshot => {
+      const correctCode = snapshot.val();
+      if (input === correctCode) {
+        localStorage.setItem("access_newworldtour", "true");
+        showVideoPage();
+      } else {
+        errorMsg.style.display = "block";
+      }
+    });
+  }
+
+
+  function showVideoPage() {
+    document.getElementById("codePrompt").style.display = "none";
+    document.getElementById("videoPage").style.display = "block";
+
+  
+    const sources = [
+      {
+        id: "player1",
+        url: "https://stream.mux.com/VhWMKXytxaUpVy5LGDX9yxSzuHzfX8K1sow39pWUWr4.m3u8",
+        skipTime: 191
+      },
+      {
+        id: "player2",
+        url: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+        skipTime: 60
+      }
+    ];
+
+ 
+    sources.forEach(src => {
+      const video = document.getElementById(src.id);
+      if (!video) return;
+
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(src.url);
+        hls.attachMedia(video);
+      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = src.url;
+      }
+
+      try {
+       const player = new Plyr(video, {
+  autoplay: false,
+  seekTime: 10, 
+  controls: [
+    "play-large",   
+    "rewind",
+    "play",   
+    "fast-forward",
+    "progress",     
+    "current-time", 
+    "duration",     
+    "mute",         
+    "volume",      
+    "captions",     
+    "pip",          
+    "airplay",      
+    "fullscreen"
+  ]
+});
+
+
+const skipForward = 10;  
+const skipBackward = 10; 
+let lastTap = 0;
+
+
+video.addEventListener("touchend", (e) => {
+  const currentTime = new Date().getTime();
+  const tapLength = currentTime - lastTap;
+
+  if (tapLength < 300 && tapLength > 0) {
+    const rect = video.getBoundingClientRect();
+    const x = e.changedTouches[0].clientX;
+
+    if (x < rect.width / 2) {
+      player.currentTime -= skipBackward;
+      showOverlay("⏪ -" + skipBackward + "s");
+    } else {
+      player.currentTime += skipForward;
+      showOverlay("⏩ +" + skipForward + "s");
+    }
+  }
+  lastTap = currentTime;
+});
+
+video.addEventListener("dblclick", (e) => {
+  const rect = video.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+
+  if (x < rect.width / 2) {
+    player.currentTime -= skipBackward;
+    showOverlay("⏪ -" + skipBackward + "s");
+  } else {
+    player.currentTime += skipForward;
+    showOverlay("⏩ +" + skipForward + "s");
+  }
+});
+
+
+function showOverlay(text) {
+  let overlay = document.createElement("div");
+  overlay.innerText = text;
+  overlay.style.position = "absolute";
+  overlay.style.top = "50%";
+  overlay.style.left = "50%";
+  overlay.style.transform = "translate(-50%, -50%)";
+  overlay.style.background = "rgba(0,0,0,0.6)";
+  overlay.style.color = "#fff";
+  overlay.style.padding = "10px 20px";
+  overlay.style.borderRadius = "10px";
+  overlay.style.fontSize = "20px";
+  overlay.style.zIndex = "9999";
+  video.parentNode.appendChild(overlay);
+
+  setTimeout(() => overlay.remove(), 600);
+}
+
+     
+const skipBtn = document.createElement("button");
+skipBtn.innerHTML = "<strong>SKIP INTRO</strong>"; 
+skipBtn.className = "plyr__controls__item plyr__control";
+skipBtn.style.marginLeft = "10px";
+
+skipBtn.addEventListener("click", () => {
+  player.currentTime = src.skipTime; 
+  skipBtn.remove(); //
+});
+
+
+player.elements.controls.appendChild(skipBtn);
+
+      } catch (err) {
+        console.error("Plyr init error:", err);
+      }
+    });
+  }
+
+
+  window.onload = function () {
+    if (localStorage.getItem("access_newworldtour") === "true") {
+      showVideoPage();
+    }
+  };
+</script>
+
+
+<script>
+const linksContainer = document.querySelector('.header-links');
+linksContainer.addEventListener('wheel', (e) => {
+  if (e.deltaY === 0) return;
+  e.preventDefault();
+  linksContainer.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
+});
+</script>
+  
+<script>
+  const allowedPaths = [
+    '/index.html',
+    '/home.html',
+    '/nanabnb.html',
+    '/newtour.html',
+    '/hxwfanconcert.html',
+    '/svtholiday.html',
+    '/arenatour.html',
+    '/svtjapanconcert.html',
+    '/svtjapanconcert.html',
+    '/touragain.html',
+    '/gallery.html',
+    '/profile.html',
+    '/soon.html'
+  ];
+
+  const currentPage = window.location.pathname;
+
+  // 1. Check if user already has internalAccess flag
+  const hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+
+  // 2. Check if user came from one of the allowed pages
+  const referrer = document.referrer;
+  const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+
+  // 3. If came from allowed page, give internalAccess
+  if (cameFromAllowedPage) {
+    sessionStorage.setItem('internalAccess', 'true');
+  }
+
+  // 4. Allow access if:
+  // - already has internalAccess OR
+  // - current page is index.html (entry point)
+  const isIndexPage = currentPage === '/index.html';
+  if (!hasInternalAccess && !isIndexPage) {
+    const modal = document.createElement('div');
+    modal.id = 'accessDeniedModal';
+    modal.style = `
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      text-align: center;
+      padding: 20px;
+    `;
+    modal.innerHTML = `
+      <div>
+        <strong style="font-size: 24px;">🚫 Access Denied</strong><br><br>
+        You cannot access this page directly.<br>
+        Please go through the homepage or allowed sections.<br><br>
+        <em>Redirecting to login page...</em>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 3000);
+  }
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      reg.onupdatefound = () => {
+        const newSW = reg.installing;
+        newSW.onstatechange = () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            window.location.reload();
+          }
+        };
+      };
+    }).catch(err => {
+      console.error('Service Worker registration failed:', err);
+    });
+  }
+</script>
+
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('mobileSidebar');
+    sidebar.classList.toggle('open');
+  }
+</script>
+
+<script>
+  let lastScrollY = window.scrollY;
+  const scrollHeader = document.getElementById('scrollHeader');
+
+  window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY > lastScrollY && currentScrollY > 50) {
+      scrollHeader.classList.add('hide');
+    } else {
+      scrollHeader.classList.remove('hide');
+    }
+
+    lastScrollY = currentScrollY;
+  });
+</script>
+
+<script>
+  const categoryLinks = document.querySelectorAll('.category-link');
+
+  categoryLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      categoryLinks.forEach(l => l.classList.remove('flash'));
+
+      link.classList.add('flash');
+
+      setTimeout(() => {
+        link.classList.remove('flash');
+
+        window.location.href = link.href;
+      }, 800); 
+    });
+  });
+</script>
+
+<script>
+  const sidebarNav = document.querySelector('.sidebar-nav');
+
+  sidebarNav.addEventListener('wheel', function (e) {
+    const isAtTop = sidebarNav.scrollTop === 0;
+    const isAtBottom = sidebarNav.scrollHeight - sidebarNav.scrollTop === sidebarNav.clientHeight;
+
+    if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+</script>
+
+</body>
+</html> 
