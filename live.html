@@ -682,7 +682,21 @@ h2.title {
             const player = new Plyr(video, {
               autoplay: true,
               seekTime: 10,
-              controls: ["play-large","play","mute","volume","current-time","captions","settings","pip","airplay","fullscreen"],
+              controls: [
+               "play-large",
+               "rewind",        // ⏪ rewind button
+               "play",
+               "fast-forward",  // ⏩ fast forward button
+               "progress",      // timeline / seek bar
+               "current-time",
+               "mute",
+               "volume",
+               "captions",
+               "settings",
+               "pip",
+               "airplay",
+               "fullscreen"
+                ],
               settings: ['quality','speed','captions'],
               quality: {
                 default: availableQualities[0],
