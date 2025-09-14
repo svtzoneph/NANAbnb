@@ -45,8 +45,6 @@
       overflow-x: hidden;
       font-size: 16px;
     }
-    
-    
 
 header {
   padding: 12px 20px;
@@ -538,16 +536,6 @@ h2.title {
   }
 }
 
-#watermark {
-  animation: moveWatermark 30s linear infinite;
-}
-
-@keyframes moveWatermark {
-  0% { bottom: 10px; right: 10px; }
-  50% { bottom: 50%; right: 50%; }
-  100% { bottom: 10px; right: 10px; }
-}
-
   </style>
 </head>
 <body>
@@ -566,7 +554,6 @@ h2.title {
     <a class="category-link" href="index.html">LOGIN</a>
     <a class="category-link" href="profile.html">PROFILE</a>
     <a class="category-link" href="home.html">HOME</a>
-    <a class="category-link" href="live.html">LIVE</a>
     <a class="category-link" href="gallery.html">GALLERY</a>
     <a class="category-link" href="nanabnb.html">NANA BNB</a>
     <a class="category-link" href="newtour.html">SEVENTEEN NEW_ WOLRD TOUR</a>
@@ -591,7 +578,6 @@ h2.title {
     <a href="index.html">LOGIN</a>
     <a href="profile.html">PROFILE</a>
     <a href="home.html">HOME</a>
-    <a href="live.html">LIVE</a>
     <a href="gallery.html">GALLERY</a>
     <a href="nanabnb.html">NANA BNB</a>
     <a href="newtour.html">SEVENTEEN NEW_ WORLD TOUR</a>
@@ -612,7 +598,7 @@ h2.title {
     
     <!-- Email Bottom Right -->
     <div class="sidebar-email">
-      <a href="zonevaultph@gmail.com" title="Send Email">
+      <a href="mailto:your@email.com" title="Send Email">
         <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
       </a>
     </div>
@@ -626,62 +612,14 @@ h2.title {
   <p id="errorMsg" style="color: red; display: none;">Incorrect code. Please try again.</p>
 </div>
 
-<div class="video-container" id="videoPage" style="display:none; width: 100%; max-width: 800px; margin: 0 auto; padding: 10px; box-sizing: border-box;">
-  <div class="video-box" style="position: relative; width: 100%;">
-
-    <!-- Video player -->
-    <video id="player1" class="player" playsinline controls 
-      poster="https://uploads.onecompiler.io/43ddry4jt/43wkywbqe/Screenshot%202025-09-13%2021-01-14.png"
-      style="width: 100%; height: auto; display: block;"></video>
-
-    <!-- Watermark overlay (on video) -->
-    <div id="watermark" style="
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      color: rgba(255,255,255,0.5);
-      font-size: 18px;
-      font-weight: bold;
-      pointer-events: none;
-      z-index: 9999;
-      user-select: none;
-      animation: moveWatermark 30s linear infinite;
-    ">Loading...</div>
-
+<div class="video-container" id="videoPage">
+  <div class="videos">
+     <div class="video-box">
+       <video id="player1" class="player" playsinline controls poster="https://uploads.onecompiler.io/43ddry4jt/43wkywbqe/Screenshot%202025-09-13%2021-01-14.png"></video>
+       <h4 class="video-label">DAY 2 SEVENTEEN [NEW_] WORLD TOUR IN INCHEON</h4>
+     </div>
   </div>
-
-  <!-- Video title below video -->
-  <div id="videoTitle" style="
-    margin-top: 10px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #fff;
-    text-align: left;
-  ">DAY 2 SEVENTEEN [NEW_] WORLD TOUR IN INCHEON</div>
 </div>
-
-<style>
-  /* Responsive adjustments for phones */
-  @media (max-width: 480px) {
-    #videoTitle {
-      font-size: 14px;
-    }
-    #watermark {
-      font-size: 10px;
-      bottom: 5px;
-      right: 5px;
-    }
-  }
-
-  @media (max-width: 360px) {
-    #videoTitle {
-      font-size: 12px;
-    }
-    #watermark {
-      font-size: 9px;
-    }
-  }
-</style>
 
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -707,19 +645,11 @@ h2.title {
     const input = document.getElementById("codeInput").value.trim();
     const errorMsg = document.getElementById("errorMsg");
 
-    db.ref("newworldtour/code").once("value").then(snapshot => {
+    db.ref("live/code").once("value").then(snapshot => {
       const correctCode = snapshot.val();
       if (input === correctCode) {
-        localStorage.setItem("access_newworldtour", "true");
-        localStorage.setItem("access_newworldtour_code", input);
-
-        // Fetch UID for watermark
-        db.ref("newworldtour/users/" + input).once("value").then(userSnap => {
-          const uid = userSnap.val()?.uid || "Guest";
-          document.getElementById("watermark").innerText = uid;
-          showVideoPage();
-        });
-
+        localStorage.setItem("access_live", "true");
+        showVideoPage();
       } else {
         errorMsg.style.display = "block";
       }
@@ -728,167 +658,63 @@ h2.title {
 
   function showVideoPage() {
     document.getElementById("codePrompt").style.display = "none";
-    const videoPage = document.getElementById("videoPage");
-    videoPage.style.display = "block";
+    document.getElementById("videoPage").style.display = "block";
 
-    const video = document.getElementById("player1");
-    const watermark = document.getElementById("watermark");
-    const streamUrl = "https://play.boxcast.com/p/sveto5rucylklx5rykvk/v/all-ext.m3u8?Expires=2147483647&Signature=doPVpVABz0z0ZqS6VDaCTDY2jYjWyDiahRxqGU70mMBxlYAYF2Nz4oDIjsSALPiNVh5bttEHcZzx4vQSwsYBrzh16zF-R2JvhC5fPNAY7qal-rDLYcXPX5J6Ryigp~xF4GtoDCWKT0Q2F4VnsyM7hzDcU7HDxwn4f9mcB45cqaVA2XoVjHUCUSaIGDe99BaPD7eAbfQi4B-55kW-bdO2M3fe0ehJDWBID3pnrRT1MoWA0E9JiQBSFGvZLFCrr6ooPCW1ZbRvbwFnI-gKap1Fx9WilljjrmsqcT9K5VaCPHHlng1uLe1M9za3WVWXJkTbTH0wdCMWC-cKSF34yqxNPA__&Key-Pair-Id=APKAJ7GUCBQUK6NTWZCA";
+    const sources = [
+      {
+        id: "player1",
+        url: "https://play.boxcast.com/p/dmxj2wos338mlgm66cv8/v/all-ext.m3u8?Expires=2147483647&Signature=pv34NYJRf8LXpa9bKXl8GVsTR1M1MBXDI9BaJj3H73Fhwar9zWfz8VC~01UoN~y9zSnjfGD7g9jrX8U-bPnMY8Bja3b6u-APCvjXMyJcSiTRuj9lBpZRXou08d23Ny3uslP-FQ3t1BksMHpO2j~ruLEh7SVN6BzdQBCNE4ye6Exy9GG5biUW6QmhLbigt0gzwW2l6KDtY4kLJhO3lt~igUKrWpPds9nAb6Gk9LvMWGWhD~CZ7mJibIp4V6rqvaEABMxcWBX9AEuBqcRj~1sS8C1O2EYshYNXeDxd8C5lSt~cRoaAj8HmyJLXnAVad6cR~-C~RihmFW5RHlJWIeuAGQ__&Key-Pair-Id=APKAJ7GUCBQUK6NTWZCA",
+      }
+    ];
 
-    if (Hls.isSupported()) {
-      const hls = new Hls({ capLevelToPlayerSize: true, maxLoadingDelay: 4 });
-      hls.loadSource(streamUrl);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, function () {
-        const availableQualities = hls.levels.map(l => l.height).sort((a,b)=>b-a);
-        const player = new Plyr(video, {
-          autoplay: true,
-          seekTime: 10,
-          controls: ["play-large","play","mute","volume","current-time","duration","captions","settings","pip","airplay","fullscreen"],
-          settings: ['quality','speed','captions'],
-          quality: {
-            default: availableQualities[0],
-            options: availableQualities,
-            forced: true,
-            onChange: (newQuality) => {
-              const levelIndex = hls.levels.findIndex(l => l.height === newQuality);
-              hls.currentLevel = levelIndex;
+    sources.forEach(src => {
+      const video = document.getElementById(src.id);
+      if (!video) return;
+
+      try {
+        if (Hls.isSupported()) {
+          const hls = new Hls({ capLevelToPlayerSize: true, maxLoadingDelay: 4 });
+          hls.loadSource(src.url);
+          hls.attachMedia(video);
+
+          hls.on(Hls.Events.MANIFEST_PARSED, function () {
+            const availableQualities = hls.levels.map(l => l.height).sort((a, b) => b - a);
+            const player = new Plyr(video, {
+              autoplay: true,
+              seekTime: 10,
+              controls: ["play-large","play","mute","volume","current-time","captions","settings","pip","airplay","fullscreen"],
+              settings: ['quality','speed','captions'],
+              quality: {
+                default: availableQualities[0],
+                options: availableQualities,
+                forced: true,
+                onChange: (newQuality) => {
+                  const levelIndex = hls.levels.findIndex(l => l.height === newQuality);
+                  hls.currentLevel = levelIndex;
+                }
+              }
+            });
+
+            // Optional: skip initial seconds if skipTime is set
+            if (src.skipTime) {
+              video.currentTime = src.skipTime;
             }
-          }
-        });
-        
-
-        // Ensure watermark stays visible in fullscreen
-        const updateWatermarkPosition = () => {
-          const fsContainer = video.closest('.plyr__video-wrapper') || document.body;
-          if (!fsContainer.contains(watermark)) fsContainer.appendChild(watermark);
-          watermark.style.position = 'absolute';
-          watermark.style.top = '10px';
-          watermark.style.left = '10px';
-          watermark.style.zIndex = 9999;
-        };
-
-        player.on('enterfullscreen', updateWatermarkPosition);
-        player.on('exitfullscreen', () => {
-          // Move watermark back to original container
-          document.getElementById("videoPage").appendChild(watermark);
-          watermark.style.position = 'absolute';
-          watermark.style.top = '10px';
-          watermark.style.left = '10px';
-        });
-      });
-    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = streamUrl;
-      const player = new Plyr(video);
-    }
-  }
-
-  // Watermark function (must have UID from Firebase)
-  function addWatermark() {
-    const code = localStorage.getItem("access_newworldtour_code"); 
-    if (!code) {
-      // No login, block access
-      alert("Access denied. Please enter a valid code.");
-      window.location.reload();
-      return;
-    }
-
-    // Fetch UID from Firebase
-    firebase.database().ref("newworldtour/users/" + code).once("value").then(userSnap => {
-      const userData = userSnap.val();
-
-      if (!userSnap.exists() || !userData.uid) {
-        // If no UID → deny
-        alert("Access denied. UID not found.");
-        localStorage.removeItem("access_newworldtour");
-        localStorage.removeItem("access_newworldtour_code");
-        window.location.reload();
-        return;
+          });
+        } else {
+          console.error("HLS not supported in this browser.");
+        }
+      } catch (err) {
+        console.error("Player init error:", err);
       }
-
-      const uid = userData.uid;
-
-      let wm = document.getElementById("watermarkUID");
-      if (!wm) {
-        wm = document.createElement("div");
-        wm.id = "watermarkUID";
-        document.body.appendChild(wm);
-      }
-
-      wm.innerText = uid;
-      wm.style.position = "absolute";
-      wm.style.top = "10px";
-      wm.style.left = "10px";
-      wm.style.color = "rgba(255,255,255,0.6)";
-      wm.style.fontSize = "14px";
-      wm.style.fontWeight = "bold";
-      wm.style.zIndex = 9999;
     });
   }
 
-  // Auto-check on load
-  window.onload = () => {
-    if (localStorage.getItem("access_newworldtour") === "true") {
-      addWatermark();
-      showVideoPage();
-    } else {
-      alert("You must login first.");
-      document.getElementById("videoPage").style.display = "none";
-      document.getElementById("codePrompt").style.display = "block";
-    }
-  };
-  
-  // Call it after login or on page load
-  window.onload = () => {
-    if (localStorage.getItem("access_newworldtour") === "true") {
-      addWatermark(); // always fetch UID from Firebase
+  window.onload = function () {
+    if (localStorage.getItem("access_live") === "true") {
       showVideoPage();
     }
   };
 </script>
-
-<style>
-#watermark {
-  position: absolute;
-  font-weight: bold;
-  font-size: 16px;
-  color: rgba(255,255,255,0.5);
-  pointer-events: none;
-  z-index: 9999;
-  user-select: none;
-}
-</style>
-
-<script>
-function moveWatermarkRandomly() {
-  const watermark = document.getElementById("watermark");
-  const videoBox = document.querySelector(".video-box"); // container
-
-  if (!watermark || !videoBox) return;
-
-  const boxWidth = videoBox.clientWidth;
-  const boxHeight = videoBox.clientHeight;
-  const wmWidth = watermark.offsetWidth;
-  const wmHeight = watermark.offsetHeight;
-
-  // Random position inside container
-  const left = Math.random() * (boxWidth - wmWidth);
-  const top = Math.random() * (boxHeight - wmHeight);
-
-  watermark.style.left = left + "px";
-  watermark.style.top = top + "px";
-}
-
-// Initial placement 
-moveWatermarkRandomly();
-
-// Move every 4–5 minutes (random interval)
-setInterval(() => {
-  moveWatermarkRandomly();
-}, 4 * 60 * 1000 + Math.random() * 60 * 1000); // 4–5 minutes
-</script>
-
-
 
 
 <script>
@@ -899,7 +725,7 @@ linksContainer.addEventListener('wheel', (e) => {
   linksContainer.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
 });
 </script>
-
+  
 
 
 <script>
