@@ -783,19 +783,66 @@ h2.title {
     }
   }
 
-  // Auto-show video if already verified
+  // Watermark function (must have UID from Firebase)
+  function addWatermark() {
+    const code = localStorage.getItem("access_newworldtour_code"); 
+    if (!code) {
+      // No login, block access
+      alert("Access denied. Please enter a valid code.");
+      window.location.reload();
+      return;
+    }
+
+    // Fetch UID from Firebase
+    firebase.database().ref("newworldtour/users/" + code).once("value").then(userSnap => {
+      const userData = userSnap.val();
+
+      if (!userSnap.exists() || !userData.uid) {
+        // If no UID → deny
+        alert("Access denied. UID not found.");
+        localStorage.removeItem("access_newworldtour");
+        localStorage.removeItem("access_newworldtour_code");
+        window.location.reload();
+        return;
+      }
+
+      const uid = userData.uid;
+
+      let wm = document.getElementById("watermarkUID");
+      if (!wm) {
+        wm = document.createElement("div");
+        wm.id = "watermarkUID";
+        document.body.appendChild(wm);
+      }
+
+      wm.innerText = uid;
+      wm.style.position = "absolute";
+      wm.style.top = "10px";
+      wm.style.left = "10px";
+      wm.style.color = "rgba(255,255,255,0.6)";
+      wm.style.fontSize = "14px";
+      wm.style.fontWeight = "bold";
+      wm.style.zIndex = 9999;
+    });
+  }
+
+  // Auto-check on load
   window.onload = () => {
     if (localStorage.getItem("access_newworldtour") === "true") {
+      addWatermark();
       showVideoPage();
-
-      // Set watermark for returning users
-      const code = localStorage.getItem("access_newworldtour_code");
-      if (code) {
-        db.ref("newworldtour/users/" + code).once("value").then(userSnap => {
-          const uid = userSnap.val()?.uid || "Guest";
-          document.getElementById("watermark").innerText = uid;
-        });
-      }
+    } else {
+      alert("You must login first.");
+      document.getElementById("videoPage").style.display = "none";
+      document.getElementById("codePrompt").style.display = "block";
+    }
+  };
+  
+  // Call it after login or on page load
+  window.onload = () => {
+    if (localStorage.getItem("access_newworldtour") === "true") {
+      addWatermark(); // always fetch UID from Firebase
+      showVideoPage();
     }
   };
 </script>
