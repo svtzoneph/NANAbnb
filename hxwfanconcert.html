@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Hoshi x Woozi</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>VIDEOS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="icon" href="favicon-new.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <link rel="icon" href="favicon-new.png" type="image/png" />
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2196f3">
 
-<meta name="apple-mobile-web-app-title" content="Zone Vault">
+  <meta name="apple-mobile-web-app-title" content="Zone Vault">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1a1a">
@@ -20,7 +21,8 @@
 <link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
 <link rel="apple-touch-startup-image" href="splash.png">
 
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -28,663 +30,560 @@
 
   gtag('config', 'G-1B2RJ659GL');
 </script>
-
-  <title>Home | Zone Vault</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
     body {
-      margin: 0;
       font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(to bottom, #232526, #414345);
-      color: #d6b4fc; /* or #b490e5 */
-      overflow-x: hidden;
-      font-size: 16px;
-    }
-
-header {
-  padding: 12px 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  overflow-x: auto;
-  white-space: nowrap;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
- background: linear-gradient(to bottom, #1a1b1d, #2e2f31);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Elegant border */
-  backdrop-filter: blur(6px); /* Slight blur behind the header */
-  transition: transform 0.3s ease-in, background 0.4s ease-in-out;
-}
-/* Header show/hide animations */
-header.show {
-  transform: translateY(0);
-  transition: transform 0.6s ease-out;
-}
-
-header.hide {
-  transform: translateY(-100%);
-}
-
-/* Flex wrapper for links */
-.header-links {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  white-space: nowrap;
-  flex: 1;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.header-logo {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-}
-
-.header-logo img {
-  width: 60px;
-  height: auto;
-  display: block;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5)); /* Logo drop shadow */
-}
-
-/* Category links with hover animation and gradient highlight */
-.category-link {
-  padding: 8px 16px;
-  background: transparent;
-  color: #fff;
-  border-radius: 12px;
-  font-size: 14px;
-  text-decoration: none;
-  flex: 0 0 auto;
-  font-weight: bold;
-  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
-  position: relative;
-}
-
-.category-link::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  opacity: 0;
-  transition: opacity 0.3s;
-  z-index: -1;
-}
-
-.category-link:hover {
-  color: #fff;
-  transform: scale(1.05);
-}
-
-.category-link:hover::before {
-  opacity: 1;
-}
-
-/* Active link style */
-.category-link.active {
-  background: #fff;
-  color: #000;
-}
-
-/* Flash effect */
-.category-link.flash {
-  background: #fff;
-  color: #000;
-  transition: background 0.6s ease, color 0.6s ease;
-}
-
-  h1 {
+      background: black;
       text-align: center;
-      color: #ff3366;
-      margin-bottom: 1.5rem;
-      font-size: 1.5rem;
+      padding: 40px;
+      margin: 0;
     }
-
-    .divider {
-      font-size: 1.1rem;
-      color: #ff6699;
-      margin: 2rem 0 1rem;
-      border-left: 4px solid #ff3366;
-      padding-left: 10px;
-    }
-
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .gallery a {
-      display: block;
-      width: 100%;
-      aspect-ratio: 2 / 3;
-      overflow: hidden;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    }
-
-    .gallery a img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-
-    .gallery a:hover img {
-      transform: scale(1.02);
-    }
-
-    .lg-backdrop {
-      backdrop-filter: blur(6px);
-      background-color: rgba(0, 0, 0, 0.85) !important;
-    }
-    
-    header {
-  transition: all 0.3s ease;
-}
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.3rem;
-      }
-
-      .gallery {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-      }
-    }
-    
- body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    filter: blur(7px) brightness(0.5);
-    z-index: -1;
-  }
-
-  .code-verify {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    text-align: center;
-    padding: 20px;
-    border-radius: 12px;
-    margin: auto;
-    max-width: 90%;
-  }
-
-  input[type="text"] {
-    padding: 12px;
-    font-size: 16px;
-    margin: 10px;
-    width: 260px;
-    border-radius: 8px;
-    border: none;
-    text-align: center;
-  }
-
-  button {
-    padding: 10px 24px;
-    font-size: 16px;
-    border-radius: 6px;
-    background-color: #00c9a7;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-
-  .video-container {
-    display: none;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 40px 20px;
-    text-align: center;
-    border-radius: 12px;
-  }
-
-  h2.title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 32px;
-  font-weight: 700;
-  color: #ff4d4d;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-  margin-bottom: 30px;
-  letter-spacing: 1px;
-}
-  .videos {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 40px;
-    justify-content: center;
-  }
-
-  .video-box {
-    width: 100%;
-  }
-
-  .player {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border-radius: 10px;
-    overflow: hidden;
-    background-color: #000; /* ✅ FIX: Prevent body blur from leaking into player */
-  }
-
-  .video-label {
-    margin-top: 10px;
-    font-size: 16px;
-    color: #ccc;
-  }
-
-  @media (max-width: 600px) {
-    .videos {
-      grid-template-columns: 1fr;
-    }
-  }
-
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0;
-  left: -100%;
-  width: 80%;
-  max-width: 300px;
-  height: 100%;
-  background: linear-gradient(to bottom, #232526, #414345);
-  backdrop-filter: blur(10px); /* Glassmorphism */
-  z-index: 9999;
-  padding: 20px;
-  gap: 10px;
-  transition: left 0.3s ease;
-  justify-content: space-between;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6);
-    overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
   
-  /* ✅ Make only the link section scrollable */
-  max-height: 450px;
-  overflow-y: auto;
-  padding-right: 5px;
+    h2 {
+      color: white;
+      margin-bottom: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-left: 10;
+      font-size: 30;
+    }
+    
+
+img {
+  max-width: 700px;
+  width: 100%; /* scales down on smaller screens */
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  margin-bottom: 20px;
+  height: auto; /* maintain aspect ratio */
 }
 
-/* Optional: prettier scrollbar */
-.sidebar-nav::-webkit-scrollbar {
-  width: 6px;
+/* Mobile-specific adjustments */
+@media (max-width: 600px) {
+  img {
+    max-width: 95%;   /* almost full width on phones */
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    margin-bottom: 15px;
+  }
 }
-.sidebar-nav::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-}
-.sidebar-nav:hover::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.4);
+   .episode-buttons {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap; /* allows wrapping on small screens */
+  justify-content: center; /* centers buttons on phone */
+  gap: 10px; /* even spacing between buttons */
 }
 
-.sidebar.open {
-  left: 0;
-}
-
-.sidebar .close-btn {
-  align-self: flex-end;
-  background: none;
+.episode-buttons button {
+  flex: 1 1 auto; /* buttons shrink if needed */
+  min-width: 100px; /* ensures buttons don’t get too small */
+  max-width: 200px; /* avoids too wide on big screens */
+  padding: 12px 20px;
   border: none;
-  font-size: 26px;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #1c0d27, #000000, #1c0d27);
   color: #fff;
   cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.sidebar .close-btn:hover {
-  transform: rotate(90deg);
-}
-
-.sidebar-title {
-  font-size: 26px;
-  font-weight: 700;
-  text-align: center;
-  color: 	#f1f1f1; /* or #b490e5 */
-  margin-bottom: 20px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding-bottom: 10px;
-}
-
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.sidebar-nav a {
-  text-decoration: none;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 500;
-  padding: 10px;
-  border-radius: 6px;
+  font-size: 20px;
+  font-weight: 600;
   transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.05);
+  box-shadow: #fff;
 }
 
-.sidebar-nav a:hover {
-  background: rgba(255, 255, 255, 0.15);
-  padding-left: 20px;
+.episode-buttons button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(128, 128, 128, 0.4);
 }
 
-.sidebar-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+/* 📱 Mobile adjustments */
+@media (max-width: 600px) {
+  .episode-buttons button {
+    flex: 1 1 45%;  /* 2 buttons per row */
+    font-size: 18px;
+    padding: 10px 15px; /* reduce padding for small screens */
+  }
 }
 
-.sidebar-logo img {
-  width: 50px;
-  height: auto;
+@media (max-width: 400px) {
+  .episode-buttons button {
+    flex: 1 1 100%; /* 1 button per row on very small phones */
+    font-size: 14px;
+    padding: 8px 12px;
+     min-width: 65px; /* ensures buttons don’t get too small */
+  max-width: 100px;
+  }
 }
 
-.sidebar-email a {
-  color: white;
-  font-size: 18px;
-  text-decoration: none;
-  transition: color 0.3s ease;
+    /* Fullscreen lock modal */
+    .lock-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.5s ease;
+    }
+
+    
+.lock-content {
+  background: linear-gradient(135deg, #000000, #1a1a1a);
+  padding: 40px 30px;
+  border-radius: 20px;
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+  animation: popIn 0.4s ease;
+  transition: all 0.3s ease;
 }
 
-.sidebar-email a:hover {
-  color: #00bfff;
+.lock-content h2 {
+  margin-bottom: 20px;
+  font-weight: 700;
+  color: #fff;
+  font-size: 24px;
 }
 
-/* Mobile header & hamburger */
-.mobile-header {
+.lock-content input {
+  padding: 14px 15px;
+  width: 90%;
+  max-width: 300px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  border: 1px solid #555;
+  font-size: 16px;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+  background: #111;
+  color: #fff;
+}
+
+.lock-content input::placeholder {
+  color: #aaa;
+}
+
+.lock-content input:focus {
+  outline: none;
+  border: 2px solid #fff;
+  box-shadow: white;
+}
+
+.lock-content button {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 50px;
+  background:  linear-gradient(135deg, #111111, #333333);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 60%;
+  max-width: 250px;
+}
+
+.lock-content button:hover {
+  background: linear-gradient(135deg, #000000, #1a1a1a);
+  transform: translateY(-2px);
+  box-shadow: white;
+}
+
+.lock-content p {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #ff4d4d;
+}
+    
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .lock-modal {
+    padding-left: px;  /* extra space on left */
+    padding-right: 30px; /* extra space on right */
+  }
+
+  .lock-content {
+    padding: 20px 20px; /* reduce padding for phone */
+    width: 100%;
+    max-width: 250px;   /* smaller max width for phone */
+    border-radius: 15px;
+  }
+
+  .lock-content h2 {
+    font-size: 20px;
+  }
+
+  .lock-content input {
+    padding: 12px 12px;
+    font-size: 14px;
+  }
+
+  .lock-content button {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+/* Video modal */
+.modal {
   display: none;
+  position: fixed;
+  z-index: 1000;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  min-height: 100vh; /* ensures full screen height */
+  background: rgba(0, 0, 0, 0.95); /* dark overlay */
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto; /* scroll if content taller than screen */
 }
 
-@media (max-width: 768px) {
-  #scrollHeader {
-    display: none;
+.modal-content {
+  background: transparent;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+
+/* Close Button */
+.close {
+  position: absolute;
+  top: -9px;
+  right: -7px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+}
+
+.close:hover {
+  background: rgba(255,255,255,0.9);
+  color: #000;
+  transform: scale(1.1);
+}
+
+/* Video styling */
+video {
+  width: 100%;
+  border-radius: 10px;
+  background: #000;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+@keyframes popIn {
+  0% {transform: scale(0.9); opacity:0;}
+  100% {transform: scale(1); opacity:1;}
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 15px;
+    width: 100%;
+    max-width: 95%;
   }
 
-  .mobile-header {
-    display: flex;
-    padding: 10px 9px;
-    align-items: center;
-    justify-content: space-between;
-    background: transparent;
-    z-index: 1000;
+  .close {
+    top: -10px;
+    right: -7px;
+    width: 35px;
+    height: 35px;
+    font-size: 22px;
   }
 
-  .hamburger {
-    font-size: 26px;
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
+  video {
+    max-height: 60vh; /* slightly smaller on phones */
   }
 
-  .sidebar {
-    display: flex;
+  .plyr__controls {
+    font-size: 5px; /* smaller text/buttons for mobile */
   }
+}
 
-  .sidebar-email img {
-    width: 30px;
-    height: 30px;
-  }
 
-  .sidebar-logo img {
-    width: 60px;
-    height: auto;
-  }
+:root {
+  /* Main control color */
+  --plyr-color-main: gray; /* Pink/Red */
+  
+  /* Control background (progress, volume, etc.) */
+  --plyr-control-bg: rgba(255, 255, 255, 0.1);
+  
+  /* Hover effect */
+  --plyr-control-hover-bg: rgba(255, 255, 255, 0.2);
 
-  .sidebar-title {
-    font-size: 30px;
-    margin-bottom: 15px;
+  /* Tooltip background & text */
+  --plyr-tooltip-background: black;
+  --plyr-tooltip-color: #fff;
+}
+
+
+
+.center-logo {
+  display: flex;
+  justify-content: center; /* horizontal center */
+  margin-bottom: 20px;    /* space below the logo */
+}
+
+.center-logo img {
+  width: 50px;           /* adjust size as needed */
+  height: auto;
+  border-radius: 12px;    /* optional, rounded corners */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .center-logo img {
+    width: 40px; /* smaller on phones */
   }
 }
 
   </style>
 </head>
 <body>
+
+<!-- Centered Logo -->
+<div class="center-logo">
+  <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault Logo">
+</div>
+
+  <h2>HOSHI X WOOZI FAN CONCERT 'WARNING' IN SEOUL</h2>
+  <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_seoul.png" alt="Poster">
+
+  <div class="episode-buttons">
+    <button onclick="openModal(1)">DAY 1</button>
+    <button onclick="openModal(2)">DAY 2</button>
+    <button onclick="openModal(3)">DAY 3</button>
+    <button onclick="openModal(4)">DAY 2 HOSHI CAM</button>
+    <button onclick="openModal(4)">DAY 2 WOOZI CAM</button>
+  </div>
+
+  <!-- 🔐 Lock Modal -->
+  <div id="lockModal" class="lock-modal">
+    <div class="lock-content">
+      <h2>🔐 Enter Access Code</h2>
+      <input type="text" id="codeInput" placeholder="Enter code..." />
+      <br>
+       <p id="errorMsg" style="display: none;">Incorrect code. Please try again.</p>
+      <button onclick="verifyCode()">Unlock</button>
+    </div>
+  </div>
+
+  <!-- 🎬 Video Modal -->
+  <div id="videoModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <div class="video-container">
+        <video id="videoPlayer" playsinline controls></video>
+      </div>
+    </div>
+  </div>
   
-<!-- Mobile hamburger header -->
-<div class="mobile-header">
-  <button class="hamburger" onclick="toggleSidebar()">☰</button>
-</div>
+  <!-- Back Button -->
+<a href="videos" class="back-btn">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
+    <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</a>
 
-<!-- Desktop header (scrollable) -->
-<header id="scrollHeader">
-  <div class="header-logo">
-    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
-  </div>
-  <div class="header-links">
-    <a class="category-link" href="index.html">LOGIN</a>
-    <a class="category-link" href="profile.html">PROFILE</a>
-    <a class="category-link" href="home.html">HOME</a>
-    <a class="category-link" href="live.html">LIVE</a>
-    <a class="category-link" href="gallery.html">GALLERY</a>
-    <a class="category-link" href="nanabnb.html">NANA BNB</a>
-    <a class="category-link" href="newtour.html">SEVENTEEN NEW_ WOLRD TOUR</a>
-    <a class="category-link" href="hxwfanconcert.html">HXW IN SEOUL</a>
-    <a class="category-link" href="hxwingwangju.html">HXW IN GWANGJU</a>
-    <a class="category-link" href="svtholiday.html">SEVENTEEN HOLIDAY</a>
-    <a class="category-link" href="rightheregoyang.html">RIGHT HERE IN GOYANG</a>
-    <a class="category-link" href="arenatour.html">2018 JAPAN ARENA TOUR</a>
-    <a class="category-link" href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
-    <a class="category-link" href="touragain.html">FOLLOW TOUR DISNEY+</a>
-  </div>
-</header>
+<style>
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: transparent;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* perfectly centers SVG */
+  text-decoration: none;
+  z-index: 3000;
+  transition: all 0.3s ease;
+}
 
-<!-- Sidebar for mobile -->
-<div id="mobileSidebar" class="sidebar">
-  <button class="close-btn" onclick="toggleSidebar()">✖</button>
-  
-  <!-- Sidebar Title -->
-  <div class="sidebar-title">Zone Vault</div>
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
 
-  <nav class="sidebar-nav">
-    <a href="index.html">LOGIN</a>
-    <a href="profile.html">PROFILE</a>
-    <a href="home.html">HOME</a>
-    <a href="live.html">LIVE</a>
-    <a href="gallery.html">GALLERY</a>
-    <a href="nanabnb.html">NANA BNB</a>
-    <a href="newtour.html">SEVENTEEN NEW_ WORLD TOUR</a>
-    <a href="hxwfanconcert.html">HXW IN SEOUL</a>
-    <a href="hxwingwangju.html">HXW IN GWANGJU</a>
-    <a href="svtholiday.html">SEVENTEEN HOLIDAY</a>
-    <a href="rightheregoyang.html">RIGHT HERE IN GOYANG</a>
-    <a href="arenatour.html">2018 JAPAN ARENA TOUR</a>
-    <a href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
-    <a href="touragain.html">FOLLOW TOUR DISNEY+</a>
-  </nav>
+.back-btn svg {
+  display: block; /* removes any inline spacing */
+}
+</style>
 
-  <div class="sidebar-footer">
-    <!-- Logo Bottom Left -->
-    <div class="sidebar-logo">
-      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
-    </div>
-    
-    <!-- Email Bottom Right -->
-    <div class="sidebar-email">
-      <a href="zonevaultph@gmail.com" title="Send Email">
-        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
-      </a>
-    </div>
-  </div>
-</div>
-  
-<!-- Access Code Prompt -->
-<div class="code-verify" id="codePrompt">
-  <h2>🔐 Enter Access Code</h2>
-  <input type="text" id="codeInput" placeholder="Enter code..." />
-  <button onclick="verifyCode()">Unlock</button>
-  <p id="errorMsg" style="color: red; display: none;">Incorrect code. Please try again.</p>
-</div>
 
-<!-- Video Content -->
-<div class="video-container" id="videoPage">
-  <h2 class="title">HOSHI X WOOZI FAN CONCERT 'WARNING' IN SEOUL</h2>
-  <div class="videos">
-    <div class="video-box">
-      <div id="player1" class="player"></div>
-      <h4 class="video-label">DAY 1 HOSHI X WOOZI FAN CONCERT 'WARNING' IN SEOUL</h4>
-    </div>
-    <div class="video-box">
-      <div id="player2" class="player"></div>
-      <h4 class="video-label">DAY 2 HOSHI X WOOZI FAN CONCERT 'WARNING' IN SEOUL</h4>
-    </div>
-    <div class="video-box">
-      <div id="player3" class="player"></div>
-      <h4 class="video-label">DAY 3 HOSHI X WOOZI FAN CONCERT 'WARNING' IN SEOUL</h4>
-    </div>
-    <div class="video-box">
-      <div id="player4" class="player"></div>
-      <h4 class="video-label">DAY 2 HOSHI X WOOZI FAN CONCERT 'WARNING' IN SEOUL HOSHI CAM - NO SUB</h4>
-    </div>
-    <div class="video-box">
-      <div id="player5" class="player"></div>
-      <h4 class="video-label">DAY 2 HOSHI X WOOZI FAN CONCERT 'WARNING' IN SEOUL WOOZI CAM - NO SUB</h4>
-    </div>
-  </div>
-</div>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-<script>
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-    authDomain: "tvnstream-b4497.firebaseapp.com",
-    databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-    projectId: "tvnstream-b4497",
-    storageBucket: "tvnstream-b4497.appspot.com",
-    messagingSenderId: "308384754214",
-    appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-    measurementId: "G-VFNH70R4D9"
-  };
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+      authDomain: "tvnstream-b4497.firebaseapp.com",
+      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+      projectId: "tvnstream-b4497",
+      storageBucket: "tvnstream-b4497.appspot.com",
+      messagingSenderId: "308384754214",
+      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+      measurementId: "G-VFNH70R4D9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+    let selectedEpisode = null;
+    const modal = document.getElementById("videoModal");
+    const videoPlayer = document.getElementById("videoPlayer");
+    const lockModal = document.getElementById("lockModal");
 
-  function verifyCode() {
-  const input = document.getElementById("codeInput").value.trim();
-  const errorMsg = document.getElementById("errorMsg");
+    const sources = {
+      1: { url: "https://stream.mux.com/2GHnJggdVWILlC3e4L00ehLFfqyqo00NEl3cwv7lIlsvA.m3u8"},
+      2: { url: "https://stream.mux.com/02VxvV67lkg02QavjOCKbdszCLj6VZ02GSIwcKlBKxhbJw.m3u8"},
+      3: { url: "https://stream.mux.com/J8TNm5ChmaHP3mE84YH02JN19L12ARy01EnRbD9ejEuNg.m3u8"},
+      4: { url: "https://stream.mux.com/c5mtO32T6dbIf1elVD01xjyFnNHiPm3VCC01ZtnP3Y0200E.m3u8"},
+      5: { url: "https://stream.mux.com/BuLudv00Bi6neCAKxTo517rMpM13aZLz2VMrltkrJbIs.m3u8"},
+    };
 
-  db.ref("Access/code").once("value").then(snapshot => {
-    const correctCode = snapshot.val();
-    if (input === correctCode) {
-      localStorage.setItem("access_Access", "true");
-      showVideoPage();
-    } else {
-      errorMsg.style.display = "block";
+    window.onload = function() {
+      const unlocked = localStorage.getItem("access_Access");
+      if (!unlocked) {
+        lockModal.style.display = "flex";
+      }
+    };
+
+    function verifyCode() {
+      const input = document.getElementById("codeInput").value.trim();
+      const errorMsg = document.getElementById("errorMsg");
+
+      db.ref("Access/code").once("value").then(snapshot => {
+        const correctCode = snapshot.val();
+        if (input === correctCode) {
+          localStorage.setItem("access_newworldtour", "true");
+          lockModal.style.display = "none";
+        } else {
+          errorMsg.style.display = "block";
+        }
+      });
     }
-  });
-}
 
- function showVideoPage() {
-  document.getElementById("codePrompt").style.display = "none";
-  document.getElementById("videoPage").style.display = "block";
+    function openModal(ep) {
+      selectedEpisode = ep;
+      modal.style.display = "flex";
 
-  // Clappr video players with MUX .m3u8 links and poster images
-  new Clappr.Player({
-    parentId: "#player1",
-    source: "https://stream.mux.com/2GHnJggdVWILlC3e4L00ehLFfqyqo00NEl3cwv7lIlsvA.m3u8",
-    poster: "https://image.mux.com/02VxvV67lkg02QavjOCKbdszCLj6VZ02GSIwcKlBKxhbJw/thumbnail.png?time=1",
-    autoPlay: false,
-    width: "100%",
-    height: "100%",
-  });
+      const src = sources[selectedEpisode];
+      if (!src) return;
 
-  new Clappr.Player({
-    parentId: "#player2",
-    source: "https://stream.mux.com/02VxvV67lkg02QavjOCKbdszCLj6VZ02GSIwcKlBKxhbJw.m3u8",
-    poster: "https://image.mux.com/02VxvV67lkg02QavjOCKbdszCLj6VZ02GSIwcKlBKxhbJw/thumbnail.png?time=1",
-    autoPlay: false,
-    width: "100%",
-    height: "100%",
-  });
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(src.url);
+        hls.attachMedia(videoPlayer);
+      } else if (videoPlayer.canPlayType("application/vnd.apple.mpegurl")) {
+        videoPlayer.src = src.url;
+      }
 
-  new Clappr.Player({
-    parentId: "#player3",
-    source: "https://stream.mux.com/J8TNm5ChmaHP3mE84YH02JN19L12ARy01EnRbD9ejEuNg.m3u8", // Duplicate for demo; replace with different one if needed
-    poster: "https://image.mux.com/02VxvV67lkg02QavjOCKbdszCLj6VZ02GSIwcKlBKxhbJw/thumbnail.png?time=1",
-    autoPlay: false,
-    width: "100%",
-    height: "100%",
-  });
+      const player = new Plyr(videoPlayer, {
+        controls: ["play-large","rewind","play","fast-forward","progress","current-time","duration","mute","volume","fullscreen"]
+      });
+
+      if (src.skipTime) {
+        const skipBtn = document.createElement("button");
+        skipBtn.innerHTML = "<strong>SKIP INTRO</strong>";
+        skipBtn.className = "plyr__controls__item plyr__control";
+        skipBtn.style.marginLeft = "10px";
+        skipBtn.addEventListener("click", () => {
+          player.currentTime = src.skipTime;
+          skipBtn.remove();
+        });
+        player.elements.controls.appendChild(skipBtn);
+      }
+    }
+
+    function closeModal() {
+      modal.style.display = "none";
+      videoPlayer.pause();
+      videoPlayer.src = "";
+    }
+  </script>
   
-    new Clappr.Player({
-    parentId: "#player4",
-    source: "https://stream.mux.com/c5mtO32T6dbIf1elVD01xjyFnNHiPm3VCC01ZtnP3Y0200E.m3u8", // Duplicate for demo; replace with different one if needed
-    poster: "https://image.mux.com/02VxvV67lkg02QavjOCKbdszCLj6VZ02GSIwcKlBKxhbJw/thumbnail.png?time=1",
-    autoPlay: false,
-    width: "100%",
-    height: "100%",
-  });
-  
-    new Clappr.Player({
-    parentId: "#player5",
-    source: "https://stream.mux.com/BuLudv00Bi6neCAKxTo517rMpM13aZLz2VMrltkrJbIs.m3u8", // Duplicate for demo; replace with different one if needed
-    poster: "https://image.mux.com/02VxvV67lkg02QavjOCKbdszCLj6VZ02GSIwcKlBKxhbJw/thumbnail.png?time=1",
-    autoPlay: false,
-    width: "100%",
-    height: "100%",
-  });
-  
-}
-
- window.onload = function () {
-  if (localStorage.getItem("access_Access") === "true") {
-    showVideoPage();
+ <style>
+  /* Access Denied Modal */
+  .access-denied-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    text-align: center;
+    padding: 20px;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+    flex-direction: column;
   }
-};
-</script>
 
+  .access-denied-modal strong {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
 
-<script>
-  // Scroll header on mouse wheel
-const linksContainer = document.querySelector('.header-links');
-linksContainer.addEventListener('wheel', (e) => {
-  if (e.deltaY === 0) return;
-  e.preventDefault();
-  linksContainer.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
-});
-</script>
-  
+  .access-denied-modal button {
+    margin-top: 15px;
+    padding: 10px 25px;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+
+  .access-denied-modal button:hover {
+    background: white;
+    color: black;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+</style>
+
 <script>
   const allowedPaths = [
     '/index.html',
     '/home.html',
     '/nanabnb.html',
+    '/newtour.html',
     '/hxwfanconcert.html',
     '/svtholiday.html',
     '/arenatour.html',
-    '/svtjapanconcert.html',
     '/svtjapanconcert.html',
     '/touragain.html',
     '/gallery.html',
@@ -694,135 +593,54 @@ linksContainer.addEventListener('wheel', (e) => {
 
   const currentPage = window.location.pathname;
 
-  // 1. Check if user already has internalAccess flag
-  const hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+  // Check if user already has internalAccess flag
+  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
 
-  // 2. Check if user came from one of the allowed pages
+  // Check if user came from an allowed page
   const referrer = document.referrer;
-  const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
+  const refPath = referrer ? new URL(referrer).pathname : null;
   const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
 
-  // 3. If came from allowed page, give internalAccess
+  // Grant internalAccess if coming from allowed page
   if (cameFromAllowedPage) {
     sessionStorage.setItem('internalAccess', 'true');
+    hasInternalAccess = true;
   }
 
-  // 4. Allow access if:
-  // - already has internalAccess OR
-  // - current page is index.html (entry point)
-  const isIndexPage = currentPage === '/index.html';
+  // Allow access if user already has internalAccess or is on index page
+  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
   if (!hasInternalAccess && !isIndexPage) {
+    showAccessDeniedModal();
+  }
+
+  function showAccessDeniedModal() {
     const modal = document.createElement('div');
-    modal.id = 'accessDeniedModal';
-    modal.style = `
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.85);
-      color: white;
-      font-family: sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      text-align: center;
-      padding: 20px;
-    `;
+    modal.className = 'access-denied-modal';
     modal.innerHTML = `
-      <div>
-        <strong style="font-size: 24px;">🚫 Access Denied</strong><br><br>
-        You cannot access this page directly.<br>
-        Please go through the homepage or allowed sections.<br><br>
-        <em>Redirecting to login page...</em>
-      </div>
+      <strong>🚫 Access Denied</strong>
+      <div>You cannot access this page directly.<br>
+      Please go through the homepage or allowed sections.</div>
+      <div id="redirectTimer">Redirecting in 3 seconds...</div>
+      <button onclick="goBack()">Go Back</button>
     `;
     document.body.appendChild(modal);
 
-    setTimeout(() => {
-      window.location.href = "index.html";
-    }, 3000);
+    let countdown = 3;
+    const timer = document.getElementById('redirectTimer');
+    const interval = setInterval(() => {
+      countdown--;
+      timer.textContent = `Redirecting in ${countdown} seconds...`;
+      if (countdown <= 0) {
+        clearInterval(interval);
+        window.location.href = "index.html";
+      }
+    }, 1000);
   }
-</script>
 
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      // ✅ Detect updates
-      reg.onupdatefound = () => {
-        const newSW = reg.installing;
-        newSW.onstatechange = () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            // ✅ New version is ready → force reload
-            window.location.reload();
-          }
-        };
-      };
-    }).catch(err => {
-      console.error('Service Worker registration failed:', err);
-    });
+  function goBack() {
+    window.history.back();
   }
-</script>
-
-<script>
-  function toggleSidebar() {
-    const sidebar = document.getElementById('mobileSidebar');
-    sidebar.classList.toggle('open');
-  }
-</script>
-
-<script>
-  let lastScrollY = window.scrollY;
-  const scrollHeader = document.getElementById('scrollHeader');
-
-  window.addEventListener('scroll', () => {
-    const currentScrollY = window.scrollY;
-
-    if (currentScrollY > lastScrollY && currentScrollY > 50) {
-      // Scroll Down → Hide header
-      scrollHeader.classList.add('hide');
-    } else {
-      // Scroll Up → Show header smoothly
-      scrollHeader.classList.remove('hide');
-    }
-
-    lastScrollY = currentScrollY;
-  });
-</script>
-
-<script>
-  const categoryLinks = document.querySelectorAll('.category-link');
-
-  categoryLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault(); // prevent immediate jump
-
-      // Remove flash class from all
-      categoryLinks.forEach(l => l.classList.remove('flash'));
-
-      // Add flash class to the clicked one
-      link.classList.add('flash');
-
-      // Remove it after a short delay (fade out effect)
-      setTimeout(() => {
-        link.classList.remove('flash');
-        // Redirect after animation (if it's a real page)
-        window.location.href = link.href;
-      }, 800); // adjust delay to match transition
-    });
-  });
-</script>
-
-<script>
-  const sidebarNav = document.querySelector('.sidebar-nav');
-
-  sidebarNav.addEventListener('wheel', function (e) {
-    const isAtTop = sidebarNav.scrollTop === 0;
-    const isAtBottom = sidebarNav.scrollHeight - sidebarNav.scrollTop === sidebarNav.clientHeight;
-
-    if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
-      e.preventDefault(); // Prevent page scroll when at the edges
-    }
-  }, { passive: false });
 </script>
 
 </body>
-</html> 
+</html>
