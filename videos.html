@@ -1,4 +1,3 @@
-
 <!Doctype html>
 <html lang="en">
 <head>
@@ -551,11 +550,9 @@ const data = [
   {id:"v7", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/arena-tour.png", category:"VIDEOS", title:"SEVENTEEN 2018 JAPAN ARENA TOUR 'SVT'", hashtags:"", link:"arenatour"},
   {id:"v8", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/japan-concert.png", category:"VIDEOS", title:"17 JAPAN CONCERT Say the name #SEVENTEEN", hashtags:"", link:"svtjapanconcert"},
   {id:"v9", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/disney.png", category:"VIDEOS", title:"SEVENTEEN TOUR AGAIN DISNEY+", hashtags:"", link:"touragain"}
-
-
 ];
 
-let currentPage = 1;
+let currentPaginationPage = 1;   
 const cardsPerPage = 4;
 const grid = document.getElementById("grid");
 
@@ -593,15 +590,15 @@ function renderPagination() {
   for(let i=1;i<=pageCount;i++){
     const btn=document.createElement("button");
     btn.textContent=i;
-    if(i===currentPage) btn.classList.add("active");
-    btn.onclick=()=>{currentPage=i; renderGrid(currentPage);}
+    if(i===currentPaginationPage) btn.classList.add("active");
+    btn.onclick=()=>{currentPaginationPage=i; renderGrid(currentPaginationPage);};
     pagination.appendChild(btn);
   }
 }
 
 function checkResponsive() {
   if(window.innerWidth<=800){
-    renderGrid(currentPage);
+    renderGrid(currentPaginationPage);
   } else {
     grid.innerHTML="";
     data.forEach(item=>{
@@ -626,7 +623,9 @@ function checkResponsive() {
 
 checkResponsive();
 window.addEventListener("resize", checkResponsive);
+</script>
 
+<script>
 // Scrollable header
 document.querySelector('.header-links').addEventListener('wheel', e=>{
   if(e.deltaY===0) return;
@@ -716,7 +715,6 @@ document.querySelector('.sidebar-nav').addEventListener('wheel', e=>{
   const allowedPaths = [
     '/index.html',
     '/home.html',
-    '/videos.html',
     '/nanabnb.html',
     '/newtour.html',
     '/hxwfanconcert.html',
@@ -729,62 +727,55 @@ document.querySelector('.sidebar-nav').addEventListener('wheel', e=>{
     '/soon.html'
   ];
 
-const currentPage = window.location.pathname;
+  const currentPage = window.location.pathname;
 
-// Check if user already has internalAccess flag
-let hasInternalAccess = localStorage.getItem('internalAccess') === 'true';
+  // Check if user already has internalAccess flag
+  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
 
-// Check if user came from an allowed page
-const referrer = document.referrer;
-const refPath = referrer ? new URL(referrer).pathname : null;
-const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+  // Check if user came from an allowed page
+  const referrer = document.referrer;
+  const refPath = referrer ? new URL(referrer).pathname : null;
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
 
-// Grant internalAccess if coming from allowed page
-if (cameFromAllowedPage) {
-  localStorage.setItem('internalAccess', 'true');
-  hasInternalAccess = true;
-}
+  // Grant internalAccess if coming from allowed page
+  if (cameFromAllowedPage) {
+    sessionStorage.setItem('internalAccess', 'true');
+    hasInternalAccess = true;
+  }
 
-// Check URL params for internal navigation
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('from')) {
-  localStorage.setItem('internalAccess', 'true');
-  hasInternalAccess = true;
-}
+  // Allow access if user already has internalAccess or is on index page
+  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
+  if (!hasInternalAccess && !isIndexPage) {
+    showAccessDeniedModal();
+  }
 
-// Allow access if user already has internalAccess or is on index page
-const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
-if (!hasInternalAccess && !isIndexPage) {
-  showAccessDeniedModal();
-}
+  function showAccessDeniedModal() {
+    const modal = document.createElement('div');
+    modal.className = 'access-denied-modal';
+    modal.innerHTML = `
+      <strong>🚫 Access Denied</strong>
+      <div>You cannot access this page directly.<br>
+      Please go through the homepage or allowed sections.</div>
+      <div id="redirectTimer">Redirecting in 3 seconds...</div>
+      <button onclick="goBack()">Go Back</button>
+    `;
+    document.body.appendChild(modal);
 
-function showAccessDeniedModal() {
-  const modal = document.createElement('div');
-  modal.className = 'access-denied-modal';
-  modal.innerHTML = `
-    <strong>🚫 Access Denied</strong>
-    <div>You cannot access this page directly.<br>
-    Please go through the homepage or allowed sections.</div>
-    <div id="redirectTimer">Redirecting in 3 seconds...</div>
-    <button onclick="goBack()">Go Back</button>
-  `;
-  document.body.appendChild(modal);
+    let countdown = 3;
+    const timer = document.getElementById('redirectTimer');
+    const interval = setInterval(() => {
+      countdown--;
+      timer.textContent = `Redirecting in ${countdown} seconds...`;
+      if (countdown <= 0) {
+        clearInterval(interval);
+        window.location.href = "index.html";
+      }
+    }, 1000);
+  }
 
-  let countdown = 3;
-  const timer = document.getElementById('redirectTimer');
-  const interval = setInterval(() => {
-    countdown--;
-    timer.textContent = `Redirecting in ${countdown} seconds...`;
-    if (countdown <= 0) {
-      clearInterval(interval);
-      window.location.href = "index.html";
-    }
-  }, 1000);
-}
-
-function goBack() {
-  window.history.back();
-}
+  function goBack() {
+    window.history.back();
+  }
 </script>
 
 </body>
