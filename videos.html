@@ -1,0 +1,782 @@
+<!Doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VIDEOS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon-new.png" type="image/png" />
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2196f3">
+
+<meta name="apple-mobile-web-app-title" content="Zone Vault">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a1a">
+<link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
+<link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
+<link rel="apple-touch-startup-image" href="splash.png">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-1B2RJ659GL');
+</script>
+<style>
+  :root {
+    --bg: black;
+    --card-bg: #fff;
+    --muted: white;
+    --accent: white;
+    --badge-bg: linear-gradient(135deg, #1743ff, #4b7bff);
+    --shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    --radius: 12px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: Inter, system-ui;
+    background: black;
+    color: #0b1020;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 36px auto;
+    padding: 0 18px;
+  }
+
+  .grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (max-width: 1100px) {
+    .grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 800px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 500px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+header {
+  padding: 30px 20px 4px 20px; /* top right bottom left */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* center all links + logo */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: transparent;
+  backdrop-filter: blur(6px);
+}
+
+/* Centered links + logo */
+.header-links {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: center;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+/* Header show/hide animations */
+header.show {
+  transform: translateY(0);
+  transition: transform 0.6s ease-out;
+}
+
+header.hide {
+  transform: translateY(-100%);
+}
+
+.header-logo {
+  width: 40px;       /* smaller logo to fit nicely beside LOGIN */
+  height: auto;
+  flex: 0 0 auto;    /* don't stretch */
+}
+
+.header-logo img {
+  width: 40px;
+  height: auto;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+}
+
+/* Centered links container */
+.header-links {
+  display: flex;
+  gap: 10px;
+  justify-content: center; /* center links horizontally */
+  flex: 1; /* take remaining space */
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Category link styles */
+.category-link {
+  padding: 8px 16px;
+  background: transparent;
+  color: #fff;
+  border-radius: 12px;
+  font-size: 14px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  position: relative;
+}
+
+.category-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: -1;
+}
+
+.category-link:hover {
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.category-link:hover::before {
+  opacity: 1;
+}
+
+/* Active & flash effects */
+.category-link.active {
+  background: #fff;
+  color: #000;
+}
+
+.category-link.flash {
+  background: #fff;
+  color: #000;
+  transition: background 0.6s ease, color 0.6s ease;
+}
+
+
+  .card {
+    background: linear-gradient(to bottom, #232526, #414345);;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 38px rgba(15, 23, 42, 0.12);
+  }
+
+  .thumb img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .card-body {
+    padding: 18px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .meta {
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+  }
+
+  .hashtags {
+    color: gray;
+    font-size: 13px;
+  }
+
+.bottom {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center horizontally */
+  gap: 10px; /* Optional spacing between button and badge */
+}
+
+.btn {
+  position: relative;
+  overflow: hidden;
+  padding: 10px 20px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  background:linear-gradient(135deg, #000000, #1a1a1a);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* Hover effect */
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+/* Press effect */
+.btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* Ripple effect */
+.btn::after {
+  content: "";
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  background: rgba(255,255,255,0.3);
+  display: block;
+  border-radius: 50%;
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.6s, opacity 1s;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+}
+
+.btn:active::after {
+  transform: translate(-50%, -50%) scale(4);
+  opacity: 1;
+  transition: 0s;
+}
+
+  #pagination {
+  text-align: center;
+  margin: 20px 0;
+}
+#pagination button {
+  margin: 0 5px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #000;
+  font-weight: 600;
+}
+#pagination button.active {
+  border: 2px solid var(--accent);
+  background:black;
+  color: #fff;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 80%;
+  max-width: 300px;
+  height: 100%;
+  background: black;
+  backdrop-filter: blur(20px); /* Glassmorphism */
+  z-index: 9999;
+  padding: 20px;
+  gap: 10px;
+  transition: left 0.3s ease;
+  justify-content: space-between;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6);
+    overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+  
+  /* ✅ Make only the link section scrollable */
+  max-height: 450px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Optional: prettier scrollbar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+.sidebar-nav:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar .close-btn {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.sidebar .close-btn:hover {
+  transform: rotate(90deg);
+}
+
+.sidebar-title {
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  color: 	#f1f1f1; /* or #b490e5 */
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 10px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.sidebar-nav a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 10px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-nav a:hover {
+  background: rgba(255, 255, 255, 0.15);
+  padding-left: 20px;
+}
+
+.sidebar-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-logo img {
+  width: 50px;
+  height: auto;
+}
+
+.sidebar-email a {
+  color: white;
+  font-size: 18px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.sidebar-email a:hover {
+  color: #00bfff;
+}
+
+/* Mobile header & hamburger */
+.mobile-header {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  #scrollHeader {
+    display: none;
+  }
+
+  .mobile-header {
+    display: flex;
+    padding: 10px 9px;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    z-index: 1000;
+  }
+
+  .hamburger {
+    font-size: 26px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+
+  .sidebar {
+    display: flex;
+  }
+
+  .sidebar-email img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .sidebar-logo img {
+    width: 60px;
+    height: auto;
+  }
+
+  .sidebar-title {
+    font-size: 30px;
+    margin-bottom: 15px;
+  }
+}
+  </style>
+</head>
+<body>
+
+<!-- Mobile hamburger header -->
+<div class="mobile-header">
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+</div>
+
+<!-- Desktop header (scrollable) -->
+<header id="scrollHeader">
+  <div class="header-links">
+      <div class="header-logo">
+    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+  </div>
+    <a class="category-link" href="index">LOGIN</a>
+    <a class="category-link" href="home">HOME</a>
+    <a class="category-link" href="live">LIVE</a>
+    <a class="category-link" href="gallery">GALLERY</a>
+    <a class="category-link" href="videos">VIDEOS</a>
+</header>
+
+<!-- Sidebar for mobile -->
+<div id="mobileSidebar" class="sidebar">
+  <button class="close-btn" onclick="toggleSidebar()">✖</button>
+  
+  <!-- Sidebar Title -->
+  <div class="sidebar-title">Zone Vault</div>
+
+  <nav class="sidebar-nav">
+    <a href="index">LOGIN</a>
+    <a href="home">HOME</a>
+    <a href="live">LIVE</a>
+    <a href="gallery">GALLERY</a>
+    <a href="videos">VIDEOS</a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <!-- Logo Bottom Left -->
+    <div class="sidebar-logo">
+      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+    </div>
+    
+    <!-- Email Bottom Right -->
+    <div class="sidebar-email">
+      <a href="zonevaultph@gmail.com" title="Send Email">
+        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="grid" id="grid"></div>
+  <div id="pagination" style="text-align:center;margin-top:20px;"></div>
+</div>
+
+<script>
+const data = [
+  {id:"v1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN [NEW_] WORLD TOUR IN INCHEON", hashtags:"", link:"newtour"},
+  {id:"v2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_gwangju.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN GWANGJU", hashtags:"", link:"hxwingwangju"},
+  {id:"v3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_seoul.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN SEOUL", hashtags:"", link:"hxwfanconcert"},
+  {id:"v4", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/nana_bnb.png", category:"VIDEOS", title:"NANA bnb with SEVENTEEN", hashtags:"", link:"nanabnb"},
+  {id:"v5", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/holiday.png", category:"VIDEOS", title:"SEVENTEEN 2025 JAPAN FAN MEETING 'HOLIDAY", hashtags:"", link:"svtholiday"},
+  {id:"v6", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.png", category:"VIDEOS", title:"SEVENTEEN 'RIGHT HERE' WORLD TOUR IN GOYANG", hashtags:"", link:"rightheregoyang"},
+  {id:"v7", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/arena-tour.png", category:"VIDEOS", title:"SEVENTEEN 2018 JAPAN ARENA TOUR 'SVT'", hashtags:"", link:"arenatour"},
+  {id:"v8", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/japan-concert.png", category:"VIDEOS", title:"17 JAPAN CONCERT Say the name #SEVENTEEN", hashtags:"", link:"svtjapanconcert"},
+  {id:"v9", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/disney.png", category:"VIDEOS", title:"SEVENTEEN TOUR AGAIN DISNEY+", hashtags:"", link:"touragain"}
+
+
+];
+
+let currentPage = 1;
+const cardsPerPage = 4;
+const grid = document.getElementById("grid");
+
+function renderGrid(page) {
+  grid.innerHTML = "";
+  const start = (page-1)*cardsPerPage;
+  const end = start+cardsPerPage;
+  const pageData = data.slice(start,end);
+
+  pageData.forEach(item=>{
+    const el=document.createElement("div");
+    el.className="card";
+    el.innerHTML=`
+      <div class="thumb"><img src="${item.thumb}" alt=""></div>
+      <div class="card-body">
+        <div class="meta">${item.category}</div>
+        <h3 class="title">${item.title}</h3>
+        <div class="hashtags">${item.hashtags}</div>
+        <div class="bottom">
+          <button class="btn">WATCH NOW</button>
+        </div>
+      </div>`;
+    el.querySelector(".btn").onclick=()=>window.location.href=item.link;
+    grid.appendChild(el);
+  });
+
+  renderPagination();
+}
+
+function renderPagination() {
+  const pagination=document.getElementById("pagination");
+  pagination.innerHTML="";
+  const pageCount=Math.ceil(data.length/cardsPerPage);
+
+  for(let i=1;i<=pageCount;i++){
+    const btn=document.createElement("button");
+    btn.textContent=i;
+    if(i===currentPage) btn.classList.add("active");
+    btn.onclick=()=>{currentPage=i; renderGrid(currentPage);}
+    pagination.appendChild(btn);
+  }
+}
+
+function checkResponsive() {
+  if(window.innerWidth<=800){
+    renderGrid(currentPage);
+  } else {
+    grid.innerHTML="";
+    data.forEach(item=>{
+      const el=document.createElement("div");
+      el.className="card";
+      el.innerHTML=`
+      <div class="thumb"><img src="${item.thumb}" alt=""></div>
+      <div class="card-body">
+        <div class="meta">${item.category}</div>
+        <h3 class="title">${item.title}</h3>
+        <div class="hashtags">${item.hashtags}</div>
+        <div class="bottom">
+          <button class="btn">WATCH NOW</button>
+        </div>
+      </div>`;
+      el.querySelector(".btn").onclick=()=>window.location.href=item.link;
+      grid.appendChild(el);
+    });
+    document.getElementById("pagination").innerHTML="";
+  }
+}
+
+checkResponsive();
+window.addEventListener("resize", checkResponsive);
+
+// Scrollable header
+document.querySelector('.header-links').addEventListener('wheel', e=>{
+  if(e.deltaY===0) return;
+  e.preventDefault();
+  e.currentTarget.scrollBy({ left: e.deltaY<0?-100:100 });
+});
+
+// Toggle sidebar
+function toggleSidebar(){ document.getElementById('mobileSidebar').classList.toggle('open'); }
+
+// Hide/show header on scroll
+let lastScrollY = window.scrollY;
+const scrollHeader = document.getElementById('scrollHeader');
+window.addEventListener('scroll', ()=>{
+  const currentScrollY = window.scrollY;
+  if(currentScrollY>lastScrollY && currentScrollY>50){ scrollHeader.classList.add('hide'); }
+  else { scrollHeader.classList.remove('hide'); }
+  lastScrollY=currentScrollY;
+});
+
+// Flash effect for category links
+document.querySelectorAll('.category-link').forEach(link=>{
+  link.addEventListener('click', e=>{
+    e.preventDefault();
+    document.querySelectorAll('.category-link').forEach(l=>l.classList.remove('flash'));
+    link.classList.add('flash');
+    setTimeout(()=>{ link.classList.remove('flash'); window.location.href=link.href; },800);
+  });
+});
+
+// Sidebar scroll lock
+document.querySelector('.sidebar-nav').addEventListener('wheel', e=>{
+  const sidebarNav=document.querySelector('.sidebar-nav');
+  const isAtTop = sidebarNav.scrollTop === 0;
+  const isAtBottom = sidebarNav.scrollHeight - sidebarNav.scrollTop === sidebarNav.clientHeight;
+  if((e.deltaY<0 && isAtTop) || (e.deltaY>0 && isAtBottom)){ e.preventDefault(); }
+},{passive:false});
+</script>
+
+ <style>
+  /* Access Denied Modal */
+  .access-denied-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    text-align: center;
+    padding: 20px;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+    flex-direction: column;
+  }
+
+  .access-denied-modal strong {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .access-denied-modal button {
+    margin-top: 15px;
+    padding: 10px 25px;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+
+  .access-denied-modal button:hover {
+    background: white;
+    color: black;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+</style>
+
+<script>
+  const allowedPaths = [
+    '/index.html',
+    '/home.html',
+    '/nanabnb.html',
+    '/newtour.html',
+    '/hxwfanconcert.html',
+    '/svtholiday.html',
+    '/arenatour.html',
+    '/svtjapanconcert.html',
+    '/touragain.html',
+    '/gallery.html',
+    '/profile.html',
+    '/soon.html'
+  ];
+
+  const currentPage = window.location.pathname;
+
+  // Check if user already has internalAccess flag
+  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+
+  // Check if user came from an allowed page
+  const referrer = document.referrer;
+  const refPath = referrer ? new URL(referrer).pathname : null;
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+
+  // Grant internalAccess if coming from allowed page
+  if (cameFromAllowedPage) {
+    sessionStorage.setItem('internalAccess', 'true');
+    hasInternalAccess = true;
+  }
+
+  // Allow access if user already has internalAccess or is on index page
+  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
+  if (!hasInternalAccess && !isIndexPage) {
+    showAccessDeniedModal();
+  }
+
+  function showAccessDeniedModal() {
+    const modal = document.createElement('div');
+    modal.className = 'access-denied-modal';
+    modal.innerHTML = `
+      <strong>🚫 Access Denied</strong>
+      <div>You cannot access this page directly.<br>
+      Please go through the homepage or allowed sections.</div>
+      <div id="redirectTimer">Redirecting in 3 seconds...</div>
+      <button onclick="goBack()">Go Back</button>
+    `;
+    document.body.appendChild(modal);
+
+    let countdown = 3;
+    const timer = document.getElementById('redirectTimer');
+    const interval = setInterval(() => {
+      countdown--;
+      timer.textContent = `Redirecting in ${countdown} seconds...`;
+      if (countdown <= 0) {
+        clearInterval(interval);
+        window.location.href = "index.html";
+      }
+    }, 1000);
+  }
+
+  function goBack() {
+    window.history.back();
+  }
+</script>
+
+</body>
+</html>
