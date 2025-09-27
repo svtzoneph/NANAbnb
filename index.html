@@ -38,7 +38,7 @@
   body {
     font-family: 'Segoe UI', sans-serif;
     background-size: cover;
-    background-color: gray;
+    background-color: black;
     margin: 0;
     padding: 0;
     display: flex;
@@ -146,6 +146,7 @@
   flex: 1;
   padding-left: 0;
   padding-right: 0;
+  background: black;
 }
 
 .google-wrapper {
@@ -160,6 +161,7 @@
   gap: 10px;
   padding-left: 0;
   padding-right: 0;
+  background: black;
 }
 
 .google-btn img {
@@ -367,7 +369,7 @@
         if (data.status === "approved") {
           show("approved");
           sessionStorage.setItem("fromIndex", "true");
-          setTimeout(() => window.location.href = "home.html", 1500);
+          setTimeout(() => window.location.href = "home", 1500);
         } else if (data.status === "pending") {
           show("waiting");
         } else if (data.status === "denied") {
