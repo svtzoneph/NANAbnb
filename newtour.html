@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>SEVENTEEN [NEW_] WORLD TOUR</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>SEVENTEEN [NEW_] WORLD TOUR IN INCHEON</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="icon" href="favicon-new.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <link rel="icon" href="favicon-new.png" type="image/png" />
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2196f3">
 
-<meta name="apple-mobile-web-app-title" content="Zone Vault">
+  <meta name="apple-mobile-web-app-title" content="Zone Vault">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1a1a">
@@ -20,11 +21,8 @@
 <link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
 <link rel="apple-touch-startup-image" href="splash.png">
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.min.js"></script>
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -32,507 +30,332 @@
 
   gtag('config', 'G-1B2RJ659GL');
 </script>
-
   <style>
-    * {
-      box-sizing: border-box;
-    }
     body {
-      margin: 0;
       font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(to bottom, #232526, #414345);
-      color: #d6b4fc; /* or #b490e5 */
-      overflow-x: hidden;
-      font-size: 16px;
-    }
-
-header {
-  padding: 12px 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  overflow-x: auto;
-  white-space: nowrap;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
- background: linear-gradient(to bottom, #1a1b1d, #2e2f31);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Subtle shadow */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Elegant border */
-  backdrop-filter: blur(6px); /* Slight blur behind the header */
-  transition: transform 0.3s ease-in, background 0.4s ease-in-out;
-}
-
-/* Header show/hide animations */
-header.show {
-  transform: translateY(0);
-  transition: transform 0.6s ease-out;
-}
-
-header.hide {
-  transform: translateY(-100%);
-}
-
-/* Flex wrapper for links */
-.header-links {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  white-space: nowrap;
-  flex: 1;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.header-logo {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-}
-
-.header-logo img {
-  width: 60px;
-  height: auto;
-  display: block;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5)); /* Logo drop shadow */
-}
-
-/* Category links with hover animation and gradient highlight */
-.category-link {
-  padding: 8px 16px;
-  background: transparent;
-  color: #fff;
-  border-radius: 12px;
-  font-size: 14px;
-  text-decoration: none;
-  flex: 0 0 auto;
-  font-weight: bold;
-  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
-  position: relative;
-}
-
-.category-link::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  opacity: 0;
-  transition: opacity 0.3s;
-  z-index: -1;
-}
-
-.category-link:hover {
-  color: #fff;
-  transform: scale(1.05);
-}
-
-.category-link:hover::before {
-  opacity: 1;
-}
-
-/* Active link style */
-.category-link.active {
-  background: #fff;
-  color: #000;
-}
-
-/* Flash effect */
-.category-link.flash {
-  background: #fff;
-  color: #000;
-  transition: background 0.6s ease, color 0.6s ease;
-}
-
-  h1 {
+      background: black;
       text-align: center;
-      color: #ff3366;
-      margin-bottom: 1.5rem;
-      font-size: 1.5rem;
+      padding: 40px;
+      margin: 0;
     }
-
-    .divider {
-      font-size: 1.1rem;
-      color: #ff6699;
-      margin: 2rem 0 1rem;
-      border-left: 4px solid #ff3366;
-      padding-left: 10px;
-    }
-
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .gallery a {
-      display: block;
-      width: 100%;
-      aspect-ratio: 2 / 3;
-      overflow: hidden;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    }
-
-    .gallery a img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-
-    .gallery a:hover img {
-      transform: scale(1.02);
-    }
-
-    .lg-backdrop {
-      backdrop-filter: blur(6px);
-      background-color: rgba(0, 0, 0, 0.85) !important;
-    }
-    
-    header {
-  transition: all 0.3s ease;
-}
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.3rem;
-      }
-
-      .gallery {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-      }
-    }
-    
- body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    filter: blur(7px) brightness(0.5);
-    z-index: -1;
-  }
-
-  .code-verify {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    text-align: center;
-    padding: 20px;
-    border-radius: 12px;
-    margin: auto;
-    max-width: 90%;
-  }
-
-  input[type="text"] {
-    padding: 12px;
-    font-size: 16px;
-    margin: 10px;
-    width: 260px;
-    border-radius: 8px;
-    border: none;
-    text-align: center;
-  }
-
-  button {
-    padding: 10px 24px;
-    font-size: 16px;
-    border-radius: 6px;
-    background-color: #00c9a7;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-
-  .video-container {
-    display: none;
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 30px 20px;
-    text-align: center;
-    border-radius: 12px;
-  }
-
-  h2.title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 32px;
-  font-weight: 700;
-  color: #d9d9d9;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-  margin-bottom: 30px;
-  letter-spacing: 1px;
-}
-  .videos {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 40px;
-    justify-content: center;
-  }
-
-  .video-box {
-    width: 100%;
-  }
-
-  .player {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border-radius: 10px;
-    overflow: hidden;
-    background-color: #000; 
-  }
-
-  .video-label {
-    margin-top: 10px;
-    font-size: 17px;
-    color: #ccc;
-  }
-
-  @media (max-width: 600px) {
-    .videos {
-      grid-template-columns: 1fr;
-    }
-  }
-
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0;
-  left: -100%;
-  width: 80%;
-  max-width: 300px;
-  height: 100%;
-  background: linear-gradient(to bottom, #232526, #414345);
-  backdrop-filter: blur(10px);
-  z-index: 9999;
-  padding: 20px;
-  gap: 10px;
-  transition: left 0.3s ease;
-  justify-content: space-between;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6);
-    overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
   
+    h2 {
+      color: white;
+      margin-bottom: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-left: 10;
+      font-size: 30;
+    }
+    
 
-  max-height: 450px;
-  overflow-y: auto;
-  padding-right: 5px;
-}
-
-
-.sidebar-nav::-webkit-scrollbar {
-  width: 6px;
-}
-.sidebar-nav::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-}
-.sidebar-nav:hover::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.4);
-}
-
-.sidebar.open {
-  left: 0;
-}
-
-.sidebar .close-btn {
-  align-self: flex-end;
-  background: none;
-  border: none;
-  font-size: 26px;
-  color: #fff;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.sidebar .close-btn:hover {
-  transform: rotate(90deg);
-}
-
-.sidebar-title {
-  font-size: 26px;
-  font-weight: 700;
-  text-align: center;
-  color: 	#f1f1f1; 
+img {
+  max-width: 700px;
+  width: 100%; /* scales down on smaller screens */
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
   margin-bottom: 20px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding-bottom: 10px;
+  height: auto; /* maintain aspect ratio */
 }
 
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.sidebar-nav a {
-  text-decoration: none;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 500;
-  padding: 10px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.sidebar-nav a:hover {
-  background: rgba(255, 255, 255, 0.15);
-  padding-left: 20px;
-}
-
-.sidebar-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.sidebar-logo img {
-  width: 50px;
-  height: auto;
-}
-
-.sidebar-email a {
-  color: white;
-  font-size: 18px;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.sidebar-email a:hover {
-  color: #00bfff;
-}
-
-
-.mobile-header {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  #scrollHeader {
-    display: none;
-  }
-
-  .mobile-header {
-    display: flex;
-    padding: 10px 9px;
-    align-items: center;
-    justify-content: space-between;
-    background: transparent;
-    z-index: 1000;
-  }
-
-  .hamburger {
-    font-size: 26px;
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-  }
-
-  .sidebar {
-    display: flex;
-  }
-
-  .sidebar-email img {
-    width: 30px;
-    height: 30px;
-  }
-
-  .sidebar-logo img {
-    width: 60px;
-    height: auto;
-  }
-
-  .sidebar-title {
-    font-size: 30px;
+/* Mobile-specific adjustments */
+@media (max-width: 600px) {
+  img {
+    max-width: 95%;   /* almost full width on phones */
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
     margin-bottom: 15px;
   }
 }
-
-:root {
-  --plyr-color-main: #d9d9d9;
+   .episode-buttons {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap; /* allows wrapping on small screens */
+  justify-content: center; /* centers buttons on phone */
+  gap: 10px; /* even spacing between buttons */
 }
 
-.plyr__control {
-  background-color: #d9d9d9 !important; 
-  color: #000 !important;               
+.episode-buttons button {
+  flex: 1 1 auto; /* buttons shrink if needed */
+  min-width: 100px; /* ensures buttons don’t get too small */
+  max-width: 200px; /* avoids too wide on big screens */
+  padding: 12px 20px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #1c0d27, #000000, #1c0d27);
+  color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: #fff;
 }
 
-
-h2.title {
-  background: #000; 
-  padding: 12px 20px; 
-  border-radius: 8px; 
-  display: inline-block; 
+.episode-buttons button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(128, 128, 128, 0.4);
 }
 
+/* 📱 Mobile adjustments */
+@media (max-width: 600px) {
+  .episode-buttons button {
+    flex: 1 1 45%;  /* 2 buttons per row */
+    font-size: 18px;
+    padding: 10px 15px; /* reduce padding for small screens */
+  }
+}
 
-.player {
-  background: #000 !important; 
-  border-radius: 10px;
+@media (max-width: 400px) {
+  .episode-buttons button {
+    flex: 1 1 100%; /* 1 button per row on very small phones */
+    font-size: 14px;
+    padding: 8px 12px;
+     min-width: 65px; /* ensures buttons don’t get too small */
+  max-width: 100px;
+  }
+}
+
+    /* Fullscreen lock modal */
+    .lock-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.5s ease;
+    }
+
+    
+.lock-content {
+  background: linear-gradient(135deg, #000000, #1a1a1a);
+  padding: 40px 30px;
+  border-radius: 20px;
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+  animation: popIn 0.4s ease;
+  transition: all 0.3s ease;
+}
+
+.lock-content h2 {
+  margin-bottom: 20px;
+  font-weight: 700;
+  color: #fff;
+  font-size: 24px;
+}
+
+.lock-content input {
+  padding: 14px 15px;
+  width: 90%;
+  max-width: 300px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  border: 1px solid #555;
+  font-size: 16px;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+  background: #111;
+  color: #fff;
+}
+
+.lock-content input::placeholder {
+  color: #aaa;
+}
+
+.lock-content input:focus {
+  outline: none;
+  border: 2px solid #fff;
+  box-shadow: white;
+}
+
+.lock-content button {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 50px;
+  background:  linear-gradient(135deg, #111111, #333333);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 60%;
+  max-width: 250px;
+}
+
+.lock-content button:hover {
+  background: linear-gradient(135deg, #000000, #1a1a1a);
+  transform: translateY(-2px);
+  box-shadow: white;
+}
+
+.lock-content p {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #ff4d4d;
+}
+    
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .lock-modal {
+    padding-left: px;  /* extra space on left */
+    padding-right: 30px; /* extra space on right */
+  }
+
+  .lock-content {
+    padding: 20px 20px; /* reduce padding for phone */
+    width: 100%;
+    max-width: 250px;   /* smaller max width for phone */
+    border-radius: 15px;
+  }
+
+  .lock-content h2 {
+    font-size: 20px;
+  }
+
+  .lock-content input {
+    padding: 12px 12px;
+    font-size: 14px;
+  }
+
+  .lock-content button {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+/* Video modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  min-height: 100vh; /* ensures full screen height */
+  background: rgba(0, 0, 0, 0.95); /* dark overlay */
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto; /* scroll if content taller than screen */
+}
+
+.modal-content {
+  background: transparent;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
   overflow: hidden;
 }
 
-
-.plyr {
-  background: #000 !important; 
+/* Close Button */
+.close {
+  position: absolute;
+  top: -9px;
+  right: -7px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
 }
 
-@media screen and (max-width: 480px) {
-  .plyr__controls .plyr__control {
-    padding: 1px 2px;   
-    margin: 1.5px;         
-    font-size: 7px;      
+.close:hover {
+  background: rgba(255,255,255,0.9);
+  color: #000;
+  transform: scale(1.1);
+}
+
+/* Video styling */
+video {
+  width: 100%;
+  border-radius: 10px;
+  background: #000;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+@keyframes popIn {
+  0% {transform: scale(0.9); opacity:0;}
+  100% {transform: scale(1); opacity:1;}
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 15px;
+    width: 100%;
+    max-width: 95%;
   }
 
-  .plyr__progress {
-    height: 15px;        
+  .close {
+    top: -10px;
+    right: -7px;
+    width: 35px;
+    height: 35px;
+    font-size: 22px;
   }
 
-  .plyr__control.plyr__play-large {
-    width: 50px;
-    height: 50px;
+  video {
+    max-height: 60vh; /* slightly smaller on phones */
+  }
+
+  .plyr__controls {
+    font-size: 5px; /* smaller text/buttons for mobile */
   }
 }
 
-@media screen and (min-width: 769px) {
-  .plyr__controls .plyr__control {
-    padding: 6px 10px;  
-    margin: 1px;        
-    font-size: 14px;     
-  }
 
-  .plyr__progress {
-    height: 4px;       
-  }
+:root {
+  /* Main control color */
+  --plyr-color-main: gray; /* Pink/Red */
+  
+  /* Control background (progress, volume, etc.) */
+  --plyr-control-bg: rgba(255, 255, 255, 0.1);
+  
+  /* Hover effect */
+  --plyr-control-hover-bg: rgba(255, 255, 255, 0.2);
 
-  .plyr__control.plyr__play-large {
-    width: 60px;
-    height: 60px;
+  /* Tooltip background & text */
+  --plyr-tooltip-background: black;
+  --plyr-tooltip-color: #fff;
+}
+
+
+
+.center-logo {
+  display: flex;
+  justify-content: center; /* horizontal center */
+  margin-bottom: 20px;    /* space below the logo */
+}
+
+.center-logo img {
+  width: 50px;           /* adjust size as needed */
+  height: auto;
+  border-radius: 12px;    /* optional, rounded corners */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .center-logo img {
+    width: 40px; /* smaller on phones */
   }
 }
 
@@ -540,271 +363,165 @@ h2.title {
 </head>
 <body>
 
-<!-- Mobile hamburger header -->
-<div class="mobile-header">
-  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+<!-- Centered Logo -->
+<div class="center-logo">
+  <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault Logo">
 </div>
 
-<!-- Desktop header (scrollable) -->
-<header id="scrollHeader">
-  <div class="header-logo">
-    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+  <h2>SEVENTEEN [NEW_] WORLD TOUR IN INCHEON</h2>
+  <img src="https://uploads.onecompiler.io/43ddry4jt/43wkywbqe/Screenshot%202025-09-13%2021-01-14.png" alt="Poster">
+
+  <div class="episode-buttons">
+    <button onclick="openModal(1)">DAY 1</button>
+    <button onclick="openModal(2)">DAY 2</button>
   </div>
-  <div class="header-links">
-    <a class="category-link" href="index.html">LOGIN</a>
-    <a class="category-link" href="profile.html">PROFILE</a>
-    <a class="category-link" href="home.html">HOME</a>
-    <a class="category-link" href="gallery.html">GALLERY</a>
-    <a class="category-link" href="nanabnb.html">NANA BNB</a>
-    <a class="category-link" href="newtour.html">SEVENTEEN NEW_ WOLRD TOUR</a>
-    <a class="category-link" href="hxwfanconcert.html">HXW IN SEOUL</a>
-    <a class="category-link" href="hxwingwangju.html">HXW IN GWANGJU</a>
-    <a class="category-link" href="svtholiday.html">SEVENTEEN HOLIDAY</a>
-    <a class="category-link" href="rightheregoyang.html">RIGHT HERE IN GOYANG</a>
-    <a class="category-link" href="arenatour.html">2018 JAPAN ARENA TOUR</a>
-    <a class="category-link" href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
-    <a class="category-link" href="touragain.html">FOLLOW TOUR DISNEY+</a>
-  </div>
-</header>
 
-<!-- Sidebar for mobile -->
-<div id="mobileSidebar" class="sidebar">
-  <button class="close-btn" onclick="toggleSidebar()">✖</button>
-  
-  <!-- Sidebar Title -->
-  <div class="sidebar-title">Zone Vault</div>
-
-  <nav class="sidebar-nav">
-    <a href="index.html">LOGIN</a>
-    <a href="profile.html">PROFILE</a>
-    <a href="home.html">HOME</a>
-    <a href="gallery.html">GALLERY</a>
-    <a href="nanabnb.html">NANA BNB</a>
-    <a href="newtour.html">SEVENTEEN NEW_ WORLD TOUR</a>
-    <a href="hxwfanconcert.html">HXW IN SEOUL</a>
-    <a href="hxwingwangju.html">HXW IN GWANGJU</a>
-    <a href="svtholiday.html">SEVENTEEN HOLIDAY</a>
-    <a href="rightheregoyang.html">RIGHT HERE IN GOYANG</a>
-    <a href="arenatour.html">2018 JAPAN ARENA TOUR</a>
-    <a href="svtjapanconcert.html">17 JAPAN CONCERT Say the name</a>
-    <a href="touragain.html">FOLLOW TOUR DISNEY+</a>
-  </nav>
-
-  <div class="sidebar-footer">
-    <!-- Logo Bottom Left -->
-    <div class="sidebar-logo">
-      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
-    </div>
-    
-    <!-- Email Bottom Right -->
-    <div class="sidebar-email">
-      <a href="mailto:your@email.com" title="Send Email">
-        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
-      </a>
+  <!-- 🔐 Lock Modal -->
+  <div id="lockModal" class="lock-modal">
+    <div class="lock-content">
+      <h2>🔐 Enter Access Code</h2>
+      <input type="text" id="codeInput" placeholder="Enter code..." />
+      <br>
+       <p id="errorMsg" style="display: none;">Incorrect code. Please try again.</p>
+      <button onclick="verifyCode()">Unlock</button>
     </div>
   </div>
-</div>
 
-<div class="code-verify" id="codePrompt">
-  <h2>🔐 Enter Access Code</h2>
-  <input type="text" id="codeInput" placeholder="Enter code..." />
-  <button onclick="verifyCode()">Unlock</button>
-  <p id="errorMsg" style="color: red; display: none;">Incorrect code. Please try again.</p>
-</div>
-
-<div class="video-container" id="videoPage">
-  <h2 class="title">SEVENTEEN [NEW_] WORLD TOUR IN INCHEON</h2>
-  <div class="videos">
-     <div class="video-box">
-       <video id="player1" class="player" playsinline controls poster="https://uploads.onecompiler.io/43ddry4jt/43wkywbqe/Screenshot%202025-09-13%2021-01-14.png"></video>
-       <h4 class="video-label">DAY 1 SEVENTEEN [NEW_] WORLD TOUR IN INCHEON |SINGLE VIEW|</h4>
-     </div>
-     
-     <div class="video-box">
-       <video id="player2" class="player" playsinline controls poster="https://uploads.onecompiler.io/43ddry4jt/43wkywbqe/Screenshot%202025-09-13%2021-01-14.png"></video>
-      <h4 class="video-label">DAY 2 SEVENTEEN [NEW_] WORLD TOUR IN INCHEON |SINGLE VIEW|</h4>
-     </div>
+  <!-- 🎬 Video Modal -->
+  <div id="videoModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <div class="video-container">
+        <video id="videoPlayer" playsinline controls></video>
+      </div>
+    </div>
   </div>
-</div>
-
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-    authDomain: "tvnstream-b4497.firebaseapp.com",
-    databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-    projectId: "tvnstream-b4497",
-    storageBucket: "tvnstream-b4497.appspot.com",
-    messagingSenderId: "308384754214",
-    appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-    measurementId: "G-VFNH70R4D9"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-
-  function verifyCode() {
-    const input = document.getElementById("codeInput").value.trim();
-    const errorMsg = document.getElementById("errorMsg");
-
-    db.ref("newworldtour/code").once("value").then(snapshot => {
-      const correctCode = snapshot.val();
-      if (input === correctCode) {
-        localStorage.setItem("access_newworldtour", "true");
-        showVideoPage();
-      } else {
-        errorMsg.style.display = "block";
-      }
-    });
-  }
-
-
-  function showVideoPage() {
-    document.getElementById("codePrompt").style.display = "none";
-    document.getElementById("videoPage").style.display = "block";
-
   
-    const sources = [
-      {
-        id: "player1",
-        url: "https://stream.mux.com/VhWMKXytxaUpVy5LGDX9yxSzuHzfX8K1sow39pWUWr4.m3u8",
-        skipTime: 191
-      },
-      {
-        id: "player2",
-        url: "https://stream.mux.com/gdjxg8a2rKsPP00igLfKnjPy3rYhOTJ2I021uDuwiZ8Kw.m3u8",
-      }
-    ];
+  <!-- Back Button -->
+<a href="videos" class="back-btn">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
+    <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</a>
 
- 
-    sources.forEach(src => {
-      const video = document.getElementById(src.id);
-      if (!video) return;
+<style>
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: transparent;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* perfectly centers SVG */
+  text-decoration: none;
+  z-index: 3000;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+.back-btn svg {
+  display: block; /* removes any inline spacing */
+}
+</style>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+      authDomain: "tvnstream-b4497.firebaseapp.com",
+      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+      projectId: "tvnstream-b4497",
+      storageBucket: "tvnstream-b4497.appspot.com",
+      messagingSenderId: "308384754214",
+      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+      measurementId: "G-VFNH70R4D9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let selectedEpisode = null;
+    const modal = document.getElementById("videoModal");
+    const videoPlayer = document.getElementById("videoPlayer");
+    const lockModal = document.getElementById("lockModal");
+
+    const sources = {
+      1: { url: "https://stream.mux.com/VhWMKXytxaUpVy5LGDX9yxSzuHzfX8K1sow39pWUWr4.m3u8", skipTime: 191 },
+      2: { url: "https://stream.mux.com/gdjxg8a2rKsPP00igLfKnjPy3rYhOTJ2I021uDuwiZ8Kw.m3u8"}
+    };
+
+    window.onload = function() {
+      const unlocked = localStorage.getItem("access_newworldtour");
+      if (!unlocked) {
+        lockModal.style.display = "flex";
+      }
+    };
+
+    function verifyCode() {
+      const input = document.getElementById("codeInput").value.trim();
+      const errorMsg = document.getElementById("errorMsg");
+
+      db.ref("newworldtour/code").once("value").then(snapshot => {
+        const correctCode = snapshot.val();
+        if (input === correctCode) {
+          localStorage.setItem("access_newworldtour", "true");
+          lockModal.style.display = "none";
+        } else {
+          errorMsg.style.display = "block";
+        }
+      });
+    }
+
+    function openModal(ep) {
+      selectedEpisode = ep;
+      modal.style.display = "flex";
+
+      const src = sources[selectedEpisode];
+      if (!src) return;
 
       if (Hls.isSupported()) {
         const hls = new Hls();
         hls.loadSource(src.url);
-        hls.attachMedia(video);
-      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-        video.src = src.url;
+        hls.attachMedia(videoPlayer);
+      } else if (videoPlayer.canPlayType("application/vnd.apple.mpegurl")) {
+        videoPlayer.src = src.url;
       }
 
-      try {
-       const player = new Plyr(video, {
-  autoplay: false,
-  seekTime: 10, 
-  controls: [
-    "play-large",   
-    "rewind",
-    "play",   
-    "fast-forward",
-    "progress",     
-    "current-time", 
-    "duration",     
-    "mute",         
-    "volume",      
-    "captions",     
-    "pip",          
-    "airplay",      
-    "fullscreen"
-  ]
-});
+      const player = new Plyr(videoPlayer, {
+        controls: ["play-large","rewind","play","fast-forward","progress","current-time","duration","mute","volume","fullscreen"]
+      });
 
-
-const skipForward = 10;  
-const skipBackward = 10; 
-let lastTap = 0;
-
-
-video.addEventListener("touchend", (e) => {
-  const currentTime = new Date().getTime();
-  const tapLength = currentTime - lastTap;
-
-  if (tapLength < 300 && tapLength > 0) {
-    const rect = video.getBoundingClientRect();
-    const x = e.changedTouches[0].clientX;
-
-    if (x < rect.width / 2) {
-      player.currentTime -= skipBackward;
-      showOverlay("⏪ -" + skipBackward + "s");
-    } else {
-      player.currentTime += skipForward;
-      showOverlay("⏩ +" + skipForward + "s");
-    }
-  }
-  lastTap = currentTime;
-});
-
-video.addEventListener("dblclick", (e) => {
-  const rect = video.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-
-  if (x < rect.width / 2) {
-    player.currentTime -= skipBackward;
-    showOverlay("⏪ -" + skipBackward + "s");
-  } else {
-    player.currentTime += skipForward;
-    showOverlay("⏩ +" + skipForward + "s");
-  }
-});
-
-
-function showOverlay(text) {
-  let overlay = document.createElement("div");
-  overlay.innerText = text;
-  overlay.style.position = "absolute";
-  overlay.style.top = "50%";
-  overlay.style.left = "50%";
-  overlay.style.transform = "translate(-50%, -50%)";
-  overlay.style.background = "rgba(0,0,0,0.6)";
-  overlay.style.color = "#fff";
-  overlay.style.padding = "10px 20px";
-  overlay.style.borderRadius = "10px";
-  overlay.style.fontSize = "20px";
-  overlay.style.zIndex = "9999";
-  video.parentNode.appendChild(overlay);
-
-  setTimeout(() => overlay.remove(), 600);
-}
-
-     
-const skipBtn = document.createElement("button");
-skipBtn.innerHTML = "<strong>SKIP INTRO</strong>"; 
-skipBtn.className = "plyr__controls__item plyr__control";
-skipBtn.style.marginLeft = "10px";
-
-skipBtn.addEventListener("click", () => {
-  player.currentTime = src.skipTime; 
-  skipBtn.remove(); //
-});
-
-
-player.elements.controls.appendChild(skipBtn);
-
-      } catch (err) {
-        console.error("Plyr init error:", err);
+      if (src.skipTime) {
+        const skipBtn = document.createElement("button");
+        skipBtn.innerHTML = "<strong>SKIP INTRO</strong>";
+        skipBtn.className = "plyr__controls__item plyr__control";
+        skipBtn.style.marginLeft = "10px";
+        skipBtn.addEventListener("click", () => {
+          player.currentTime = src.skipTime;
+          skipBtn.remove();
+        });
+        player.elements.controls.appendChild(skipBtn);
       }
-    });
-  }
-
-
-  window.onload = function () {
-    if (localStorage.getItem("access_newworldtour") === "true") {
-      showVideoPage();
     }
-  };
-</script>
 
-
-<script>
-const linksContainer = document.querySelector('.header-links');
-linksContainer.addEventListener('wheel', (e) => {
-  if (e.deltaY === 0) return;
-  e.preventDefault();
-  linksContainer.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
-});
-</script>
+    function closeModal() {
+      modal.style.display = "none";
+      videoPlayer.pause();
+      videoPlayer.src = "";
+    }
+  </script>
   
  <style>
   /* Access Denied Modal */
@@ -919,80 +636,5 @@ linksContainer.addEventListener('wheel', (e) => {
   }
 </script>
 
-
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      reg.onupdatefound = () => {
-        const newSW = reg.installing;
-        newSW.onstatechange = () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            window.location.reload();
-          }
-        };
-      };
-    }).catch(err => {
-      console.error('Service Worker registration failed:', err);
-    });
-  }
-</script>
-
-<script>
-  function toggleSidebar() {
-    const sidebar = document.getElementById('mobileSidebar');
-    sidebar.classList.toggle('open');
-  }
-</script>
-
-<script>
-  let lastScrollY = window.scrollY;
-  const scrollHeader = document.getElementById('scrollHeader');
-
-  window.addEventListener('scroll', () => {
-    const currentScrollY = window.scrollY;
-
-    if (currentScrollY > lastScrollY && currentScrollY > 50) {
-      scrollHeader.classList.add('hide');
-    } else {
-      scrollHeader.classList.remove('hide');
-    }
-
-    lastScrollY = currentScrollY;
-  });
-</script>
-
-<script>
-  const categoryLinks = document.querySelectorAll('.category-link');
-
-  categoryLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-
-      categoryLinks.forEach(l => l.classList.remove('flash'));
-
-      link.classList.add('flash');
-
-      setTimeout(() => {
-        link.classList.remove('flash');
-
-        window.location.href = link.href;
-      }, 800); 
-    });
-  });
-</script>
-
-<script>
-  const sidebarNav = document.querySelector('.sidebar-nav');
-
-  sidebarNav.addEventListener('wheel', function (e) {
-    const isAtTop = sidebarNav.scrollTop === 0;
-    const isAtBottom = sidebarNav.scrollHeight - sidebarNav.scrollTop === sidebarNav.clientHeight;
-
-    if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
-      e.preventDefault();
-    }
-  }, { passive: false });
-</script>
-
 </body>
-</html> 
+</html>
