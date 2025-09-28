@@ -588,7 +588,7 @@ video {
     };
 
     window.onload = function() {
-      const unlocked = localStorage.getItem("access_hoshixwoozi");
+      const unlocked = localStorage.getItem("access_nanabnb");
       if (!unlocked) {
         lockModal.style.display = "flex";
       }
@@ -598,10 +598,10 @@ video {
       const input = document.getElementById("codeInput").value.trim();
       const errorMsg = document.getElementById("errorMsg");
 
-      db.ref("Access/code").once("value").then(snapshot => {
+      db.ref("nanabnb/code").once("value").then(snapshot => {
         const correctCode = snapshot.val();
         if (input === correctCode) {
-          localStorage.setItem("access_hoshixwoozi", "true");
+          localStorage.setItem("access_nanabnb", "true");
           lockModal.style.display = "none";
         } else {
           errorMsg.style.display = "block";
