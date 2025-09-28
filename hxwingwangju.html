@@ -483,7 +483,7 @@ video {
       const input = document.getElementById("codeInput").value.trim();
       const errorMsg = document.getElementById("errorMsg");
 
-      db.ref("Access/code").once("value").then(snapshot => {
+      db.ref("hoshixwoozi/code").once("value").then(snapshot => {
         const correctCode = snapshot.val();
         if (input === correctCode) {
           localStorage.setItem("access_hoshixwoozi", "true");
