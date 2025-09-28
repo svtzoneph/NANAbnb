@@ -376,6 +376,16 @@ video {
     <button onclick="openModal(2)">DAY 2</button>
   </div>
 
+  <!-- 🔐 Lock Modal -->
+  <div id="lockModal" class="lock-modal">
+    <div class="lock-content">
+      <h2>🔐 Enter Access Code</h2>
+      <input type="text" id="codeInput" placeholder="Enter code..." />
+      <br>
+       <p id="errorMsg" style="display: none;">Incorrect code. Please try again.</p>
+      <button onclick="verifyCode()">Unlock</button>
+    </div>
+  </div>
 
   <!-- 🎬 Video Modal -->
   <div id="videoModal" class="modal">
@@ -452,6 +462,27 @@ video {
       2: { url: "https://stream.mux.com/V8mzwKPeokUYmWKx58aqLn82dlB00Rliy77bT7Jyrfjk.m3u8"}
     };
 
+    window.onload = function() {
+      const unlocked = localStorage.getItem("access_righthere");
+      if (!unlocked) {
+        lockModal.style.display = "flex";
+      }
+    };
+
+    function verifyCode() {
+      const input = document.getElementById("codeInput").value.trim();
+      const errorMsg = document.getElementById("errorMsg");
+
+      db.ref("Access/code").once("value").then(snapshot => {
+        const correctCode = snapshot.val();
+        if (input === correctCode) {
+          localStorage.setItem("access_righthere", "true");
+          lockModal.style.display = "none";
+        } else {
+          errorMsg.style.display = "block";
+        }
+      });
+    }
 
     function openModal(ep) {
       selectedEpisode = ep;
