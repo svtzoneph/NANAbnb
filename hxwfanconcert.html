@@ -482,7 +482,7 @@ video {
       db.ref("Access/code").once("value").then(snapshot => {
         const correctCode = snapshot.val();
         if (input === correctCode) {
-          localStorage.setItem("access_newworldtour", "true");
+          localStorage.setItem("access_Access", "true");
           lockModal.style.display = "none";
         } else {
           errorMsg.style.display = "block";
