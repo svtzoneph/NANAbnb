@@ -463,7 +463,7 @@ video {
     };
 
     window.onload = function() {
-      const unlocked = localStorage.getItem("access_Access");
+      const unlocked = localStorage.getItem("access_svtholiday");
       if (!unlocked) {
         lockModal.style.display = "flex";
       }
@@ -476,7 +476,7 @@ video {
       db.ref("Access/code").once("value").then(snapshot => {
         const correctCode = snapshot.val();
         if (input === correctCode) {
-          localStorage.setItem("access_newworldtour", "true");
+          localStorage.setItem("access_svtholiday", "true");
           lockModal.style.display = "none";
         } else {
           errorMsg.style.display = "block";
