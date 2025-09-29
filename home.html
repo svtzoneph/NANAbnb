@@ -613,93 +613,100 @@ header.hide {
   background: #555;
 }
 
-  /* Modal overlay */
-  #noticeModal {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    padding: 10px;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-    opacity: 1;
-    transition: opacity 0.6s ease;
-  }
+/* Modal overlay */
+#noticeModal,
+#secondModal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: none;           /* hide by default */
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 10px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
 
-  /* Modal content box */
-  #noticeBox {
-    background: linear-gradient(to bottom, #232526, #414345);
-    padding: 18px;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 480px;
-    text-align: center;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-    border-top: 6px solid #b0b0b0;
-    overflow-y: auto;
-    max-height: 90vh;
-    color: black;
-  }
+/* Modal content box */
+#noticeBox,
+#secondBox {
+  position: relative;       /* make clickable */
+  z-index: 10;
+  background: url("https://uploads.onecompiler.io/43ddry4jt/43y67ve8d/sxm.jpg") no-repeat center center;
+  background-size: cover; /* make image cover the box */
+  padding: 18px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  border-top: 6px solid #b0b0b0;
+  overflow-y: auto;
+  max-height: 90vh;
+  color: white;
+  backdrop-filter: blur(6px); /* blur effect */
+}
 
-  /* Title */
-  #noticeBox h3 {
-    font-size: 25px;
-    margin-bottom: 12px;
-    color: white;
-    font-weight: bold;
-  }
+/* Dark overlay inside the modal */
+#noticeBox::before,
+#secondBox::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* dark effect */
+  border-radius: 12px;
+  z-index: -1; /* behind the content */
+}
 
-  /* Paragraph */
-  #noticeBox p {
-    font-size: 14px;
-    line-height: 1.5;
-    color: white;
-    text-align: justify;
-    word-break: break-word;
-  }
 
-  #noticeBox button,
-  #noticeBox .btn-link {
-    background: black;
-    color: white;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    text-decoration: none;
-    display: inline-block;
-    transition: background 0.3s;
-  }
+/* Buttons */
+#noticeBox button,
+#noticeBox .btn-link,
+#secondBox button,
+#secondBox .btn-link {
+  background: black;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.3s;
+  margin: 6px;
+  position: relative; /* ensures clickable above background */
+  z-index: 20;
+}
+#noticeBox button:hover,
+#noticeBox .btn-link:hover,
+#secondBox button:hover,
+#secondBox .btn-link:hover{
+  background: gray;
+}
 
-  #noticeBox button:hover,
-  #noticeBox .btn-link:hover {
-    background: #0056b3;
+/* Responsive */
+@media (max-width: 480px) {
+  #noticeBox h3, #secondBox h3 { font-size: 18px; }
+  #noticeBox p, #secondBox p { font-size: 12px; line-height: 1.4; }
+  #noticeBox button, #noticeBox .btn-link, #secondBox button, #secondBox .btn-link {
+    font-size: 10px; padding: 8px;
   }
-  /* Responsive for phones */
-  @media (max-width: 480px) {
-    #noticeBox h3 {
-      font-size: 18px;
-    }
-    #noticeBox p {
-      font-size: 12px;
-      line-height: 1.4;
-    }
-    #noticeBox button
-    #noticeBox .btn-link{
-      font-size: 10px;
-      padding: 8px;
-    }
-  }
+  #noticeBox, #secondBox { background-size: 500px 450px; }
+}
+
 
   </style>
 </head>
 <body>
   
+<!-- First Modal -->
 <div id="noticeModal">
   <div id="noticeBox">
     <h3>⚠️ Notice</h3>
@@ -710,33 +717,67 @@ header.hide {
       <br><br>
       Thank you for your understanding and cooperation.
     </p>
-
     <div class="btn-group">
-      <button onclick="closeNotice()">I Understand</button>
-      <a href="bdaymessage.html" target="_blank" class="btn-link">Hoshi Bday Message</a>
+      <button onclick="showSecondModal()">I Understand</button>
+      <a href="bdaymessage.html" target="_blank" class="btn-link">Bday Message</a>
+    </div>
+  </div>
+</div>
+
+<!-- Second Modal -->
+<div id="secondModal">
+  <div id="secondBox">
+    <p style="line-height: 1.5; font-size: 14px;">
+    <h3>  🚨 <strong>OUT NOW</strong> 🚨 <br></h3>
+      에스쿱스 X 민규 (SEVENTEEN) – <strong>‘5, 4, 3 (Pretty Woman)’</strong> (feat. Lay Bankz) OFFICIAL MV 💎 <br>
+      Let’s show our love and support. STREAM the full MV on 
+      <a href="https://www.youtube.com/@HYBELABELS" target="_blank" style="color: white; text-decoration:underline;">
+        <b>HYBE LABELS’ Official YouTube Channel</b>
+      </a> NOW! <br>
+      Every view counts, CARATs 💖✨ <br>
+      #SEVENTEEN #에스쿱스 X 민규규 #PrettyWoman
+    </p>
+    <div class="btn-group">
+      <button onclick="closeSecondModal()">Close </button>
+       <a href="https://www.youtube.com/results?search_query=%EC%97%90%EC%8A%A4%EC%BF%B1%EC%8A%A4X%EB%AF%BC%EA%B7%9C+(SEVENTEEN)+%275%2C+4%2C+3+(Pretty+woman)+(feat.+Lay+Bankz)%27+Official+MV" target="_blank" class="btn-link">STREAM NOW</a>
     </div>
   </div>
 </div>
 
 
 <script>
-  // Show notice only if not already seen in this session
-  window.addEventListener('load', () => {
-    if (!sessionStorage.getItem('noticeSeen')) {
-      document.getElementById('noticeModal').style.display = 'flex';
-    } else {
-      document.getElementById('noticeModal').style.display = 'none';
-    }
-  });
-
-  function closeNotice() {
-    const modal = document.getElementById("noticeModal");
-    modal.style.opacity = "0"; // fade out
-    sessionStorage.setItem('noticeSeen', 'true'); // mark as seen
-    setTimeout(() => {
-      modal.style.display = "none";
-    }, 800); // match transition
+ window.addEventListener('load', () => {
+  // Check if user has seen the notice in this session
+  if (!sessionStorage.getItem('noticeSeen')) {
+    const firstModal = document.getElementById('noticeModal');
+    firstModal.style.display = 'flex';
+    firstModal.style.opacity = '0';
+    setTimeout(() => firstModal.style.opacity = '1', 50);
   }
+});
+
+function showSecondModal() {
+  const firstModal = document.getElementById('noticeModal');
+  const secondModal = document.getElementById('secondModal');
+
+  firstModal.style.opacity = '0';
+  setTimeout(() => {
+    firstModal.style.display = 'none';
+    secondModal.style.display = 'flex';
+    secondModal.style.opacity = '0';
+    setTimeout(() => secondModal.style.opacity = '1', 50);
+  }, 600);
+}
+
+function closeSecondModal() {
+  const secondModal = document.getElementById('secondModal');
+  secondModal.style.opacity = '0';
+  setTimeout(() => {
+    secondModal.style.display = 'none';
+    // Mark modal as seen for this session only
+    sessionStorage.setItem('noticeSeen', 'true');
+  }, 600);
+}
 </script>
 
 <!-- Mobile hamburger header -->
@@ -793,6 +834,9 @@ header.hide {
     <div class="hero-left">
       <h1>Welcome to Zone Vault</h1>
       <p>Watch, Enjoy, and Stay Private! Enjoy exclusive content in a private, full-featured layout. Don’t forget to read the rules.</p>
+   
+   
+   
     </div>
    
    
