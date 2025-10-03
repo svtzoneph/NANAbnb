@@ -1,106 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+   <meta charset="UTF-8">
+  <title>VIDEOS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BIRTHDAY MESSAGE</title>
-   <link rel="icon" href="favicon-new.png" type="image/png" />
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <link rel="icon" href="favicon-new.png" type="image/png" />
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2196f3">
-<meta name="description" content="Private SEVENTEEN streaming vault with lifetime access for approved members.">
-<meta name="keywords" content="SEVENTEEN, concert, vault, fanclub, exclusive, stream, archive">
-<meta property="og:title" content="Zone Vault - SEVENTEEN Exclusive Archive">
-<meta property="og:description" content="Private vault for SEVENTEEN concerts and shows. Members-only. No leaks allowed.">
-<meta property="og:image" content="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png">
-<meta property="og:type" content="website">
 
+  <meta name="apple-mobile-web-app-title" content="Zone Vault">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a1a">
+<link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
+<link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
+<link rel="apple-touch-startup-image" href="splash.png">
+
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-1B2RJ659GL');
+</script>
   <!-- Plyr CSS -->
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
   <style>
     body {
       margin: 0;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg, #1f1c2c, #928dab);
-      font-family: "Segoe UI", sans-serif;
       flex-direction: column;
       padding: 20px;
-      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      overflow-x: hidden;
     }
 
-    /* Glassmorphism video container */
+    /* Glassmorphism card */
     .video-wrapper {
       width: 85%;
-      max-width: 320px; /* smaller for desktop */
+      max-width: 350px;
       aspect-ratio: 9 / 16;
       border-radius: 20px;
       overflow: hidden;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
       transform: scale(0.9);
       opacity: 0;
-      animation: fadeIn 0.8s ease forwards;
+      animation: fadeIn 0.9s ease forwards;
+      position: relative;
+    }
+
+    /* Loading shimmer */
+    .loading {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.05) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      z-index: 1;
+    }
+
+    @keyframes shimmer {
+      100% { background-position: -200% 0; }
     }
 
     @keyframes fadeIn {
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
+      to { opacity: 1; transform: scale(1); }
     }
 
     video {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
     }
 
-    /* Plyr custom colors */
+    /* Plyr theme */
     :root {
-      --plyr-color-main: #ff4b2b; /* accent color */
+      --plyr-color-main: #ff4b2b;
       --plyr-video-control-background-hover: rgba(0,0,0,0.6);
     }
 
-    /* Center controls a bit higher for portrait */
     .plyr__controls {
       padding: 8px;
     }
 
-    /* Title styling */
     .video-title {
-      margin-top: 15px;
-      font-size: 1.2rem;
+      margin-top: 18px;
+      font-size: 1.3rem;
       font-weight: 600;
       color: #fff;
       text-align: center;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      letter-spacing: 0.5px;
     }
   </style>
 </head>
 <body>
 
+  <!-- Video Container -->
   <div class="video-wrapper">
+    <div class="loading" id="loading"></div>
     <video id="player" playsinline muted autoplay controls>
-      <source src="https://stream.mux.com/INEFsp1goWj551V6oHZD727I3nI89KFhSV1itAZtTGU.m3u8" type="application/x-mpegURL" />
+      <source src="https://stream.mux.com/1PbYZs3zb00f02dRnXhRREZYhZYsAESZOMcmx7alHZzZM.m3u8" type="application/x-mpegURL" />
     </video>
   </div>
 
-  <!-- Video title -->
-  <div class="video-title">[H.B.D] MESSAGE FOR SEPTEMBER CARAT💎</div>
+  <!-- Video Title -->
+  <div class="video-title">[H.B.D] MESSAGE FOR OCTOBER CARAT 💎</div>
 
   <!-- Plyr JS -->
   <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-  <!-- hls.js for m3u8 support -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
   <script>
     const video = document.getElementById('player');
     const source = video.querySelector('source').src;
+    const loader = document.getElementById('loading');
 
+    // HLS setup
     if (Hls.isSupported()) {
       const hls = new Hls();
       hls.loadSource(source);
@@ -109,39 +140,150 @@
       video.src = source;
     }
 
+    // Plyr init
     const player = new Plyr(video, {
       ratio: '9:16',
       autoplay: true,
-      muted: false, // autoplay works if muted
+      muted: true, // safer for autoplay
       clickToPlay: true,
-      controls: [
-        'play', 'current-time', 'mute'
-      ]
+      controls: ['play', 'current-time', 'mute']
     });
 
-    // Ensure autoplay
+    // Autoplay fallback
     player.play().catch(() => {
-      console.log("Autoplay blocked by browser. User interaction required.");
+      console.warn("Autoplay blocked. Waiting for user interaction.");
     });
+
+    // Remove loading shimmer once video starts
+    video.addEventListener('playing', () => loader.style.display = 'none');
   </script>
 
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        reg.onupdatefound = () => {
+          const newSW = reg.installing;
+          newSW.onstatechange = () => {
+            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+              window.location.reload();
+            }
+          };
+        };
+      }).catch(err => console.error('SW failed:', err));
+    }
+  </script>
+  
+   <style>
+  /* Access Denied Modal */
+  .access-denied-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    text-align: center;
+    padding: 20px;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+    flex-direction: column;
+  }
+
+  .access-denied-modal strong {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .access-denied-modal button {
+    margin-top: 15px;
+    padding: 10px 25px;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+
+  .access-denied-modal button:hover {
+    background: white;
+    color: black;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+</style>
 
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      // ✅ Detect updates
-      reg.onupdatefound = () => {
-        const newSW = reg.installing;
-        newSW.onstatechange = () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            // ✅ New version is ready → force reload
-            window.location.reload();
-          }
-        };
-      };
-    }).catch(err => {
-      console.error('Service Worker registration failed:', err);
-    });
+  const allowedPaths = [
+    '/index.html',
+    '/home.html',
+    '/nanabnb.html',
+    '/newtour.html',
+    '/hxwfanconcert.html',
+    '/svtholiday.html',
+    '/arenatour.html',
+    '/svtjapanconcert.html',
+    '/touragain.html',
+    '/gallery.html',
+    '/profile.html',
+    '/soon.html'
+  ];
+
+  const currentPage = window.location.pathname;
+
+  // Check if user already has internalAccess flag
+  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+
+  // Check if user came from an allowed page
+  const referrer = document.referrer;
+  const refPath = referrer ? new URL(referrer).pathname : null;
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+
+  // Grant internalAccess if coming from allowed page
+  if (cameFromAllowedPage) {
+    sessionStorage.setItem('internalAccess', 'true');
+    hasInternalAccess = true;
+  }
+
+  // Allow access if user already has internalAccess or is on index page
+  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
+  if (!hasInternalAccess && !isIndexPage) {
+    showAccessDeniedModal();
+  }
+
+  function showAccessDeniedModal() {
+    const modal = document.createElement('div');
+    modal.className = 'access-denied-modal';
+    modal.innerHTML = `
+      <strong>🚫 Access Denied</strong>
+      <div>You cannot access this page directly.<br>
+      Please go through the homepage or allowed sections.</div>
+      <div id="redirectTimer">Redirecting in 3 seconds...</div>
+      <button onclick="goBack()">Go Back</button>
+    `;
+    document.body.appendChild(modal);
+
+    let countdown = 3;
+    const timer = document.getElementById('redirectTimer');
+    const interval = setInterval(() => {
+      countdown--;
+      timer.textContent = `Redirecting in ${countdown} seconds...`;
+      if (countdown <= 0) {
+        clearInterval(interval);
+        window.location.href = "index.html";
+      }
+    }, 1000);
+  }
+
+  function goBack() {
+    window.history.back();
   }
 </script>
 
