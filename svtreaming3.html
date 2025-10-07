@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VIDEOS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <link rel="icon" href="favicon-new.png" type="image/png" />
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2196f3">
+
+  <meta name="apple-mobile-web-app-title" content="Zone Vault">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a1a">
+<link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
+<link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
+<link rel="apple-touch-startup-image" href="splash.png">
+
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-1B2RJ659GL');
+</script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: black;
+      text-align: center;
+      padding: 40px;
+      margin: 0;
+    }
+  
+    h2 {
+      color: white;
+      margin-bottom: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-left: 10;
+      font-size: 30;
+    }
+    
+
+img {
+  max-width: 700px;
+  width: 100%; /* scales down on smaller screens */
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  margin-bottom: 20px;
+  height: auto; /* maintain aspect ratio */
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 600px) {
+  img {
+    max-width: 95%;   /* almost full width on phones */
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    margin-bottom: 15px;
+  }
+}
+   .episode-buttons {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap; /* allows wrapping on small screens */
+  justify-content: center; /* centers buttons on phone */
+  gap: 10px; /* even spacing between buttons */
+}
+
+.episode-buttons button {
+  flex: 1 1 auto; /* buttons shrink if needed */
+  min-width: 100px; /* ensures buttons don’t get too small */
+  max-width: 200px; /* avoids too wide on big screens */
+  padding: 12px 20px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #1c0d27, #000000, #1c0d27);
+  color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: #fff;
+}
+
+.episode-buttons button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(128, 128, 128, 0.4);
+}
+
+/* 📱 Mobile adjustments */
+@media (max-width: 600px) {
+  .episode-buttons button {
+    flex: 1 1 45%;  /* 2 buttons per row */
+    font-size: 18px;
+    padding: 10px 15px; /* reduce padding for small screens */
+  }
+}
+
+@media (max-width: 400px) {
+  .episode-buttons button {
+    flex: 1 1 100%; /* 1 button per row on very small phones */
+    font-size: 14px;
+    padding: 8px 12px;
+     min-width: 65px; /* ensures buttons don’t get too small */
+  max-width: 100px;
+  }
+}
+
+    /* Fullscreen lock modal */
+    .lock-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.5s ease;
+    }
+
+    
+.lock-content {
+  background: linear-gradient(135deg, #000000, #1a1a1a);
+  padding: 40px 30px;
+  border-radius: 20px;
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+  animation: popIn 0.4s ease;
+  transition: all 0.3s ease;
+}
+
+.lock-content h2 {
+  margin-bottom: 20px;
+  font-weight: 700;
+  color: #fff;
+  font-size: 24px;
+}
+
+.lock-content input {
+  padding: 14px 15px;
+  width: 90%;
+  max-width: 300px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  border: 1px solid #555;
+  font-size: 16px;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+  background: #111;
+  color: #fff;
+}
+
+.lock-content input::placeholder {
+  color: #aaa;
+}
+
+.lock-content input:focus {
+  outline: none;
+  border: 2px solid #fff;
+  box-shadow: white;
+}
+
+.lock-content button {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 50px;
+  background:  linear-gradient(135deg, #111111, #333333);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 60%;
+  max-width: 250px;
+}
+
+.lock-content button:hover {
+  background: linear-gradient(135deg, #000000, #1a1a1a);
+  transform: translateY(-2px);
+  box-shadow: white;
+}
+
+.lock-content p {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #ff4d4d;
+}
+    
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .lock-modal {
+    padding-left: px;  /* extra space on left */
+    padding-right: 30px; /* extra space on right */
+  }
+
+  .lock-content {
+    padding: 20px 20px; /* reduce padding for phone */
+    width: 100%;
+    max-width: 250px;   /* smaller max width for phone */
+    border-radius: 15px;
+  }
+
+  .lock-content h2 {
+    font-size: 20px;
+  }
+
+  .lock-content input {
+    padding: 12px 12px;
+    font-size: 14px;
+  }
+
+  .lock-content button {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+/* Video modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  min-height: 100vh; /* ensures full screen height */
+  background: rgba(0, 0, 0, 0.95); /* dark overlay */
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto; /* scroll if content taller than screen */
+}
+
+.modal-content {
+  background: transparent;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+
+/* Close Button */
+.close {
+  position: absolute;
+  top: -9px;
+  right: -7px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+}
+
+.close:hover {
+  background: rgba(255,255,255,0.9);
+  color: #000;
+  transform: scale(1.1);
+}
+
+/* Video styling */
+video {
+  width: 100%;
+  border-radius: 10px;
+  background: #000;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+@keyframes popIn {
+  0% {transform: scale(0.9); opacity:0;}
+  100% {transform: scale(1); opacity:1;}
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 15px;
+    width: 100%;
+    max-width: 95%;
+  }
+
+  .close {
+    top: -10px;
+    right: -7px;
+    width: 35px;
+    height: 35px;
+    font-size: 22px;
+  }
+
+  video {
+    max-height: 60vh; /* slightly smaller on phones */
+  }
+
+  .plyr__controls {
+    font-size: 5px; /* smaller text/buttons for mobile */
+  }
+}
+
+
+:root {
+  /* Main control color */
+  --plyr-color-main: gray; /* Pink/Red */
+  
+  /* Control background (progress, volume, etc.) */
+  --plyr-control-bg: rgba(255, 255, 255, 0.1);
+  
+  /* Hover effect */
+  --plyr-control-hover-bg: rgba(255, 255, 255, 0.2);
+
+  /* Tooltip background & text */
+  --plyr-tooltip-background: black;
+  --plyr-tooltip-color: #fff;
+}
+
+
+
+.center-logo {
+  display: flex;
+  justify-content: center; /* horizontal center */
+  margin-bottom: 20px;    /* space below the logo */
+}
+
+.center-logo img {
+  width: 50px;           /* adjust size as needed */
+  height: auto;
+  border-radius: 12px;    /* optional, rounded corners */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .center-logo img {
+    width: 40px; /* smaller on phones */
+  }
+}
+
+  </style>
+</head>
+<body>
+
+<!-- Centered Logo -->
+<div class="center-logo">
+  <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault Logo">
+</div>
+
+  <h2>SEVENTEEN TOUR 'FOLLOW' TO SEOUL</h2>
+  <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png" alt="Poster">
+
+  <div class="episode-buttons">
+    <button onclick="openModal(1)">WATCH NOW</button>
+  </div>
+
+  <!-- 🎬 Video Modal -->
+  <div id="videoModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <div class="video-container">
+        <video id="videoPlayer" playsinline controls></video>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Back Button -->
+<a href="videos" class="back-btn">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
+    <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</a>
+
+<style>
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: transparent;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* perfectly centers SVG */
+  text-decoration: none;
+  z-index: 3000;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+.back-btn svg {
+  display: block; /* removes any inline spacing */
+}
+</style>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+      authDomain: "tvnstream-b4497.firebaseapp.com",
+      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+      projectId: "tvnstream-b4497",
+      storageBucket: "tvnstream-b4497.appspot.com",
+      messagingSenderId: "308384754214",
+      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+      measurementId: "G-VFNH70R4D9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let selectedEpisode = null;
+    const modal = document.getElementById("videoModal");
+    const videoPlayer = document.getElementById("videoPlayer");
+
+    const sources = {
+      1: { url: "https://stream.mux.com/JmSGq02RbkgkeEwzRcTw7sw56afgtUVSHsWe02UcJHTew.m3u8"},
+    };
+
+
+    function openModal(ep) {
+      selectedEpisode = ep;
+      modal.style.display = "flex";
+
+      const src = sources[selectedEpisode];
+      if (!src) return;
+
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(src.url);
+        hls.attachMedia(videoPlayer);
+      } else if (videoPlayer.canPlayType("application/vnd.apple.mpegurl")) {
+        videoPlayer.src = src.url;
+      }
+
+      const player = new Plyr(videoPlayer, {
+        controls: ["play-large","rewind","play","fast-forward","progress","current-time","duration","mute","volume","fullscreen"]
+      });
+
+      if (src.skipTime) {
+        const skipBtn = document.createElement("button");
+        skipBtn.innerHTML = "<strong>SKIP INTRO</strong>";
+        skipBtn.className = "plyr__controls__item plyr__control";
+        skipBtn.style.marginLeft = "10px";
+        skipBtn.addEventListener("click", () => {
+          player.currentTime = src.skipTime;
+          skipBtn.remove();
+        });
+        player.elements.controls.appendChild(skipBtn);
+      }
+    }
+
+    function closeModal() {
+      modal.style.display = "none";
+      videoPlayer.pause();
+      videoPlayer.src = "";
+    }
+  </script>
+  
+ <style>
+  /* Access Denied Modal */
+  .access-denied-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    text-align: center;
+    padding: 20px;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+    flex-direction: column;
+  }
+
+  .access-denied-modal strong {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .access-denied-modal button {
+    margin-top: 15px;
+    padding: 10px 25px;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+
+  .access-denied-modal button:hover {
+    background: white;
+    color: black;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+</style>
+
+<script>
+  const allowedPaths = [
+    '/index.html',
+    '/home.html',
+    '/nanabnb.html',
+    '/newtour.html',
+    '/hxwfanconcert.html',
+    '/svtholiday.html',
+    '/arenatour.html',
+    '/svtjapanconcert.html',
+    '/touragain.html',
+    '/gallery.html',
+    '/profile.html',
+    '/soon.html'
+  ];
+
+  const currentPage = window.location.pathname;
+
+  // Check if user already has internalAccess flag
+  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+
+  // Check if user came from an allowed page
+  const referrer = document.referrer;
+  const refPath = referrer ? new URL(referrer).pathname : null;
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+
+  // Grant internalAccess if coming from allowed page
+  if (cameFromAllowedPage) {
+    sessionStorage.setItem('internalAccess', 'true');
+    hasInternalAccess = true;
+  }
+
+  // Allow access if user already has internalAccess or is on index page
+  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
+  if (!hasInternalAccess && !isIndexPage) {
+    showAccessDeniedModal();
+  }
+
+  function showAccessDeniedModal() {
+    const modal = document.createElement('div');
+    modal.className = 'access-denied-modal';
+    modal.innerHTML = `
+      <strong>🚫 Access Denied</strong>
+      <div>You cannot access this page directly.<br>
+      Please go through the homepage or allowed sections.</div>
+      <div id="redirectTimer">Redirecting in 3 seconds...</div>
+      <button onclick="goBack()">Go Back</button>
+    `;
+    document.body.appendChild(modal);
+
+    let countdown = 3;
+    const timer = document.getElementById('redirectTimer');
+    const interval = setInterval(() => {
+      countdown--;
+      timer.textContent = `Redirecting in ${countdown} seconds...`;
+      if (countdown <= 0) {
+        clearInterval(interval);
+        window.location.href = "index.html";
+      }
+    }, 1000);
+  }
+
+  function goBack() {
+    window.history.back();
+  }
+</script>
+
+</body>
+</html>
