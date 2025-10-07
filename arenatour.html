@@ -375,17 +375,6 @@ video {
     <button onclick="openModal(1)">WATCH NOW</button>
   </div>
 
-  <!-- 🔐 Lock Modal -->
-  <div id="lockModal" class="lock-modal">
-    <div class="lock-content">
-      <h2>🔐 Enter Access Code</h2>
-      <input type="text" id="codeInput" placeholder="Enter code..." />
-      <br>
-       <p id="errorMsg" style="display: none;">Incorrect code. Please try again.</p>
-      <button onclick="verifyCode()">Unlock</button>
-    </div>
-  </div>
-
   <!-- 🎬 Video Modal -->
   <div id="videoModal" class="modal">
     <div class="modal-content">
@@ -454,33 +443,11 @@ video {
     let selectedEpisode = null;
     const modal = document.getElementById("videoModal");
     const videoPlayer = document.getElementById("videoPlayer");
-    const lockModal = document.getElementById("lockModal");
 
     const sources = {
-      1: { url: "ttps://stream.mux.com/iBdO47FxrLOaHnj1ne2DQ9i02EU301bj8JdJLIc97MP8Q.m3u8"},
+      1: { url: "https://stream.mux.com/iBdO47FxrLOaHnj1ne2DQ9i02EU301bj8JdJLIc97MP8Q.m3u8"},
     };
 
-    window.onload = function() {
-      const unlocked = localStorage.getItem("access_newworldtour");
-      if (!unlocked) {
-        lockModal.style.display = "flex";
-      }
-    };
-
-    function verifyCode() {
-      const input = document.getElementById("codeInput").value.trim();
-      const errorMsg = document.getElementById("errorMsg");
-
-      db.ref("newworldtour/code").once("value").then(snapshot => {
-        const correctCode = snapshot.val();
-        if (input === correctCode) {
-          localStorage.setItem("access_newworldtour", "true");
-          lockModal.style.display = "none";
-        } else {
-          errorMsg.style.display = "block";
-        }
-      });
-    }
 
     function openModal(ep) {
       selectedEpisode = ep;
