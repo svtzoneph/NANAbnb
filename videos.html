@@ -482,13 +482,171 @@ header.hide {
     margin-bottom: 15px;
   }
 }
+
+.fav-btn {
+  background: none;
+  border: none;
+  color: gold;
+  font-size: 22px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.fav-btn:hover {
+  transform: scale(1.2);
+}
+
+.favorite-label {
+  color: gold;
+  font-size: 13px;
+  text-align: center;
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+.favorite-btn {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  font-weight: bold;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.favorite-btn:hover {
+  background: gold;
+  color: black;
+}
+
+/* Modal styling */
+.favorite-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 99999;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.favorite-modal.active {
+  display: flex;
+}
+
+.favorite-content {
+  background: #111;
+  color: white;
+  padding: 20px;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 0 30px rgba(255,255,255,0.1);
+
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for modern browsers */
+.favorite-content::-webkit-scrollbar {
+  width: 8px; /* width of the scrollbar */
+}
+
+.favorite-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05); /* track color */
+  border-radius: 8px;
+}
+
+.favorite-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2); /* thumb color */
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.favorite-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Optional: Firefox support */
+.favorite-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.2) rgba(255,255,255,0.05);
+}
+
+.favorite-content h2 {
+  text-align: center;
+  margin-top: 0;
+}
+
+.close-fav {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+}
+
+.favorite-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.favorite-list .fav-item {
+  background: linear-gradient(to bottom, #232526, #414345);
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  color: white;
+  transition: transform 0.2s ease;
+}
+
+.favorite-list .fav-item:hover {
+  transform: translateY(-4px);
+}
+.favorite-list img {
+  width: 100%;
+  height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* Hide desktop favorite by default */
+.favorite-desktop-container {
+  display: none;
+  margin-top: 10px;
+  text-align: right;
+}
+
+/* Show only on large screens */
+@media (min-width: 992px) {
+  .favorite-desktop-container {
+    display: block;
+  }
+  /* Hide mobile header favorite */
+  .mobile-header .favorite-btn {
+    display: none;
+  }
+}
   </style>
 </head>
 <body>
 
-<!-- Mobile hamburger header -->
 <div class="mobile-header">
-  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    <button class="favorite-btn" onclick="openFavoriteModal()">Your Favorite</button>
+  </div>
 </div>
 
 <!-- Desktop header (scrollable) -->
@@ -502,6 +660,7 @@ header.hide {
     <a class="category-link" href="live">LIVE</a>
     <a class="category-link" href="gallery">GALLERY</a>
     <a class="category-link" href="videos?from=home">VIDEOS</a>
+    <button class="favorite-btn desktop-fav-btn" onclick="openFavoriteModal()">Your Favorite</button>
 </header>
 
 <!-- Sidebar for mobile -->
@@ -534,10 +693,21 @@ header.hide {
   </div>
 </div>
 
+<!-- Favorite Modal -->
+<div id="favoriteModal" class="favorite-modal">
+  <div class="favorite-content">
+    <button class="close-fav" onclick="closeFavoriteModal()">✖</button>
+    <h2>⭐ Your Favorites</h2>
+    <div id="favoriteList" class="favorite-list"></div>
+  </div>
+</div>
+
 <div class="container">
   <div class="grid" id="grid"></div>
   <div id="pagination" style="text-align:center;margin-top:20px;"></div>
 </div>
+
+
 
 <script>
 const data = [
@@ -568,18 +738,32 @@ function renderGrid(page) {
   pageData.forEach(item=>{
     const el=document.createElement("div");
     el.className="card";
-    el.innerHTML=`
-      <div class="thumb"><img src="${item.thumb}" alt=""></div>
-      <div class="card-body">
-        <div class="meta">${item.category}</div>
-        <h3 class="title">${item.title}</h3>
-        <div class="hashtags">${item.hashtags}</div>
-        <div class="bottom">
-          <button class="btn">WATCH NOW</button>
-        </div>
-      </div>`;
+el.innerHTML = `
+  <div class="thumb"><img src="${item.thumb}" alt=""></div>
+  <div class="card-body">
+    <div class="meta">${item.category}</div>
+    <h3 class="title">${item.title}</h3>
+    <div class="hashtags">${item.hashtags}</div>
+    <div class="bottom">
+      <button class="btn">WATCH NOW</button>
+      <button class="fav-btn" data-id="${item.id}">
+        <span class="star">☆</span>
+      </button>
+    </div>
+    <div class="favorite-label"></div>
+  </div>`;
     el.querySelector(".btn").onclick=()=>window.location.href=item.link;
     grid.appendChild(el);
+    
+    // Favorite button logic
+const favBtn = el.querySelector(".fav-btn");
+const label = el.querySelector(".favorite-label");
+if (favorites.includes(item.id)) {
+  favBtn.querySelector(".star").textContent = "★";
+  label.style.display = "block";
+}
+favBtn.onclick = () => toggleFavorite(item.id);
+    
   });
 
   renderPagination();
@@ -599,6 +783,64 @@ function renderPagination() {
   }
 }
 
+// === FAVORITES LOGIC ===
+let favorites = JSON.parse(sessionStorage.getItem("favorites") || "[]");
+
+function toggleFavorite(id) {
+  if (favorites.includes(id)) {
+    favorites = favorites.filter(f => f !== id);
+  } else {
+    favorites.unshift(id);
+  }
+  sessionStorage.setItem("favorites", JSON.stringify(favorites));
+  reorderFavorites();
+}
+
+function reorderFavorites() {
+  // Move favorites to top of list
+  const favSet = new Set(favorites);
+  const sorted = data.slice().sort((a,b)=>{
+    if (favSet.has(a.id) && !favSet.has(b.id)) return -1;
+    if (!favSet.has(a.id) && favSet.has(b.id)) return 1;
+    return 0;
+  });
+  // render again
+  if(window.innerWidth<=800){
+    renderGrid(currentPaginationPage);
+  } else {
+    grid.innerHTML="";
+    sorted.forEach(item=>{
+      const el=document.createElement("div");
+      el.className="card";
+      el.innerHTML=`
+        <div class="thumb"><img src="${item.thumb}" alt=""></div>
+        <div class="card-body">
+          <div class="meta">${item.category}</div>
+          <h3 class="title">${item.title}</h3>
+          <div class="hashtags">${item.hashtags}</div>
+          <div class="bottom">
+            <button class="btn">WATCH NOW</button>
+            <button class="fav-btn" data-id="${item.id}">
+              <span class="star">☆</span>
+            </button>
+          </div>
+          <div class="favorite-label"></div>
+        </div>`;
+      el.querySelector(".btn").onclick=()=>window.location.href=item.link;
+      const favBtn = el.querySelector(".fav-btn");
+      const label = el.querySelector(".favorite-label");
+      if (favorites.includes(item.id)) {
+        favBtn.querySelector(".star").textContent = "★";
+        label.style.display = "block";
+      }
+      favBtn.onclick = ()=>toggleFavorite(item.id);
+      grid.appendChild(el);
+    });
+    document.getElementById("pagination").innerHTML="";
+  }
+}
+
+
 function checkResponsive() {
   if(window.innerWidth<=800){
     renderGrid(currentPaginationPage);
@@ -607,18 +849,33 @@ function checkResponsive() {
     data.forEach(item=>{
       const el=document.createElement("div");
       el.className="card";
-      el.innerHTML=`
-      <div class="thumb"><img src="${item.thumb}" alt=""></div>
-      <div class="card-body">
-        <div class="meta">${item.category}</div>
-        <h3 class="title">${item.title}</h3>
-        <div class="hashtags">${item.hashtags}</div>
-        <div class="bottom">
-          <button class="btn">WATCH NOW</button>
-        </div>
-      </div>`;
+el.innerHTML = `
+  <div class="thumb"><img src="${item.thumb}" alt=""></div>
+  <div class="card-body">
+    <div class="meta">${item.category}</div>
+    <h3 class="title">${item.title}</h3>
+    <div class="hashtags">${item.hashtags}</div>
+    <div class="bottom">
+      <button class="btn">WATCH NOW</button>
+      <button class="fav-btn" data-id="${item.id}">
+        <span class="star">☆</span>
+      </button>
+    </div>
+    <div class="favorite-label" style="display:none;">⭐ Your Favorite</div>
+  </div>`;
       el.querySelector(".btn").onclick=()=>window.location.href=item.link;
       grid.appendChild(el);
+      
+      // Favorite button logic
+const favBtn = el.querySelector(".fav-btn");
+const label = el.querySelector(".favorite-label");
+if (favorites.includes(item.id)) {
+  favBtn.querySelector(".star").textContent = "★";
+  label.style.display = "block";
+}
+favBtn.onclick = () => toggleFavorite(item.id);
+
+      
     });
     document.getElementById("pagination").innerHTML="";
   }
@@ -626,6 +883,42 @@ function checkResponsive() {
 
 checkResponsive();
 window.addEventListener("resize", checkResponsive);
+</script>
+
+<script>
+function openFavoriteModal() {
+  const modal = document.getElementById('favoriteModal');
+  const list = document.getElementById('favoriteList');
+  list.innerHTML = '';
+
+  if (favorites.length === 0) {
+    list.innerHTML = '<p style="text-align:center;color:gray;">No favorites yet</p>';
+  } else {
+    favorites.forEach(favId => {
+      const item = data.find(d => d.id === favId);
+      if (item) {
+        const el = document.createElement('div');
+        el.className = 'fav-item';
+        el.innerHTML = `
+          <img src="${item.thumb}" alt="${item.title}">
+          <div style="margin-top:8px;font-weight:bold;">${item.title}</div>
+          <button class="btn" style="margin-top:8px;" onclick="window.location.href='${item.link}'">WATCH</button>
+        `;
+        list.appendChild(el);
+      }
+    });
+  }
+
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden'; // <-- Prevent background scroll
+}
+
+function closeFavoriteModal() {
+  const modal = document.getElementById('favoriteModal');
+  modal.classList.remove('active');
+  document.body.style.overflow = ''; // <-- Restore background scroll
+}
+
 </script>
 
 <script>
