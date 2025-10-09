@@ -1077,6 +1077,14 @@ linksContainer.addEventListener('wheel', (e) => {
     '/soon.html'
   ];
 
+  // Pages that can be accessed without internalAccess
+  const publicPages = [
+    '/index.html',
+    '/',
+    '/login.html',
+    '/register.html'
+  ];
+
   const currentPage = window.location.pathname;
 
   // Check if user already has internalAccess flag
@@ -1093,9 +1101,9 @@ linksContainer.addEventListener('wheel', (e) => {
     hasInternalAccess = true;
   }
 
-  // Allow access if user already has internalAccess or is on index page
-  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
-  if (!hasInternalAccess && !isIndexPage) {
+  // Allow access if user has internalAccess or if page is public
+  const isPublicPage = publicPages.includes(currentPage);
+  if (!hasInternalAccess && !isPublicPage) {
     showAccessDeniedModal();
   }
 
