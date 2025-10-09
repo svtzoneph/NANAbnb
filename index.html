@@ -4,6 +4,51 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Zone Vault</title>
+  
+  <!-- Manifest and Favicon -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="favicon-new.png" type="image/png">
+  <meta name="theme-color" content="#2196f3">
+
+  <!-- Primary Meta Tags -->
+<title>Zone Vault</title>
+<meta name="title" content="Zone Vault">
+<meta name="description" content="Watch, Enjoy, and Stay Private! Enjoy exclusive content in a private, full-featured layout. Don’t forget to read the rules.">
+
+<!-- Open Graph (Facebook, Discord, LinkedIn, WhatsApp, Telegram, etc.) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://zonevault.site/index">
+<meta property="og:title" content="Zone Vault">
+<meta property="og:description" content="Watch, Enjoy, and Stay Private! Enjoy exclusive content in a private, full-featured layout. Don’t forget to read the rules.">
+<meta property="og:image" content="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png">
+<meta property="og:site_name" content="Zone Vault">
+<meta property="og:locale" content="en_PH">
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://zonevault.site/index">
+<meta name="twitter:title" content="Zone Vault">
+<meta name="twitter:description" content="Watch, Enjoy, and Stay Private! Enjoy exclusive content in a private, full-featured layout. Don’t forget to read the rules. ">
+<meta name="twitter:image" content="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png">
+<meta name="twitter:site" content="@101_livestream">
+
+<meta name="apple-mobile-web-app-title" content="Zone Vault">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a1a">
+<link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
+<link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
+<link rel="apple-touch-startup-image" href="splash.png">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1B2RJ659GL');
+  </script>
+  
   <style>
     * {
       margin: 0;
@@ -139,17 +184,6 @@
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-20px); }
-    }
-
-    /* === FOOTER === */
-    footer {
-      text-align: center;
-      padding: 15px 0;
-      font-size: 0.9rem;
-      color: #777;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      position: relative;
-      z-index: 2;
     }
 
     /* === MODAL BASE === */
@@ -291,13 +325,10 @@
   <main>
     <div class="welcome">
       <h1>Welcome to Zone Vault</h1>
-      <p>Your exclusive gateway to SEVENTEEN content — safe, sleek, and made for Carats worldwide.</p>
+      <p>Watch, Enjoy, and Stay Private! Enjoy exclusive content in a private, full-featured layout. </p>
     </div>
   </main>
 
-  <footer>
-    © 2025 Zone Vault. All rights reserved.
-  </footer>
 
   <!-- Login/Register Modal -->
   <div class="modal-overlay" id="welcomeModal" >
@@ -493,5 +524,23 @@ function closeAbout() {
       }
     });
   </script>
+  
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      reg.onupdatefound = () => {
+        const newSW = reg.installing;
+        newSW.onstatechange = () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            window.location.reload();
+          }
+        };
+      };
+    }).catch(err => {
+      console.error('Service Worker registration failed:', err);
+    });
+  }
+</script>
+  
 </body>
 </html>
