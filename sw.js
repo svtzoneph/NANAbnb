@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zonevault-v98'; // ⬅ Change this on every update
+const CACHE_NAME = 'zonevault-v99'; // ⬅ Change this on every update
 
 const urlsToCache = [
   './',
