@@ -560,18 +560,6 @@ lightGallery(document.getElementById('lightgallery2'), {
   </script>
 
   
-  <script>
-const urlParams = new URLSearchParams(window.location.search);
-const access = urlParams.get("access");
-const savedAccess = sessionStorage.getItem("accessID");
-const internalAccess = sessionStorage.getItem("internalAccess");
-
-if (!access || !savedAccess || access !== savedAccess || !internalAccess) {
-  alert("Access denied");
-  window.location.href = "index.html";
-}
-</script>
-  
     <script>
     const header = document.getElementById('scrollHeader');
     header.addEventListener('wheel', (e) => {
