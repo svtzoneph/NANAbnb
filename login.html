@@ -155,7 +155,7 @@ import {
   getAuth, signInWithEmailAndPassword, onAuthStateChanged,
   reload, signInWithPopup, GoogleAuthProvider, signOut
 } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
-import { getDatabase, ref, onValue, get, set, update } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+import { getDatabase, ref, onValue, get, set, update, push } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
@@ -184,6 +184,27 @@ function generateAccessID(){
          Math.random().toString(36).substring(2,10); // 24 chars
 }
 
+// --- New functions for session tracking and login history ---
+async function recordSession(user, accessID, page="home.html"){
+  const sessionRef = ref(db, 'currentSessions/'+user.uid);
+  await set(sessionRef, {
+    email: user.email,
+    accessID,
+    lastActive: Date.now(),
+    page
+  });
+}
+
+async function recordLoginHistory(user){
+  const histRef = ref(db, 'loginHistory/'+user.uid);
+  await push(histRef, {
+    email: user.email,
+    provider: user.providerData[0]?.providerId || "password",
+    timestamp: Date.now()
+  });
+}
+// --- end new functions ---
+
 async function handleApprovedUser(reqRef, data){
   const accessID = generateAccessID();
   await update(reqRef, { accessID }); // overwrite previous accessID
@@ -191,6 +212,13 @@ async function handleApprovedUser(reqRef, data){
   sessionStorage.setItem("internalAccess","true");
   sessionStorage.setItem("fromIndex","true");
   sessionStorage.setItem("accessID", accessID);
+
+  // Record session and login history
+  const user = auth.currentUser;
+  if(user){
+    await recordSession(user, accessID, "home.html");
+    await recordLoginHistory(user);
+  }
 
   show("approved");
 
@@ -280,8 +308,6 @@ onAuthStateChanged(auth,user=>{
   }else show("auth-section");
 });
 </script>
-
-
 
 <script>
 if ('serviceWorker' in navigator) {
