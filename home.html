@@ -1262,6 +1262,26 @@ linksContainer.addEventListener('wheel', (e) => {
   }, { passive: false });
 </script>
 
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  const access = sessionStorage.getItem("accessID");
+  if (!access) return;
+
+  // Loop through all links in the header or page
+  document.querySelectorAll('a[href]').forEach(link => {
+    const href = link.getAttribute('href');
+
+    // Skip external or anchor links
+    if (!href || href.startsWith('http') || href.startsWith('#')) return;
+
+    // Prevent duplicates
+    if (href.includes("access=")) return;
+
+    const separator = href.includes('?') ? '&' : '?';
+    link.href = `${href}${separator}access=${access}`;
+  });
+});
+</script>
 
 
 </body>
