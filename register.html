@@ -160,7 +160,7 @@ import {
   reload,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
-import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+import { getDatabase, ref, onValue, set, get, update, push } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
@@ -183,6 +183,50 @@ function show(id){
   document.getElementById(id).classList.remove("hidden");
 }
 
+function generateAccessID(){
+  return Math.random().toString(36).substring(2,10) +
+         Math.random().toString(36).substring(2,10) +
+         Math.random().toString(36).substring(2,10); // 24 chars
+}
+
+// ---------- SESSION & HISTORY ----------
+async function recordSession(user, accessID, page="home.html"){
+  const sessionRef = ref(db, 'currentSessions/' + user.uid);
+  await set(sessionRef, {
+    email: user.email,
+    accessID,
+    lastActive: Date.now(),
+    page
+  });
+}
+
+async function recordLoginHistory(user){
+  const histRef = ref(db, 'loginHistory/' + user.uid);
+  await push(histRef, {
+    email: user.email,
+    provider: user.providerData[0]?.providerId || "password",
+    timestamp: Date.now()
+  });
+}
+
+// ---------- HANDLE APPROVED USER ----------
+async function handleApprovedUser(reqRef, data){
+  const accessID = generateAccessID();
+  await update(reqRef, { accessID }); // overwrite previous accessID
+
+  sessionStorage.setItem("internalAccess","true");
+  sessionStorage.setItem("fromIndex","true");
+  sessionStorage.setItem("accessID", accessID);
+
+  // Record session & login history
+  await recordSession(auth.currentUser, accessID);
+  await recordLoginHistory(auth.currentUser);
+
+  show("approved");
+  setTimeout(()=> window.location.href = `home.html?access=${accessID}`, 1500);
+}
+
+// ---------- REGISTER ----------
 window.register = function(){
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -197,6 +241,7 @@ window.register = function(){
     .catch(e=> alert("Registration error: "+e.message));
 };
 
+// ---------- GOOGLE LOGIN ----------
 window.googleLogin = async function(){
   try{
     const result = await signInWithPopup(auth,provider);
@@ -204,13 +249,11 @@ window.googleLogin = async function(){
     currentUid = user.uid;
     const reqRef = ref(db,'joinRequests/'+currentUid);
     const snapshot = await get(reqRef);
+
     if(snapshot.exists()){
       const data = snapshot.val();
       if(data.status==="approved"){
-        sessionStorage.setItem("internalAccess","true"); // <-- added
-        sessionStorage.setItem("fromIndex","true");
-        show("approved");
-        setTimeout(()=> window.location.href="home",1500);
+        await handleApprovedUser(reqRef, data);
       }else if(data.status==="pending"){
         show("waiting");
       }else{
@@ -221,6 +264,7 @@ window.googleLogin = async function(){
   }catch(e){ alert("Google login error: "+e.message);}
 };
 
+// ---------- RELOAD & CHECK ----------
 window.reloadAndCheck = function(){
   const user = auth.currentUser;
   if(user){
@@ -234,14 +278,11 @@ window.reloadAndCheck = function(){
 function checkJoinRequest(user){
   currentUid = user.uid;
   const reqRef = ref(db,'joinRequests/'+currentUid);
-  onValue(reqRef,snapshot=>{
+  onValue(reqRef, async snapshot=>{
     const data = snapshot.val();
     if(!data) show("form-section");
     else if(data.status==="approved"){
-      sessionStorage.setItem("internalAccess","true"); // <-- added
-      sessionStorage.setItem("fromIndex","true");
-      show("approved");
-      setTimeout(()=>window.location.href="home",1500);
+      await handleApprovedUser(reqRef, data);
     }else if(data.status==="pending") show("waiting");
     else{
       alert("❌ Your request was denied.");
@@ -250,6 +291,7 @@ function checkJoinRequest(user){
   });
 }
 
+// ---------- SUBMIT JOIN REQUEST ----------
 window.submitRequest = function(){
   const name = document.getElementById("name").value;
   const reason = document.getElementById("reason").value;
@@ -264,6 +306,7 @@ window.submitRequest = function(){
   }).then(()=> show("waiting"));
 };
 
+// ---------- AUTH STATE ----------
 onAuthStateChanged(auth,user=>{
   if(user){
     reload(user).then(()=>{
@@ -274,6 +317,7 @@ onAuthStateChanged(auth,user=>{
   }else show("auth-section");
 });
 </script>
+
 
 <script>
 if ('serviceWorker' in navigator) {
