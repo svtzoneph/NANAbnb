@@ -752,40 +752,45 @@ header.hide {
 <!-- Desktop header (scrollable) -->
 <header id="scrollHeader">
   <div class="header-links">
-    <div class="header-logo">
-      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
-    </div>
-    <a class="category-link" id="loginLink">LOGIN</a>
-    <a class="category-link" id="homeLink">HOME</a>
-    <a class="category-link" id="liveLink">LIVE</a>
-    <a class="category-link" id="galleryLink">GALLERY</a>
-    <a class="category-link" id="videosLink">VIDEOS</a>
+      <div class="header-logo">
+    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
   </div>
+    <a class="category-link" href="index">LOGIN</a>
+    <a class="category-link" href="home">HOME</a>
+    <a class="category-link" href="live">LIVE</a>
+    <a class="category-link" href="gallery">GALLERY</a>
+    <a class="category-link" href="videos">VIDEOS</a>
 </header>
 
 <!-- Sidebar for mobile -->
 <div id="mobileSidebar" class="sidebar">
   <button class="close-btn" onclick="toggleSidebar()">✖</button>
+  
+  <!-- Sidebar Title -->
   <div class="sidebar-title">Zone Vault</div>
+
   <nav class="sidebar-nav">
-    <a id="mloginLink">LOGIN</a>
-    <a id="mhomeLink">HOME</a>
-    <a id="mliveLink">LIVE</a>
-    <a id="mgalleryLink">GALLERY</a>
-    <a id="mvideosLink">VIDEOS</a>
+    <a href="index">LOGIN</a>
+    <a href="home">HOME</a>
+    <a href="live">LIVE</a>
+    <a href="gallery">GALLERY</a>
+    <a href="videos">VIDEOS</a>
   </nav>
+
   <div class="sidebar-footer">
+    <!-- Logo Bottom Left -->
     <div class="sidebar-logo">
       <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
     </div>
+    
+    <!-- Email Bottom Right -->
     <div class="sidebar-email">
-      <a href="mailto:zonevaultph@gmail.com" title="Send Email">
+      <a href="zonevaultph@gmail.com" title="Send Email">
         <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
       </a>
     </div>
   </div>
 </div>
-
 
   <!-- Hero Section -->
   <div class="hero-section">
@@ -900,8 +905,35 @@ header.hide {
 
   </div>
 </div>
-    
+
+<script type="module">
+  // ✅ Get random access ID from URL or session
+  const params = new URLSearchParams(window.location.search);
+  let accessId = params.get("id") || sessionStorage.getItem("accessId");
+
+  if (!accessId) {
+    // If missing, force user back to login
+    window.location.href = "login.html";
+  } else {
+    sessionStorage.setItem("accessId", accessId); // keep it consistent
+    console.log("Access ID:", accessId);
+  }
+
+  // ✅ Auto-append ?id= to all internal <a> links
+  window.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('a').forEach(link => {
+      // Skip external links (only update same-domain pages)
+      if (link.href.includes(window.location.origin)) {
+        const url = new URL(link.href);
+        url.searchParams.set("id", accessId);
+        link.href = url.toString();
+      }
+    });
+  });
+</script>
+
   <script>
+    
     // Accordion toggle
     document.querySelectorAll('.accordion-header').forEach(header => {
       header.addEventListener('click', () => {
@@ -1216,126 +1248,5 @@ linksContainer.addEventListener('wheel', (e) => {
     }
   }, { passive: false });
 </script>
-
-    <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
-import {
-  getDatabase,
-  ref,
-  get,
-  update
-} from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
-
-// ---------- Firebase Setup ----------
-const firebaseConfig = {
-  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-  authDomain: "tvnstream-b4497.firebaseapp.com",
-  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-  projectId: "tvnstream-b4497",
-  storageBucket: "tvnstream-b4497.appspot.com",
-  messagingSenderId: "308384754214",
-  appId: "1:308384754214:web:2938e76cd29b288f75d4e7"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-
-// ---------- Session and Access Check ----------
-const urlParams = new URLSearchParams(window.location.search);
-const accessParam = urlParams.get("access");
-const sessionAccess = sessionStorage.getItem("accessID");
-const accessID = accessParam || sessionAccess;
-const internalAccess = sessionStorage.getItem("internalAccess");
-const currentUid = sessionStorage.getItem("currentUid");
-
-// If missing session, block access
-if (!accessID || !internalAccess || !currentUid) {
-  alert("❌ Access denied. Please log in again.");
-  window.location.href = "index.html";
-}
-
-// ---------- Firebase Auth State ----------
-onAuthStateChanged(auth, async user => {
-  if (!user) {
-    window.location.href = "index.html";
-    return;
-  }
-
-  const reqRef = ref(db, "joinRequests/" + user.uid);
-  const snapshot = await get(reqRef);
-
-  if (!snapshot.exists()) {
-    signOut(auth);
-    window.location.href = "index.html";
-    return;
-  }
-
-  const data = snapshot.val();
-  if (data.status !== "approved" || data.accessID !== accessID) {
-    alert("Unauthorized access. Please log in again.");
-    await signOut(auth);
-    sessionStorage.clear();
-    window.location.href = "index.html";
-    return;
-  }
-
-  // ✅ Valid Access
-  setProtectedLinks(accessID);
-  enableSecureNavigation(user.uid);
-});
-
-// ---------- Generate New Access ID ----------
-function generateAccessID() {
-  return (
-    Math.random().toString(36).substring(2, 10) +
-    Math.random().toString(36).substring(2, 10) +
-    Math.random().toString(36).substring(2, 10)
-  );
-}
-
-// ---------- Secure Navigation ----------
-function enableSecureNavigation(uid) {
-  document.querySelectorAll("a[href], .btn").forEach(link => {
-    if (!link.getAttribute("href")?.startsWith("http")) {
-      link.addEventListener("click", async (e) => {
-        e.preventDefault();
-        const newAccess = generateAccessID();
-        sessionStorage.setItem("accessID", newAccess);
-
-        const userRef = ref(db, "joinRequests/" + uid);
-        await update(userRef, { accessID: newAccess });
-
-        const target = link.getAttribute("href").split("?")[0];
-        window.location.href = `${target}?access=${newAccess}`;
-      });
-    }
-  });
-}
-
-// ---------- Set Header Links ----------
-function setProtectedLinks(accessID) {
-  // Desktop Header
-  document.getElementById("homeLink").href = `home.html?access=${accessID}`;
-  document.getElementById("liveLink").href = `live.html?access=${accessID}`;
-  document.getElementById("galleryLink").href = `gallery.html?access=${accessID}`;
-  document.getElementById("videosLink").href = `videos.html?access=${accessID}`;
-  document.getElementById("loginLink").href = "index.html";
-
-  // Mobile Sidebar
-  document.getElementById("mHomeLink").href = `home.html?access=${accessID}`;
-  document.getElementById("mLiveLink").href = `live.html?access=${accessID}`;
-  document.getElementById("mGalleryLink").href = `gallery.html?access=${accessID}`;
-  document.getElementById("mVideosLink").href = `videos.html?access=${accessID}`;
-  document.getElementById("mLoginLink").href = "index.html";
-}
-</script>
-
-    
 </body>
 </html> 
