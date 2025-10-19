@@ -209,7 +209,11 @@ window.googleLogin = async function(){
         sessionStorage.setItem("accessId", accessId);
         sessionStorage.setItem("internalAccess","true");
         sessionStorage.setItem("fromIndex","true");
-        set(ref(db, 'accessIDs/' + currentUid), { accessId, timestamp: Date.now() });
+        set(ref(db, 'accessIDs/' + currentUid), {
+  accessId,
+  uid: currentUid,
+  timestamp: Date.now()
+});
         show("approved");
         setTimeout(()=> window.location.href="home.html?id=" + accessId,1500);
       }else if(data.status==="pending"){
