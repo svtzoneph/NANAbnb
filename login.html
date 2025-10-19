@@ -178,6 +178,25 @@ function show(id){
   document.getElementById(id).classList.remove("hidden");
 }
 
+function generateAccessID(){
+  return Math.random().toString(36).substring(2,10) +
+         Math.random().toString(36).substring(2,10) +
+         Math.random().toString(36).substring(2,10); // 24 chars
+}
+
+async function handleApprovedUser(reqRef, data){
+  const accessID = generateAccessID();
+  await update(reqRef, { accessID }); // overwrite previous accessID
+
+  sessionStorage.setItem("internalAccess","true");
+  sessionStorage.setItem("fromIndex","true");
+  sessionStorage.setItem("accessID", accessID);
+
+  show("approved");
+
+  setTimeout(()=> window.location.href = `home.html?access=${accessID}`, 1500);
+}
+
 window.login = function(){
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -195,22 +214,10 @@ window.googleLogin = async function(){
     const reqRef = ref(db,'joinRequests/'+currentUid);
     const snapshot = await get(reqRef);
     const data = snapshot.val();
+
     if(data){
       if(data.status==="approved"){
-        sessionStorage.setItem("internalAccess","true");
-        sessionStorage.setItem("fromIndex","true");
-        sessionStorage.setItem("accessID", data.accessID || "");
-
-        show("approved");
-
-        // Generate or reuse unique random access ID
-        let accessID = data.accessID;
-        if(!accessID){
-          accessID = Math.random().toString(36).substring(2,8);
-          await update(reqRef, { accessID });
-        }
-
-        setTimeout(()=> window.location.href = `home.html?access=${accessID}`, 1500);
+        await handleApprovedUser(reqRef, data);
       }else if(data.status==="pending"){
         show("waiting");
       }else{
@@ -240,19 +247,7 @@ function checkJoinRequest(user){
     const data = snapshot.val();
     if(!data) show("form-section");
     else if(data.status==="approved"){
-      sessionStorage.setItem("internalAccess","true");
-      sessionStorage.setItem("fromIndex","true");
-      sessionStorage.setItem("accessID", data.accessID || "");
-      show("approved");
-
-      // Generate or reuse access ID for approved user
-      let accessID = data.accessID;
-      if(!accessID){
-        accessID = Math.random().toString(36).substring(2,8);
-        await update(reqRef, { accessID });
-      }
-
-      setTimeout(()=> window.location.href = `home.html?access=${accessID}`, 1500);
+      await handleApprovedUser(reqRef, data);
     }else if(data.status==="pending") show("waiting");
     else{
       alert("❌ Your request was denied.");
@@ -285,6 +280,7 @@ onAuthStateChanged(auth,user=>{
   }else show("auth-section");
 });
 </script>
+
 
 
 <script>
