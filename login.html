@@ -195,13 +195,21 @@ window.googleLogin = async function(){
     const reqRef = ref(db,'joinRequests/'+currentUid);
     const snapshot = await get(reqRef);
     const data = snapshot.val();
-    if(data){
-      if(data.status==="approved"){
-        sessionStorage.setItem("internalAccess","true");
-        sessionStorage.setItem("fromIndex","true");
-        show("approved");
-        setTimeout(()=> window.location.href="home",1500);
-      }else if(data.status==="pending"){
+    if (data.status === "approved") {
+  sessionStorage.setItem("internalAccess", "true");
+  sessionStorage.setItem("fromIndex", "true");
+  show("approved");
+
+  // If no random link exists, create one and store it
+  if (!data.link) {
+    const randomLink = "home-" + Math.random().toString(36).substring(2, 8) + ".html";
+    await set(ref(db, 'joinRequests/' + currentUid + '/link'), randomLink);
+    setTimeout(() => window.location.href = randomLink, 1500);
+  } else {
+    // Use existing saved random link
+    setTimeout(() => window.location.href = data.link, 1500);
+  }
+} else if(data.status==="pending"){
         show("waiting");
       }else{
         alert("❌ Your request was denied.");
