@@ -160,8 +160,17 @@ import {
   reload,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
-import { getDatabase, ref, onValue, set, get, update, push } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  set,
+  get,
+  update,
+  push
+} from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
 
+// ---------- FIREBASE CONFIG ----------
 const firebaseConfig = {
   apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
   authDomain: "tvnstream-b4497.firebaseapp.com",
@@ -172,26 +181,33 @@ const firebaseConfig = {
   appId: "1:308384754214:web:2938e76cd29b288f75d4e7"
 };
 
+// ---------- INITIALIZE ----------
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 const provider = new GoogleAuthProvider();
 let currentUid = null;
 
-function show(id){
-  document.querySelectorAll(".container > div").forEach(div=>div.classList.add("hidden"));
+// ---------- UTILITIES ----------
+function show(id) {
+  document.querySelectorAll(".container > div").forEach(div =>
+    div.classList.add("hidden")
+  );
   document.getElementById(id).classList.remove("hidden");
 }
 
-function generateAccessID(){
-  return Math.random().toString(36).substring(2,10) +
-         Math.random().toString(36).substring(2,10) +
-         Math.random().toString(36).substring(2,10); // 24 chars
+// Generate a unique random Access ID
+function generateAccessID() {
+  return (
+    Math.random().toString(36).substring(2, 10) +
+    Math.random().toString(36).substring(2, 10) +
+    Math.random().toString(36).substring(2, 10)
+  ); // 24 chars total
 }
 
-// ---------- SESSION & HISTORY ----------
-async function recordSession(user, accessID, page="home.html"){
-  const sessionRef = ref(db, 'currentSessions/' + user.uid);
+// ---------- SESSION + HISTORY ----------
+async function recordSession(user, accessID, page = "home.html") {
+  const sessionRef = ref(db, "currentSessions/" + user.uid);
   await set(sessionRef, {
     email: user.email,
     accessID,
@@ -200,8 +216,8 @@ async function recordSession(user, accessID, page="home.html"){
   });
 }
 
-async function recordLoginHistory(user){
-  const histRef = ref(db, 'loginHistory/' + user.uid);
+async function recordLoginHistory(user) {
+  const histRef = ref(db, "loginHistory/" + user.uid);
   await push(histRef, {
     email: user.email,
     provider: user.providerData[0]?.providerId || "password",
@@ -210,113 +226,126 @@ async function recordLoginHistory(user){
 }
 
 // ---------- HANDLE APPROVED USER ----------
-async function handleApprovedUser(reqRef, data){
+async function handleApprovedUser(reqRef, data) {
   const accessID = generateAccessID();
-  await update(reqRef, { accessID }); // overwrite previous accessID
+  await update(reqRef, { accessID }); // overwrite previous accessID if any
 
-  sessionStorage.setItem("internalAccess","true");
-  sessionStorage.setItem("fromIndex","true");
+  sessionStorage.setItem("internalAccess", "true");
+  sessionStorage.setItem("fromIndex", "true");
   sessionStorage.setItem("accessID", accessID);
 
-  // Record session & login history
+  // Record session + login history
   await recordSession(auth.currentUser, accessID);
   await recordLoginHistory(auth.currentUser);
 
   show("approved");
-  setTimeout(()=> window.location.href = `home.html?access=${accessID}`, 1500);
+  setTimeout(() => {
+    window.location.href = `home.html?access=${accessID}`;
+  }, 1500);
 }
 
-// ---------- REGISTER ----------
-window.register = function(){
+// ---------- REGISTER NEW USER ----------
+window.register = function() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  if(!email || !password) return alert("Please enter email and password.");
-  createUserWithEmailAndPassword(auth,email,password)
-    .then(userCred=>{
-      sendEmailVerification(userCred.user).then(()=>{
-        alert("✅ Verification email sent. Check your inbox.");
+  if (!email || !password) return alert("Please enter email and password.");
+
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(userCred => {
+      sendEmailVerification(userCred.user).then(() => {
+        alert("✅ Verification email sent. Please check your inbox.");
         show("verify-section");
       });
     })
-    .catch(e=> alert("Registration error: "+e.message));
+    .catch(e => alert("Registration error: " + e.message));
 };
 
 // ---------- GOOGLE LOGIN ----------
-window.googleLogin = async function(){
-  try{
-    const result = await signInWithPopup(auth,provider);
+window.googleLogin = async function() {
+  try {
+    const result = await signInWithPopup(auth, provider);
     const user = result.user;
     currentUid = user.uid;
-    const reqRef = ref(db,'joinRequests/'+currentUid);
+    const reqRef = ref(db, "joinRequests/" + currentUid);
     const snapshot = await get(reqRef);
 
-    if(snapshot.exists()){
+    if (snapshot.exists()) {
       const data = snapshot.val();
-      if(data.status==="approved"){
+      if (data.status === "approved") {
         await handleApprovedUser(reqRef, data);
-      }else if(data.status==="pending"){
+      } else if (data.status === "pending") {
         show("waiting");
-      }else{
+      } else {
         alert("❌ Your request was denied.");
-        signOut(auth).then(()=> show("auth-section"));
+        signOut(auth).then(() => show("auth-section"));
       }
-    }else show("form-section");
-  }catch(e){ alert("Google login error: "+e.message);}
+    } else {
+      show("form-section");
+    }
+  } catch (e) {
+    alert("Google login error: " + e.message);
+  }
 };
 
-// ---------- RELOAD & CHECK ----------
-window.reloadAndCheck = function(){
+// ---------- EMAIL VERIFIED CHECK ----------
+window.reloadAndCheck = function() {
   const user = auth.currentUser;
-  if(user){
-    reload(user).then(()=>{
-      if(user.emailVerified) checkJoinRequest(user);
+  if (user) {
+    reload(user).then(() => {
+      if (user.emailVerified) checkJoinRequest(user);
       else alert("❌ Your email is still not verified.");
     });
   }
 };
 
-function checkJoinRequest(user){
+// ---------- CHECK JOIN REQUEST ----------
+function checkJoinRequest(user) {
   currentUid = user.uid;
-  const reqRef = ref(db,'joinRequests/'+currentUid);
-  onValue(reqRef, async snapshot=>{
+  const reqRef = ref(db, "joinRequests/" + currentUid);
+  onValue(reqRef, async snapshot => {
     const data = snapshot.val();
-    if(!data) show("form-section");
-    else if(data.status==="approved"){
+    if (!data) show("form-section");
+    else if (data.status === "approved") {
       await handleApprovedUser(reqRef, data);
-    }else if(data.status==="pending") show("waiting");
-    else{
+    } else if (data.status === "pending") show("waiting");
+    else {
       alert("❌ Your request was denied.");
-      signOut(auth).then(()=>show("auth-section"));
+      signOut(auth).then(() => show("auth-section"));
     }
   });
 }
 
 // ---------- SUBMIT JOIN REQUEST ----------
-window.submitRequest = function(){
+window.submitRequest = function() {
   const name = document.getElementById("name").value;
   const reason = document.getElementById("reason").value;
   const user = auth.currentUser;
-  if(!name || !reason) return alert("Please fill out all fields.");
-  set(ref(db,'joinRequests/'+currentUid),{
+  if (!name || !reason) return alert("Please fill out all fields.");
+
+  set(ref(db, "joinRequests/" + currentUid), {
     name,
     reason,
-    email:user.email,
-    provider:user.providerData[0]?.providerId || "password",
-    status:"pending"
-  }).then(()=> show("waiting"));
+    email: user.email,
+    provider: user.providerData[0]?.providerId || "password",
+    status: "pending"
+  }).then(() => show("waiting"));
 };
 
 // ---------- AUTH STATE ----------
-onAuthStateChanged(auth,user=>{
-  if(user){
-    reload(user).then(()=>{
-      if(user.emailVerified || user.providerData.some(p=> p.providerId==="google.com")){
+onAuthStateChanged(auth, user => {
+  if (user) {
+    reload(user).then(() => {
+      if (
+        user.emailVerified ||
+        user.providerData.some(p => p.providerId === "google.com")
+      ) {
         checkJoinRequest(user);
-      }else show("verify-section");
+      } else show("verify-section");
     });
-  }else show("auth-section");
+  } else show("auth-section");
 });
 </script>
+
 
 
 <script>
