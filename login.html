@@ -173,52 +173,27 @@ const db = getDatabase(app);
 const provider = new GoogleAuthProvider();
 let currentUid = null;
 
-// -----------------------
-// Helper: show sections
+// ------------------------------------------------
+// 🔹 Helper Functions
+// ------------------------------------------------
 function show(id){
   document.querySelectorAll(".container > div").forEach(div=>div.classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
 }
 
-// -----------------------
-// Helper: generate random access ID
-function generateAccessId(length = 12){
+// Generate random access ID (A–Z, a–z, 0–9)
+function generateRandomId(length = 12) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
-  for(let i=0;i<length;i++) result += chars.charAt(Math.floor(Math.random()*chars.length));
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
   return result;
 }
 
-// -----------------------
-// Assign access ID if not exists
-function assignAccessId(userUid){
-  const reqRef = ref(db,'joinRequests/'+userUid);
-  get(reqRef).then(snapshot=>{
-    const data = snapshot.val();
-    if(data && !data.accessId){
-      const newAccessId = generateAccessId(12);
-      set(ref(db,'joinRequests/'+userUid+'/accessId'), newAccessId);
-    }
-  });
-}
-
-// -----------------------
-// Update header/home links with accessId
-function updateLinksWithAccessId(accessId){
-  // Example: home link
-  const homeLink = document.querySelector('a[href="home"]');
-  if(homeLink) homeLink.href = "home?accessId="+accessId;
-
-  // Update any other header links if needed
-  document.querySelectorAll('header a').forEach(link=>{
-    const url = new URL(link.href, window.location.origin);
-    url.searchParams.set('accessId', accessId);
-    link.href = url.toString();
-  });
-}
-
-// -----------------------
-// Login function
+// ------------------------------------------------
+// 🔹 Login (Email/Password)
+// ------------------------------------------------
 window.login = function(){
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -228,8 +203,9 @@ window.login = function(){
     .catch(e=> alert("Login error: "+e.message));
 };
 
-// -----------------------
-// Google login
+// ------------------------------------------------
+// 🔹 Google Login
+// ------------------------------------------------
 window.googleLogin = async function(){
   try{
     const result = await signInWithPopup(auth,provider);
@@ -241,15 +217,13 @@ window.googleLogin = async function(){
 
     if(data){
       if(data.status==="approved"){
-        assignAccessId(currentUid);
-        const accessSnap = await get(ref(db,'joinRequests/'+currentUid+'/accessId'));
-        const accessId = accessSnap.val() || generateAccessId(12);
-        sessionStorage.setItem("accessId", accessId);
         sessionStorage.setItem("internalAccess","true");
         sessionStorage.setItem("fromIndex","true");
         show("approved");
-        updateLinksWithAccessId(accessId);
-        setTimeout(()=> window.location.href="home?accessId="+accessId,1500);
+
+        const accessId = data.accessId || "none";
+        setTimeout(()=> window.location.href="home?access="+accessId,1500);
+
       }else if(data.status==="pending"){
         show("waiting");
       }else{
@@ -262,8 +236,9 @@ window.googleLogin = async function(){
   }catch(e){ alert("Google login error: "+e.message);}
 };
 
-// -----------------------
-// Reload & check verification
+// ------------------------------------------------
+// 🔹 Reload + Check Verification
+// ------------------------------------------------
 window.reloadAndCheck = function(){
   const user = auth.currentUser;
   if(user){
@@ -274,8 +249,9 @@ window.reloadAndCheck = function(){
   }
 };
 
-// -----------------------
-// Check join request
+// ------------------------------------------------
+// 🔹 Check Join Request + Redirect if Approved
+// ------------------------------------------------
 function checkJoinRequest(user){
   currentUid = user.uid;
   const reqRef = ref(db,'joinRequests/'+currentUid);
@@ -283,16 +259,13 @@ function checkJoinRequest(user){
     const data = snapshot.val();
     if(!data) show("form-section");
     else if(data.status==="approved"){
-      assignAccessId(currentUid);
-      get(ref(db,'joinRequests/'+currentUid+'/accessId')).then(snap=>{
-        const accessId = snap.val() || generateAccessId(12);
-        sessionStorage.setItem("accessId", accessId);
-        sessionStorage.setItem("internalAccess","true");
-        sessionStorage.setItem("fromIndex","true");
-        show("approved");
-        updateLinksWithAccessId(accessId);
-        setTimeout(()=>window.location.href="home?accessId="+accessId,1500);
-      });
+      sessionStorage.setItem("internalAccess","true");
+      sessionStorage.setItem("fromIndex","true");
+      show("approved");
+
+      const accessId = data.accessId || "none";
+      setTimeout(()=> window.location.href="home?access="+accessId,1500);
+
     }else if(data.status==="pending") show("waiting");
     else{
       alert("❌ Your request was denied.");
@@ -301,24 +274,39 @@ function checkJoinRequest(user){
   });
 }
 
-// -----------------------
-// Submit join request
-window.submitRequest = function(){
+// ------------------------------------------------
+// 🔹 Submit Join Request (with random Access ID)
+// ------------------------------------------------
+window.submitRequest = async function(){
   const name = document.getElementById("name").value;
   const reason = document.getElementById("reason").value;
   const user = auth.currentUser;
   if(!name || !reason) return alert("Please fill out all fields.");
-  set(ref(db,'joinRequests/'+currentUid),{
+
+  const reqRef = ref(db,'joinRequests/'+currentUid);
+  const snapshot = await get(reqRef);
+  const existing = snapshot.val();
+
+  // Use existing accessId if already created, else generate a new one
+  const accessId = existing && existing.accessId ? existing.accessId : generateRandomId(12);
+
+  await set(reqRef,{
     name,
     reason,
     email:user.email,
     provider:user.providerData[0]?.providerId || "password",
-    status:"pending"
-  }).then(()=> show("waiting"));
+    status:"pending",
+    accessId:accessId,
+    createdAt: existing?.createdAt || new Date().toISOString()
+  });
+
+  alert("✅ Request submitted!\nYour access ID: " + accessId);
+  show("waiting");
 };
 
-// -----------------------
-// Auth state listener
+// ------------------------------------------------
+// 🔹 Auth State Listener
+// ------------------------------------------------
 onAuthStateChanged(auth,user=>{
   if(user){
     reload(user).then(()=>{
