@@ -558,6 +558,18 @@ lightGallery(document.getElementById('lightgallery2'), {
   }
 });
   </script>
+
+  <script>
+const urlParams = new URLSearchParams(window.location.search);
+const access = urlParams.get("access");
+const savedAccess = sessionStorage.getItem("accessID");
+const internalAccess = sessionStorage.getItem("internalAccess");
+
+if (!access || !savedAccess || access !== savedAccess || !internalAccess) {
+  alert("Access denied");
+  window.location.href = "index.html";
+}
+</script>
   
     <script>
     const header = document.getElementById('scrollHeader');
@@ -868,5 +880,27 @@ linksContainer.addEventListener('wheel', (e) => {
   }
 </script>
 
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  const access = sessionStorage.getItem("accessID");
+  if (!access) return;
+
+  // Loop through all links in the header or page
+  document.querySelectorAll('a[href]').forEach(link => {
+    const href = link.getAttribute('href');
+
+    // Skip external or anchor links
+    if (!href || href.startsWith('http') || href.startsWith('#')) return;
+
+    // Prevent duplicates
+    if (href.includes("access=")) return;
+
+    const separator = href.includes('?') ? '&' : '?';
+    link.href = `${href}${separator}access=${access}`;
+  });
+});
+</script>
+
+  
 </body>
 </html> 
