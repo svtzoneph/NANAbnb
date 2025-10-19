@@ -173,27 +173,19 @@ const db = getDatabase(app);
 const provider = new GoogleAuthProvider();
 let currentUid = null;
 
-// ------------------------------------------------
-// 🔹 Helper Functions
-// ------------------------------------------------
+// 🔹 Random Access ID Generator
+function generateAccessId(length = 12) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const arr = new Uint8Array(length);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, n => chars[n % chars.length]).join('');
+}
+
 function show(id){
   document.querySelectorAll(".container > div").forEach(div=>div.classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
 }
 
-// Generate random access ID (A–Z, a–z, 0–9)
-function generateRandomId(length = 12) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
-
-// ------------------------------------------------
-// 🔹 Login (Email/Password)
-// ------------------------------------------------
 window.login = function(){
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -203,9 +195,6 @@ window.login = function(){
     .catch(e=> alert("Login error: "+e.message));
 };
 
-// ------------------------------------------------
-// 🔹 Google Login
-// ------------------------------------------------
 window.googleLogin = async function(){
   try{
     const result = await signInWithPopup(auth,provider);
@@ -214,16 +203,15 @@ window.googleLogin = async function(){
     const reqRef = ref(db,'joinRequests/'+currentUid);
     const snapshot = await get(reqRef);
     const data = snapshot.val();
-
     if(data){
       if(data.status==="approved"){
+        const accessId = generateAccessId();
+        sessionStorage.setItem("accessId", accessId);
         sessionStorage.setItem("internalAccess","true");
         sessionStorage.setItem("fromIndex","true");
+        set(ref(db, 'accessIDs/' + currentUid), { accessId, timestamp: Date.now() });
         show("approved");
-
-        const accessId = data.accessId || "none";
-        setTimeout(()=> window.location.href="home?access="+accessId,1500);
-
+        setTimeout(()=> window.location.href="home.html?id=" + accessId,1500);
       }else if(data.status==="pending"){
         show("waiting");
       }else{
@@ -236,9 +224,6 @@ window.googleLogin = async function(){
   }catch(e){ alert("Google login error: "+e.message);}
 };
 
-// ------------------------------------------------
-// 🔹 Reload + Check Verification
-// ------------------------------------------------
 window.reloadAndCheck = function(){
   const user = auth.currentUser;
   if(user){
@@ -249,9 +234,6 @@ window.reloadAndCheck = function(){
   }
 };
 
-// ------------------------------------------------
-// 🔹 Check Join Request + Redirect if Approved
-// ------------------------------------------------
 function checkJoinRequest(user){
   currentUid = user.uid;
   const reqRef = ref(db,'joinRequests/'+currentUid);
@@ -259,13 +241,13 @@ function checkJoinRequest(user){
     const data = snapshot.val();
     if(!data) show("form-section");
     else if(data.status==="approved"){
+      const accessId = generateAccessId();
+      sessionStorage.setItem("accessId", accessId);
       sessionStorage.setItem("internalAccess","true");
       sessionStorage.setItem("fromIndex","true");
+      set(ref(db, 'accessIDs/' + currentUid), { accessId, timestamp: Date.now() });
       show("approved");
-
-      const accessId = data.accessId || "none";
-      setTimeout(()=> window.location.href="home?access="+accessId,1500);
-
+      setTimeout(()=>window.location.href="home.html?id=" + accessId,1500);
     }else if(data.status==="pending") show("waiting");
     else{
       alert("❌ Your request was denied.");
@@ -274,39 +256,20 @@ function checkJoinRequest(user){
   });
 }
 
-// ------------------------------------------------
-// 🔹 Submit Join Request (with random Access ID)
-// ------------------------------------------------
-window.submitRequest = async function(){
+window.submitRequest = function(){
   const name = document.getElementById("name").value;
   const reason = document.getElementById("reason").value;
   const user = auth.currentUser;
   if(!name || !reason) return alert("Please fill out all fields.");
-
-  const reqRef = ref(db,'joinRequests/'+currentUid);
-  const snapshot = await get(reqRef);
-  const existing = snapshot.val();
-
-  // Use existing accessId if already created, else generate a new one
-  const accessId = existing && existing.accessId ? existing.accessId : generateRandomId(12);
-
-  await set(reqRef,{
+  set(ref(db,'joinRequests/'+currentUid),{
     name,
     reason,
     email:user.email,
     provider:user.providerData[0]?.providerId || "password",
-    status:"pending",
-    accessId:accessId,
-    createdAt: existing?.createdAt || new Date().toISOString()
-  });
-
-  alert("✅ Request submitted!\nYour access ID: " + accessId);
-  show("waiting");
+    status:"pending"
+  }).then(()=> show("waiting"));
 };
 
-// ------------------------------------------------
-// 🔹 Auth State Listener
-// ------------------------------------------------
 onAuthStateChanged(auth,user=>{
   if(user){
     reload(user).then(()=>{
@@ -317,7 +280,6 @@ onAuthStateChanged(auth,user=>{
   }else show("auth-section");
 });
 </script>
-
 
 <script>
 if ('serviceWorker' in navigator) {
