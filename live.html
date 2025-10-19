@@ -614,58 +614,25 @@ h2.title {
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
 <script type="module">
-import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+  import { verifyAccess } from "./auth-guard.js";
+  verifyAccess();
 
-const db = getDatabase();
-
-// --- Check session access on page load ---
-const currentAccess = sessionStorage.getItem("accessID");
-const internalAccess = sessionStorage.getItem("internalAccess");
-const currentUid = sessionStorage.getItem("currentUid"); // optional: track uid
-
-if (!currentAccess || !internalAccess) {
-  alert("Access denied ❌ Please login again.");
-  window.location.href = "login.html";
-}
-
-// --- Function to generate a random accessID ---
-function generateAccessID() {
-  return Math.random().toString(36).substring(2,10) +
-         Math.random().toString(36).substring(2,10) +
-         Math.random().toString(36).substring(2,10); // 24 chars
-}
-
-// --- Update accessID in Firebase (optional) ---
-async function updateAccessID(uid, newAccess) {
-  if (!uid) return;
-  const userRef = ref(db, 'joinRequests/' + uid);
-  await update(userRef, { accessID: newAccess });
-}
-
-// --- Function to handle navigation with new accessID ---
-function navigateWithAccess(element, targetAttr = "href") {
-  element.addEventListener("click", async (e) => {
-    e.preventDefault();
-
-    const newAccess = generateAccessID();
-    sessionStorage.setItem("accessID", newAccess);
-
-    if (currentUid) await updateAccessID(currentUid, newAccess);
-
-    const target = element.getAttribute(targetAttr).split("?")[0];
-    window.location.href = `${target}?access=${newAccess}`;
+  // Optional: auto-append ?id= for navigation
+  window.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const accessId = params.get("id");
+    if (accessId) {
+      document.querySelectorAll("a").forEach(link => {
+        if (link.href.includes(window.location.origin)) {
+          const url = new URL(link.href);
+          url.searchParams.set("id", accessId);
+          link.href = url.toString();
+        }
+      });
+    }
   });
-}
-
-// --- Apply to header links ---
-document.querySelectorAll("header a").forEach(link => navigateWithAccess(link));
-
-// --- Apply to watch buttons ---
-document.querySelectorAll(".watch-btn").forEach(btn => {
-  const target = btn.dataset.link || "video.html";
-  navigateWithAccess(btn, "data-link");
-});
 </script>
+
 
   
 <script>
