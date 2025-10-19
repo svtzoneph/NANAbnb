@@ -947,61 +947,47 @@ import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.3.1
 
 const db = getDatabase();
 
-// --- Check session access on page load ---
-const internalAccess = sessionStorage.getItem("internalAccess");
+// Get current session info
 const currentUid = sessionStorage.getItem("currentUid");
+const internalAccess = sessionStorage.getItem("internalAccess");
 
-if (!internalAccess || !currentUid) {
-  alert("Access denied ❌ Please login again.");
+if (!currentUid || !internalAccess) {
+  alert("Access denied ❌ Please login first.");
   window.location.href = "login.html";
 }
 
-// --- Fetch the current accessID from Firebase ---
-async function fetchAccessID(uid) {
-  const userRef = ref(db, 'joinRequests/' + uid + '/accessID');
-  const snapshot = await get(userRef);
-  if (snapshot.exists()) {
-    return snapshot.val();
-  }
-  return null;
-}
+// Check accessID from Firebase
+const accessRef = ref(db, 'joinRequests/' + currentUid + '/accessID');
+const snapshot = await get(accessRef);
 
-// --- Apply navigation with Firebase accessID ---
-async function initNavigation() {
-  const accessID = await fetchAccessID(currentUid);
-  if (!accessID) {
-    alert("AccessID not found ❌ Please login again.");
-    window.location.href = "login.html";
-    return;
-  }
-
-  // Save it in sessionStorage
+if (!snapshot.exists()) {
+  alert("Access denied ❌ Please login first.");
+  window.location.href = "login.html";
+} else {
+  const accessID = snapshot.val();
   sessionStorage.setItem("accessID", accessID);
+}
 
-  // Navigation links
-  document.querySelectorAll("header a").forEach(link => {
-    link.addEventListener("click", (e) => {
-      e.preventDefault();
-      const target = link.getAttribute("href").split("?")[0];
-      window.location.href = `${target}?access=${accessID}`;
-    });
-  });
-
-  // Watch buttons
-  document.querySelectorAll(".watch-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const target = btn.dataset.link || "video.html";
-      window.location.href = `${target}?access=${accessID}`;
-    });
+// --- Optional: update links/buttons to preserve accessID ---
+function navigateWithAccess(element, attr="href") {
+  element.addEventListener("click", (e)=>{
+    e.preventDefault();
+    const target = element.getAttribute(attr).split("?")[0];
+    const accessID = sessionStorage.getItem("accessID");
+    window.location.href = `${target}?access=${accessID}`;
   });
 }
 
-// Initialize
-initNavigation();
+// Apply to header links
+document.querySelectorAll("header a").forEach(link => navigateWithAccess(link));
+
+// Apply to buttons with .watch-btn
+document.querySelectorAll(".watch-btn").forEach(btn => {
+  const target = btn.dataset.link || "video.html";
+  navigateWithAccess(btn, "data-link");
+});
 </script>
 
-
-    
   <script>
     // Accordion toggle
     document.querySelectorAll('.accordion-header').forEach(header => {
