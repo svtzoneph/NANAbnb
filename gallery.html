@@ -560,58 +560,63 @@ lightGallery(document.getElementById('lightgallery2'), {
   </script>
 
 <script type="module">
-import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
 
 const db = getDatabase();
 
 // --- Check session access on page load ---
-const currentAccess = sessionStorage.getItem("accessID");
 const internalAccess = sessionStorage.getItem("internalAccess");
-const currentUid = sessionStorage.getItem("currentUid"); // optional: track uid
+const currentUid = sessionStorage.getItem("currentUid");
 
-if (!currentAccess || !internalAccess) {
+if (!internalAccess || !currentUid) {
   alert("Access denied ❌ Please login again.");
   window.location.href = "login.html";
 }
 
-// --- Function to generate a random accessID ---
-function generateAccessID() {
-  return Math.random().toString(36).substring(2,10) +
-         Math.random().toString(36).substring(2,10) +
-         Math.random().toString(36).substring(2,10); // 24 chars
+// --- Fetch the current accessID from Firebase ---
+async function fetchAccessID(uid) {
+  const userRef = ref(db, 'joinRequests/' + uid + '/accessID');
+  const snapshot = await get(userRef);
+  if (snapshot.exists()) {
+    return snapshot.val();
+  }
+  return null;
 }
 
-// --- Update accessID in Firebase (optional) ---
-async function updateAccessID(uid, newAccess) {
-  if (!uid) return;
-  const userRef = ref(db, 'joinRequests/' + uid);
-  await update(userRef, { accessID: newAccess });
-}
+// --- Apply navigation with Firebase accessID ---
+async function initNavigation() {
+  const accessID = await fetchAccessID(currentUid);
+  if (!accessID) {
+    alert("AccessID not found ❌ Please login again.");
+    window.location.href = "login.html";
+    return;
+  }
 
-// --- Function to handle navigation with new accessID ---
-function navigateWithAccess(element, targetAttr = "href") {
-  element.addEventListener("click", async (e) => {
-    e.preventDefault();
+  // Save it in sessionStorage
+  sessionStorage.setItem("accessID", accessID);
 
-    const newAccess = generateAccessID();
-    sessionStorage.setItem("accessID", newAccess);
+  // Navigation links
+  document.querySelectorAll("header a").forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const target = link.getAttribute("href").split("?")[0];
+      window.location.href = `${target}?access=${accessID}`;
+    });
+  });
 
-    if (currentUid) await updateAccessID(currentUid, newAccess);
-
-    const target = element.getAttribute(targetAttr).split("?")[0];
-    window.location.href = `${target}?access=${newAccess}`;
+  // Watch buttons
+  document.querySelectorAll(".watch-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.link || "video.html";
+      window.location.href = `${target}?access=${accessID}`;
+    });
   });
 }
 
-// --- Apply to header links ---
-document.querySelectorAll("header a").forEach(link => navigateWithAccess(link));
-
-// --- Apply to watch buttons ---
-document.querySelectorAll(".watch-btn").forEach(btn => {
-  const target = btn.dataset.link || "video.html";
-  navigateWithAccess(btn, "data-link");
-});
+// Initialize
+initNavigation();
 </script>
+
 
   
   <script>
