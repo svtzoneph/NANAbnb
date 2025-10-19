@@ -155,7 +155,7 @@ import {
   getAuth, signInWithEmailAndPassword, onAuthStateChanged,
   reload, signInWithPopup, GoogleAuthProvider, signOut
 } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
-import { getDatabase, ref, onValue, get, set } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+import { getDatabase, ref, onValue, get, set, update } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
@@ -195,21 +195,23 @@ window.googleLogin = async function(){
     const reqRef = ref(db,'joinRequests/'+currentUid);
     const snapshot = await get(reqRef);
     const data = snapshot.val();
-    if (data.status === "approved") {
-  sessionStorage.setItem("internalAccess", "true");
-  sessionStorage.setItem("fromIndex", "true");
-  show("approved");
+    if(data){
+      if(data.status==="approved"){
+        sessionStorage.setItem("internalAccess","true");
+        sessionStorage.setItem("fromIndex","true");
+        sessionStorage.setItem("accessID", data.accessID || "");
 
-  // If no random link exists, create one and store it
-  if (!data.link) {
-    const randomLink = "home-" + Math.random().toString(36).substring(2, 8) + ".html";
-    await set(ref(db, 'joinRequests/' + currentUid + '/link'), randomLink);
-    setTimeout(() => window.location.href = randomLink, 1500);
-  } else {
-    // Use existing saved random link
-    setTimeout(() => window.location.href = data.link, 1500);
-  }
-} else if(data.status==="pending"){
+        show("approved");
+
+        // Generate or reuse unique random access ID
+        let accessID = data.accessID;
+        if(!accessID){
+          accessID = Math.random().toString(36).substring(2,8);
+          await update(reqRef, { accessID });
+        }
+
+        setTimeout(()=> window.location.href = `home.html?access=${accessID}`, 1500);
+      }else if(data.status==="pending"){
         show("waiting");
       }else{
         alert("❌ Your request was denied.");
@@ -234,14 +236,23 @@ window.reloadAndCheck = function(){
 function checkJoinRequest(user){
   currentUid = user.uid;
   const reqRef = ref(db,'joinRequests/'+currentUid);
-  onValue(reqRef,snapshot=>{
+  onValue(reqRef, async snapshot=>{
     const data = snapshot.val();
     if(!data) show("form-section");
     else if(data.status==="approved"){
       sessionStorage.setItem("internalAccess","true");
       sessionStorage.setItem("fromIndex","true");
+      sessionStorage.setItem("accessID", data.accessID || "");
       show("approved");
-      setTimeout(()=>window.location.href="home",1500);
+
+      // Generate or reuse access ID for approved user
+      let accessID = data.accessID;
+      if(!accessID){
+        accessID = Math.random().toString(36).substring(2,8);
+        await update(reqRef, { accessID });
+      }
+
+      setTimeout(()=> window.location.href = `home.html?access=${accessID}`, 1500);
     }else if(data.status==="pending") show("waiting");
     else{
       alert("❌ Your request was denied.");
@@ -274,6 +285,7 @@ onAuthStateChanged(auth,user=>{
   }else show("auth-section");
 });
 </script>
+
 
 <script>
 if ('serviceWorker' in navigator) {
