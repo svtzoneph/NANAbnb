@@ -947,7 +947,6 @@ import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.3.1
 
 const db = getDatabase();
 
-// Get current session info
 const currentUid = sessionStorage.getItem("currentUid");
 const internalAccess = sessionStorage.getItem("internalAccess");
 
@@ -956,17 +955,17 @@ if (!currentUid || !internalAccess) {
   window.location.href = "login.html";
 }
 
-// Check accessID from Firebase
+// Fetch accessID from Firebase
 const accessRef = ref(db, 'joinRequests/' + currentUid + '/accessID');
 const snapshot = await get(accessRef);
 
 if (!snapshot.exists()) {
   alert("Access denied ❌ Please login first.");
   window.location.href = "login.html";
-} else {
-  const accessID = snapshot.val();
-  sessionStorage.setItem("accessID", accessID);
 }
+
+const accessID = snapshot.val();
+sessionStorage.setItem("accessID", accessID);
 
 // --- Optional: update links/buttons to preserve accessID ---
 function navigateWithAccess(element, attr="href") {
