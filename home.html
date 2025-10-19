@@ -906,26 +906,6 @@ header.hide {
   </div>
 </div>
 
-<script type="module">
-  import { verifyAccess } from "./auth-guard.js";
-  verifyAccess();
-
-  // Optional: auto-append ?id= for navigation
-  window.addEventListener("DOMContentLoaded", () => {
-    const params = new URLSearchParams(window.location.search);
-    const accessId = params.get("id");
-    if (accessId) {
-      document.querySelectorAll("a").forEach(link => {
-        if (link.href.includes(window.location.origin)) {
-          const url = new URL(link.href);
-          url.searchParams.set("id", accessId);
-          link.href = url.toString();
-        }
-      });
-    }
-  });
-</script>
-
   <script>
     
     // Accordion toggle
