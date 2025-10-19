@@ -943,50 +943,50 @@ function closeSecondModal() {
 </div>
 
 <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
 
-const db = getDatabase();
+const firebaseConfig = {
+  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+  authDomain: "tvnstream-b4497.firebaseapp.com",
+  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+  projectId: "tvnstream-b4497",
+  storageBucket: "tvnstream-b4497.appspot.com",
+  messagingSenderId: "308384754214",
+  appId: "1:308384754214:web:2938e76cd29b288f75d4e7"
+};
 
-const currentUid = sessionStorage.getItem("currentUid");
-const internalAccess = sessionStorage.getItem("internalAccess");
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-if (!currentUid || !internalAccess) {
-  alert("Access denied ❌ Please login first.");
-  window.location.href = "login.html";
+async function checkAccess() {
+  const currentUid = sessionStorage.getItem("currentUid");
+  const internalAccess = sessionStorage.getItem("internalAccess");
+
+  if (!currentUid || !internalAccess) {
+    alert("Access denied ❌ Please login first.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  // Fetch accessID from Firebase
+  const accessRef = ref(db, 'joinRequests/' + currentUid + '/accessID');
+  const snapshot = await get(accessRef);
+
+  if (!snapshot.exists()) {
+    alert("Access denied ❌ No accessID found.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const accessID = snapshot.val();
+  sessionStorage.setItem("accessID", accessID);
 }
 
-// Fetch accessID from Firebase
-const accessRef = ref(db, 'joinRequests/' + currentUid + '/accessID');
-const snapshot = await get(accessRef);
-
-if (!snapshot.exists()) {
-  alert("Access denied ❌ Please login first.");
-  window.location.href = "login.html";
-}
-
-const accessID = snapshot.val();
-sessionStorage.setItem("accessID", accessID);
-
-// --- Optional: update links/buttons to preserve accessID ---
-function navigateWithAccess(element, attr="href") {
-  element.addEventListener("click", (e)=>{
-    e.preventDefault();
-    const target = element.getAttribute(attr).split("?")[0];
-    const accessID = sessionStorage.getItem("accessID");
-    window.location.href = `${target}?access=${accessID}`;
-  });
-}
-
-// Apply to header links
-document.querySelectorAll("header a").forEach(link => navigateWithAccess(link));
-
-// Apply to buttons with .watch-btn
-document.querySelectorAll(".watch-btn").forEach(btn => {
-  const target = btn.dataset.link || "video.html";
-  navigateWithAccess(btn, "data-link");
-});
+checkAccess();
 </script>
 
+    
   <script>
     // Accordion toggle
     document.querySelectorAll('.accordion-header').forEach(header => {
