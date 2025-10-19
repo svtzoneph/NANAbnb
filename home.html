@@ -907,28 +907,22 @@ header.hide {
 </div>
 
 <script type="module">
-  // ✅ Get random access ID from URL or session
-  const params = new URLSearchParams(window.location.search);
-  let accessId = params.get("id") || sessionStorage.getItem("accessId");
+  import { verifyAccess } from "./auth-guard.js";
+  verifyAccess();
 
-  if (!accessId) {
-    // If missing, force user back to login
-    window.location.href = "login.html";
-  } else {
-    sessionStorage.setItem("accessId", accessId); // keep it consistent
-    console.log("Access ID:", accessId);
-  }
-
-  // ✅ Auto-append ?id= to all internal <a> links
+  // Optional: auto-append ?id= for navigation
   window.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll('a').forEach(link => {
-      // Skip external links (only update same-domain pages)
-      if (link.href.includes(window.location.origin)) {
-        const url = new URL(link.href);
-        url.searchParams.set("id", accessId);
-        link.href = url.toString();
-      }
-    });
+    const params = new URLSearchParams(window.location.search);
+    const accessId = params.get("id");
+    if (accessId) {
+      document.querySelectorAll("a").forEach(link => {
+        if (link.href.includes(window.location.origin)) {
+          const url = new URL(link.href);
+          url.searchParams.set("id", accessId);
+          link.href = url.toString();
+        }
+      });
+    }
   });
 </script>
 
