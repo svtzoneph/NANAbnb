@@ -943,17 +943,6 @@ header.hide {
         if (!open) acc.classList.add('open');
       });
     });
-
-// Access verification
-const urlParams = new URLSearchParams(window.location.search);
-const access = urlParams.get("access");
-const savedAccess = sessionStorage.getItem("accessID");
-const internalAccess = sessionStorage.getItem("internalAccess");
-
-if (!access || !savedAccess || access !== savedAccess || !internalAccess) {
-  alert("Access denied ❌");
-  window.location.href = "login.html";
-}
     
     // Thumbnail switching
    const thumbnailBoxes = document.querySelectorAll('.thumb-box');
