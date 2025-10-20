@@ -906,8 +906,75 @@ header.hide {
   </div>
 </div>
 
-  <script>
+<!-- Activity Logger Script -->
+<script type="module">
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
+
+const db = getDatabase();
+const auth = getAuth();
+
+// Detect device type
+function getDeviceType() {
+  const ua = navigator.userAgent;
+  if (/Mobi|Android/i.test(ua)) return 'Mobile';
+  if (/Tablet|iPad/i.test(ua)) return 'Tablet';
+  return 'Desktop';
+}
+
+function logActivity(action, page) {
+  try {
+    const user = auth.currentUser;
+    const uid = user?.uid || sessionStorage.getItem('currentUid') || 'anonymous';
+
+    const rec = {
+      email: user?.email || 'anonymous',
+      uid,
+      action: action || page || 'page_view',
+      page: page || window.location.pathname,
+      timestamp: Date.now(),
+      userAgent: navigator.userAgent || 'Unknown',
+      platform: navigator.platform || 'Unknown',
+      screen: `${screen.width}x${screen.height}`,
+      deviceType: getDeviceType(),
+      referrer: document.referrer || 'Direct'
+    };
+
+    const node = ref(db, `userActivities/${uid}/${Date.now()}_${Math.random().toString(36).slice(2,8)}`);
+    set(node, rec).catch(e => console.error('logActivity error:', e));
+  } catch(e) {
+    console.error('logActivity exception:', e);
+  }
+}
+
+// log on page load
+window.addEventListener('load', () => logActivity('page_load', window.location.pathname));
+
+// example: log clicks
+// document.getElementById('downloadBtn').addEventListener('click', () => logActivity('download','/video.html'));
+</script>
+
+<!-- Service Worker Update Script -->
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    console.log('Service Worker registered');
+
+    reg.onupdatefound = () => {
+      const newSW = reg.installing;
+      newSW.onstatechange = () => {
+        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+          console.log('New content available, reloading...');
+          window.location.reload();
+        }
+      };
+    };
+  }).catch(err => console.error('Service Worker registration failed:', err));
+}
+</script>
+
     
+  <script>
     // Accordion toggle
     document.querySelectorAll('.accordion-header').forEach(header => {
       header.addEventListener('click', () => {
