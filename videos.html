@@ -707,65 +707,71 @@ header.hide {
   <div id="pagination" style="text-align:center;margin-top:20px;"></div>
 </div>
 
-
-
-<!-- Firebase scripts -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-
+<!-- Activity Logger Script -->
 <script type="module">
-import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
 
 const db = getDatabase();
+const auth = getAuth();
 
-// --- Check session access on page load ---
-const currentAccess = sessionStorage.getItem("accessID");
-const internalAccess = sessionStorage.getItem("internalAccess");
-const currentUid = sessionStorage.getItem("currentUid"); // optional: track uid
-
-if (!currentAccess || !internalAccess) {
-  alert("Access denied ❌ Please login again.");
-  window.location.href = "login.html";
+// Detect device type
+function getDeviceType() {
+  const ua = navigator.userAgent;
+  if (/Mobi|Android/i.test(ua)) return 'Mobile';
+  if (/Tablet|iPad/i.test(ua)) return 'Tablet';
+  return 'Desktop';
 }
 
-// --- Function to generate a random accessID ---
-function generateAccessID() {
-  return Math.random().toString(36).substring(2,10) +
-         Math.random().toString(36).substring(2,10) +
-         Math.random().toString(36).substring(2,10); // 24 chars
+function logActivity(action, page) {
+  try {
+    const user = auth.currentUser;
+    const uid = user?.uid || sessionStorage.getItem('currentUid') || 'anonymous';
+
+    const rec = {
+      email: user?.email || 'anonymous',
+      uid,
+      action: action || page || 'page_view',
+      page: page || window.location.pathname,
+      timestamp: Date.now(),
+      userAgent: navigator.userAgent || 'Unknown',
+      platform: navigator.platform || 'Unknown',
+      screen: `${screen.width}x${screen.height}`,
+      deviceType: getDeviceType(),
+      referrer: document.referrer || 'Direct'
+    };
+
+    const node = ref(db, `userActivities/${uid}/${Date.now()}_${Math.random().toString(36).slice(2,8)}`);
+    set(node, rec).catch(e => console.error('logActivity error:', e));
+  } catch(e) {
+    console.error('logActivity exception:', e);
+  }
 }
 
-// --- Update accessID in Firebase (optional) ---
-async function updateAccessID(uid, newAccess) {
-  if (!uid) return;
-  const userRef = ref(db, 'joinRequests/' + uid);
-  await update(userRef, { accessID: newAccess });
+// log on page load
+window.addEventListener('load', () => logActivity('page_load', window.location.pathname));
+
+// example: log clicks
+// document.getElementById('downloadBtn').addEventListener('click', () => logActivity('download','/video.html'));
+</script>
+
+<!-- Service Worker Update Script -->
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    console.log('Service Worker registered');
+
+    reg.onupdatefound = () => {
+      const newSW = reg.installing;
+      newSW.onstatechange = () => {
+        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+          console.log('New content available, reloading...');
+          window.location.reload();
+        }
+      };
+    };
+  }).catch(err => console.error('Service Worker registration failed:', err));
 }
-
-// --- Function to handle navigation with new accessID ---
-function navigateWithAccess(element, targetAttr = "href") {
-  element.addEventListener("click", async (e) => {
-    e.preventDefault();
-
-    const newAccess = generateAccessID();
-    sessionStorage.setItem("accessID", newAccess);
-
-    if (currentUid) await updateAccessID(currentUid, newAccess);
-
-    const target = element.getAttribute(targetAttr).split("?")[0];
-    window.location.href = `${target}?access=${newAccess}`;
-  });
-}
-
-// --- Apply to header links ---
-document.querySelectorAll("header a").forEach(link => navigateWithAccess(link));
-
-// --- Apply to watch buttons ---
-document.querySelectorAll(".watch-btn").forEach(btn => {
-  const target = btn.dataset.link || "video.html";
-  navigateWithAccess(btn, "data-link");
-});
 </script>
 
   
