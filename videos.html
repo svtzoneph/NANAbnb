@@ -145,7 +145,7 @@ header.hide {
   background: transparent;
   color: #fff;
   border-radius: 12px;
-  font-size: 14px;
+  font-size: 12px;
   text-decoration: none;
   font-weight: bold;
   transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
@@ -217,13 +217,13 @@ header.hide {
 
   .meta {
     color: white;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 10px;
+    font-weight: 500;
   }
 
   .title {
     margin: 0;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
     color: white;
   }
@@ -517,7 +517,7 @@ header.hide {
 }
 
 .favorite-btn:hover {
-  background: gold;
+  background: gray;
   color: black;
 }
 
@@ -638,6 +638,8 @@ header.hide {
     display: none;
   }
 }
+
+
   </style>
 </head>
 <body>
@@ -760,9 +762,10 @@ function saveFavoritesToFirebase() {
 
 /* ==================== Video Data ==================== */
 const data = [
-  {id:"v1.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN CONCERT 'POWER OF LOVE'", hashtags:"NEW ADDED", link:"svtreaming1"},
-  {id:"v1.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN WORLD TOUR [BE THE SUN] - SEOUL", hashtags:"NEW ADDED", link:"svtreaming2"},
-  {id:"v1.3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN TOUR 'FOLLOW' TO SEOUL", hashtags:"NEW ADDED", link:"svtreaming3"},
+  {id:"v0.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/Trailer -Cover.jpg", category:"After 10 years together, Seventeen look back at where they've been to uncover where they'll go next.", title:"SEVENTEEN: OUR CHAPTER", hashtags:"NEW ADDED", link:"ourchapterS17N-111025-6B4"},
+  {id:"v1.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN CONCERT 'POWER OF LOVE'", hashtags:"", link:"svtreaming1"},
+  {id:"v1.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN WORLD TOUR [BE THE SUN] - SEOUL", hashtags:"", link:"svtreaming2"},
+  {id:"v1.3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN TOUR 'FOLLOW' TO SEOUL", hashtags:"", link:"svtreaming3"},
   {id:"v1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN [NEW_] WORLD TOUR IN INCHEON", hashtags:"", link:"newtour"},
   {id:"v2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_gwangju.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN GWANGJU", hashtags:"", link:"hxwingwangju"},
   {id:"v3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_seoul.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN SEOUL", hashtags:"", link:"hxwfanconcert"},
