@@ -40,30 +40,6 @@
 <link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
 <link rel="apple-touch-startup-image" href="splash.png">
 
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "a1dff3e0-0b5b-443d-adb5-550aaa4740ba", // Your App ID
-      notifyButton: { enable: true }, // Shows bell icon
-      promptOptions: {
-        slidedown: {
-          enabled: true,
-          actionMessage: "Get notifications for new Zone Vault updates!",
-          acceptButtonText: "ALLOW",
-          cancelButtonText: "NO THANKS",
-          timeout: 1000
-        }
-      },
-      welcomeNotification: {
-        title: "ZONE VAULT",
-        message: "Thanks for subscribing!",
-        url: "https://zonevault.site"
-      }
-    });
-  });
-</script>
 
 
   
@@ -725,6 +701,25 @@ function openAbout() {
     <p style="margin: 30px 0 0;">&copy; 2025 <strong>Zone Vault</strong>. All rights reserved.</p>
   </div>
 </footer>
+
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      reg.onupdatefound = () => {
+        const newSW = reg.installing;
+        newSW.onstatechange = () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            window.location.reload();
+          }
+        };
+      };
+    }).catch(err => {
+      console.error('Service Worker registration failed:', err);
+    });
+  }
+</script>
+
+<!-- start webpushr code --> <script>(function(w,d, s, id) {if(typeof(w.webpushr)!=='undefined') return;w.webpushr=w.webpushr||function(){(w.webpushr.q=w.webpushr.q||[]).push(arguments)};var js, fjs = d.getElementsByTagName(s)[0];js = d.createElement(s); js.id = id;js.async=1;js.src = "https://cdn.webpushr.com/app.min.js";fjs.parentNode.appendChild(js);}(window,document, 'script', 'webpushr-jssdk'));webpushr('setup',{'key':'BHgAjztOwkzDnHiGexX1GTXQeyvxRgyYMcyDr6RrOVsVW6NyZUje5HWQUphLFFAbfPUkBEqBOsTALOaxZXW42Z8' });</script><!-- end webpushr code -->
   
 </body>
 </html>
