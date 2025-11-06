@@ -46,18 +46,22 @@
 <!-- Firebase Messaging -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 
-<!-- Firebase Realtime Database -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
       appId: "a1dff3e0-0b5b-443d-adb5-550aaa4740ba",
+      notifyButton: {
+        enable: true, // ✅ This makes the bell appear
+        position: 'bottom-right', // Optional: bottom-left, bottom-right, top-left, top-right
+        size: 'medium', // small, medium, large
+      },
+      allowLocalhostAsSecureOrigin: true // Only needed for local testing
     });
   });
 </script>
+
   
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
