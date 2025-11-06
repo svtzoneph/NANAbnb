@@ -40,23 +40,31 @@
 <link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
 <link rel="apple-touch-startup-image" href="splash.png">
 
-<button id="notifyBtn">Notify Me</button>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
-  document.getElementById('notifyBtn').addEventListener('click', async () => {
-    if (!("Notification" in window)) return alert("Notifications not supported");
-    
-    let permission = Notification.permission;
-    if (permission !== "granted") {
-      permission = await Notification.requestPermission();
-    }
-    
-    if (permission === "granted") {
-      new Notification("Hello!", { body: "This is a test notification.", icon: "/favicon-new.png" });
-    } else {
-      alert("Notifications denied");
-    }
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "a1dff3e0-0b5b-443d-adb5-550aaa4740ba", // Your App ID
+      notifyButton: { enable: true }, // Shows bell icon
+      promptOptions: {
+        slidedown: {
+          enabled: true,
+          actionMessage: "Get notifications for new Zone Vault updates!",
+          acceptButtonText: "ALLOW",
+          cancelButtonText: "NO THANKS",
+          timeout: 1000
+        }
+      },
+      welcomeNotification: {
+        title: "ZONE VAULT",
+        message: "Thanks for subscribing!",
+        url: "https://zonevault.site"
+      }
+    });
   });
 </script>
+
 
   
   <!-- Google Analytics -->
