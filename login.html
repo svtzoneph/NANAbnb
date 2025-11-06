@@ -339,5 +339,72 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 
+<!-- Put this just before </body> -->
+
+<!-- Firebase Messaging -->
+<script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-messaging-compat.js"></script>
+
+<script>
+  // -----------------------------
+  // 1️⃣ Initialize Firebase Messaging
+  // -----------------------------
+  const messaging = firebase.messaging ? firebase.messaging() : null; // fallback if not loaded
+
+  async function subscribeToNotifications(userId) {
+    if (!messaging) return console.warn("Firebase messaging not initialized.");
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        console.warn('Notification permission denied');
+        return;
+      }
+
+      // Replace with your own public VAPID key
+      const token = await messaging.getToken({ vapidKey: 'YOUR_PUBLIC_VAPID_KEY' });
+
+      if (!token) {
+        console.error('No FCM token received');
+        return;
+      }
+
+      console.log('FCM token:', token);
+
+      // Save token under users/{userId}/fcmToken
+      firebase.database().ref('users/' + userId).set({
+        fcmToken: token
+      });
+
+      console.log(`Token saved for user: ${userId}`);
+    } catch (err) {
+      console.error('Error subscribing to notifications:', err);
+    }
+  }
+
+  // -----------------------------
+  // 2️⃣ Hook into login & auth state
+  // -----------------------------
+  const originalCheckJoinRequest = window.checkJoinRequest;
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      reload(user).then(() => {
+        const uid = user.uid;
+
+        // Subscribe this user to notifications
+        subscribeToNotifications(uid);
+
+        // Keep your original joinRequest logic
+        if (user.emailVerified || user.providerData.some(p => p.providerId === "google.com")) {
+          originalCheckJoinRequest(user);
+        } else show("verify-section");
+      });
+    } else {
+      show("auth-section");
+    }
+  });
+</script>
+
+  
 </body>
 </html>
