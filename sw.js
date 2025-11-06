@@ -1,7 +1,5 @@
 // 🔹 Version your cache
-const CACHE_NAME = 'zonevault-v100'; // ⬅ Change this every time you update
-
-// 🔹 Files to cache for offline access
+const CACHE_NAME = 'zonevault-v100';
 const urlsToCache = [
   './',
   './index.html',
@@ -59,3 +57,23 @@ self.addEventListener('fetch', event => {
   );
 });
 
+// ======================================================
+// ✅ PUSH NOTIFICATIONS
+// ======================================================
+self.addEventListener('push', function(event) {
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'Zone Vault';
+  const options = {
+    body: data.body || 'New notification!',
+    icon: data.icon || '/favicon-new.png',
+    data: data.url || '/'
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow(event.notification.data)
+  );
+});
