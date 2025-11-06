@@ -703,8 +703,12 @@ function openAbout() {
 </footer>
 
   <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => {
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(async reg => {
+      console.log('Service Worker registered:', reg);
+
+      // Reload page if new SW installed
       reg.onupdatefound = () => {
         const newSW = reg.installing;
         newSW.onstatechange = () => {
@@ -713,13 +717,32 @@ function openAbout() {
           }
         };
       };
-    }).catch(err => {
-      console.error('Service Worker registration failed:', err);
-    });
-  }
+
+      // --- PUSH SUBSCRIPTION ---
+      if ('PushManager' in window) {
+        try {
+          const subscription = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: 'BK9alX3N_G_fP-iqKZtUAMdrNc65Y_ciEcMxic6yrpX39AWcVbJBndrKASU6YBdhNK1i2SYJ1vVpW3Ir_HTB0oo'
+          });
+          console.log('Push subscription:', JSON.stringify(subscription));
+
+          // Send subscription to Webpushr or your server
+          await fetch('/subscribe', {
+            method: 'POST',
+            body: JSON.stringify(subscription),
+            headers: { 'Content-Type': 'application/json' }
+          });
+        } catch (err) {
+          console.error('Push subscription failed:', err);
+        }
+      }
+    })
+    .catch(err => console.error('SW registration failed:', err));
+}
 </script>
 
-<!-- start webpushr code --> <script>(function(w,d, s, id) {if(typeof(w.webpushr)!=='undefined') return;w.webpushr=w.webpushr||function(){(w.webpushr.q=w.webpushr.q||[]).push(arguments)};var js, fjs = d.getElementsByTagName(s)[0];js = d.createElement(s); js.id = id;js.async=1;js.src = "https://cdn.webpushr.com/app.min.js";fjs.parentNode.appendChild(js);}(window,document, 'script', 'webpushr-jssdk'));webpushr('setup',{'key':'BHgAjztOwkzDnHiGexX1GTXQeyvxRgyYMcyDr6RrOVsVW6NyZUje5HWQUphLFFAbfPUkBEqBOsTALOaxZXW42Z8' });</script><!-- end webpushr code -->
-  
+
+
 </body>
 </html>
