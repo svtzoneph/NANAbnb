@@ -40,25 +40,21 @@
 <link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
 <link rel="apple-touch-startup-image" href="splash.png">
 
-<!-- Firebase App (core) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-
-<!-- Firebase Messaging -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<button id="notifyBtn">Notify Me</button>
 <script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "a1dff3e0-0b5b-443d-adb5-550aaa4740ba",
-      notifyButton: {
-        enable: true, // ✅ This makes the bell appear
-        position: 'bottom-right', // Optional: bottom-left, bottom-right, top-left, top-right
-        size: 'medium', // small, medium, large
-      },
-      allowLocalhostAsSecureOrigin: true // Only needed for local testing
-    });
+  document.getElementById('notifyBtn').addEventListener('click', async () => {
+    if (!("Notification" in window)) return alert("Notifications not supported");
+    
+    let permission = Notification.permission;
+    if (permission !== "granted") {
+      permission = await Notification.requestPermission();
+    }
+    
+    if (permission === "granted") {
+      new Notification("Hello!", { body: "This is a test notification.", icon: "/favicon-new.png" });
+    } else {
+      alert("Notifications denied");
+    }
   });
 </script>
 
@@ -646,96 +642,6 @@ main {
 function closeAbout() {
   document.getElementById('aboutModal').style.display = 'none';
 }
-</script>
-
-
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-  
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-
-<script>
-  // -----------------------------
-  // 1️⃣ Firebase config
-  // -----------------------------
-  const firebaseConfig = {
-    apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-    authDomain: "tvnstream-b4497.firebaseapp.com",
-    databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-    projectId: "tvnstream-b4497",
-    storageBucket: "tvnstream-b4497.appspot.com",
-    messagingSenderId: "308384754214",
-    appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-    measurementId: "G-VFNH70R4D9"
-  };
-
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-
-  const messaging = firebase.messaging();
-  const db = firebase.database();
-  const auth = firebase.auth();
-
-  // -----------------------------
-  // 2️⃣ Request notification permission & get FCM token
-  // -----------------------------
-  async function subscribeToNotifications(userId) {
-    try {
-      // Ask permission for notifications
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        alert('Notification permission denied');
-        return;
-      }
-
-      // Get FCM token
-      const token = await messaging.getToken({
-        vapidKey: 'BKIRidsAoqVkU5UwhUq17FGUMLriCTBs9407EC6BNuZ6zgiyaypFVGD7UNGN5JT1SB7iry0t9_jmqJwe94n_T6g' // Replace with your web push key
-      });
-
-      if (!token) {
-        console.error('No FCM token received');
-        return;
-      }
-
-      console.log('FCM token:', token);
-
-      // Save token in Realtime Database
-      await db.ref('users/' + userId).set({
-        fcmToken: token
-      });
-
-      console.log(`Token saved for user: ${userId}`);
-      alert('Subscribed to notifications!');
-    } catch (err) {
-      console.error('Error subscribing to notifications:', err);
-    }
-  }
-
-  // -----------------------------
-  // 3️⃣ Detect user ID automatically
-  // -----------------------------
-  auth.onAuthStateChanged(user => {
-    let userId;
-
-    if (user) {
-      // Logged-in user
-      userId = user.uid;
-    } else {
-      // Guest user - generate unique ID and store in localStorage
-      userId = localStorage.getItem('guestUserId');
-      if (!userId) {
-        userId = 'guest_' + Math.random().toString(36).substring(2, 10);
-        localStorage.setItem('guestUserId', userId);
-      }
-    }
-
-    // Subscribe this user
-    subscribeToNotifications(userId);
-  });
 </script>
 
 
