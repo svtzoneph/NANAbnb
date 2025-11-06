@@ -51,29 +51,31 @@ self.addEventListener('fetch', event => {
 });
 
 // ============================
-// PUSH: show notification
+// PUSH: show notifications
 // ============================
-self.addEventListener('push', event => {
-  let data = { title: 'Zone Vault', message: 'New update!', url: '/' };
-  if (event.data) {
-    data = event.data.json();
-  }
+self.addEventListener('push', function(event) {
+  console.log('[sw.js] Push Received.');
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'Zone Vault';
+  const options = {
+    body: data.body || 'You have a new update!',
+    icon: data.icon || '/icon.png',
+    badge: data.badge || '/badge.png',
+    data: data.url || '/',
+    vibrate: [100, 50, 100],
+  };
 
   event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.message,
-      icon: './favicon-new.png',
-      data: { url: data.url }
-    })
+    self.registration.showNotification(title, options)
   );
 });
 
 // ============================
-// CLICK: open notification URL
+// NOTIFICATION CLICK: open site
 // ============================
-self.addEventListener('notificationclick', event => {
+self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   event.waitUntil(
-    clients.openWindow(event.notification.data.url)
+    clients.openWindow(event.notification.data)
   );
 });
