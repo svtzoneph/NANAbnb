@@ -342,68 +342,62 @@ if ('serviceWorker' in navigator) {
 <!-- Put this just before </body> -->
 
 <!-- Firebase Messaging -->
-<script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-messaging-compat.js"></script>
+<script type="module">
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-messaging.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+import { onAuthStateChanged, reload } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
 
-<script>
-  // -----------------------------
-  // 1️⃣ Initialize Firebase Messaging
-  // -----------------------------
-  const messaging = firebase.messaging ? firebase.messaging() : null; // fallback if not loaded
+// Use your initialized app, auth, db from earlier
+const messaging = getMessaging(app);
+const db = getDatabase();
 
-  async function subscribeToNotifications(userId) {
-    if (!messaging) return console.warn("Firebase messaging not initialized.");
-
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        console.warn('Notification permission denied');
-        return;
-      }
-
-      // Replace with your own public VAPID key
-      const token = await messaging.getToken({ vapidKey: 'BKIRidsAoqVkU5UwhUq17FGUMLriCTBs9407EC6BNuZ6zgiyaypFVGD7UNGN5JT1SB7iry0t9_jmqJwe94n_T6g' });
-
-      if (!token) {
-        console.error('No FCM token received');
-        return;
-      }
-
-      console.log('FCM token:', token);
-
-      // Save token under users/{userId}/fcmToken
-      firebase.database().ref('users/' + userId).set({
-        fcmToken: token
-      });
-
-      console.log(`Token saved for user: ${userId}`);
-    } catch (err) {
-      console.error('Error subscribing to notifications:', err);
+async function subscribeToNotifications(userId) {
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      console.warn('Notification permission denied');
+      return;
     }
+
+    // Replace with your web push public VAPID key
+    const token = await getToken(messaging, {
+      vapidKey: 'BKIRidsAoqVkU5UwhUq17FGUMLriCTBs9407EC6BNuZ6zgiyaypFVGD7UNGN5JT1SB7iry0t9_jmqJwe94n_T6g'
+    });
+
+    if (!token) {
+      console.error('No FCM token received');
+      return;
+    }
+
+    console.log('FCM token:', token);
+
+    // Save token under users/{userId}/fcmToken
+    await set(ref(db, 'token/' + userId), { fcmToken: token }); 
+    console.log(`Token saved for user: ${userId}`);
+  } catch (err) {
+    console.error('Error subscribing to notifications:', err);
   }
+}
 
-  // -----------------------------
-  // 2️⃣ Hook into login & auth state
-  // -----------------------------
-  const originalCheckJoinRequest = window.checkJoinRequest;
-
-  onAuthStateChanged(auth, user => {
-    if (user) {
-      reload(user).then(() => {
-        const uid = user.uid;
-
-        // Subscribe this user to notifications
-        subscribeToNotifications(uid);
-
-        // Keep your original joinRequest logic
-        if (user.emailVerified || user.providerData.some(p => p.providerId === "google.com")) {
-          originalCheckJoinRequest(user);
-        } else show("verify-section");
-      });
-    } else {
-      show("auth-section");
-    }
+// Listen for messages when page is open
+onMessage(messaging, payload => {
+  console.log('Message received. ', payload);
+  new Notification(payload.notification.title, {
+    body: payload.notification.body,
+    icon: payload.notification.image || '/favicon-new.png'
   });
+});
+
+// Subscribe user after login / auth state
+onAuthStateChanged(auth, user => {
+  if (user) {
+    reload(user).then(() => {
+      subscribeToNotifications(user.uid);
+    });
+  }
+});
 </script>
+
 
   
 </body>
