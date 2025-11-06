@@ -626,6 +626,45 @@ function closeAbout() {
 </script>
 
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+  
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+    authDomain: "tvnstream-b4497.firebaseapp.com",
+    databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+    projectId: "tvnstream-b4497",
+    storageBucket: "tvnstream-b4497.firebasestorage.app",
+    messagingSenderId: "308384754214",
+    appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+    measurementId: "G-VFNH70R4D9"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const messaging = firebase.messaging();
+
+  async function requestPermission() {
+  console.log('Requesting permission...');
+  const permission = await Notification.requestPermission();
+
+  if (permission === 'granted') {
+    console.log('Notification permission granted.');
+    const token = await messaging.getToken({
+      vapidKey: 'BKIRidsAoqVkU5UwhUq17FGUMLriCTBs9407EC6BNuZ6zgiyaypFVGD7UNGN5JT1SB7iry0t9_jmqJwe94n_T6g'
+    });
+    console.log('FCM Token:', token);
+    // Save token to Firebase Database if you want to send notifications later
+  } else {
+    console.warn('Permission not granted for notifications');
+  }
+}
+
+requestPermission();
+  
+</script>
+
+</script>
  <script>
   // Show welcome modal only if user hasn't seen it before
   window.onload = function() {
@@ -664,25 +703,20 @@ function openAbout() {
 }
 </script>
 
-
   
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      reg.onupdatefound = () => {
-        const newSW = reg.installing;
-        newSW.onstatechange = () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            window.location.reload();
-          }
-        };
-      };
-    }).catch(err => {
-      console.error('Service Worker registration failed:', err);
-    });
-  }
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+  .then((registration) => {
+    console.log('Service Worker registered with scope:', registration.scope);
+  })
+  .catch((err) => {
+    console.error('Service Worker registration failed:', err);
+  });
+}
 </script>
 
+  
 <!-- Fully Responsive Footer -->
 <footer style="
   width: 100%;
