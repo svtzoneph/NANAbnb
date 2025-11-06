@@ -4,7 +4,6 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
     .then(reg => console.log('Service Worker Registered'))
     .catch(err => console.error('SW registration failed:', err));
 }
-
 // 2. Request notification permission
 Notification.requestPermission().then(permission => {
   if (permission !== 'granted') {
