@@ -238,6 +238,9 @@ img {
   <div class="episode-buttons">
     <button onclick="openModal(1)">TRAILER</button>
     <button onclick="openModal(2)">EPISODE 1</button>
+    <button onclick="openModal(3)">EPISODE 2</button>
+    <button onclick="openModal(4)">EPISODE 3</button>
+    <button onclick="openModal(5)">EPISODE 4</button>
   </div>
 
   <!-- Video Modal -->
@@ -260,203 +263,130 @@ img {
     </svg>
   </a>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-      authDomain: "tvnstream-b4497.firebaseapp.com",
-      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-      projectId: "tvnstream-b4497",
-      storageBucket: "tvnstream-b4497.appspot.com",
-      messagingSenderId: "308384754214",
-      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-      measurementId: "G-VFNH70R4D9"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+ <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+  authDomain: "tvnstream-b4497.firebaseapp.com",
+  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+  projectId: "tvnstream-b4497",
+  storageBucket: "tvnstream-b4497.appspot.com",
+  messagingSenderId: "308384754214",
+  appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+  measurementId: "G-VFNH70R4D9"
+};
+firebase.initializeApp(firebaseConfig);
 
-    const modal = document.getElementById("videoModal");
-    const videoPlayer = document.getElementById("videoPlayer");
-    let player = null;
+let hls = null;
+let selectedEpisode = null;
+const modal = document.getElementById("videoModal");
+const videoPlayer = document.getElementById("videoPlayer");
 
-    const sources = {
-      1: { url: "https://stream.mux.com/7x5gPxyKt5vrL7WqteUIJmh6J1Ec8TcSju00w4AaUFKA.m3u8" },
-      2: { url: "https://stream.mux.com/hILs00lI3HGMuq7MzM6wNnImAhoNZinrEHnZhvV01vqNU.m3u8" }
-    };
+// ✅ Remember playback positions per episode
+let playbackPositions = JSON.parse(localStorage.getItem("plyr-positions") || "{}");
 
-    const subtitlesData = {
-      2: [
-        { label: "English", srclang: "en", src: "https://cdn.jsdelivr.net/gh/svtzoneph/subtitle@main/suvourchapter/English.vtt", default: true },
-         { label: "Korean CC", srclang: "kor", src: "https://cdn.jsdelivr.net/gh/svtzoneph/subtitle@main/suvourchapter/KoreanCC.vtt", default: true },
-        { label: "Japanese", srclang: "jpn", src: "https://cdn.jsdelivr.net/gh/svtzoneph/subtitle@main/suvourchapter/Japanese.vtt", default: true },
-        { label: "Chinese", srclang: "zh", src: "https://cdn.jsdelivr.net/gh/svtzoneph/subtitle@main/suvourchapter/ChineseTraditional.vtt", default: true },
-      
-      ]
-    };
+// ✅ Create Plyr once
+const player = new Plyr(videoPlayer, {
+  captions: { active: true, update: true, language: "en" },
+  controls: [
+    "play-large","rewind","play","fast-forward",
+    "progress","current-time","duration",
+    "mute","volume","settings","fullscreen"
+  ],
+  settings: ["captions","speed"]
+});
 
-    function openModal(ep) {
-      modal.style.display = "flex";
+const sources = {
+  1: {
+    url: "https://stream.mux.com/7x5gPxyKt5vrL7WqteUIJmh6J1Ec8TcSju00w4AaUFKA.m3u8"
+  },
+  2: {
+    url: "https://stream.mux.com/hILs00lI3HGMuq7MzM6wNnImAhoNZinrEHnZhvV01vqNU.m3u8",
+    subtitles: [
+      { label: "English", srclang: "en", src: "https://cdn.jsdelivr.net/gh/svtzoneph/subtitle@main/suvourchapter/English.vtt" },
+      { label: "Korean CC", srclang: "ko", src: "https://cdn.jsdelivr.net/gh/svtzoneph/subtitle@main/suvourchapter/KoreanCC.vtt" },
+      { label: "Japanese", srclang: "ja", src: "https://cdn.jsdelivr.net/gh/svtzoneph/subtitle@main/suvourchapter/Japanese.vtt" },
+      { label: "Chinese", srclang: "zh", src: "https://cdn.jsdelivr.net/gh/svtzoneph/subtitle@main/suvourchapter/ChineseTraditional.vtt" }
+    ]
+  }
+};
 
-      const btnText = document.querySelector(`.episode-buttons button:nth-child(${ep})`).textContent;
-      document.getElementById("videoTitle").textContent = btnText;
+// 🧠 Save current time every 5 seconds
+player.on("timeupdate", () => {
+  if (!selectedEpisode) return;
+  playbackPositions[selectedEpisode] = player.currentTime;
+  localStorage.setItem("plyr-positions", JSON.stringify(playbackPositions));
+});
 
-      videoPlayer.innerHTML = '';
-      if(player) { player.destroy(); player = null; }
+// 📱 Auto-rotate to landscape on fullscreen
+player.on("enterfullscreen", () => {
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock("landscape").catch(() => {});
+  }
+});
+player.on("exitfullscreen", () => {
+  if (screen.orientation && screen.orientation.unlock) {
+    screen.orientation.unlock().catch(() => {});
+  }
+});
 
-      // Add subtitles
-      if(subtitlesData[ep]){
-        subtitlesData[ep].forEach((sub, index) => {
-          const track = document.createElement('track');
-          track.kind = "subtitles";
-          track.label = sub.label;
-          track.srclang = sub.srclang;
-          track.src = sub.src;
-          if(sub.default && index === 0) track.default = true;
-          videoPlayer.appendChild(track);
-        });
-      }
+function openModal(ep) {
+  selectedEpisode = ep;
+  modal.style.display = "flex";
+  const src = sources[ep];
+  if (!src) return;
 
-      const src = sources[ep];
-      if(Hls.isSupported()){
-        const hls = new Hls();
-        hls.loadSource(src.url);
-        hls.attachMedia(videoPlayer);
-      } else if(videoPlayer.canPlayType("application/vnd.apple.mpegurl")){
-        videoPlayer.src = src.url;
-      }
+  // Pause any current playback before switching
+  player.pause();
 
-      player = new Plyr(videoPlayer, {
-        controls: ["play-large","rewind","play","fast-forward","progress","current-time","duration","mute","volume","fullscreen","settings"],
-        settings: ['captions', 'quality', 'speed'],
-      });
+  // Clear old subtitles
+  videoPlayer.querySelectorAll("track").forEach(t => t.remove());
 
-      player.on('ready', () => {
-        const tracks = videoPlayer.textTracks;
-        for (let i = 0; i < tracks.length; i++) {
-          if(tracks[i].language === "en") tracks[i].mode = "showing";
-        }
-      });
+  // Load video
+  if (hls) hls.destroy();
+  if (Hls.isSupported()) {
+    hls = new Hls();
+    hls.loadSource(src.url);
+    hls.attachMedia(videoPlayer);
+  } else videoPlayer.src = src.url;
+
+  // Add subtitles if available
+  if (src.subtitles) {
+    src.subtitles.forEach(sub => {
+      const track = document.createElement("track");
+      track.kind = "subtitles";
+      track.label = sub.label;
+      track.srclang = sub.srclang;
+      track.src = sub.src;
+      if (sub.label === "English") track.default = true;
+      videoPlayer.appendChild(track);
+    });
+  }
+
+  // Force enable English captions
+  setTimeout(() => {
+    const textTracks = videoPlayer.textTracks;
+    for (let i = 0; i < textTracks.length; i++) {
+      textTracks[i].mode = textTracks[i].language === "en" ? "showing" : "disabled";
     }
+    player.toggleCaptions(true);
+  }, 800);
 
-    function closeModal(){
-      modal.style.display = "none";
-      videoPlayer.pause();
-      videoPlayer.src = "";
-      if(player) { player.destroy(); player = null; }
-    }
-  </script>
-  
-  <style>
-  /* Access Denied Modal */
-  .access-denied-modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    text-align: center;
-    padding: 20px;
-    opacity: 0;
-    animation: fadeIn 0.5s forwards;
-    flex-direction: column;
-  }
+  // Resume saved time if exists
+  const resumeTime = playbackPositions[ep] || 0;
+  player.once("canplay", () => {
+    player.currentTime = resumeTime;
+  });
 
-  .access-denied-modal strong {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
+  player.play();
+}
 
-  .access-denied-modal button {
-    margin-top: 15px;
-    padding: 10px 25px;
-    background: transparent;
-    color: white;
-    border: 2px solid white;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-  }
-
-  .access-denied-modal button:hover {
-    background: white;
-    color: black;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-</style>
-
-<script>
-  const allowedPaths = [
-    '/index.html',
-    '/home.html',
-    '/nanabnb.html',
-    '/newtour.html',
-    '/hxwfanconcert.html',
-    '/svtholiday.html',
-    '/arenatour.html',
-    '/svtjapanconcert.html',
-    '/touragain.html',
-    '/gallery.html',
-    '/profile.html',
-    '/soon.html'
-  ];
-
-  const currentPage = window.location.pathname;
-
-  // Check if user already has internalAccess flag
-  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
-
-  // Check if user came from an allowed page
-  const referrer = document.referrer;
-  const refPath = referrer ? new URL(referrer).pathname : null;
-  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
-
-  // Grant internalAccess if coming from allowed page
-  if (cameFromAllowedPage) {
-    sessionStorage.setItem('internalAccess', 'true');
-    hasInternalAccess = true;
-  }
-
-  // Allow access if user already has internalAccess or is on index page
-  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
-  if (!hasInternalAccess && !isIndexPage) {
-    showAccessDeniedModal();
-  }
-
-  function showAccessDeniedModal() {
-    const modal = document.createElement('div');
-    modal.className = 'access-denied-modal';
-    modal.innerHTML = `
-      <strong>🚫 Access Denied</strong>
-      <div>You cannot access this page directly.<br>
-      Please go through the homepage or allowed sections.</div>
-      <div id="redirectTimer">Redirecting in 3 seconds...</div>
-      <button onclick="goBack()">Go Back</button>
-    `;
-    document.body.appendChild(modal);
-
-    let countdown = 3;
-    const timer = document.getElementById('redirectTimer');
-    const interval = setInterval(() => {
-      countdown--;
-      timer.textContent = `Redirecting in ${countdown} seconds...`;
-      if (countdown <= 0) {
-        clearInterval(interval);
-        window.location.href = "index.html";
-      }
-    }, 1000);
-  }
-
-  function goBack() {
-    window.history.back();
-  }
+function closeModal() {
+  modal.style.display = "none";
+  player.pause(); // pause but don't destroy
+}
 </script>
+
+
   
 </body>
 </html>
