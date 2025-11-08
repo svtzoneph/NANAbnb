@@ -126,7 +126,43 @@ img {
       overflow: hidden;
       backdrop-filter: blur(10px);
     }
-    .video-title { color: #fff; text-align: left; margin: 10px 0 20px; font-size: 18px; font-weight: 600; letter-spacing: 1px; }
+    .video-title {
+  color: #fff;
+  text-align: left;
+  margin: 10px 0 20px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  word-wrap: break-word;
+}
+
+/* Tablet / small screens */
+@media (max-width: 768px) {
+  .video-title {
+    font-size: 16px;
+    margin: 8px 0 16px;
+    letter-spacing: 0.8px;
+  }
+}
+
+/* Mobile screens */
+@media (max-width: 600px) {
+  .video-title {
+    font-size: 14px;
+    margin: 6px 0 12px;
+    letter-spacing: 0.6px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 400px) {
+  .video-title {
+    font-size: 12px;
+    margin: 4px 0 8px;
+    letter-spacing: 0.5px;
+  }
+}
+
     .close {
       position: absolute;
       top: -9px;
@@ -143,7 +179,7 @@ img {
       box-shadow: 0 3px 10px rgba(0,0,0,0.4);
     }
     .close:hover { background: rgba(255,255,255,0.9); color: #000; transform: scale(1.1); }
-    video { width: 100%; border-radius: 10px; background: #000; }
+    video { width: 100%; border-radius: 0px; background: #000; }
     :root {
       --plyr-color-main: gray;
       --plyr-control-bg: rgba(255,255,255,0.1);
@@ -238,9 +274,6 @@ img {
   <div class="episode-buttons">
     <button onclick="openModal(1)">TRAILER</button>
     <button onclick="openModal(2)">EPISODE 1</button>
-    <button onclick="openModal(3)">EPISODE 2</button>
-    <button onclick="openModal(4)">EPISODE 3</button>
-    <button onclick="openModal(5)">EPISODE 4</button>
   </div>
 
   <!-- Video Modal -->
@@ -292,7 +325,7 @@ const player = new Plyr(videoPlayer, {
     "progress","current-time","duration",
     "mute","volume","settings","fullscreen"
   ],
-  settings: ["captions","speed"]
+  settings: ["captions","speed","quality"]
 });
 
 const sources = {
@@ -334,6 +367,19 @@ function openModal(ep) {
   modal.style.display = "flex";
   const src = sources[ep];
   if (!src) return;
+
+  // Titles for each episode
+  const titles = {
+    1: "TRAILER — SEVENTEEN: OUR CHAPTER",
+    2: "EPISODE 1 — SEVENTEEN: OUR CHAPTER",
+    3: "NO SERVICE ",
+    4: "NO SERVICE",
+    5: "NO SERVICE"
+  };
+
+  // Set the video title text
+  document.getElementById("videoTitle").textContent = titles[ep] || "SEVENTEEN: OUR CHAPTER";
+
 
   // Pause any current playback before switching
   player.pause();
