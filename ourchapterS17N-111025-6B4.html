@@ -433,6 +433,117 @@ function closeModal() {
 </script>
 
 
-  
+   <style>
+  /* Access Denied Modal */
+  .access-denied-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    text-align: center;
+    padding: 20px;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+    flex-direction: column;
+  }
+
+  .access-denied-modal strong {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .access-denied-modal button {
+    margin-top: 15px;
+    padding: 10px 25px;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+
+  .access-denied-modal button:hover {
+    background: white;
+    color: black;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+</style>
+
+<script>
+  const allowedPaths = [
+    '/index.html',
+    '/home.html',
+    '/nanabnb.html',
+    '/newtour.html',
+    '/hxwfanconcert.html',
+    '/svtholiday.html',
+    '/arenatour.html',
+    '/svtjapanconcert.html',
+    '/touragain.html',
+    '/gallery.html',
+    '/profile.html',
+    '/soon.html'
+  ];
+
+  const currentPage = window.location.pathname;
+
+  // Check if user already has internalAccess flag
+  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+
+  // Check if user came from an allowed page
+  const referrer = document.referrer;
+  const refPath = referrer ? new URL(referrer).pathname : null;
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+
+  // Grant internalAccess if coming from allowed page
+  if (cameFromAllowedPage) {
+    sessionStorage.setItem('internalAccess', 'true');
+    hasInternalAccess = true;
+  }
+
+  // Allow access if user already has internalAccess or is on index page
+  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
+  if (!hasInternalAccess && !isIndexPage) {
+    showAccessDeniedModal();
+  }
+
+  function showAccessDeniedModal() {
+    const modal = document.createElement('div');
+    modal.className = 'access-denied-modal';
+    modal.innerHTML = `
+      <strong>🚫 Access Denied</strong>
+      <div>You cannot access this page directly.<br>
+      Please go through the homepage or allowed sections.</div>
+      <div id="redirectTimer">Redirecting in 3 seconds...</div>
+      <button onclick="goBack()">Go Back</button>
+    `;
+    document.body.appendChild(modal);
+
+    let countdown = 3;
+    const timer = document.getElementById('redirectTimer');
+    const interval = setInterval(() => {
+      countdown--;
+      timer.textContent = `Redirecting in ${countdown} seconds...`;
+      if (countdown <= 0) {
+        clearInterval(interval);
+        window.location.href = "index.html";
+      }
+    }, 1000);
+  }
+
+  function goBack() {
+    window.history.back();
+  }
+</script>
 </body>
 </html>
