@@ -59,14 +59,11 @@ img {
   max-width: 700px;
   width: 100%;
   border-radius: 15px;
-  /* white back shadow */
   box-shadow: 0 12px 25px rgba(255, 255, 255, 0.5);
   margin-bottom: 20px;
   height: auto;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
-
 @media (max-width: 600px) {
   img { 
     max-width: 95%; 
@@ -76,57 +73,54 @@ img {
   }
 }
 
-    .episode-buttons {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-    }
-    .episode-buttons button {
-      flex: 1 1 auto;
-      min-width: 100px;
-      max-width: 200px;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 50px;
-      background: linear-gradient(135deg, #1c0d27, #000000, #1c0d27);
-      color: #fff;
-      cursor: pointer;
-      font-size: 18px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      box-shadow: #fff;
-    }
-    .episode-buttons button:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(128,128,128,0.4); }
-    @media (max-width: 600px) { .episode-buttons button { flex: 1 1 45%; font-size: 14px; padding: 10px 15px; } }
-    @media (max-width: 400px) { .episode-buttons button { flex: 1 1 100%; font-size: 14px; padding: 8px 12px; min-width: 65px; max-width: 100px; } }
+.episode-buttons {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.episode-buttons button {
+  flex: 1 1 auto;
+  min-width: 100px;
+  max-width: 200px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #1c0d27, #000000, #1c0d27);
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.episode-buttons button:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(128,128,128,0.4); }
+@media (max-width: 600px) { .episode-buttons button { flex: 1 1 45%; font-size: 14px; padding: 10px 15px; } }
+@media (max-width: 400px) { .episode-buttons button { flex: 1 1 100%; font-size: 14px; padding: 8px 12px; min-width: 65px; max-width: 100px; } }
 
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      min-height: 100vh;
-      background: rgba(0,0,0,0.95);
-      justify-content: center;
-      align-items: center;
-      overflow-y: auto;
-    }
-    .modal-content {
-      background: transparent;
-      padding: 20px;
-      border-radius: 12px;
-      max-width: 800px;
-      width: 100%;
-      text-align: center;
-      position: relative;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.35);
-      overflow: hidden;
-      backdrop-filter: blur(10px);
-    }
-    .video-title {
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.95);
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+}
+.modal-content {
+  background: transparent;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+.video-title {
   color: #fff;
   text-align: left;
   margin: 10px 0 20px;
@@ -135,135 +129,67 @@ img {
   letter-spacing: 1px;
   word-wrap: break-word;
 }
+@media (max-width: 768px) { .video-title { font-size: 16px; margin: 8px 0 16px; } }
+@media (max-width: 600px) { .video-title { font-size: 14px; margin: 6px 0 12px; } }
+@media (max-width: 400px) { .video-title { font-size: 12px; margin: 4px 0 8px; } }
 
-/* Tablet / small screens */
-@media (max-width: 768px) {
-  .video-title {
-    font-size: 16px;
-    margin: 8px 0 16px;
-    letter-spacing: 0.8px;
-  }
+.close {
+  position: absolute;
+  top: -9px;
+  right: -7px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s ease;
 }
+.close:hover { background: rgba(255,255,255,0.9); color: #000; transform: scale(1.1); }
 
-/* Mobile screens */
-@media (max-width: 600px) {
-  .video-title {
-    font-size: 14px;
-    margin: 6px 0 12px;
-    letter-spacing: 0.6px;
-  }
+video { width: 100%; border-radius: 0px; background: #000; }
+:root {
+  --plyr-color-main: gray;
+  --plyr-control-bg: rgba(255,255,255,0.1);
+  --plyr-control-hover-bg: rgba(255,255,255,0.2);
 }
+.center-logo { display: flex; justify-content: center; margin-bottom: 20px; }
+.center-logo img { width: 50px; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+@media (max-width: 600px) { .center-logo img { width: 40px; } }
 
-/* Very small screens */
-@media (max-width: 400px) {
-  .video-title {
-    font-size: 12px;
-    margin: 4px 0 8px;
-    letter-spacing: 0.5px;
-  }
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px; height: 50px;
+  background: transparent;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  display: flex; justify-content: center; align-items: center;
+  text-decoration: none; z-index: 3000;
+  transition: all 0.3s ease;
 }
+.back-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
+.back-btn svg { display: block; }
 
-    .close {
-      position: absolute;
-      top: -9px;
-      right: -7px;
-      font-size: 28px;
-      font-weight: bold;
-      color: #fff;
-      cursor: pointer;
-      background: rgba(0,0,0,0.6);
-      border-radius: 50%;
-      width: 40px; height: 40px;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.3s ease;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.4);
-    }
-    .close:hover { background: rgba(255,255,255,0.9); color: #000; transform: scale(1.1); }
-    video { width: 100%; border-radius: 0px; background: #000; }
-    :root {
-      --plyr-color-main: gray;
-      --plyr-control-bg: rgba(255,255,255,0.1);
-      --plyr-control-hover-bg: rgba(255,255,255,0.2);
-      --plyr-tooltip-background: black;
-      --plyr-tooltip-color: #fff;
-    }
-    .center-logo { display: flex; justify-content: center; margin-bottom: 20px; }
-    .center-logo img { width: 50px; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-    @media (max-width: 600px) { .center-logo img { width: 40px; } }
-
-    .back-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 50px; height: 50px;
-      background: transparent;
-      border: 2px solid #fff;
-      border-radius: 50%;
-      display: flex; justify-content: center; align-items: center;
-      text-decoration: none; z-index: 3000;
-      transition: all 0.3s ease;
-    }
-    .back-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
-    .back-btn svg { display: block; }
-    
-/* Base subtitle style */
 .plyr__captions {
-  font-size: 18px;                   /* Desktop size */
-  font-weight: bold;                  /* Bold text */
-  color: white;                     /* Yellow text */
-  text-shadow: 5px 5px 14px black;    /* Outline for readability */
-  padding: 4px 8px;                   /* Padding around text */
-  border-radius: 0px;                 /* Rounded edges */
-  bottom: 40px !important;            /* Move up from bottom */
-  line-height: 1.4;                   /* Better spacing */
-  word-wrap: break-word;              /* Break long words */
-  text-align: center;                 /* Centered text */
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 5px 5px 14px black;
+  padding: 4px 8px;
+  bottom: 40px !important;
+  text-align: center;
 }
-
-/* Mobile responsiveness (up to 600px) */
-@media (max-width: 600px) {
-  .plyr__captions {
-    font-size: 14px;                  /* Smaller font for phones */
-    padding: 3px 6px;                 /* Less padding */
-    bottom: 30px !important;          /* Move slightly higher */
-  }
-}
-
-/* Small screen responsiveness (up to 400px) */
-@media (max-width: 400px) {
-  .plyr__captions {
-    font-size: 12px;                  /* Even smaller font */
-    padding: 2px 4px;                 /* Minimal padding */
-    bottom: 20px !important;          /* Higher to avoid controls */
-    line-height: 1;                  /* Slightly tighter spacing */
-  }
-}
-
-/* Small screen responsiveness (up to 400px) */
-@media (max-width: 300px) {
-  .plyr__captions {
-    font-size: 10px;                  /* Even smaller font */
-    padding: 2px 4px;                 /* Minimal padding */
-    bottom: 15px !important;          /* Higher to avoid controls */
-    line-height: 1.3;                  /* Slightly tighter spacing */
-  }
-}
-
-/* Optional: Slight fade-in for subtitles */
-.plyr__captions span {
-  transition: opacity 3s ease-in-out;
-}
-
-
-/* Optional: Slight fade-in for subtitles */
-.plyr__captions span {
-  transition: opacity 3s ease-in-out;
-}
-
+@media (max-width: 600px) { .plyr__captions { font-size: 14px; bottom: 30px !important; } }
+@media (max-width: 400px) { .plyr__captions { font-size: 12px; bottom: 20px !important; } }
+@media (max-width: 300px) { .plyr__captions { font-size: 10px; bottom: 15px !important; } }
+.plyr__captions span { transition: opacity 3s ease-in-out; }
   </style>
 </head>
 <body>
-  <!-- Logo -->
   <div class="center-logo">
     <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault Logo">
   </div>
@@ -286,17 +212,14 @@ img {
       </div>
     </div>
   </div>
-  
-  
 
-  <!-- Back Button -->
   <a href="videos" class="back-btn">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
       <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </a>
 
- <script>
+<script>
 const firebaseConfig = {
   apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
   authDomain: "tvnstream-b4497.firebaseapp.com",
@@ -308,86 +231,52 @@ const firebaseConfig = {
   measurementId: "G-VFNH70R4D9"
 };
 firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 let hls = null;
 let selectedEpisode = null;
 const modal = document.getElementById("videoModal");
 const videoPlayer = document.getElementById("videoPlayer");
 
-// ✅ Remember playback positions per episode
+// Playback memory
 let playbackPositions = JSON.parse(localStorage.getItem("plyr-positions") || "{}");
-
-// ✅ Create Plyr once
 const player = new Plyr(videoPlayer, {
   captions: { active: true, update: true, language: "en" },
-  controls: [
-    "play-large","rewind","play","fast-forward",
-    "progress","current-time","duration",
-    "mute","volume","settings","fullscreen"
-  ],
+  controls: ["play-large","rewind","play","fast-forward","progress","current-time","duration","mute","volume","settings","fullscreen"],
   settings: ["captions","speed","quality"]
 });
 
-const sources = {
-  1: {
-    url: "https://stream.mux.com/7x5gPxyKt5vrL7WqteUIJmh6J1Ec8TcSju00w4AaUFKA.m3u8"
-  },
-  2: {
-    url: "https://stream.mux.com/hILs00lI3HGMuq7MzM6wNnImAhoNZinrEHnZhvV01vqNU.m3u8",
-    subtitles: [
-      { label: "English", srclang: "en", src: "https://cdn.jsdelivr.net/gh/svtzoneph/subtitle@main/suvourchapter/English.vtt" },
-      { label: "Korean CC", srclang: "ko", src: "https://cdn.jsdelivr.net/gh/svtzoneph/subtitle@main/suvourchapter/KoreanCC.vtt" },
-      { label: "Japanese", srclang: "ja", src: "https://cdn.jsdelivr.net/gh/svtzoneph/subtitle@main/suvourchapter/Japanese.vtt" },
-      { label: "Chinese", srclang: "zh", src: "https://cdn.jsdelivr.net/gh/svtzoneph/subtitle@main/suvourchapter/ChineseTraditional.vtt" }
-    ]
-  }
-};
-
-// 🧠 Save current time every 5 seconds
+// Save position
 player.on("timeupdate", () => {
   if (!selectedEpisode) return;
   playbackPositions[selectedEpisode] = player.currentTime;
   localStorage.setItem("plyr-positions", JSON.stringify(playbackPositions));
 });
 
-// 📱 Auto-rotate to landscape on fullscreen
 player.on("enterfullscreen", () => {
-  if (screen.orientation && screen.orientation.lock) {
-    screen.orientation.lock("landscape").catch(() => {});
-  }
+  if (screen.orientation && screen.orientation.lock) screen.orientation.lock("landscape").catch(()=>{});
 });
 player.on("exitfullscreen", () => {
-  if (screen.orientation && screen.orientation.unlock) {
-    screen.orientation.unlock().catch(() => {});
-  }
+  if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock().catch(()=>{});
 });
 
-function openModal(ep) {
+async function openModal(ep) {
   selectedEpisode = ep;
   modal.style.display = "flex";
-  const src = sources[ep];
-  if (!src) return;
 
-  // Titles for each episode
-  const titles = {
-    1: "TRAILER — SEVENTEEN: OUR CHAPTER",
-    2: "EPISODE 1 — SEVENTEEN: OUR CHAPTER",
-    3: "NO SERVICE ",
-    4: "NO SERVICE",
-    5: "NO SERVICE"
-  };
+  const snapshot = await db.ref("ourchapter/" + ep).once("value");
+  const src = snapshot.val();
+  if (!src || !src.url) {
+    alert("⚠️ Video not available right now.");
+    closeModal();
+    return;
+  }
 
-  // Set the video title text
-  document.getElementById("videoTitle").textContent = titles[ep] || "SEVENTEEN: OUR CHAPTER";
+  document.getElementById("videoTitle").textContent = src.title || "SEVENTEEN: OUR CHAPTER";
 
-
-  // Pause any current playback before switching
   player.pause();
-
-  // Clear old subtitles
   videoPlayer.querySelectorAll("track").forEach(t => t.remove());
 
-  // Load video
   if (hls) hls.destroy();
   if (Hls.isSupported()) {
     hls = new Hls();
@@ -395,20 +284,18 @@ function openModal(ep) {
     hls.attachMedia(videoPlayer);
   } else videoPlayer.src = src.url;
 
-  // Add subtitles if available
   if (src.subtitles) {
-    src.subtitles.forEach(sub => {
+    Object.entries(src.subtitles).forEach(([lang, url]) => {
       const track = document.createElement("track");
       track.kind = "subtitles";
-      track.label = sub.label;
-      track.srclang = sub.srclang;
-      track.src = sub.src;
-      if (sub.label === "English") track.default = true;
+      track.label = lang.toUpperCase();
+      track.srclang = lang;
+      track.src = url;
+      if (lang === "en") track.default = true;
       videoPlayer.appendChild(track);
     });
   }
 
-  // Force enable English captions
   setTimeout(() => {
     const textTracks = videoPlayer.textTracks;
     for (let i = 0; i < textTracks.length; i++) {
@@ -417,7 +304,6 @@ function openModal(ep) {
     player.toggleCaptions(true);
   }, 800);
 
-  // Resume saved time if exists
   const resumeTime = playbackPositions[ep] || 0;
   player.once("canplay", () => {
     player.currentTime = resumeTime;
@@ -428,10 +314,9 @@ function openModal(ep) {
 
 function closeModal() {
   modal.style.display = "none";
-  player.pause(); // pause but don't destroy
+  player.pause();
 }
 </script>
-
 
    <style>
   /* Access Denied Modal */
@@ -545,5 +430,7 @@ function closeModal() {
     window.history.back();
   }
 </script>
+
+
 </body>
 </html>
