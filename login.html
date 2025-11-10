@@ -341,66 +341,183 @@ if ('serviceWorker' in navigator) {
 
 <!-- Put this just before </body> -->
 
-<!-- Firebase Messaging -->
 <script type="module">
-import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-messaging.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
-import { onAuthStateChanged, reload } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged,
+  reload, signInWithPopup, GoogleAuthProvider, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getDatabase, ref, onValue, get, set, update, push, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import {
+  getMessaging, getToken, onMessage
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 
-// Use your initialized app, auth, db from earlier
+// ✅ Initialize Firebase once
+const firebaseConfig = {
+  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+  authDomain: "tvnstream-b4497.firebaseapp.com",
+  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+  projectId: "tvnstream-b4497",
+  storageBucket: "tvnstream-b4497.appspot.com",
+  messagingSenderId: "308384754214",
+  appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+  measurementId: "G-VFNH70R4D9"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const provider = new GoogleAuthProvider();
 const messaging = getMessaging(app);
-const db = getDatabase();
 
-async function subscribeToNotifications(userId) {
-  try {
-    // Request permission
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      console.warn('Notification permission denied');
-      return;
-    }
+// ------------------------------------------------
+// 🔹 User Login / Request / Approval Flow
+// ------------------------------------------------
+let currentUid = null;
 
-    // Get FCM token (VAPID key)
-    const token = await getToken(messaging, {
-      vapidKey: 'BKIRidsAoqVkU5UwhUq17FGUMLriCTBs9407EC6BNuZ6zgiyaypFVGD7UNGN5JT1SB7iry0t9_jmqJwe94n_T6g'
-    });
-
-    if (!token) {
-      console.error('No FCM token received');
-      return;
-    }
-
-    console.log('FCM token:', token);
-
-    // Save token under users/{userId}/fcmToken
-    await set(ref(db, 'users/' + userId + '/fcmToken'), token);
-    console.log(`Token saved for user: ${userId}`);
-  } catch (err) {
-    console.error('Error subscribing to notifications:', err);
-  }
+function show(id) {
+  document.querySelectorAll(".container > div").forEach(div => div.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
 }
 
-// Listen for messages when page is open
-onMessage(messaging, payload => {
-  console.log('Message received:', payload);
+window.login = function() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  if (!email || !password) return alert("Please enter email and password.");
+  signInWithEmailAndPassword(auth, email, password)
+    .then(userCred => reload(userCred.user).then(() => show("verify-section")))
+    .catch(e => alert("Login error: " + e.message));
+};
 
-  if (Notification.permission === 'granted') {
-    new Notification(payload.notification?.title || 'New Notification', {
-      body: payload.notification?.body || '',
-      icon: payload.notification?.image || '/favicon-new.png'
+window.googleLogin = async function() {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    currentUid = user.uid;
+    checkJoinRequest(user);
+  } catch (e) {
+    alert("Google login error: " + e.message);
+  }
+};
+
+window.reloadAndCheck = function() {
+  const user = auth.currentUser;
+  if (user) {
+    reload(user).then(() => {
+      if (user.emailVerified) checkJoinRequest(user);
+      else alert("❌ Your email is still not verified.");
     });
   }
-});
+};
 
-// Subscribe user after login / auth state
+function checkJoinRequest(user) {
+  currentUid = user.uid;
+  const reqRef = ref(db, 'joinRequests/' + currentUid);
+  onValue(reqRef, snapshot => {
+    const data = snapshot.val();
+    if (!data) show("form-section");
+    else if (data.status === "approved") {
+      sessionStorage.setItem("internalAccess", "true");
+      show("approved");
+      setTimeout(() => window.location.href = "home", 1500);
+    } else if (data.status === "pending") show("waiting");
+    else {
+      alert("❌ Your request was denied.");
+      signOut(auth).then(() => show("auth-section"));
+    }
+  });
+}
+
+window.submitRequest = function() {
+  const name = document.getElementById("name").value;
+  const reason = document.getElementById("reason").value;
+  const user = auth.currentUser;
+  if (!name || !reason) return alert("Please fill out all fields.");
+  set(ref(db, 'joinRequests/' + currentUid), {
+    name, reason, email: user.email,
+    provider: user.providerData[0]?.providerId || "password",
+    status: "pending"
+  }).then(() => show("waiting"));
+};
+
 onAuthStateChanged(auth, user => {
   if (user) {
     reload(user).then(() => {
-      subscribeToNotifications(user.uid);
-    }).catch(err => console.error('Reload error:', err));
+      if (user.emailVerified || user.providerData.some(p => p.providerId === "google.com")) {
+        checkJoinRequest(user);
+        trackUserSession(user.uid);
+        subscribeToNotifications(user.uid);
+      } else show("verify-section");
+    });
+  } else show("auth-section");
+});
+
+// ------------------------------------------------
+// 🔹 Realtime Activity & Session Tracking
+// ------------------------------------------------
+let userId = localStorage.getItem("userId");
+if (!userId) {
+  userId = "user_" + Math.random().toString(36).substring(2, 10);
+  localStorage.setItem("userId", userId);
+}
+
+const deviceInfo = navigator.userAgent;
+
+function logActivity(action, details = "") {
+  const uid = currentUid || userId;
+  const sessionRef = ref(db, "userSessions/" + uid);
+  update(sessionRef, {
+    lastAction: action,
+    lastDetails: details,
+    lastActive: new Date().toLocaleString(),
+    device: deviceInfo,
+    currentPage: window.location.pathname
+  });
+  const activityRef = push(ref(db, "userSessions/" + uid + "/activityLog"));
+  set(activityRef, {
+    action, details, timestamp: serverTimestamp(), page: window.location.pathname
+  });
+}
+
+window.addEventListener("load", () => logActivity("Page Visit", document.title));
+document.addEventListener("click", e => logActivity("Click", `Clicked ${e.target.tagName}`));
+window.addEventListener("beforeunload", () => logActivity("Left Page", document.title));
+
+function trackUserSession(uid) {
+  update(ref(db, "userSessions/" + uid), {
+    loginTime: new Date().toLocaleString(),
+    device: deviceInfo,
+    page: window.location.pathname
+  });
+}
+
+// ------------------------------------------------
+// 🔹 Firebase Cloud Messaging Notifications
+// ------------------------------------------------
+async function subscribeToNotifications(userId) {
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") return;
+    const token = await getToken(messaging, {
+      vapidKey: "BKIRidsAoqVkU5UwhUq17FGUMLriCTBs9407EC6BNuZ6zgiyaypFVGD7UNGN5JT1SB7iry0t9_jmqJwe94n_T6g"
+    });
+    if (token) await set(ref(db, "users/" + userId + "/fcmToken"), token);
+  } catch (err) {
+    console.error("Notification error:", err);
   }
+}
+
+onMessage(messaging, payload => {
+  new Notification(payload.notification?.title || "New Notification", {
+    body: payload.notification?.body || "",
+    icon: payload.notification?.image || "/favicon-new.png"
+  });
 });
 </script>
+
+
   
 </body>
 </html>
