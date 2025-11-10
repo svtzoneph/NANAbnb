@@ -1070,7 +1070,6 @@ if ('serviceWorker' in navigator) {
       });
     });
     
-    // Thumbnail switching
 const thumbnailBoxes = document.querySelectorAll('.thumb-box');
 const mainImage = document.getElementById('mainDisplay');
 let current = 0;
@@ -1078,58 +1077,51 @@ let current = 0;
 // Extra hidden slides (these won't appear in thumbnail row)
 const extraSlides = [
   'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/Trailer -Cover.jpg',
-  'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.jpg',
-  'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.jpg',
-  'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning-gwangju.jpg'
+  'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png',
+  'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.png',
+  'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_gwangju.png'
 ];
 
+// Only use the combined array for cycling images, thumbnails stay separate
+const slideshowSources = [
+  ...Array.from(thumbnailBoxes).map(box => box.querySelector('img').src),
+  ...extraSlides
+];
 
-  // Combined array for slideshow (visible + hidden)
-  const slideshowSources = [
-    ...Array.from(thumbnailBoxes).map(box => box.querySelector('img').src),
-    ...extraSlides
-  ];
+function switchImageByIndex(index) {
+  const newSrc = slideshowSources[index];
+  mainImage.classList.add('fade-out');
+  setTimeout(() => {
+    mainImage.src = newSrc;
+    mainImage.classList.remove('fade-out');
+  }, 300);
 
-  function switchImageByIndex(index) {
-    const newSrc = slideshowSources[index];
-    mainImage.classList.add('fade-out');
-    setTimeout(() => {
-      mainImage.src = newSrc;
-      mainImage.classList.remove('fade-out');
-    }, 300);
-
-    // Highlight active thumbnail only if it's one of the original thumbs
-    thumbnailBoxes.forEach(b => b.classList.remove('active'));
-    if (index < thumbnailBoxes.length) {
-      thumbnailBoxes[index].classList.add('active');
-    }
+  // Only highlight thumbnails if it's one of the visible thumbs
+  thumbnailBoxes.forEach(b => b.classList.remove('active'));
+  if (index < thumbnailBoxes.length) {
+    thumbnailBoxes[index].classList.add('active');
   }
+}
 
-  setInterval(() => {
-    current = (current + 1) % slideshowSources.length;
-    switchImageByIndex(current);
-  }, 2000);
+setInterval(() => {
+  current = (current + 1) % slideshowSources.length;
+  switchImageByIndex(current);
+}, 2000);
 
-  // Manual switch from visible thumbnail
-  function switchImage(box) {
-    const img = box.querySelector('img');
-    mainImage.classList.add('fade-out');
-    setTimeout(() => {
-      mainImage.src = img.src;
-      mainImage.classList.remove('fade-out');
-    }, 300);
-    thumbnailBoxes.forEach(b => b.classList.remove('active'));
-    box.classList.add('active');
-    current = slideshowSources.indexOf(img.src);
-  }
+// Manual switch from visible thumbnail
+function switchImage(box) {
+  const img = box.querySelector('img');
+  mainImage.classList.add('fade-out');
+  setTimeout(() => {
+    mainImage.src = img.src;
+    mainImage.classList.remove('fade-out');
+  }, 300);
 
-  // Scroll header on mouse wheel
-const linksContainer = document.querySelector('.header-links');
-linksContainer.addEventListener('wheel', (e) => {
-  if (e.deltaY === 0) return;
-  e.preventDefault();
-  linksContainer.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
-});
+  thumbnailBoxes.forEach(b => b.classList.remove('active'));
+  box.classList.add('active');
+  current = slideshowSources.indexOf(img.src); // will keep cycling after this
+}
+
 </script>
 
 <style>
@@ -1178,80 +1170,7 @@ linksContainer.addEventListener('wheel', (e) => {
   }
 </style>
 
-<script>
-  const allowedPaths = [
-    '/index.html',
-    '/home.html',
-    '/nanabnb.html',
-    '/newtour.html',
-    '/hxwfanconcert.html',
-    '/svtholiday.html',
-    '/arenatour.html',
-    '/svtjapanconcert.html',
-    '/touragain.html',
-    '/gallery.html',
-    '/profile.html',
-    '/soon.html'
-  ];
 
-  // Pages that can be accessed without internalAccess
-  const publicPages = [
-    '/index.html',
-    '/',
-    '/login.html',
-    '/register.html'
-  ];
-
-  const currentPage = window.location.pathname;
-
-  // Check if user already has internalAccess flag
-  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
-
-  // Check if user came from an allowed page
-  const referrer = document.referrer;
-  const refPath = referrer ? new URL(referrer).pathname : null;
-  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
-
-  // Grant internalAccess if coming from allowed page
-  if (cameFromAllowedPage) {
-    sessionStorage.setItem('internalAccess', 'true');
-    hasInternalAccess = true;
-  }
-
-  // Allow access if user has internalAccess or if page is public
-  const isPublicPage = publicPages.includes(currentPage);
-  if (!hasInternalAccess && !isPublicPage) {
-    showAccessDeniedModal();
-  }
-
-  function showAccessDeniedModal() {
-    const modal = document.createElement('div');
-    modal.className = 'access-denied-modal';
-    modal.innerHTML = `
-      <strong>🚫 Access Denied</strong>
-      <div>You cannot access this page directly.<br>
-      Please go through the homepage or allowed sections.</div>
-      <div id="redirectTimer">Redirecting in 3 seconds...</div>
-      <button onclick="goBack()">Go Back</button>
-    `;
-    document.body.appendChild(modal);
-
-    let countdown = 3;
-    const timer = document.getElementById('redirectTimer');
-    const interval = setInterval(() => {
-      countdown--;
-      timer.textContent = `Redirecting in ${countdown} seconds...`;
-      if (countdown <= 0) {
-        clearInterval(interval);
-        window.location.href = "index.html";
-      }
-    }, 1000);
-  }
-
-  function goBack() {
-    window.history.back();
-  }
-</script>
 
 <script>
   if ('serviceWorker' in navigator) {
