@@ -710,64 +710,13 @@ header.hide {
 </div>
 
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, push, set, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-  authDomain: "tvnstream-b4497.firebaseapp.com",
-  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-  projectId: "tvnstream-b4497",
-  storageBucket: "tvnstream-b4497.firebasestorage.app",
-  messagingSenderId: "308384754214",
-  appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-  measurementId: "G-VFNH70R4D9"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// ---------- USER SESSION LOGGING ----------
-let userId = localStorage.getItem("userId");
-if (!userId) {
-  userId = "user_" + Math.random().toString(36).substring(2, 10);
-  localStorage.setItem("userId", userId);
-}
-
-const deviceInfo = navigator.userAgent;
-
-function logActivity(action, details = "") {
-  const sessionRef = ref(db, "userSessions/" + userId);
-  update(sessionRef, {
-    lastAction: action,
-    lastDetails: details,
-    lastActive: new Date().toLocaleString(),
-    device: deviceInfo,
-    currentPage: window.location.pathname,
-  });
-
-  const activityRef = push(ref(db, "userSessions/" + userId + "/activityLog"));
-  set(activityRef, {
-    action,
-    details,
-    timestamp: serverTimestamp(),
-    page: window.location.pathname
-  });
-}
-
-window.addEventListener("load", () => logActivity("Page Visit", document.title));
-document.addEventListener("click", e => logActivity("Click", `Clicked on ${e.target.tagName}`));
-window.addEventListener("beforeunload", () => logActivity("Left Page", document.title));
-
-</script>
-
-<!-- ==================== FAVORITES & VIDEO GRID ==================== -->
+<!-- Firebase scripts -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
-const firebaseConfigCompat = {
+/* ==================== Firebase Initialization ==================== */
+const firebaseConfig = {
   apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
   authDomain: "tvnstream-b4497.firebaseapp.com",
   databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
@@ -777,37 +726,38 @@ const firebaseConfigCompat = {
   appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
   measurementId: "G-VFNH70R4D9"
 };
-firebase.initializeApp(firebaseConfigCompat);
-
+firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const dbCompat = firebase.database();
+const db = firebase.database();
+let favorites = []; // initially empty
+let userId = null;
 
-let favorites = [];
-let userIdCompat = null;
-
+// Firebase auth: anonymous login
 auth.onAuthStateChanged(user => {
   if (user) {
-    userIdCompat = user.uid;
+    userId = user.uid;
     loadFavoritesFromFirebase();
   } else {
     auth.signInAnonymously().catch(console.error);
   }
 });
 
+// Load favorites from Firebase
 function loadFavoritesFromFirebase() {
-  if (!userIdCompat) return;
-  dbCompat.ref('users/' + userIdCompat + '/favorites').on('value', snapshot => {
+  if (!userId) return;
+  db.ref('users/' + userId + '/favorites').on('value', snapshot => {
     favorites = snapshot.val() || [];
-    renderGrid(currentPaginationPage); // ensure favorites updated
+    reorderFavorites();
   });
 }
 
+// Save favorites to Firebase
 function saveFavoritesToFirebase() {
-  if (!userIdCompat) return;
-  dbCompat.ref('users/' + userIdCompat + '/favorites').set(favorites);
+  if (!userId) return;
+  db.ref('users/' + userId + '/favorites').set(favorites);
 }
 
-// ---------------- VIDEO DATA ----------------
+/* ==================== Video Data ==================== */
 const data = [
   {id:"v0.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/Trailer -Cover.jpg", category:"After 10 years together, Seventeen look back at where they've been to uncover where they'll go next.", title:"SEVENTEEN: OUR CHAPTER", hashtags:"NEW ADDED", link:"ourchapterS17N-111025-6B4"},
   {id:"v1.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN CONCERT 'POWER OF LOVE'", hashtags:"", link:"svtreaming1"},
@@ -828,18 +778,80 @@ let currentPaginationPage = 1;
 const cardsPerPage = 4;
 const grid = document.getElementById("grid");
 
-// ---------------- GRID RENDERING ----------------
+/* ==================== Grid Rendering ==================== */
 function renderGrid(page) {
   grid.innerHTML = "";
   const start = (page-1)*cardsPerPage;
   const end = start+cardsPerPage;
   const pageData = data.slice(start,end);
-
   pageData.forEach(item=>{
     const el=document.createElement("div");
     el.className="card";
-    el.innerHTML = `
-      <div class="thumb"><img src="${item.thumb}" alt=""></div>
+    el.innerHTML = `<div class="thumb"><img src="${item.thumb}" alt=""></div>
+    <div class="card-body">
+      <div class="meta">${item.category}</div>
+      <h3 class="title">${item.title}</h3>
+      <div class="hashtags">${item.hashtags}</div>
+      <div class="bottom">
+        <button class="btn">WATCH NOW</button>
+        <button class="fav-btn" data-id="${item.id}">
+          <span class="star">☆</span>
+        </button>
+      </div>
+      <div class="favorite-label"></div>
+    </div>`;
+    el.querySelector(".btn").onclick=()=>window.location.href=item.link;
+    grid.appendChild(el);
+    const favBtn = el.querySelector(".fav-btn");
+    const label = el.querySelector(".favorite-label");
+    if (favorites.includes(item.id)) {
+      favBtn.querySelector(".star").textContent = "★";
+      label.style.display = "block";
+    }
+    favBtn.onclick = () => toggleFavorite(item.id);
+  });
+  renderPagination();
+}
+
+function renderPagination() {
+  const pagination=document.getElementById("pagination");
+  pagination.innerHTML="";
+  const pageCount=Math.ceil(data.length/cardsPerPage);
+  for(let i=1;i<=pageCount;i++){
+    const btn=document.createElement("button");
+    btn.textContent=i;
+    if(i===currentPaginationPage) btn.classList.add("active");
+    btn.onclick=()=>{currentPaginationPage=i; renderGrid(currentPaginationPage);};
+    pagination.appendChild(btn);
+  }
+}
+
+/* ==================== Favorites Logic ==================== */
+function toggleFavorite(id) {
+  if (favorites.includes(id)) {
+    favorites = favorites.filter(f => f !== id);
+  } else {
+    favorites.unshift(id);
+  }
+  saveFavoritesToFirebase(); // <-- Firebase sync
+  reorderFavorites();
+}
+
+function reorderFavorites() {
+  const favSet = new Set(favorites);
+  const sorted = data.slice().sort((a,b)=>{
+    if (favSet.has(a.id) && !favSet.has(b.id)) return -1;
+    if (!favSet.has(a.id) && favSet.has(b.id)) return 1;
+    return 0;
+  });
+  if(window.innerWidth<=800){
+    renderGrid(currentPaginationPage);
+  } else {
+    grid.innerHTML="";
+    sorted.forEach(item=>{
+      const el=document.createElement("div");
+      el.className="card";
+      el.innerHTML=`<div class="thumb"><img src="${item.thumb}" alt=""></div>
       <div class="card-body">
         <div class="meta">${item.category}</div>
         <h3 class="title">${item.title}</h3>
@@ -850,65 +862,91 @@ function renderGrid(page) {
             <span class="star">☆</span>
           </button>
         </div>
-        <div class="favorite-label" style="display:none;">⭐ Your Favorite</div>
+        <div class="favorite-label"></div>
       </div>`;
-    el.querySelector(".btn").onclick=()=>window.location.href=item.link;
-    grid.appendChild(el);
-
-    const favBtn = el.querySelector(".fav-btn");
-    const label = el.querySelector(".favorite-label");
-
-    // update star and label if already favorite
-    if(favorites.includes(item.id)){
-      favBtn.querySelector(".star").textContent="★";
-      label.style.display="block";
-    }
-
-    favBtn.onclick = () => {
-      toggleFavorite(item.id);
-      // immediately update star and label
-      if(favorites.includes(item.id)){
-        favBtn.querySelector(".star").textContent="★";
-        label.style.display="block";
-      } else {
-        favBtn.querySelector(".star").textContent="☆";
-        label.style.display="none";
+      el.querySelector(".btn").onclick=()=>window.location.href=item.link;
+      const favBtn = el.querySelector(".fav-btn");
+      const label = el.querySelector(".favorite-label");
+      if (favorites.includes(item.id)) {
+        favBtn.querySelector(".star").textContent = "★";
+        label.style.display = "block";
       }
-    };
-  });
-
-  renderPagination();
+      favBtn.onclick = ()=>toggleFavorite(item.id);
+      grid.appendChild(el);
+    });
+    document.getElementById("pagination").innerHTML="";
+  }
 }
 
-// ---------------- FAVORITES LOGIC ----------------
-function toggleFavorite(id) {
-  if (favorites.includes(id)) {
-    favorites = favorites.filter(f => f !== id);
+/* ==================== Responsive Check ==================== */
+function checkResponsive() {
+  if(window.innerWidth<=800){
+    renderGrid(currentPaginationPage);
   } else {
-    favorites.unshift(id);
+    grid.innerHTML="";
+    data.forEach(item=>{
+      const el=document.createElement("div");
+      el.className="card";
+      el.innerHTML = `<div class="thumb"><img src="${item.thumb}" alt=""></div>
+      <div class="card-body">
+        <div class="meta">${item.category}</div>
+        <h3 class="title">${item.title}</h3>
+        <div class="hashtags">${item.hashtags}</div>
+        <div class="bottom">
+          <button class="btn">WATCH NOW</button>
+          <button class="fav-btn" data-id="${item.id}">
+            <span class="star">☆</span>
+          </button>
+        </div>
+        <div class="favorite-label" style="display:none;"></div>
+      </div>`;
+      el.querySelector(".btn").onclick=()=>window.location.href=item.link;
+      grid.appendChild(el);
+      const favBtn = el.querySelector(".fav-btn");
+      const label = el.querySelector(".favorite-label");
+      if (favorites.includes(item.id)) {
+        favBtn.querySelector(".star").textContent = "★";
+        label.style.display = "block";
+      }
+      favBtn.onclick = () => toggleFavorite(item.id);
+    });
+    document.getElementById("pagination").innerHTML="";
   }
-  saveFavoritesToFirebase();
+}
+checkResponsive();
+window.addEventListener("resize", checkResponsive);
+
+/* ==================== Favorite Modal ==================== */
+function openFavoriteModal() {
+  const modal = document.getElementById('favoriteModal');
+  const list = document.getElementById('favoriteList');
+  list.innerHTML = '';
+  if (favorites.length === 0) {
+    list.innerHTML = '<p style="text-align:center;color:gray;">No favorites yet 💔</p>';
+  } else {
+    favorites.forEach(favId => {
+      const item = data.find(d => d.id === favId);
+      if (item) {
+        const el = document.createElement('div');
+        el.className = 'fav-item';
+        el.innerHTML = `<img src="${item.thumb}" alt="${item.title}">
+          <div style="margin-top:8px;font-weight:bold;">${item.title}</div>
+          <button class="btn" style="margin-top:8px;" onclick="window.location.href='${item.link}'">WATCH</button>`;
+        list.appendChild(el);
+      }
+    });
+  }
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden'; // Prevent background scroll
 }
 
-// ---------------- PAGINATION ----------------
-function renderPagination() {
-  const pagination=document.getElementById("pagination");
-  pagination.innerHTML="";
-  const pageCount=Math.ceil(data.length/cardsPerPage);
-
-  for(let i=1;i<=pageCount;i++){
-    const btn=document.createElement("button");
-    btn.textContent=i;
-    if(i===currentPaginationPage) btn.classList.add("active");
-    btn.onclick=()=>{currentPaginationPage=i; renderGrid(currentPaginationPage);};
-    pagination.appendChild(btn);
-  }
+function closeFavoriteModal() {
+  const modal = document.getElementById('favoriteModal');
+  modal.classList.remove('active');
+  document.body.style.overflow = ''; // Restore background scroll
 }
-
-// ---------------- INITIAL RENDER ----------------
-renderGrid(currentPaginationPage);
-window.addEventListener("resize", () => renderGrid(currentPaginationPage));
 </script>
+
 
 
 <script>
