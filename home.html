@@ -1071,14 +1071,18 @@ if ('serviceWorker' in navigator) {
     });
     
     // Thumbnail switching
-   const thumbnailBoxes = document.querySelectorAll('.thumb-box');
-  const mainImage = document.getElementById('mainDisplay');
-  let current = 0;
+const thumbnailBoxes = document.querySelectorAll('.thumb-box');
+const mainImage = document.getElementById('mainDisplay');
+let current = 0;
 
-  // Extra hidden slides (these won't appear in thumbnail row)
-  const extraSlides = [
-   
-  ];
+// Extra hidden slides (these won't appear in thumbnail row)
+const extraSlides = [
+  'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/Trailer -Cover.jpg',
+  'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.jpg',
+  'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.jpg',
+  'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning-gwangju.jpg'
+];
+
 
   // Combined array for slideshow (visible + hidden)
   const slideshowSources = [
@@ -1092,7 +1096,7 @@ if ('serviceWorker' in navigator) {
     setTimeout(() => {
       mainImage.src = newSrc;
       mainImage.classList.remove('fade-out');
-    }, 500);
+    }, 300);
 
     // Highlight active thumbnail only if it's one of the original thumbs
     thumbnailBoxes.forEach(b => b.classList.remove('active'));
@@ -1104,7 +1108,7 @@ if ('serviceWorker' in navigator) {
   setInterval(() => {
     current = (current + 1) % slideshowSources.length;
     switchImageByIndex(current);
-  }, 5000);
+  }, 2000);
 
   // Manual switch from visible thumbnail
   function switchImage(box) {
@@ -1113,7 +1117,7 @@ if ('serviceWorker' in navigator) {
     setTimeout(() => {
       mainImage.src = img.src;
       mainImage.classList.remove('fade-out');
-    }, 500);
+    }, 300);
     thumbnailBoxes.forEach(b => b.classList.remove('active'));
     box.classList.add('active');
     current = slideshowSources.indexOf(img.src);
