@@ -1286,5 +1286,36 @@ function switchImage(box) {
     }
   }, { passive: false });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const noticeModal = document.getElementById("noticeModal");
+  const secondModal = document.getElementById("secondModal");
+
+  // Show the first modal automatically when page loads
+  setTimeout(() => {
+    noticeModal.style.display = "flex";
+    setTimeout(() => (noticeModal.style.opacity = "1"), 100);
+  }, 500); // delay for smooth load
+
+  // Function for "I Understand"
+  window.showSecondModal = function() {
+    noticeModal.style.opacity = "0";
+    setTimeout(() => {
+      noticeModal.style.display = "none";
+      secondModal.style.display = "flex";
+      setTimeout(() => (secondModal.style.opacity = "1"), 100);
+    }, 400);
+  };
+
+  // Function for "Close"
+  window.closeSecondModal = function() {
+    secondModal.style.opacity = "0";
+    setTimeout(() => (secondModal.style.display = "none"), 400);
+  };
+});
+</script>
+
+    
 </body>
 </html> 
