@@ -639,10 +639,149 @@ header.hide {
   }
 }
 
+/* Overall modal overlay */
+.info-modal {
+  display: flex;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 7777;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Modal content box */
+.info-content {
+  background: #111;
+  color: white;
+  border-radius: 14px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Title styling */
+.info-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding-bottom: 10px;
+  width: 100%;
+}
+
+/* space between title and box */
+.spacer {
+  height: 15px;
+}
+
+/* Scrollable text box */
+.scroll-box {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 15px;
+  width: 100%;
+  flex: 1;
+  max-height: 45vh;
+  overflow-y: auto;
+  text-align: left;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.3) transparent;
+}
+
+.scroll-box::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll-box::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.3);
+  border-radius: 5px;
+}
+.scroll-box::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.5);
+}
+
+/* Close button */
+.close-info {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #333;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+.close-info:hover {
+  background: gray;
+}
 
   </style>
 </head>
 <body>
+  
+  <!-- Info Modal -->
+<div id="infoModal" class="info-modal">
+  <div class="info-content">
+    <h2 class="info-title">Important Notice</h2>
+
+    <!-- space below title -->
+    <div class="spacer"></div>
+
+<!-- Scrollable text box -->
+<div class="scroll-box">
+  Please take time to read.
+  <p>We kindly ask for your <strong>full cooperation and responsibility</strong> as a viewer of this site. Please ensure that you do not <strong>record, reupload, redistribute, or share</strong> any of the VODs available here on other platforms, social media, or websites.</p>
+  
+  <p>We acknowledge that the VODs and all content available on this site are <strong>not our property</strong> and belong to their respective <strong>creators and official platforms</strong>. We provide access solely for <strong>personal viewing purposes</strong> and do not claim ownership of any material.</p>
+  
+  <p><strong>Unauthorized recording, copying, distribution, or public posting</strong> of any content from this site is <strong>strictly prohibited</strong> and may result in a <strong>permanent ban and immediate removal of your access</strong>. This means you will no longer be allowed to <strong>join upcoming streams, watch any future VODs, or access your account</strong>. Such actions could also impact the <strong>availability of these VODs for everyone</strong> and affect <strong>future access for all users</strong>.</p>
+  
+  <p>We sincerely thank you for your <strong>understanding, respect, and cooperation</strong> in helping maintain a <strong>safe and fair viewing environment</strong> for all, while respecting the rights of the <strong>original content creators</strong>.</p>
+</div>
+
+    <button class="close-info" onclick="closeInfoModal()">Close</button>
+  </div>
+</div>
+
+
+
+<script>
+// Function to open modal
+function openInfoModal() {
+  const modal = document.getElementById("infoModal");
+  if (!modal) return;
+  modal.style.display = "flex";
+  document.body.style.overflow = "hidden"; // prevent background scroll
+}
+
+// Function to close modal
+function closeInfoModal() {
+  const modal = document.getElementById("infoModal");
+  if (!modal) return;
+  modal.style.display = "none";
+  document.body.style.overflow = "";
+}
+
+// Check and show modal once per session
+document.addEventListener("DOMContentLoaded", () => {
+  // Only show if flag not set
+  if (!sessionStorage.getItem("infoModalShown")) {
+    setTimeout(() => {
+      openInfoModal();
+      sessionStorage.setItem("infoModalShown", "true"); // set immediately
+    }, 500); // show after 0.5s
+  }
+});
+</script>
+
+
 
 <div class="mobile-header">
   <div style="display:flex;align-items:center;gap:12px;">
@@ -1000,7 +1139,7 @@ document.querySelector('.sidebar-nav').addEventListener('wheel', e=>{
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
+    z-index: 11000;
     text-align: center;
     padding: 20px;
     opacity: 0;
@@ -1101,6 +1240,6 @@ document.querySelector('.sidebar-nav').addEventListener('wheel', e=>{
     window.history.back();
   }
 </script>
-  
+ 
 </body>
 </html>
