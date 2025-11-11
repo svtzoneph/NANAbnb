@@ -636,7 +636,7 @@ header.hide {
 #secondBox {
   position: relative;       /* make clickable */
   z-index: 10;
-  background: url("https://uploads.onecompiler.io/43ddry4jt/43y67ve8d/sxm.jpg") no-repeat center center;
+  background: url("") no-repeat center center;
   background-size: cover; /* make image cover the box */
   padding: 18px;
   border-radius: 12px;
@@ -709,20 +709,23 @@ header.hide {
 <!-- First Modal -->
 <div id="noticeModal">
   <div id="noticeBox">
-    <h3>⚠️ Notice</h3>
-    <p>
-      We kindly ask for your cooperation and responsibility as a viewer. Please do not <b>record, reupload, or share any of the VODs</b> available on this site to other platforms or social media.
-      <br><br>
-      Unauthorized recording, distribution, or posting of the content online may result in a <b>permanent ban and removal of your access,</b> meaning you will no longer be allowed to <b>join upcoming streams and access your account</b>. It could also affect future access to these VODs for everyone.
-      <br><br>
-      Thank you for your understanding and cooperation.
-    </p>
-    <div class="btn-group">
-      <button onclick="showSecondModal()">I Understand</button>
-      <a href="bdaymessage.html" target="_blank" class="btn-link">Bday Message</a>
+    <h3 class="modal-title">⚠️ Notice</h3>
+    <div class="modal-content scrollable">
+      <p>
+        We kindly ask for your cooperation and responsibility as a viewer. Please do not <b>record, reupload, or share any of the VODs</b> available on this site to other platforms or social media.
+        <br><br>
+        Unauthorized recording, distribution, or posting of the content online may result in a <b>permanent ban and removal of your access,</b> meaning you will no longer be allowed to <b>join upcoming streams and access your account</b>. It could also affect future access to these VODs for everyone.
+        <br><br>
+        Thank you for your understanding and cooperation.
+      </p>
+      <div class="btn-group">
+        <button onclick="showSecondModal()">I Understand</button>
+        <a href="bdaymessage.html" target="_blank" class="btn-link">Bday Message</a>
+      </div>
     </div>
   </div>
 </div>
+
 
 <!-- Second Modal -->
 <div id="secondModal">
@@ -1292,11 +1295,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const noticeModal = document.getElementById("noticeModal");
   const secondModal = document.getElementById("secondModal");
 
-  // Show the first modal automatically when page loads
-  setTimeout(() => {
-    noticeModal.style.display = "flex";
-    setTimeout(() => (noticeModal.style.opacity = "1"), 100);
-  }, 500); // delay for smooth load
+  // Check if modal has already been shown in this session
+  if (!sessionStorage.getItem("modalShown")) {
+    // Show the first modal automatically when page loads
+    setTimeout(() => {
+      noticeModal.style.display = "flex";
+      setTimeout(() => (noticeModal.style.opacity = "1"), 100);
+    }, 500); // delay for smooth load
+
+    // Mark modal as shown
+    sessionStorage.setItem("modalShown", "true");
+  }
 
   // Function for "I Understand"
   window.showSecondModal = function() {
@@ -1315,6 +1324,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 });
 </script>
+
 
     
 </body>
