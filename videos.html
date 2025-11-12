@@ -588,11 +588,72 @@ header.hide {
   position: absolute;
   top: 10px;
   right: 15px;
-  background: none;
+  background: none; /* removed background */
   border: none;
   font-size: 24px;
   color: white;
   cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 8px; /* optional, can remove if not needed */
+  z-index: 20; /* stays on top */
+  transition: transform 0.2s ease; /* keep hover scale */
+}
+
+.close-fav:hover {
+  transform: scale(1.2);
+  /* optional: you can change color on hover if you want */
+  color: gray;
+}
+
+
+/* Title */
+.favorite-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  position: sticky;
+  top: 0;
+  background: #111;
+  padding: 15px 0;
+  z-index: 10;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Scrollable favorite box */
+.favorite-box {
+  max-height: 60vh; /* Adjust as needed */
+  overflow-y: auto;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.85);
+}
+
+/* Custom scrollbar for modern browsers */
+.favorite-box::-webkit-scrollbar {
+  width: 10px;
+}
+
+.favorite-box::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05); /* light transparent track */
+  border-radius: 10px;
+}
+
+.favorite-box::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.6); /* white thumb */
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,0.2);
+  transition: background 0.3s ease;
+}
+
+.favorite-box::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.9);
+}
+
+/* Firefox support */
+.favorite-box {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.6) rgba(255,255,255,0.05);
 }
 
 .favorite-list {
@@ -628,6 +689,13 @@ header.hide {
   text-align: right;
 }
 
+.favorite-content {
+  display: flex;
+  flex-direction: column;
+}
+
+
+
 /* Show only on large screens */
 @media (min-width: 992px) {
   .favorite-desktop-container {
@@ -637,18 +705,6 @@ header.hide {
   .mobile-header .favorite-btn {
     display: none;
   }
-}
-
-/* Overall modal overlay */
-.info-modal {
-  display: flex;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  z-index: 7777;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
 }
 
 
@@ -848,10 +904,13 @@ window.addEventListener('DOMContentLoaded', () => {
 <div id="favoriteModal" class="favorite-modal">
   <div class="favorite-content">
     <button class="close-fav" onclick="closeFavoriteModal()">✖</button>
-    <h2>⭐ Your Favorites</h2>
-    <div id="favoriteList" class="favorite-list"></div>
+    <div class="favorite-title">⭐ Your Favorites</div>
+    <div class="favorite-box">
+      <div id="favoriteList" class="favorite-list"></div>
+    </div>
   </div>
 </div>
+
 
 <div class="container">
   <div class="grid" id="grid"></div>
