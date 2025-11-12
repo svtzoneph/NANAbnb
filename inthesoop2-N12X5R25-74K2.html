@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VIDEOS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <!-- HLS & Plyr -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+  <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+
+  <!-- Clappr (optional) -->
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+
+  <!-- Favicon & Manifest -->
+  <link rel="icon" href="favicon-new.png" type="image/png" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2196f3">
+
+  <!-- Apple -->
+  <meta name="apple-mobile-web-app-title" content="Zone Vault">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
+  <link rel="apple-touch-startup-image" href="splash.png">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1B2RJ659GL');
+  </script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: black;
+      text-align: center;
+      padding: 40px;
+      margin: 0;
+    }
+    h2 {
+      color: white;
+      margin-bottom: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-left: 10;
+      font-size: 30px;
+    }
+img {
+  max-width: 700px;
+  width: 100%;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  height: auto;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+@media (max-width: 600px) {
+  img { 
+    max-width: 95%; 
+    border-radius: 10px; 
+    margin-bottom: 15px; 
+  }
+}
+
+.episode-buttons {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.episode-buttons button {
+  flex: 1 1 auto;
+  min-width: 100px;
+  max-width: 200px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #1c0d27, #000000, #1c0d27);
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.episode-buttons button:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(128,128,128,0.4); }
+@media (max-width: 600px) { .episode-buttons button { flex: 1 1 45%; font-size: 14px; padding: 10px 15px; } }
+@media (max-width: 400px) { .episode-buttons button { flex: 1 1 100%; font-size: 14px; padding: 8px 12px; min-width: 65px; max-width: 100px; } }
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.95);
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+}
+.modal-content {
+  background: transparent;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+.video-title {
+  color: #fff;
+  text-align: left;
+  margin: 10px 0 20px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  word-wrap: break-word;
+}
+@media (max-width: 768px) { .video-title { font-size: 16px; margin: 8px 0 16px; } }
+@media (max-width: 600px) { .video-title { font-size: 14px; margin: 6px 0 12px; } }
+@media (max-width: 400px) { .video-title { font-size: 12px; margin: 4px 0 8px; } }
+
+.close {
+  position: absolute;
+  top: -9px;
+  right: -7px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s ease;
+}
+.close:hover { background: rgba(255,255,255,0.9); color: #000; transform: scale(1.1); }
+
+video { width: 100%; border-radius: 0px; background: #000; }
+:root {
+  --plyr-color-main: gray;
+  --plyr-control-bg: rgba(255,255,255,0.1);
+  --plyr-control-hover-bg: rgba(255,255,255,0.2);
+}
+.center-logo { display: flex; justify-content: center; margin-bottom: 20px; }
+.center-logo img { width: 50px; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+@media (max-width: 600px) { .center-logo img { width: 40px; } }
+
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px; height: 50px;
+  background: transparent;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  display: flex; justify-content: center; align-items: center;
+  text-decoration: none; z-index: 3000;
+  transition: all 0.3s ease;
+}
+.back-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
+.back-btn svg { display: block; }
+
+.plyr__captions {
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 5px 5px 14px black;
+  padding: 4px 8px;
+  bottom: 40px !important;
+  text-align: center;
+}
+@media (max-width: 600px) { .plyr__captions { font-size: 14px; bottom: 30px !important; } }
+@media (max-width: 400px) { .plyr__captions { font-size: 12px; bottom: 20px !important; } }
+@media (max-width: 300px) { .plyr__captions { font-size: 10px; bottom: 15px !important; } }
+.plyr__captions span { transition: opacity 3s ease-in-out; }
+  </style>
+</head>
+<body>
+  <div class="center-logo">
+    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault Logo">
+  </div>
+
+  <h2>IN THE SOOP SEVENTEEN ver. Season2</h2>
+  <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png" alt="Poster">
+
+  <div class="episode-buttons">
+    <button onclick="openModal(1)">EPISODE 1</button>
+    <button onclick="openModal(2)">EPISODE 2</button>
+    <button onclick="openModal(3)">EPISODE 3</button>
+    <button onclick="openModal(4)">EPISODE 4</button>
+    <button onclick="openModal(5)">EPISODE 5</button>
+    <button onclick="openModal(6)">EPISODE 6</button>
+    
+  </div>
+
+  <!-- Video Modal -->
+  <div id="videoModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3 id="videoTitle" class="video-title"></h3>
+      <div class="video-container">
+        <video id="videoPlayer" playsinline controls crossorigin="anonymous"></video>
+      </div>
+    </div>
+  </div>
+
+  <a href="videos" class="back-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
+      <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+  authDomain: "tvnstream-b4497.firebaseapp.com",
+  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+  projectId: "tvnstream-b4497",
+  storageBucket: "tvnstream-b4497.appspot.com",
+  messagingSenderId: "308384754214",
+  appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+  measurementId: "G-VFNH70R4D9"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let hls = null;
+let selectedEpisode = null;
+const modal = document.getElementById("videoModal");
+const videoPlayer = document.getElementById("videoPlayer");
+
+// Playback memory
+let playbackPositions = JSON.parse(localStorage.getItem("plyr-positions") || "{}");
+const player = new Plyr(videoPlayer, {
+  captions: { active: true, update: true, language: "en" },
+  controls: ["play-large","rewind","play","fast-forward","progress","current-time","duration","mute","volume","settings","fullscreen"],
+  settings: ["captions","speed","quality"]
+});
+
+// Save position
+player.on("timeupdate", () => {
+  if (!selectedEpisode) return;
+  playbackPositions[selectedEpisode] = player.currentTime;
+  localStorage.setItem("plyr-positions", JSON.stringify(playbackPositions));
+});
+
+player.on("enterfullscreen", () => {
+  if (screen.orientation && screen.orientation.lock) screen.orientation.lock("landscape").catch(()=>{});
+});
+player.on("exitfullscreen", () => {
+  if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock().catch(()=>{});
+});
+
+async function openModal(ep) {
+  selectedEpisode = ep;
+  modal.style.display = "flex";
+
+  const snapshot = await db.ref("inthesoop2/" + ep).once("value");
+  const src = snapshot.val();
+  if (!src || !src.url) {
+    alert("⚠️ Video not available right now.");
+    closeModal();
+    return;
+  }
+
+  document.getElementById("videoTitle").textContent = src.title || "IN THE SOOP SEVENTEEN ver. Season2";
+
+  player.pause();
+  videoPlayer.querySelectorAll("track").forEach(t => t.remove());
+
+  if (hls) hls.destroy();
+  if (Hls.isSupported()) {
+    hls = new Hls();
+    hls.loadSource(src.url);
+    hls.attachMedia(videoPlayer);
+  } else videoPlayer.src = src.url;
+
+  if (src.subtitles) {
+    Object.entries(src.subtitles).forEach(([lang, url]) => {
+      const track = document.createElement("track");
+      track.kind = "subtitles";
+      track.label = lang.toUpperCase();
+      track.srclang = lang;
+      track.src = url;
+      if (lang === "en") track.default = true;
+      videoPlayer.appendChild(track);
+    });
+  }
+
+  setTimeout(() => {
+    const textTracks = videoPlayer.textTracks;
+    for (let i = 0; i < textTracks.length; i++) {
+      textTracks[i].mode = textTracks[i].language === "en" ? "showing" : "disabled";
+    }
+    player.toggleCaptions(true);
+  }, 300);
+
+  const resumeTime = playbackPositions[ep] || 0;
+  player.once("canplay", () => {
+    player.currentTime = resumeTime;
+  });
+
+  player.play();
+}
+
+function closeModal() {
+  modal.style.display = "none";
+  player.pause();
+}
+</script>
+
+ <style>
+  /* Access Denied Modal */
+  .access-denied-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 11000;
+    text-align: center;
+    padding: 20px;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+    flex-direction: column;
+  }
+
+  .access-denied-modal strong {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .access-denied-modal button {
+    margin-top: 15px;
+    padding: 10px 25px;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+
+  .access-denied-modal button:hover {
+    background: white;
+    color: black;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+</style>
+
+<script>
+  const allowedPaths = [
+    '/index.html',
+    '/home.html',
+    '/nanabnb.html',
+    '/newtour.html',
+    '/hxwfanconcert.html',
+    '/svtholiday.html',
+    '/arenatour.html',
+    '/svtjapanconcert.html',
+    '/touragain.html',
+    '/gallery.html',
+    '/profile.html',
+    '/soon.html'
+  ];
+
+  const currentPage = window.location.pathname;
+
+  // Check if user already has internalAccess flag
+  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+
+  // Check if user came from an allowed page
+  const referrer = document.referrer;
+  const refPath = referrer ? new URL(referrer).pathname : null;
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+
+  // Grant internalAccess if coming from allowed page
+  if (cameFromAllowedPage) {
+    sessionStorage.setItem('internalAccess', 'true');
+    hasInternalAccess = true;
+  }
+
+  // Allow access if user already has internalAccess or is on index page
+  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
+  if (!hasInternalAccess && !isIndexPage) {
+    showAccessDeniedModal();
+  }
+
+  function showAccessDeniedModal() {
+    const modal = document.createElement('div');
+    modal.className = 'access-denied-modal';
+    modal.innerHTML = `
+      <strong>🚫 Access Denied</strong>
+      <div>You cannot access this page directly.<br>
+      Please go through the homepage or allowed sections.</div>
+      <div id="redirectTimer">Redirecting in 3 seconds...</div>
+      <button onclick="goBack()">Go Back</button>
+    `;
+    document.body.appendChild(modal);
+
+    let countdown = 3;
+    const timer = document.getElementById('redirectTimer');
+    const interval = setInterval(() => {
+      countdown--;
+      timer.textContent = `Redirecting in ${countdown} seconds...`;
+      if (countdown <= 0) {
+        clearInterval(interval);
+        window.location.href = "index.html";
+      }
+    }, 1000);
+  }
+
+  function goBack() {
+    window.history.back();
+  }
+</script>
+  
+</body>
+</html>
