@@ -707,14 +707,16 @@ header.hide {
   }
 }
 
-
-
 .countdown {
   font-weight: bold;
   color: white;
   font-size: 14px;
-  margin-bottom: 5px;
-  display: block; /* important for desktop */
+  margin-top: 5px;
+}
+@media (min-width: 1980px) {
+  .countdown {
+    display: block;    /* ensure desktop shows it too */
+  }
 }
 
 
@@ -977,7 +979,7 @@ function saveFavoritesToFirebase() {
 
 /* ==================== Video Data ==================== */
 const data = [
-  {id:"v0.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png", category:"IN THE SOOP SEVENTEEN Ver. Season 2 will be available here soon. Get ready to experience SEVENTEEN’s relaxing and heartwarming moments once again.", title:"IN THE SOOP SEVENTEEN ver. Season2", hashtags:"Set to be available in November 14, 2025.", link:"#",},
+  {id:"v0.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png", category:"IN THE SOOP SEVENTEEN Ver. Season 2 will be available here soon. Get ready to experience SEVENTEEN’s relaxing and heartwarming moments once again.", title:"IN THE SOOP SEVENTEEN ver. Season2", hashtags:"Set to be available in November 14, 2025.", link:"#", releaseDate: "2025-11-14T21:00:00"},
   {id:"v0.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svt_ourchapter.jpg", category:"After 10 years together, Seventeen look back at where they've been to uncover where they'll go next.", title:"SEVENTEEN: OUR CHAPTER", hashtags:"NEW ADDED", link:"ourchapterS17N-111025-6B4"},
   {id:"v1.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN CONCERT 'POWER OF LOVE'", hashtags:"", link:"svtreaming1"},
   {id:"v1.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN WORLD TOUR [BE THE SUN] - SEOUL", hashtags:"", link:"svtreaming2"},
@@ -1007,20 +1009,21 @@ function renderGrid(page) {
   pageData.forEach(item => {
     const el = document.createElement("div");
     el.className = "card";
-el.innerHTML=`<div class="thumb"><img src="${item.thumb}" alt=""></div>
-<div class="card-body">
-  <div class="countdown" data-date="2025-11-14T13:00:00"></div>
-  <div class="meta">${item.category}</div>
-  <h3 class="title">${item.title}</h3>
-  <div class="hashtags">${item.hashtags}</div>
-  <div class="bottom">
-    <button class="btn">WATCH NOW</button>
-    <button class="fav-btn" data-id="${item.id}">
-      <span class="star">☆</span>
-    </button>
-  </div>
-  <div class="favorite-label"></div>
-</div>`;
+    el.innerHTML = `
+      <div class="thumb"><img src="${item.thumb}" alt=""></div>
+      <div class="card-body">
+      <div class="countdown" data-date="${item.releaseDate || ''}"></div>
+        <div class="meta">${item.category}</div>
+        <h3 class="title">${item.title}</h3>
+           <div class="hashtags">${item.hashtags}</div>
+        <div class="bottom">
+          <button class="btn">WATCH NOW</button>
+          <button class="fav-btn" data-id="${item.id}">
+            <span class="star">☆</span>
+          </button>
+        </div>
+        <div class="favorite-label"></div>
+      </div>`;
 
     el.querySelector(".btn").onclick = () => window.location.href = item.link;
     grid.appendChild(el);
@@ -1047,14 +1050,11 @@ function startCountdown() {
     const dateStr = elem.dataset.date;
     if (!dateStr) return;
 
-    // Parse the date in UTC
-    const endDate = new Date(dateStr + "Z"); // "Z" forces UTC
+    const endDate = new Date(dateStr);
 
     function update() {
       const now = new Date();
-
-      // Calculate difference in milliseconds
-      const diff = endDate.getTime() - now.getTime();
+      const diff = endDate - now;
 
       if (diff <= 0) {
         elem.textContent = "Released!";
@@ -1073,9 +1073,6 @@ function startCountdown() {
     setInterval(update, 1000);
   });
 }
-
-// Run the countdown
-startCountdown();
 
 function renderPagination() {
   const pagination=document.getElementById("pagination");
@@ -1117,6 +1114,7 @@ function reorderFavorites() {
       el.className="card";
       el.innerHTML=`<div class="thumb"><img src="${item.thumb}" alt=""></div>
       <div class="card-body">
+      <div class="countdown" data-date="${item.releaseDate || ''}"></div>
         <div class="meta">${item.category}</div>
         <h3 class="title">${item.title}</h3>
         <div class="hashtags">${item.hashtags}</div>
@@ -1153,6 +1151,7 @@ function checkResponsive() {
       el.className="card";
       el.innerHTML = `<div class="thumb"><img src="${item.thumb}" alt=""></div>
       <div class="card-body">
+      <div class="countdown" data-date="${item.releaseDate || ''}"></div>
         <div class="meta">${item.category}</div>
         <h3 class="title">${item.title}</h3>
         <div class="hashtags">${item.hashtags}</div>
@@ -1195,6 +1194,7 @@ function openFavoriteModal() {
         el.className = 'fav-item';
         el.innerHTML = `<img src="${item.thumb}" alt="${item.title}">
           <div style="margin-top:8px;font-weight:bold;">${item.title}</div>
+          <div class="countdown" data-date="${item.releaseDate || ''}"></div>
           <button class="btn" style="margin-top:8px;" onclick="window.location.href='${item.link}'">WATCH</button>`;
         list.appendChild(el);
       }
@@ -1252,6 +1252,9 @@ document.querySelector('.sidebar-nav').addEventListener('wheel', e=>{
   if((e.deltaY<0 && isAtTop) || (e.deltaY>0 && isAtBottom)){ e.preventDefault(); }
 },{passive:false});
 </script>
+
+
+
  
 </body>
 </html>
