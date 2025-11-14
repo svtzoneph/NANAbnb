@@ -708,6 +708,16 @@ header.hide {
 }
 
 
+
+.countdown {
+  font-weight: bold;
+  color: white;
+  font-size: 14px;
+  margin-bottom: 5px;
+  display: block; /* important for desktop */
+}
+
+
   </style>
 </head>
 <body>
@@ -967,7 +977,7 @@ function saveFavoritesToFirebase() {
 
 /* ==================== Video Data ==================== */
 const data = [
-  {id:"v0.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png", category:"IN THE SOOP SEVENTEEN Ver. Season 2 will be available here soon. Get ready to experience SEVENTEEN’s relaxing and heartwarming moments once again.", title:"IN THE SOOP SEVENTEEN ver. Season2", hashtags:"Set to be available in November 2025.", link:"#"},
+  {id:"v0.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png", category:"IN THE SOOP SEVENTEEN Ver. Season 2 will be available here soon. Get ready to experience SEVENTEEN’s relaxing and heartwarming moments once again.", title:"IN THE SOOP SEVENTEEN ver. Season2", hashtags:"Set to be available in November 14, 2025.", link:"#",},
   {id:"v0.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svt_ourchapter.jpg", category:"After 10 years together, Seventeen look back at where they've been to uncover where they'll go next.", title:"SEVENTEEN: OUR CHAPTER", hashtags:"NEW ADDED", link:"ourchapterS17N-111025-6B4"},
   {id:"v1.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN CONCERT 'POWER OF LOVE'", hashtags:"", link:"svtreaming1"},
   {id:"v1.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN WORLD TOUR [BE THE SUN] - SEOUL", hashtags:"", link:"svtreaming2"},
@@ -993,24 +1003,29 @@ function renderGrid(page) {
   const start = (page-1)*cardsPerPage;
   const end = start+cardsPerPage;
   const pageData = data.slice(start,end);
-  pageData.forEach(item=>{
-    const el=document.createElement("div");
-    el.className="card";
-    el.innerHTML = `<div class="thumb"><img src="${item.thumb}" alt=""></div>
-    <div class="card-body">
-      <div class="meta">${item.category}</div>
-      <h3 class="title">${item.title}</h3>
-      <div class="hashtags">${item.hashtags}</div>
-      <div class="bottom">
-        <button class="btn">WATCH NOW</button>
-        <button class="fav-btn" data-id="${item.id}">
-          <span class="star">☆</span>
-        </button>
-      </div>
-      <div class="favorite-label"></div>
-    </div>`;
-    el.querySelector(".btn").onclick=()=>window.location.href=item.link;
+
+  pageData.forEach(item => {
+    const el = document.createElement("div");
+    el.className = "card";
+el.innerHTML=`<div class="thumb"><img src="${item.thumb}" alt=""></div>
+<div class="card-body">
+  <div class="countdown" data-date="2025-11-14T13:00:00"></div>
+  <div class="meta">${item.category}</div>
+  <h3 class="title">${item.title}</h3>
+  <div class="hashtags">${item.hashtags}</div>
+  <div class="bottom">
+    <button class="btn">WATCH NOW</button>
+    <button class="fav-btn" data-id="${item.id}">
+      <span class="star">☆</span>
+    </button>
+  </div>
+  <div class="favorite-label"></div>
+</div>`;
+
+    el.querySelector(".btn").onclick = () => window.location.href = item.link;
     grid.appendChild(el);
+
+    // Favorites
     const favBtn = el.querySelector(".fav-btn");
     const label = el.querySelector(".favorite-label");
     if (favorites.includes(item.id)) {
@@ -1019,8 +1034,48 @@ function renderGrid(page) {
     }
     favBtn.onclick = () => toggleFavorite(item.id);
   });
+
   renderPagination();
+  startCountdown(); // Start countdown after grid is rendered
 }
+
+/* ==================== Countdown Timer ==================== */
+function startCountdown() {
+  const countdownElems = document.querySelectorAll(".countdown");
+
+  countdownElems.forEach(elem => {
+    const dateStr = elem.dataset.date;
+    if (!dateStr) return;
+
+    // Parse the date in UTC
+    const endDate = new Date(dateStr + "Z"); // "Z" forces UTC
+
+    function update() {
+      const now = new Date();
+
+      // Calculate difference in milliseconds
+      const diff = endDate.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        elem.textContent = "Released!";
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      elem.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    update();
+    setInterval(update, 1000);
+  });
+}
+
+// Run the countdown
+startCountdown();
 
 function renderPagination() {
   const pagination=document.getElementById("pagination");
@@ -1196,119 +1251,6 @@ document.querySelector('.sidebar-nav').addEventListener('wheel', e=>{
   const isAtBottom = sidebarNav.scrollHeight - sidebarNav.scrollTop === sidebarNav.clientHeight;
   if((e.deltaY<0 && isAtTop) || (e.deltaY>0 && isAtBottom)){ e.preventDefault(); }
 },{passive:false});
-</script>
-
- <style>
-  /* Access Denied Modal */
-  .access-denied-modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 11000;
-    text-align: center;
-    padding: 20px;
-    opacity: 0;
-    animation: fadeIn 0.5s forwards;
-    flex-direction: column;
-  }
-
-  .access-denied-modal strong {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-
-  .access-denied-modal button {
-    margin-top: 15px;
-    padding: 10px 25px;
-    background: transparent;
-    color: white;
-    border: 2px solid white;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-  }
-
-  .access-denied-modal button:hover {
-    background: white;
-    color: black;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-</style>
-
-<script>
-  const allowedPaths = [
-    '/index.html',
-    '/home.html',
-    '/nanabnb.html',
-    '/newtour.html',
-    '/hxwfanconcert.html',
-    '/svtholiday.html',
-    '/arenatour.html',
-    '/svtjapanconcert.html',
-    '/touragain.html',
-    '/gallery.html',
-    '/profile.html',
-    '/soon.html'
-  ];
-
-  const currentPage = window.location.pathname;
-
-  // Check if user already has internalAccess flag
-  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
-
-  // Check if user came from an allowed page
-  const referrer = document.referrer;
-  const refPath = referrer ? new URL(referrer).pathname : null;
-  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
-
-  // Grant internalAccess if coming from allowed page
-  if (cameFromAllowedPage) {
-    sessionStorage.setItem('internalAccess', 'true');
-    hasInternalAccess = true;
-  }
-
-  // Allow access if user already has internalAccess or is on index page
-  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
-  if (!hasInternalAccess && !isIndexPage) {
-    showAccessDeniedModal();
-  }
-
-  function showAccessDeniedModal() {
-    const modal = document.createElement('div');
-    modal.className = 'access-denied-modal';
-    modal.innerHTML = `
-      <strong>🚫 Access Denied</strong>
-      <div>You cannot access this page directly.<br>
-      Please go through the homepage or allowed sections.</div>
-      <div id="redirectTimer">Redirecting in 3 seconds...</div>
-      <button onclick="goBack()">Go Back</button>
-    `;
-    document.body.appendChild(modal);
-
-    let countdown = 3;
-    const timer = document.getElementById('redirectTimer');
-    const interval = setInterval(() => {
-      countdown--;
-      timer.textContent = `Redirecting in ${countdown} seconds...`;
-      if (countdown <= 0) {
-        clearInterval(interval);
-        window.location.href = "index.html";
-      }
-    }, 1000);
-  }
-
-  function goBack() {
-    window.history.back();
-  }
 </script>
  
 </body>
