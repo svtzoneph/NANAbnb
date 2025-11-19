@@ -111,6 +111,16 @@
     font-size: 20px;
   }
 
+  /* --- ACTIVE EPISODE HIGHLIGHT (UPDATED) --- */
+  .active-episode {
+    /* CHANGED TO WHITE */
+    background: rgba(255, 255, 255, 0.15) !important; 
+    border: 1px solid #ffffff !important; 
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2); 
+    
+    /* REMOVED ZOOM (transform: scale) */
+  }
+
   /* --- MOBILE ADJUSTMENTS --- */
   @media (max-width: 600px) {
     h2 { font-size: 18px; }
@@ -143,7 +153,7 @@
   }
 
   .center-logo { display: flex; justify-content: center; margin-bottom: 20px; }
-  .center-logo img { width: 50px; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+  .center-logo img { width: 40px; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
 
   .plyr {
     width: 100%;
@@ -312,7 +322,6 @@
 </div> 
 
 <script>
-// --- 1. UPDATE YOUR DATA HERE ---
 const playlistData = [
   { 
     id: "1", 
@@ -342,41 +351,23 @@ const playlistData = [
     image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svt_ourchapter.jpg" 
   }
 ];
-
 const playlistContainer = document.getElementById('playlist-items');
 const posterContainer = document.getElementById('poster-container');
 const playerContainer = document.getElementById('player-container');
 const mainTitle = document.getElementById('main-title');
 
+window.currentActiveEp = null;
+
 playlistData.forEach(ep => {
   const epDiv = document.createElement('div');
-   
-  // --- LOCK LOGIC ---
+  
+  epDiv.classList.add('playlist-item');
+
   const today = new Date();
   let isLocked = false;
   if (ep.date) {
       const releaseDate = new Date(ep.date);
       if (releaseDate > today) isLocked = true;
-  }
-
-  // --- STYLE ---
-  epDiv.style.display = "flex";
-  epDiv.style.alignItems = "center"; 
-  epDiv.style.gap = "15px"; 
-  epDiv.style.background = "rgba(255,255,255,0.05)";
-  epDiv.style.padding = "10px";
-  epDiv.style.borderRadius = "8px";
-  epDiv.style.transition = "all 0.2s";
-
-  if (isLocked) {
-      epDiv.style.opacity = "0.5"; 
-      epDiv.style.cursor = "not-allowed"; 
-  } else {
-      epDiv.style.opacity = "1";
-      epDiv.style.cursor = "pointer"; 
-      epDiv.style.color = "white";
-      epDiv.addEventListener('mouseover', () => epDiv.style.background = "rgba(255,255,255,0.15)");
-      epDiv.addEventListener('mouseout', () => epDiv.style.background = "rgba(255,255,255,0.05)");
   }
 
   const thumb = document.createElement('img');
@@ -406,15 +397,59 @@ playlistData.forEach(ep => {
       textDiv.appendChild(dateSpan);
   }
 
+  epDiv.style.display = "flex";
+  epDiv.style.alignItems = "center"; 
+  epDiv.style.gap = "15px"; 
+  epDiv.style.background = "rgba(255,255,255,0.05)";
+  epDiv.style.padding = "10px";
+  epDiv.style.borderRadius = "8px";
+  epDiv.style.transition = "all 0.2s";
+  epDiv.style.border = "1px solid transparent"; 
+
+  if (isLocked) {
+      epDiv.style.opacity = "0.5"; 
+      epDiv.style.cursor = "not-allowed"; 
+      
+      // LOCKED TEXT COLOR Gray
+      epDiv.style.color = "gray"; 
+  } else {
+      epDiv.style.opacity = "1";
+      epDiv.style.cursor = "pointer"; 
+      epDiv.style.color = "white";
+      
+      epDiv.addEventListener('mouseover', () => {
+          if (!epDiv.classList.contains('active-episode')) {
+              epDiv.style.background = "rgba(255,255,255,0.15)";
+          }
+      });
+      epDiv.addEventListener('mouseout', () => {
+          if (!epDiv.classList.contains('active-episode')) {
+              epDiv.style.background = "rgba(255,255,255,0.05)";
+          }
+      });
+  }
+
   epDiv.appendChild(thumb);
   epDiv.appendChild(textDiv);
 
   epDiv.addEventListener('click', () => {
     if (isLocked) {
-        alert(`This episode is not yet available.\nRelease Date: ${ep.date}`);
+        alert(`This episode is not yet available.\nAvailable Date: ${ep.date}`);
         return; 
     }
+
+    document.querySelectorAll('.playlist-item').forEach(item => {
+        item.classList.remove('active-episode');
+        item.style.background = "rgba(255,255,255,0.05)"; 
+    });
+
+    epDiv.classList.add('active-episode');
+    epDiv.style.background = ""; 
+
+    player.stop();
    
+    window.currentActiveEp = ep.id;
+
     posterContainer.style.display = "none";
     playerContainer.style.display = "block";
 
@@ -424,13 +459,32 @@ playlistData.forEach(ep => {
 
       if(typeof hls !== 'undefined' && hls){ hls.destroy(); hls = null; }
 
+      const checkTimeAndPlay = () => {
+          if (!window.currentActiveEp) return;
+          
+          const uniqueKey = 'watch_history_' + window.currentActiveEp;
+          const savedTime = localStorage.getItem(uniqueKey);
+
+          if (savedTime && parseFloat(savedTime) > 0) {
+              console.log("Resuming at: " + savedTime);
+              player.currentTime = parseFloat(savedTime);
+          } else {
+              console.log("New episode, starting at 0");
+              player.currentTime = 0;
+          }
+          player.play();
+      };
+
       if(typeof Hls !== 'undefined' && Hls.isSupported()){
         hls = new Hls();
         hls.loadSource(data.url);
         hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => { player.play(); });
+        hls.on(Hls.Events.MANIFEST_PARSED, () => { 
+            setTimeout(checkTimeAndPlay, 100);
+        });
       } else {
         video.src = data.url;
+        video.addEventListener('loadedmetadata', checkTimeAndPlay, { once: true });
       }
 
       video.querySelectorAll("track").forEach(t => t.remove());
@@ -452,7 +506,6 @@ playlistData.forEach(ep => {
         mainTitle.textContent = ep.title;
       }
 
-      player.play();
     }).catch(err => console.error("Firebase Error:", err));
   });
 
@@ -500,7 +553,6 @@ const db = firebase.database();
 
 const video = document.getElementById("videoPlayer");
 let hls;
-let positions = JSON.parse(localStorage.getItem("plyr-positions") || "{}");
 
 const player = new Plyr(video, {
   captions: { active: true, update: true, language: "en" },
@@ -610,6 +662,10 @@ player.on('ready', () => {
 });
 
 player.on("timeupdate", () => {
+    if (window.currentActiveEp && !player.paused && player.currentTime > 1) {
+        const uniqueKey = 'watch_history_' + window.currentActiveEp;
+        localStorage.setItem(uniqueKey, player.currentTime);
+    }
 });
 </script>
 
@@ -693,21 +749,17 @@ player.on("timeupdate", () => {
 
   const currentPage = window.location.pathname;
 
-  // Check if user already has internalAccess flag
   let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
 
-  // Check if user came from an allowed page
   const referrer = document.referrer;
   const refPath = referrer ? new URL(referrer).pathname : null;
   const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
 
-  // Grant internalAccess if coming from allowed page
   if (cameFromAllowedPage) {
     sessionStorage.setItem('internalAccess', 'true');
     hasInternalAccess = true;
   }
 
-  // Allow access if user already has internalAccess or is on index page
   const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
   if (!hasInternalAccess && !isIndexPage) {
     showAccessDeniedModal();
