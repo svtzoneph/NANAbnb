@@ -190,7 +190,6 @@
 
     .user-details { text-align: center; width: 100%; max-width: 500px; }
     
-    /* Display & Edit Views */
     #profile-display-view h1 { font-size: 28px; font-weight: 700; margin-bottom: 5px; }
     #profile-display-view p { color: var(--text-muted); font-size: 14px; margin-bottom: 15px; }
     
@@ -251,14 +250,14 @@
     }
     .content-area { flex: 1; font-size: 14px; line-height: 1.6; }
 
-    /* --- YOUTUBE STYLE HISTORY CARDS --- */
-    .youtube-history-card {
+    /* --- UPDATED HISTORY CARD STYLE --- */
+    .history-card {
       display: flex; gap: 15px;
       background: rgba(255,255,255,0.02);
       border-radius: 8px; overflow: hidden; margin-bottom: 15px;
       cursor: pointer; transition: background 0.2s; border: 1px solid transparent;
     }
-    .youtube-history-card:hover {
+    .history-card:hover {
       background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
     }
 
@@ -317,11 +316,12 @@
     .access-denied-modal strong { font-size: 24px; margin-bottom: 10px; }
     .access-denied-modal button {
       margin-top: 15px; padding: 10px 25px; background: transparent;
-      color: white; border: 2px solid white; border-radius: 50px; cursor: pointer; font-weight: bold;
+      color: white; border: 2px solid white; border-radius: 50px;
+      cursor: pointer; font-weight: bold;
     }
     @keyframes fadeIn { to { opacity: 1; } }
     
-    /* Avatar & Banner Modals */
+    /* Modals */
     #avatarModal, #bannerColorModal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.9); z-index: 10001; justify-content: center; align-items: center;
@@ -568,7 +568,7 @@
     // --- 2. BANNER COLOR LOGIC ---
     let tempSelectedBanner = null;
     const bannerOptions = [
-        "linear-gradient(135deg, #F7CAC9, #92A8D1)", // Rose Quartz & Serenity (Seventeen)
+        "linear-gradient(135deg, #F7CAC9, #92A8D1)", // Rose Quartz & Serenity
         "linear-gradient(120deg, #1e3c72, #2a5298)", // Default Blue
         "linear-gradient(120deg, #e65c00, #F9D423)", // Orange/Gold
         "linear-gradient(120deg, #cc2b5e, #753a88)", // Purple/Pink
@@ -711,7 +711,6 @@
             
             if (data) {
                 const historyItems = Object.values(data);
-                // Sort by timestamp (newest first)
                 historyItems.sort((a, b) => b.timestamp - a.timestamp);
                 
                 let historyHTML = "";
@@ -727,8 +726,9 @@
                              percent = (item.currentTime / item.duration) * 100;
                          }
 
+                         // UPDATED LINK: passes specific episode ID
                          historyHTML += `
-                            <div class="youtube-history-card" onclick="window.location.href='videos.html'">
+                            <div class="history-card" onclick="window.location.href='videos.html?id=${item.id}'">
                                <div class="history-thumb-wrapper">
                                    <img src="${item.image || 'https://via.placeholder.com/160x90'}" class="history-thumb-img" alt="${item.title}">
                                    <div class="progress-bar-bg">
