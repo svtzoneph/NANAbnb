@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Episode 1</title>
+<title>IN THE SOOP SEVENTEEN ver. Season2 EP2. Thank you for your support</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -12,6 +12,29 @@
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 
+
+
+<!-- Favicon & Manifest -->
+  <link rel="icon" href="favicon-new.png" type="image/png" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2196f3">
+
+  <!-- Apple -->
+  <meta name="apple-mobile-web-app-title" content="Zone Vault">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
+  <link rel="apple-touch-startup-image" href="splash.png">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1B2RJ659GL');
+  </script>
 
 <style>
   body {
@@ -192,7 +215,7 @@ h2 {
 
 <video id="videoPlayer" playsinline controls crossorigin="anonymous"></video>
 
-<a href="inthesoop2.html" class="back-btn">
+<a href="main" class="back-btn">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
     <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
@@ -243,6 +266,39 @@ const player = new Plyr(video, {
   clickToPlay: false, 
   dblclickFullscreen: false
 });
+
+// --- AUTO LANDSCAPE FULLSCREEN ON MOBILE/TABLET ---
+const isMobileOrTablet = /Mobi|Android|iPad|Tablet/i.test(navigator.userAgent);
+
+function enterFullscreen(el) {
+  if (el.requestFullscreen) el.requestFullscreen();
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  else if (el.msRequestFullscreen) el.msRequestFullscreen();
+}
+
+// Hook into Plyr fullscreen events
+player.on('enterfullscreen', () => {
+  if (isMobileOrTablet) {
+    // Lock orientation to landscape
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(err => {
+        console.log("Orientation lock failed:", err);
+      });
+    } else if (window.screen.lockOrientation) {
+      window.screen.lockOrientation('landscape');
+    }
+  }
+});
+
+player.on('exitfullscreen', () => {
+  if (isMobileOrTablet) {
+    // Unlock orientation when exiting fullscreen
+    if (screen.orientation && screen.orientation.unlock) {
+      screen.orientation.unlock();
+    }
+  }
+});
+
 
 // --- DOUBLE TAP / CLICK
 player.on('ready', () => {
@@ -371,7 +427,26 @@ player.on("timeupdate", () => {
 });
 </script>
 
- <style>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      // ✅ Detect updates
+      reg.onupdatefound = () => {
+        const newSW = reg.installing;
+        newSW.onstatechange = () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            // ✅ New version is ready → force reload
+            window.location.reload();
+          }
+        };
+      };
+    }).catch(err => {
+      console.error('Service Worker registration failed:', err);
+    });
+  }
+</script>
+
+<style>
   /* Access Denied Modal */
   .access-denied-modal {
     position: fixed;
