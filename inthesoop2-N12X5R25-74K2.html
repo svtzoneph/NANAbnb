@@ -1,28 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>VIDEOS</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<meta charset="UTF-8">
+<title>VIDEOS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- HLS & Plyr -->
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-  <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
-  <!-- Clappr (optional) -->
-  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 
-  <!-- Favicon & Manifest -->
-  <link rel="icon" href="favicon-new.png" type="image/png" />
+<link rel="icon" href="favicon-new.png" type="image/png" />
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2196f3">
 
-  <!-- Apple -->
   <meta name="apple-mobile-web-app-title" content="Zone Vault">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,7 +23,6 @@
   <link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
   <link rel="apple-touch-startup-image" href="splash.png">
 
-  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -39,188 +31,419 @@
     gtag('config', 'G-1B2RJ659GL');
   </script>
 
-  <style>
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: black;
-      text-align: center;
-      padding: 40px;
-      margin: 0;
-    }
-    h2 {
-      color: white;
-      margin-bottom: 15px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      margin-left: 10;
-      font-size: 30px;
-    }
-img {
-  max-width: 700px;
-  width: 100%;
-  border-radius: 15px;
-  margin-bottom: 20px;
-  height: auto;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-@media (max-width: 600px) {
-  img { 
-    max-width: 95%; 
-    border-radius: 10px; 
-    margin-bottom: 15px; 
+<style>
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: black;
+    text-align: center;
+    padding: 20px 10px;
+    margin: 0;
   }
+
+  /* --- LAYOUT CONTAINERS --- */
+  .main-layout {
+    max-width: 1180px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .video-wrapper-left {
+    width: 100%;
+    position: relative; /* Needed for swapping player/poster */
+  }
+
+  /* --- POSTER / THUMBNAIL STYLES --- */
+  #poster-container {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background-size: cover;
+    background-position: center;
+    background-image: url('https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png'); /* Default Cover */
+    border-radius: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+
+#poster-overlay {
+    background: rgba(0,0,0,0.6);
+    padding: 15px 25px;
+    border-radius: 50px;
+    border: 2px solid white;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    pointer-events: none; /* Click passes through to container */
+    max-width: 90%;
+    text-align: center;
+    margin: 0 auto;
 }
 
-.episode-buttons {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+/* Mobile adjustments */
+@media (max-width: 600px) {
+    #poster-overlay {
+        padding: 10px 15px;
+        font-size: 14px;
+        border-radius: 35px;
+        border-width: 1.5px;
+    }
 }
-.episode-buttons button {
-  flex: 1 1 auto;
-  min-width: 100px;
-  max-width: 200px;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 50px;
-  background: linear-gradient(135deg, #1c0d27, #000000, #1c0d27);
-  color: #fff;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-.episode-buttons button:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(128,128,128,0.4); }
-@media (max-width: 600px) { .episode-buttons button { flex: 1 1 45%; font-size: 14px; padding: 10px 15px; } }
-@media (max-width: 400px) { .episode-buttons button { flex: 1 1 100%; font-size: 14px; padding: 8px 12px; min-width: 65px; max-width: 100px; } }
 
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.95);
-  justify-content: center;
-  align-items: center;
-  overflow-y: auto;
+/* Smaller phones */
+@media (max-width: 400px) {
+    #poster-overlay {
+        padding: 8px 12px;
+        font-size: 12px;
+        border-radius: 25px;
+        border-width: 1px;
+    }
 }
-.modal-content {
-  background: transparent;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 800px;
-  width: 100%;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-}
-.video-title {
-  color: #fff;
-  text-align: left;
-  margin: 10px 0 20px;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  word-wrap: break-word;
-}
-@media (max-width: 768px) { .video-title { font-size: 16px; margin: 8px 0 16px; } }
-@media (max-width: 600px) { .video-title { font-size: 14px; margin: 6px 0 12px; } }
-@media (max-width: 400px) { .video-title { font-size: 12px; margin: 4px 0 8px; } }
 
-.close {
-  position: absolute;
-  top: -9px;
-  right: -7px;
-  font-size: 28px;
-  font-weight: bold;
-  color: #fff;
-  cursor: pointer;
-  background: rgba(0,0,0,0.6);
-  border-radius: 50%;
-  width: 40px; height: 40px;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.3s ease;
-}
-.close:hover { background: rgba(255,255,255,0.9); color: #000; transform: scale(1.1); }
 
-video { width: 100%; border-radius: 0px; background: #000; }
-:root {
-  --plyr-color-main: gray;
-  --plyr-control-bg: rgba(255,255,255,0.1);
-  --plyr-control-hover-bg: rgba(255,255,255,0.2);
-}
-.center-logo { display: flex; justify-content: center; margin-bottom: 20px; }
-.center-logo img { width: 50px; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-@media (max-width: 600px) { .center-logo img { width: 40px; } }
+  /* Hide Player Container Initially */
+  #player-container {
+    display: none; 
+    width: 100%;
+  }
 
-.back-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 50px; height: 50px;
-  background: transparent;
-  border: 2px solid #fff;
-  border-radius: 50%;
-  display: flex; justify-content: center; align-items: center;
-  text-decoration: none; z-index: 3000;
-  transition: all 0.3s ease;
-}
-.back-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
-.back-btn svg { display: block; }
+  h2 {
+    font-size: 22px;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-align: left; 
+    font-size: 24px;
+  }
 
-.plyr__captions {
-  font-size: 18px;
-  font-weight: bold;
-  color: white;
-  text-shadow: 5px 5px 14px black;
-  padding: 4px 8px;
-  bottom: 40px !important;
-  text-align: center;
-}
-@media (max-width: 600px) { .plyr__captions { font-size: 14px; bottom: 30px !important; } }
-@media (max-width: 400px) { .plyr__captions { font-size: 12px; bottom: 20px !important; } }
-@media (max-width: 300px) { .plyr__captions { font-size: 10px; bottom: 15px !important; } }
-.plyr__captions span { transition: opacity 3s ease-in-out; }
-  </style>
-</head>
-<body>
-  <div class="center-logo">
-    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault Logo">
-  </div>
+  h3.playlist-header {
+    color: white; 
+    margin-bottom: 10px; 
+    font-size: 20px;
+  }
 
-  <h2>IN THE SOOP SEVENTEEN ver. Season2</h2>
-  <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png" alt="Poster">
+  @media (max-width: 600px) {
+    h2 { font-size: 18px; }
+    #poster-overlay { font-size: 14px; padding: 10px 20px; }
+  }
 
-  <div class="episode-buttons">
-    <button onclick="openModal(1)">EPISODE 1</button>
-    <button onclick="openModal(2)">EPISODE 2</button>
-    <button onclick="openModal(3)">EPISODE 3</button>
-    <button onclick="openModal(4)">EPISODE 4</button>
-    <button onclick="openModal(5)">EPISODE 5</button>
-    <button onclick="openModal(6)">EPISODE 6</button>
+  .center-logo { display: flex; justify-content: center; margin-bottom: 20px; }
+  .center-logo img { width: 50px; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+  @media (max-width: 600px) { .center-logo img { width: 40px; } }
+
+  .plyr {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 0px;
+    overflow: hidden;
+  }
+   
+  video { width: 100%; }
+
+  .back-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px; height: 50px;
+    background: transparent;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    text-decoration: none; z-index: 3000;
+    transition: all 0.3s ease;
+  }
+  .back-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
+  .back-btn svg { display: block; }
+
+  :root {
+    --plyr-color-main: gray;
+    --plyr-control-bg: rgba(255,255,255,0.1);
+    --plyr-control-hover-bg: rgba(255,255,255,0.2);
+  }
+
+  .plyr__captions {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 5px 5px 14px black;
+    padding: 4px 8px;
+    bottom: 40px !important;
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    .plyr__captions { font-size: 13px; bottom: 30px !important; padding: 3px 6px; }
+    .plyr { font-size: 14px; }
+    .plyr__controls button { padding: 4px !important; }
+    .plyr__control--play-large { width: 50px; height: 50px; }
+  }
+
+  @media (max-width: 400px) {
+    .plyr__captions { font-size: 11px; bottom: 20px !important; padding: 2px 4px; }
+    .plyr { font-size: 12px; }
+    .plyr__controls button { padding: 2px !important; }
+    .plyr__control--play-large { width: 40px; height: 40px; }
+  }
+
+  .plyr__captions span { transition: opacity 3s ease-in-out; }
+
+  /* --- DOUBLE TAP ICONS --- */
+  .seek-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    z-index: 20; 
+  }
+  .seek-overlay.visible {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  .seek-overlay svg {
+    width: 40px;
+    height: 40px;
+    fill: white;
+    display: block;
+  }
+   
+  /* Scrollbar Styling */
+  #playlist-items::-webkit-scrollbar { width: 8px; }
+  #playlist-items::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }
+  #playlist-items::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+  #playlist-items::-webkit-scrollbar-thumb:hover { background: #777; }
+
+  /* --- DESKTOP SIDE-BY-SIDE LOGIC --- */
+  @media (min-width: 900px) {
+    .main-layout {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 10px; 
+      padding: 0 20px;
+      text-align: left;
+    }
+
+    .video-wrapper-left {
+      flex: 2; 
+    }
+
+    #playlist {
+      flex: 1; 
+      margin-top: 0 !important; 
+      margin-bottom: 0 !important;
+      max-width: none !important;
+    }
     
+    h3.playlist-header {
+      margin-top: 0 !important; 
+      line-height: 1;
+    }
+    
+    #playlist-items {
+      max-height: 500px !important; 
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="center-logo">
+  <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault Logo">
+</div>
+
+<div class="main-layout">
+
+  <div class="video-wrapper-left">
+    
+    <div id="poster-container">
+      <div id="poster-overlay">Select an Episode to Watch</div>
+    </div>
+
+    <div id="player-container">
+      <video id="videoPlayer" playsinline controls crossorigin="anonymous"></video>
+    </div>
+
+    <h2 id="main-title">Select Episode</h2>
   </div>
 
-  <!-- Video Modal -->
-  <div id="videoModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h3 id="videoTitle" class="video-title"></h3>
-      <div class="video-container">
-        <video id="videoPlayer" playsinline controls crossorigin="anonymous"></video>
-      </div>
+  <div id="playlist" style="width: 100%; max-width: 1000px; margin: 20px auto; text-align: left;">
+    <h3 class="playlist-header">Other Episodes</h3>
+    
+    <div id="playlist-items" style="
+        display: flex; 
+        flex-direction: column; 
+        gap: 10px;
+        
+        /* SCROLL LOGIC */
+        max-height: 300px; 
+        overflow-y: auto; 
+        padding-right: 10px;
+    ">
     </div>
   </div>
 
-  <a href="videos" class="back-btn">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
-      <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</div> <script>
+const playlistData = [
+  { 
+    id: "1", 
+    title: "EP1. READY TO TIME OFF", 
+    image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png" 
+  },
+  { 
+    id: "2", 
+    title: "EP2. Thank you for your support", 
+    image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png" 
+  },
+  { 
+    id: "3", 
+    title: "EP3. Your smile is the most brilliant thing", 
+    image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png" 
+  },
+  { 
+    id: "4", 
+    title: "EP4. It's been another exciting day.", 
+    image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png" 
+  },
+  { 
+    id: "5", 
+    title: "EP5. 우리 추억 더 밝게 빛나고", 
+    image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png" 
+  },
+  { 
+    id: "6", 
+    title: "EP6. Remember, We're Always Together", 
+    image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png" 
+  }
+];
+
+const playlistContainer = document.getElementById('playlist-items');
+const posterContainer = document.getElementById('poster-container');
+const playerContainer = document.getElementById('player-container');
+const mainTitle = document.getElementById('main-title');
+
+playlistData.forEach(ep => {
+  const epDiv = document.createElement('div');
+   
+  epDiv.style.display = "flex";
+  epDiv.style.alignItems = "center"; 
+  epDiv.style.gap = "15px"; 
+   
+  epDiv.style.background = "rgba(255,255,255,0.05)";
+  epDiv.style.padding = "10px";
+  epDiv.style.borderRadius = "8px";
+  epDiv.style.cursor = "pointer";
+  epDiv.style.color = "white";
+  epDiv.style.transition = "all 0.2s";
+
+  const thumb = document.createElement('img');
+  thumb.src = ep.image;
+  thumb.style.width = "120px";  
+  thumb.style.height = "68px";   
+  thumb.style.objectFit = "cover"; 
+  thumb.style.borderRadius = "4px";
+   
+  const title = document.createElement('span');
+  title.textContent = ep.title;
+  title.style.fontSize = "15px";
+  title.style.fontWeight = "500";
+
+  epDiv.appendChild(thumb);
+  epDiv.appendChild(title);
+
+  epDiv.addEventListener('mouseover', () => epDiv.style.background = "rgba(255,255,255,0.15)");
+  epDiv.addEventListener('mouseout', () => epDiv.style.background = "rgba(255,255,255,0.05)");
+
+  epDiv.addEventListener('click', () => {
+  
+    posterContainer.style.display = "none";
+    playerContainer.style.display = "block";
+
+    db.ref(`inthesoop2/${ep.id}`).once('value').then(snapshot => {
+      const data = snapshot.val();
+      if(!data || !data.url) { alert("Video unavailable"); return; }
+
+      if(typeof hls !== 'undefined' && hls){ hls.destroy(); hls = null; }
+
+      if(typeof Hls !== 'undefined' && Hls.isSupported()){
+        hls = new Hls();
+        hls.loadSource(data.url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => { player.play(); });
+      } else {
+        video.src = data.url;
+      }
+
+      video.querySelectorAll("track").forEach(t => t.remove());
+      if(data.subtitles){
+        Object.entries(data.subtitles).forEach(([lang,url])=>{
+          const track = document.createElement("track");
+          track.kind = "subtitles";
+          track.label = lang.toUpperCase();
+          track.srclang = lang;
+          track.src = url;
+          if(lang==="en") track.default = true;
+          video.appendChild(track);
+        });
+      }
+
+      
+      if(data.title){
+        mainTitle.textContent = data.title;
+      } else {
+        mainTitle.textContent = ep.title;
+      }
+
+      player.play();
+    }).catch(err => console.error("Firebase Error:", err));
+  });
+
+  playlistContainer.appendChild(epDiv);
+});
+</script>
+
+
+<a href="videos" class="back-btn">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
+    <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</a>
+
+
+<div id="rewind-icon-overlay" class="seek-overlay">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M9.9998 1.5V6.4428C5.5598 6.9048 2.4418 10.3368 2.4418 14.8828C2.4418 19.8288 6.4418 23.8288 11.3878 23.8288C15.8278 23.8288 19.4678 20.4968 20.0758 16.1988H17.5558C17.0098 18.9888 14.4838 21.3288 11.3878 21.3288C7.8118 21.3288 4.9418 18.4588 4.9418 14.8828C4.9418 11.6688 7.3738 9.0708 10.4998 8.6148V13.4998L17.4998 7.4998L9.9998 1.5Z"/>
+     
     </svg>
-  </a>
+</div>
+<div id="forward-icon-overlay" class="seek-overlay">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M14.0002 1.5L6.50016 7.49984L14.0002 13.4998V8.61484C17.1262 9.07084 19.5582 11.6688 19.5582 14.8828C19.5582 18.4588 16.6882 21.3288 13.1122 21.3288C10.0162 21.3288 7.49016 18.9888 6.94416 16.1988H4.42416C5.03216 20.4968 8.67216 23.8288 13.1122 23.8288C18.0582 23.8288 22.0582 19.8288 22.0582 14.8828C22.0582 10.3368 18.9402 6.90484 14.5002 6.44284V1.5Z"/>
+    </svg>
+</div>
+<div id="play-pause-icon-overlay" class="seek-overlay"></div>
+
+<svg id="svg-play" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path d="M8 5.14V19.14L19 12.14L8 5.14Z"/>
+</svg>
+<svg id="svg-pause" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path d="M6 19H10V5H6V19ZM14 5V19H18V5H14Z"/>
+</svg>
 
 <script>
 const firebaseConfig = {
@@ -231,97 +454,188 @@ const firebaseConfig = {
   storageBucket: "tvnstream-b4497.appspot.com",
   messagingSenderId: "308384754214",
   appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-  measurementId: "G-VFNH70R4D9"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let hls = null;
-let selectedEpisode = null;
-const modal = document.getElementById("videoModal");
-const videoPlayer = document.getElementById("videoPlayer");
+const video = document.getElementById("videoPlayer");
+let hls;
+let positions = JSON.parse(localStorage.getItem("plyr-positions") || "{}");
 
-// Playback memory
-let playbackPositions = JSON.parse(localStorage.getItem("plyr-positions") || "{}");
-const player = new Plyr(videoPlayer, {
+const player = new Plyr(video, {
   captions: { active: true, update: true, language: "en" },
-  controls: ["play-large","rewind","play","fast-forward","progress","current-time","duration","mute","volume","settings","fullscreen"],
-  settings: ["captions","speed","quality"]
+  controls: ["play-large","play","progress","current-time","duration","mute","settings","fullscreen"],
+  settings: ["captions","speed","quality"],
+  clickToPlay: false, 
+  dblclickFullscreen: false
 });
 
-// Save position
-player.on("timeupdate", () => {
-  if (!selectedEpisode) return;
-  playbackPositions[selectedEpisode] = player.currentTime;
-  localStorage.setItem("plyr-positions", JSON.stringify(playbackPositions));
-});
+const isMobileOrTablet = /Mobi|Android|iPad|Tablet/i.test(navigator.userAgent);
 
-player.on("enterfullscreen", () => {
-  if (screen.orientation && screen.orientation.lock) screen.orientation.lock("landscape").catch(()=>{});
-});
-player.on("exitfullscreen", () => {
-  if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock().catch(()=>{});
-});
+function enterFullscreen(el) {
+  if (el.requestFullscreen) el.requestFullscreen();
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  else if (el.msRequestFullscreen) el.msRequestFullscreen();
+}
 
-async function openModal(ep) {
-  selectedEpisode = ep;
-  modal.style.display = "flex";
-
-  const snapshot = await db.ref("inthesoop2/" + ep).once("value");
-  const src = snapshot.val();
-  if (!src || !src.url) {
-    alert("⚠️ Video not available right now.");
-    closeModal();
-    return;
-  }
-
-  document.getElementById("videoTitle").textContent = src.title || "IN THE SOOP SEVENTEEN ver. Season2";
-
-  player.pause();
-  videoPlayer.querySelectorAll("track").forEach(t => t.remove());
-
-  if (hls) hls.destroy();
-  if (Hls.isSupported()) {
-    hls = new Hls();
-    hls.loadSource(src.url);
-    hls.attachMedia(videoPlayer);
-  } else videoPlayer.src = src.url;
-
-  if (src.subtitles) {
-    Object.entries(src.subtitles).forEach(([lang, url]) => {
-      const track = document.createElement("track");
-      track.kind = "subtitles";
-      track.label = lang.toUpperCase();
-      track.srclang = lang;
-      track.src = url;
-      if (lang === "en") track.default = true;
-      videoPlayer.appendChild(track);
-    });
-  }
-
-  setTimeout(() => {
-    const textTracks = videoPlayer.textTracks;
-    for (let i = 0; i < textTracks.length; i++) {
-      textTracks[i].mode = textTracks[i].language === "en" ? "showing" : "disabled";
+player.on('enterfullscreen', () => {
+  if (isMobileOrTablet) {
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(err => {
+        console.log("Orientation lock failed:", err);
+      });
+    } else if (window.screen.lockOrientation) {
+      window.screen.lockOrientation('landscape');
     }
-    player.toggleCaptions(true);
-  }, 300);
+  }
+});
 
-  const resumeTime = playbackPositions[ep] || 0;
-  player.once("canplay", () => {
-    player.currentTime = resumeTime;
-  });
+player.on('exitfullscreen', () => {
+  if (isMobileOrTablet) {
+    if (screen.orientation && screen.orientation.unlock) {
+      screen.orientation.unlock();
+    }
+  }
+});
 
-  player.play();
-}
+player.on('ready', () => {
+    const videoContainer = player.elements.container;
+    const videoWrapper = videoContainer.querySelector('.plyr__video-wrapper');
+    if (!videoWrapper) { console.warn("Plyr video wrapper not found yet."); return; }
 
-function closeModal() {
-  modal.style.display = "none";
-  player.pause();
-}
+    const rewindIcon = document.getElementById('rewind-icon-overlay');
+    const forwardIcon = document.getElementById('forward-icon-overlay');
+    const playPauseIcon = document.getElementById('play-pause-icon-overlay');
+    const playSvg = document.getElementById('svg-play') ? document.getElementById('svg-play').cloneNode(true) : null;
+    const pauseSvg = document.getElementById('svg-pause') ? document.getElementById('svg-pause').cloneNode(true) : null;
+    
+    if(playSvg) playSvg.style.display = 'block';
+    if(pauseSvg) pauseSvg.style.display = 'block';
+
+    if (rewindIcon) videoWrapper.appendChild(rewindIcon);
+    if (forwardIcon) videoWrapper.appendChild(forwardIcon);
+    if (playPauseIcon) videoWrapper.appendChild(playPauseIcon);
+
+    let lastTapTime = 0, tapTimeout = null, iconHideTimeout = null;
+
+    function showSeekIcon(type) {
+        if (iconHideTimeout) clearTimeout(iconHideTimeout);
+        if(rewindIcon) rewindIcon.classList.remove('visible');
+        if(forwardIcon) forwardIcon.classList.remove('visible');
+        if(playPauseIcon) playPauseIcon.classList.remove('visible');
+
+        let iconToShow;
+        if (type === 'rewind') iconToShow = rewindIcon;
+        else if (type === 'forward') iconToShow = forwardIcon;
+        else if (type === 'play-pause') {
+            iconToShow = playPauseIcon;
+            if(playPauseIcon) {
+                playPauseIcon.innerHTML = '';
+                if (player.paused && pauseSvg) playPauseIcon.appendChild(pauseSvg); 
+                else if (!player.paused && playSvg) playPauseIcon.appendChild(playSvg);
+            }
+        }
+        if (iconToShow) {
+            iconToShow.classList.add('visible');
+            iconHideTimeout = setTimeout(() => { iconToShow.classList.remove('visible'); }, 500);
+        }
+    }
+
+    function handleDoubleTap(event) {
+        const rect = videoWrapper.getBoundingClientRect();
+        const tapX = event.clientX - rect.left;
+        const zoneWidth = rect.width;
+        if (tapX < zoneWidth * 0.35) { player.rewind(10); showSeekIcon('rewind'); }
+        else if (tapX > zoneWidth * 0.65) { player.forward(10); showSeekIcon('forward'); }
+        else { showSeekIcon('play-pause'); player.togglePlay(); }
+    }
+
+    videoWrapper.addEventListener('click', (event) => {
+        if (event.target.closest('.plyr__controls')) return;
+        event.stopPropagation();
+        const currentTime = new Date().getTime();
+        const timeSinceLastTap = currentTime - lastTapTime;
+        if (tapTimeout) { clearTimeout(tapTimeout); tapTimeout = null; }
+
+        if (timeSinceLastTap > 0 && timeSinceLastTap < 300) {
+            event.preventDefault(); handleDoubleTap(event); lastTapTime = 0;
+        } else {
+            event.preventDefault();
+            tapTimeout = setTimeout(() => { player.toggleControls(); }, 300);
+        }
+        lastTapTime = currentTime;
+    });
+
+    videoWrapper.addEventListener('dblclick', (e) => { e.preventDefault(); e.stopPropagation(); });
+});
+
+player.on("timeupdate", () => {
+});
 </script>
 
- <style>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      reg.onupdatefound = () => {
+        const newSW = reg.installing;
+        newSW.onstatechange = () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            window.location.reload();
+          }
+        };
+      };
+    }).catch(err => {
+      console.error('Service Worker registration failed:', err);
+    });
+  }
+</script>
+
+<style>
+  .access-denied-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    text-align: center;
+    padding: 20px;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+    flex-direction: column;
+  }
+
+  .access-denied-modal strong {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .access-denied-modal button {
+    margin-top: 15px;
+    padding: 10px 25px;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+
+  .access-denied-modal button:hover {
+    background: white;
+    color: black;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+</style>
+
+   <style>
   /* Access Denied Modal */
   .access-denied-modal {
     position: fixed;
@@ -332,7 +646,7 @@ function closeModal() {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 11000;
+    z-index: 9999;
     text-align: center;
     padding: 20px;
     opacity: 0;
@@ -433,6 +747,6 @@ function closeModal() {
     window.history.back();
   }
 </script>
-  
+
 </body>
 </html>
