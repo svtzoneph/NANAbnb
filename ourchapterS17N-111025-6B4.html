@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -69,11 +70,16 @@
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);
   }
 
+  /* --- GLASSMORPHISM POSTER OVERLAY --- */
   #poster-overlay {
-    background: rgba(0,0,0,0.6);
+    /* Glass Style */
+    background: rgba(0, 0, 0, 0.4); 
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    
     padding: 15px 25px;
     border-radius: 50px;
-    border: 2px solid white;
     color: white;
     font-weight: bold;
     font-size: 18px;
@@ -81,6 +87,7 @@
     max-width: 90%;
     text-align: center;
     margin: 0 auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
   }
 
   #player-container {
@@ -115,7 +122,7 @@
         font-size: 14px; 
         padding: 10px 15px;
         border-radius: 35px;
-        border-width: 1.5px;
+        border-width: 1px;
     }
     .center-logo img { width: 40px; }
   }
@@ -130,22 +137,33 @@
     border-radius: 0px;
     overflow: hidden;
   }
-   
+    
   video { width: 100%; }
 
+  /* --- GLASSMORPHISM BACK BUTTON --- */
   .back-btn {
     position: fixed;
     bottom: 20px;
     right: 20px;
     width: 50px; height: 50px;
-    background: transparent;
-    border: 2px solid #fff;
+    
+    /* Glass Style */
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    
     border-radius: 50%;
     display: flex; justify-content: center; align-items: center;
     text-decoration: none; z-index: 3000;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   }
-  .back-btn:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
+  .back-btn:hover { 
+    background: rgba(255,255,255,0.15); 
+    transform: scale(1.1); 
+    border-color: white;
+  }
   .back-btn svg { display: block; }
 
   :root {
@@ -164,6 +182,7 @@
     text-align: center;
   }
 
+  /* --- GLASSMORPHISM SEEK OVERLAY --- */
   .seek-overlay {
     position: absolute;
     top: 50%;
@@ -172,7 +191,13 @@
     opacity: 0;
     pointer-events: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    background-color: rgba(0, 0, 0, 0.6);
+    
+    /* Glass Style */
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    
     border-radius: 100%;
     display: flex;
     align-items: center;
@@ -191,12 +216,12 @@
     fill: white;
     display: block;
   }
-   
+    
   /* Scrollbar Styling */
   #playlist-items::-webkit-scrollbar { width: 8px; }
   #playlist-items::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }
-  #playlist-items::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
-  #playlist-items::-webkit-scrollbar-thumb:hover { background: #777; }
+  #playlist-items::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 4px; border: 1px solid rgba(0,0,0,0.2); }
+  #playlist-items::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
 
   @media (min-width: 900px) {
     .main-layout {
