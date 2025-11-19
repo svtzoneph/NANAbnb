@@ -1,3 +1,4 @@
+
 <!Doctype html>
 <html lang="en">
 <head>
@@ -31,7 +32,7 @@
 <style>
     :root {
         --bg: black;
-        --card-bg: rgba(255, 255, 255, 0.03); /* Updated for Glass */
+        --card-bg: rgba(255, 255, 255, 0.03);
         --muted: white;
         --accent: white;
         --badge-bg: linear-gradient(135deg, #1743ff, #4b7bff);
@@ -47,7 +48,7 @@
         margin: 0;
         font-family: Inter, system-ui;
         background: black;
-        color: #ffffff; /* Updated text color for contrast on black */
+        color: #ffffff;
     }
 
     .container {
@@ -89,8 +90,6 @@
         position: sticky;
         top: 0;
         z-index: 100;
-        
-        /* Glass Effect */
         background: rgba(255, 255, 255, 0.02);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
@@ -133,13 +132,10 @@
     /* --- LINKS GLASSMORPHISM --- */
     .category-link {
         padding: 8px 16px;
-        
-        /* Glass Effect added to Links */
         background: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        
         color: #fff;
         border-radius: 12px;
         font-size: 12px;
@@ -163,7 +159,6 @@
     .category-link:hover {
         color: #fff;
         transform: scale(1.05);
-        /* Hover Glass */
         background: rgba(255, 255, 255, 0.15);
         border-color: rgba(255, 255, 255, 0.3);
     }
@@ -186,12 +181,10 @@
 
     /* --- CARD GLASSMORPHISM --- */
     .card {
-        /* Replaced linear-gradient with Glass style */
         background: rgba(255, 255, 255, 0.03);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        
         border-radius: var(--radius);
         box-shadow: var(--shadow);
         overflow: hidden;
@@ -203,7 +196,6 @@
     .card:hover {
         transform: translateY(-6px);
         box-shadow: 0 14px 38px rgba(0, 0, 0, 0.5);
-        /* Brighten glass on hover */
         background: rgba(255, 255, 255, 0.08);
         border-color: rgba(255, 255, 255, 0.2);
     }
@@ -257,7 +249,7 @@
         font-size: 14px;
         color: #fff;
         background: linear-gradient(135deg, #000000, #1a1a1a);
-        border: 1px solid rgba(255, 255, 255, 0.1); /* Slight border for btn */
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 8px;
         cursor: pointer;
         transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
@@ -328,12 +320,9 @@
         width: 80%;
         max-width: 300px;
         height: 100%;
-        
-        /* Glass Style */
         background: rgba(0, 0, 0, 0.6);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        
         z-index: 9999;
         padding: 20px;
         gap: 10px;
@@ -454,8 +443,6 @@
             align-items: center;
             justify-content: space-between;
             z-index: 1000;
-            
-            /* Mobile Header Glass */
             background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -530,16 +517,17 @@
         color: white;
     }
 
-    /* --- MODAL GLASSMORPHISM --- */
+    /* --- FAVORITE MODAL GLASSMORPHISM --- */
     .favorite-modal {
         display: none;
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.7);
+        /* Lighter overlay to let blur show */
+        background: rgba(0,0,0,0.6);
         z-index: 99999;
         align-items: center;
         justify-content: center;
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(8px);
     }
 
     .favorite-modal.active {
@@ -547,10 +535,10 @@
     }
 
     .favorite-content {
-        /* Glass Modal */
-        background: rgba(30, 30, 30, 0.6);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
+        /* Strong Glass Modal */
+        background: rgba(20, 20, 20, 0.75);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         
         color: white;
@@ -561,7 +549,7 @@
         max-height: 80vh;
         overflow-y: auto;
         position: relative;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         scroll-behavior: smooth;
     }
 
@@ -612,11 +600,9 @@
         margin-bottom: 10px;
         position: sticky;
         top: 0;
-        background: rgba(30, 30, 30, 0.8); /* Semi-transparent sticky header */
-        backdrop-filter: blur(5px);
         padding: 15px 0;
         z-index: 10;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        
     }
 
     .favorite-box {
@@ -624,7 +610,9 @@
         overflow-y: auto;
         padding: 10px;
         border-radius: 12px;
-        background: rgba(0, 0, 0, 0.3);
+        /* Inner Glass Box */
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .favorite-box::-webkit-scrollbar {
@@ -635,13 +623,13 @@
         border-radius: 10px;
     }
     .favorite-box::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.6);
+        background: rgba(255,255,255,0.3);
         border-radius: 10px;
-        border: 2px solid rgba(255,255,255,0.2);
+        border: 2px solid rgba(255,255,255,0.1);
         transition: background 0.3s ease;
     }
     .favorite-box::-webkit-scrollbar-thumb:hover {
-        background: rgba(255,255,255,0.9);
+        background: rgba(255,255,255,0.6);
     }
 
     .favorite-list {
@@ -652,18 +640,21 @@
     }
 
     .favorite-list .fav-item {
+        /* Glass Item Cards */
         background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 10px;
         padding: 10px;
         text-align: center;
         color: white;
-        transition: transform 0.2s ease;
+        transition: transform 0.2s ease, background 0.3s;
     }
 
     .favorite-list .fav-item:hover {
         transform: translateY(-4px);
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.2);
     }
     .favorite-list img {
         width: 100%;
@@ -699,18 +690,19 @@
         }
     }
 
+    /* --- INFO MODAL GLASSMORPHISM --- */
     .info-modal {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 0, 0.6);
         display: none;
         align-items: center;
         justify-content: center;
         z-index: 9999;
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(8px);
     }
 
     .info-modal.active {
@@ -718,9 +710,9 @@
     }
 
     .info-content {
-        background: rgba(30, 30, 30, 0.6);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
+        background: rgba(20, 20, 20, 0.75);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         
         color: white;
@@ -732,7 +724,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.6);
     }
 
     .info-title {
@@ -750,7 +742,7 @@
     }
 
     .scroll-box {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(0, 0, 0, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: 10px;
         padding: 15px;
