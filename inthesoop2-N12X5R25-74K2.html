@@ -111,6 +111,16 @@
     font-size: 20px;
   }
 
+  /* --- ACTIVE EPISODE HIGHLIGHT (UPDATED) --- */
+  .active-episode {
+    /* CHANGED TO WHITE */
+    background: rgba(255, 255, 255, 0.15) !important; 
+    border: 1px solid #ffffff !important; 
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2); 
+    
+    /* REMOVED ZOOM (transform: scale) */
+  }
+
   /* --- MOBILE ADJUSTMENTS --- */
   @media (max-width: 600px) {
     h2 { font-size: 18px; }
@@ -351,8 +361,14 @@ const posterContainer = document.getElementById('poster-container');
 const playerContainer = document.getElementById('player-container');
 const mainTitle = document.getElementById('main-title');
 
+// GLOBAL VARIABLE to know exactly which EP is playing
+window.currentActiveEp = null;
+
 playlistData.forEach(ep => {
   const epDiv = document.createElement('div');
+  
+  // Add a common class so we can find them all later
+  epDiv.classList.add('playlist-item');
    
   // --- LOCK LOGIC ---
   const today = new Date();
@@ -370,6 +386,7 @@ playlistData.forEach(ep => {
   epDiv.style.padding = "10px";
   epDiv.style.borderRadius = "8px";
   epDiv.style.transition = "all 0.2s";
+  epDiv.style.border = "1px solid transparent"; // Pre-set border
 
   if (isLocked) {
       epDiv.style.opacity = "0.5"; 
@@ -378,8 +395,18 @@ playlistData.forEach(ep => {
       epDiv.style.opacity = "1";
       epDiv.style.cursor = "pointer"; 
       epDiv.style.color = "white";
-      epDiv.addEventListener('mouseover', () => epDiv.style.background = "rgba(255,255,255,0.15)");
-      epDiv.addEventListener('mouseout', () => epDiv.style.background = "rgba(255,255,255,0.05)");
+      
+      // Only add hover effect if NOT active
+      epDiv.addEventListener('mouseover', () => {
+          if (!epDiv.classList.contains('active-episode')) {
+              epDiv.style.background = "rgba(255,255,255,0.15)";
+          }
+      });
+      epDiv.addEventListener('mouseout', () => {
+          if (!epDiv.classList.contains('active-episode')) {
+              epDiv.style.background = "rgba(255,255,255,0.05)";
+          }
+      });
   }
 
   const thumb = document.createElement('img');
@@ -417,7 +444,24 @@ playlistData.forEach(ep => {
         alert(`This episode is not yet available.\nRelease Date: ${ep.date}`);
         return; 
     }
+
+    // --- 1. HIGHLIGHT LOGIC ---
+    // Remove active class from ALL other items
+    document.querySelectorAll('.playlist-item').forEach(item => {
+        item.classList.remove('active-episode');
+        item.style.background = "rgba(255,255,255,0.05)"; // Reset background
+    });
+
+    // Add active class to THIS item
+    epDiv.classList.add('active-episode');
+    epDiv.style.background = ""; // Remove inline style so CSS class takes over
+
+    // --- 2. PLAYER LOGIC ---
+    player.stop();
    
+    // Set the NEW ID
+    window.currentActiveEp = ep.id;
+
     posterContainer.style.display = "none";
     playerContainer.style.display = "block";
 
@@ -427,13 +471,33 @@ playlistData.forEach(ep => {
 
       if(typeof hls !== 'undefined' && hls){ hls.destroy(); hls = null; }
 
+      // --- SEPARATION LOGIC ---
+      const checkTimeAndPlay = () => {
+          if (!window.currentActiveEp) return;
+          
+          const uniqueKey = 'watch_history_' + window.currentActiveEp;
+          const savedTime = localStorage.getItem(uniqueKey);
+
+          if (savedTime && parseFloat(savedTime) > 0) {
+              console.log("Resuming at: " + savedTime);
+              player.currentTime = parseFloat(savedTime);
+          } else {
+              console.log("New episode, starting at 0");
+              player.currentTime = 0;
+          }
+          player.play();
+      };
+
       if(typeof Hls !== 'undefined' && Hls.isSupported()){
         hls = new Hls();
         hls.loadSource(data.url);
         hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => { player.play(); });
+        hls.on(Hls.Events.MANIFEST_PARSED, () => { 
+            setTimeout(checkTimeAndPlay, 100);
+        });
       } else {
         video.src = data.url;
+        video.addEventListener('loadedmetadata', checkTimeAndPlay, { once: true });
       }
 
       video.querySelectorAll("track").forEach(t => t.remove());
@@ -455,7 +519,6 @@ playlistData.forEach(ep => {
         mainTitle.textContent = ep.title;
       }
 
-      player.play();
     }).catch(err => console.error("Firebase Error:", err));
   });
 
@@ -503,7 +566,6 @@ const db = firebase.database();
 
 const video = document.getElementById("videoPlayer");
 let hls;
-let positions = JSON.parse(localStorage.getItem("plyr-positions") || "{}");
 
 const player = new Plyr(video, {
   captions: { active: true, update: true, language: "en" },
@@ -612,7 +674,13 @@ player.on('ready', () => {
     videoWrapper.addEventListener('dblclick', (e) => { e.preventDefault(); e.stopPropagation(); });
 });
 
+// --- UNIQUE SAVING LOGIC ---
 player.on("timeupdate", () => {
+    // Only save if there is an active ID and video is playing
+    if (window.currentActiveEp && !player.paused && player.currentTime > 1) {
+        const uniqueKey = 'watch_history_' + window.currentActiveEp;
+        localStorage.setItem(uniqueKey, player.currentTime);
+    }
 });
 </script>
 
