@@ -1,5 +1,5 @@
 // 🔹 Version your cache
-const CACHE_NAME = 'zonevault-v101'; // increment version when you update cache
+const CACHE_NAME = 'zonevault-v102'; // increment version when you update cache
 const urlsToCache = [
   './',
   './index.html',
