@@ -5,7 +5,29 @@
   <title>VIDEOS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- CSS (same as your original) -->
+!-- Favicon & Manifest -->
+  <link rel="icon" href="favicon-new.png" type="image/png" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2196f3">
+
+  <!-- Apple -->
+  <meta name="apple-mobile-web-app-title" content="Zone Vault">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
+  <link rel="apple-touch-startup-image" href="splash.png">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1B2RJ659GL');
+  </script>
+
+  
   <style>
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
@@ -141,12 +163,12 @@
 
   <!-- Episode Buttons -->
   <div class="episode-buttons">
-    <button onclick="location.href='episode1.html'">EPISODE 1</button>
-    <button onclick="location.href='episode2.html'">EPISODE 2</button>
-    <button onclick="location.href='episode3.html'">EPISODE 3</button>
-    <button onclick="location.href='episode4.html'">EPISODE 4</button>
-    <button onclick="location.href='episode5.html'">EPISODE 5</button>
-    <button onclick="location.href='episode6.html'">EPISODE 6</button>
+    <button onclick="location.href='episode1'">EPISODE 1</button>
+    <button onclick="location.href='episode2'">EPISODE 2</button>
+    <button onclick="location.href='episode3'">EPISODE 3</button>
+    <button onclick="location.href='episode4'">EPISODE 4</button>
+    <button onclick="location.href='episode5'">EPISODE 5</button>
+    <button onclick="location.href='episode6">EPISODE 6</button>
   </div>
 
   <a href="videos" class="back-btn">
@@ -157,7 +179,26 @@
     </svg>
   </a>
 
-   <style>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      // ✅ Detect updates
+      reg.onupdatefound = () => {
+        const newSW = reg.installing;
+        newSW.onstatechange = () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            // ✅ New version is ready → force reload
+            window.location.reload();
+          }
+        };
+      };
+    }).catch(err => {
+      console.error('Service Worker registration failed:', err);
+    });
+  }
+</script>
+
+  <style>
   /* Access Denied Modal */
   .access-denied-modal {
     position: fixed;
