@@ -31,15 +31,48 @@
   gtag('config', 'G-1B2RJ659GL');
 </script>
 
+<script>
+  (function() {
+    const savedTheme = localStorage.getItem('zoneVaultTheme');
+    if(savedTheme) {
+      const style = document.createElement('style');
+      style.innerHTML = `
+        body { 
+          background: ${savedTheme} !important; 
+          background-size: cover !important;
+          background-attachment: fixed !important;
+          background-repeat: no-repeat !important;
+          min-height: 100vh;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  })();
+</script>
+
 <style>
+  /* --- CSS VARIABLES FOR GLASS --- */
+  :root {
+      --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --glass-blur: blur(20px);
+      --text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+      
+      --plyr-color-main: gray;
+      --plyr-control-bg: rgba(255,255,255,0.1);
+      --plyr-control-hover-bg: rgba(255,255,255,0.2);
+  }
+
   * { box-sizing: border-box; }
 
   body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: black;
+    background: black; /* Fallback */
     text-align: center;
     padding: 20px 10px;
     margin: 0;
+    transition: background 0.5s ease;
   }
 
   .main-layout {
@@ -66,16 +99,20 @@
     justify-content: center;
     cursor: pointer;
     position: relative;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    
+    /* Poster Hyper Glass Border */
+    box-shadow: var(--glass-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   /* --- GLASSMORPHISM POSTER OVERLAY --- */
   #poster-overlay {
-    /* Glass Style */
-    background: rgba(0, 0, 0, 0.4); 
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    /* Hyper Glass Style */
+    background: rgba(0, 0, 0, 0.5); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
     
     padding: 15px 25px;
     border-radius: 50px;
@@ -86,12 +123,14 @@
     max-width: 90%;
     text-align: center;
     margin: 0 auto;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-shadow: var(--text-shadow);
   }
 
   #player-container {
     display: none; 
     width: 100%;
+    box-shadow: var(--glass-shadow);
   }
 
   h2 {
@@ -102,12 +141,14 @@
     font-weight: 500;
     letter-spacing: 0.5px;
     text-align: left; 
+    text-shadow: var(--text-shadow);
   }
 
   h3.playlist-header {
     color: white; 
     margin-bottom: 10px; 
     font-size: 20px;
+    text-shadow: var(--text-shadow);
   }
 
   @media (max-width: 600px) {
@@ -139,37 +180,32 @@
     
   video { width: 100%; }
 
-  /* --- GLASSMORPHISM BACK BUTTON --- */
+  /* --- GLASSMORPHISM BACK BUTTON (Hyper) --- */
   .back-btn {
     position: fixed;
     bottom: 20px;
     right: 20px;
     width: 50px; height: 50px;
     
-    /* Glass Style */
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    /* Hyper Glass Style */
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
     
     border-radius: 50%;
     display: flex; justify-content: center; align-items: center;
     text-decoration: none; z-index: 3000;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
   }
   .back-btn:hover { 
-    background: rgba(255,255,255,0.15); 
+    background: rgba(255,255,255,0.25); 
     transform: scale(1.1); 
     border-color: white;
   }
   .back-btn svg { display: block; }
-
-  :root {
-    --plyr-color-main: gray;
-    --plyr-control-bg: rgba(255,255,255,0.1);
-    --plyr-control-hover-bg: rgba(255,255,255,0.2);
-  }
 
   .plyr__captions {
     font-size: 18px;
@@ -192,10 +228,10 @@
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     
     /* Glass Style */
-    background-color: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     
     border-radius: 100%;
     display: flex;
@@ -221,6 +257,36 @@
   #playlist-items::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }
   #playlist-items::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 4px; border: 1px solid rgba(0,0,0,0.2); }
   #playlist-items::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
+
+  /* --- PLAYLIST ITEMS GLASS CLASS --- */
+  .playlist-item {
+      display: flex; 
+      align-items: center; 
+      gap: 15px; 
+      padding: 10px;
+      border-radius: 8px;
+      transition: all 0.2s;
+      
+      /* Hyper Glass */
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      
+      color: white;
+      cursor: pointer;
+  }
+  .playlist-item:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+  .playlist-item.locked {
+      opacity: 0.5; 
+      cursor: not-allowed; 
+      filter: grayscale(1);
+  }
 
   @media (min-width: 900px) {
     .main-layout {
@@ -254,7 +320,9 @@
     </div>
 
     <div id="player-container">
-      <video id="videoPlayer" playsinline controls crossorigin="anonymous"></video>
+      <div class="plyr__video-wrapper">
+        <video id="videoPlayer" playsinline controls crossorigin="anonymous"></video>
+      </div>
     </div>
 
     <h2 id="main-title">Select Episode</h2>
@@ -317,6 +385,8 @@ window.currentEpData = null;
 
 playlistData.forEach(ep => {
   const epDiv = document.createElement('div');
+  // Add glass class instead of manual styles
+  epDiv.className = 'playlist-item';
    
   const today = new Date();
   let isLocked = false;
@@ -325,23 +395,8 @@ playlistData.forEach(ep => {
       if (releaseDate > today) isLocked = true;
   }
 
-  epDiv.style.display = "flex";
-  epDiv.style.alignItems = "center"; 
-  epDiv.style.gap = "15px"; 
-  epDiv.style.background = "rgba(255,255,255,0.05)";
-  epDiv.style.padding = "10px";
-  epDiv.style.borderRadius = "8px";
-  epDiv.style.transition = "all 0.2s";
-
   if (isLocked) {
-      epDiv.style.opacity = "0.5"; 
-      epDiv.style.cursor = "not-allowed"; 
-  } else {
-      epDiv.style.opacity = "1";
-      epDiv.style.cursor = "pointer"; 
-      epDiv.style.color = "white";
-      epDiv.addEventListener('mouseover', () => epDiv.style.background = "rgba(255,255,255,0.15)");
-      epDiv.addEventListener('mouseout', () => epDiv.style.background = "rgba(255,255,255,0.05)");
+      epDiv.classList.add('locked');
   }
 
   const thumb = document.createElement('img');
@@ -359,6 +414,7 @@ playlistData.forEach(ep => {
   title.textContent = ep.title;
   title.style.fontSize = "15px";
   title.style.fontWeight = "500";
+  title.style.textShadow = "0 1px 2px rgba(0,0,0,0.8)"; // Added text shadow
 
   textDiv.appendChild(title);
 
@@ -366,8 +422,9 @@ playlistData.forEach(ep => {
       const dateSpan = document.createElement('span');
       dateSpan.textContent = isLocked ? `Available: ${ep.date}` : ep.date;
       dateSpan.style.fontSize = "12px";
-      dateSpan.style.color = isLocked ? "#ff5252" : "#aaa";
+      dateSpan.style.color = isLocked ? "#ff5252" : "#ccc";
       dateSpan.style.marginTop = "2px";
+      dateSpan.style.textShadow = "0 1px 1px rgba(0,0,0,0.8)";
       textDiv.appendChild(dateSpan);
   }
 
@@ -449,7 +506,7 @@ playlistData.forEach(ep => {
 });
 </script>
 
-<a href="videos" class="back-btn">
+<a href="videos.html" class="back-btn">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
     <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
@@ -631,21 +688,27 @@ player.on("timeupdate", () => {
 </script>
 
 <style>
+  /* Access Denied Modal - Hyper Glass */
   .access-denied-modal {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85); color: #fff;
+    background: rgba(0, 0, 0, 0.8); 
+    color: #fff;
     font-family: 'Segoe UI', Arial, sans-serif;
     display: flex; align-items: center; justify-content: center;
     z-index: 9999; text-align: center; padding: 20px;
     opacity: 0; animation: fadeIn 0.5s forwards; flex-direction: column;
+    backdrop-filter: blur(15px);
   }
-  .access-denied-modal strong { font-size: 24px; margin-bottom: 10px; }
+  .access-denied-modal strong { font-size: 24px; margin-bottom: 10px; text-shadow: var(--text-shadow); }
   .access-denied-modal button {
-    margin-top: 15px; padding: 10px 25px; background: transparent;
-    color: white; border: 2px solid white; border-radius: 50px;
+    margin-top: 15px; padding: 10px 25px; 
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white; border-radius: 50px;
     cursor: pointer; font-weight: bold; transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
   }
-  .access-denied-modal button:hover { background: white; color: black; }
+  .access-denied-modal button:hover { background: rgba(255,255,255,0.25); color: white; }
   @keyframes fadeIn { to { opacity: 1; } }
 </style>
 
