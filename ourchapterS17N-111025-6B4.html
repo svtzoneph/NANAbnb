@@ -345,6 +345,7 @@
 </div> 
 
 <script>
+// --- 1. CONFIGURATION & DATA ---
 const playlistData = [
   { 
     id: "1", 
@@ -383,9 +384,113 @@ const mainTitle = document.getElementById('main-title');
 // Global variable to store current ep data
 window.currentEpData = null;
 
+// --- 2. CORE FUNCTION: PLAY EPISODE ---
+// Usage: loadAndPlayEpisode("1", true) -> true means update the URL
+function loadAndPlayEpisode(epId, updateUrl = true) {
+    // A. Find the episode
+    const ep = playlistData.find(item => item.id === epId);
+    
+    if (!ep) {
+        console.warn("Episode ID not found:", epId);
+        return;
+    }
+
+    // B. Check Date Locking
+    const today = new Date();
+    if (ep.date) {
+        const releaseDate = new Date(ep.date);
+        if (releaseDate > today) {
+            alert(`This episode is not yet available.\nRelease Date: ${ep.date}`);
+            return; 
+        }
+    }
+
+    // C. Update the Browser Link (Deep Linking)
+    if (updateUrl) {
+        const newUrl = window.location.pathname + '?v=' + ep.id;
+        // pushState changes the URL without reloading the page
+        history.pushState({id: ep.id}, '', newUrl);
+    }
+
+    // D. Set Data & UI
+    window.currentEpData = ep;
+    posterContainer.style.display = "none";
+    playerContainer.style.display = "block";
+
+    // E. Load Video from Firebase (Path: ourchapter)
+    db.ref(`ourchapter/${ep.id}`).once('value').then(snapshot => {
+      const data = snapshot.val();
+      if(!data || !data.url) { alert("Video unavailable"); return; }
+
+      if(typeof hls !== 'undefined' && hls){ hls.destroy(); hls = null; }
+
+      // Resume Logic
+      const resumePlayback = () => {
+          const user = auth.currentUser;
+          if (!window.currentEpData || !user) {
+             player.play(); 
+             return;
+          }
+          db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).once('value').then(snap => {
+              const saved = snap.val();
+              if (saved && saved.currentTime > 0) {
+                  player.currentTime = saved.currentTime;
+              }
+              player.play();
+          });
+      };
+
+      if(typeof Hls !== 'undefined' && Hls.isSupported()){
+        hls = new Hls();
+        hls.loadSource(data.url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => { 
+             setTimeout(resumePlayback, 100);
+        });
+      } else {
+        video.src = data.url;
+        video.addEventListener('loadedmetadata', resumePlayback, { once: true });
+      }
+
+      // Subtitles
+      video.querySelectorAll("track").forEach(t => t.remove());
+      if(data.subtitles){
+        Object.entries(data.subtitles).forEach(([lang,url])=>{
+          const track = document.createElement("track");
+          track.kind = "subtitles";
+          track.label = lang.toUpperCase();
+          track.srclang = lang;
+          track.src = url;
+          if(lang==="en") track.default = true;
+          video.appendChild(track);
+        });
+      }
+      
+      // Title Update
+      if(data.title){
+        mainTitle.textContent = data.title;
+      } else {
+        mainTitle.textContent = ep.title;
+      }
+
+    }).catch(err => console.error("Firebase Error:", err));
+}
+
+// --- 3. HANDLE BROWSER BACK BUTTON ---
+window.addEventListener('popstate', (event) => {
+    if (event.state && event.state.id) {
+        loadAndPlayEpisode(event.state.id, false);
+    } else {
+        // Reset to poster if back goes to start
+        posterContainer.style.display = "flex";
+        playerContainer.style.display = "none";
+        player.pause();
+    }
+});
+
+// --- 4. GENERATE PLAYLIST UI ---
 playlistData.forEach(ep => {
   const epDiv = document.createElement('div');
-  // Add glass class instead of manual styles
   epDiv.className = 'playlist-item';
    
   const today = new Date();
@@ -414,7 +519,7 @@ playlistData.forEach(ep => {
   title.textContent = ep.title;
   title.style.fontSize = "15px";
   title.style.fontWeight = "500";
-  title.style.textShadow = "0 1px 2px rgba(0,0,0,0.8)"; // Added text shadow
+  title.style.textShadow = "0 1px 2px rgba(0,0,0,0.8)"; 
 
   textDiv.appendChild(title);
 
@@ -431,78 +536,26 @@ playlistData.forEach(ep => {
   epDiv.appendChild(thumb);
   epDiv.appendChild(textDiv);
 
+  // CHANGED: Call the loadAndPlayEpisode function
   epDiv.addEventListener('click', () => {
-    if (isLocked) {
-        alert(`This episode is not yet available.\nRelease Date: ${ep.date}`);
-        return; 
-    }
-   
-    // SET DATA FOR HISTORY
-    window.currentEpData = ep;
-
-    posterContainer.style.display = "none";
-    playerContainer.style.display = "block";
-
-    db.ref(`ourchapter/${ep.id}`).once('value').then(snapshot => {
-      const data = snapshot.val();
-      if(!data || !data.url) { alert("Video unavailable"); return; }
-
-      if(typeof hls !== 'undefined' && hls){ hls.destroy(); hls = null; }
-
-      // --- RESUME LOGIC (Cloud First) ---
-      const resumePlayback = () => {
-          const user = auth.currentUser;
-          if (!window.currentEpData || !user) {
-             player.play(); // Just play if no user or ep data
-             return;
-          }
-
-          // Check Firebase for last position
-          db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).once('value').then(snap => {
-              const saved = snap.val();
-              if (saved && saved.currentTime > 0) {
-                  console.log("Resuming from cloud at:", saved.currentTime);
-                  player.currentTime = saved.currentTime;
-              }
-              player.play();
-          });
-      };
-
-      if(typeof Hls !== 'undefined' && Hls.isSupported()){
-        hls = new Hls();
-        hls.loadSource(data.url);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => { 
-             setTimeout(resumePlayback, 100);
-        });
-      } else {
-        video.src = data.url;
-        video.addEventListener('loadedmetadata', resumePlayback, { once: true });
-      }
-
-      video.querySelectorAll("track").forEach(t => t.remove());
-      if(data.subtitles){
-        Object.entries(data.subtitles).forEach(([lang,url])=>{
-          const track = document.createElement("track");
-          track.kind = "subtitles";
-          track.label = lang.toUpperCase();
-          track.srclang = lang;
-          track.src = url;
-          if(lang==="en") track.default = true;
-          video.appendChild(track);
-        });
-      }
-      
-      if(data.title){
-        mainTitle.textContent = data.title;
-      } else {
-        mainTitle.textContent = ep.title;
-      }
-
-    }).catch(err => console.error("Firebase Error:", err));
+    loadAndPlayEpisode(ep.id, true);
   });
 
   playlistContainer.appendChild(epDiv);
+});
+
+// --- 5. CHECK URL ON PAGE LOAD ---
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const videoId = urlParams.get('v'); // Looks for ?v=1
+    
+    if (videoId) {
+        // Delay slightly to ensure Firebase is ready
+        setTimeout(() => {
+            console.log("Auto-playing from link ID:", videoId);
+            loadAndPlayEpisode(videoId, false);
+        }, 500);
+    }
 });
 </script>
 
