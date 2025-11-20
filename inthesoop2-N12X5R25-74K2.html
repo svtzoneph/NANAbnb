@@ -711,13 +711,23 @@ player.on("timeupdate", () => {
     const now = Date.now();
     if (user && window.currentEpData && !player.paused && player.currentTime > 5) {
         if (now - lastSaveTime > 5000) { // Save every 5s
+            
+            // 1. GET CURRENT PAGE NAME AUTOMATICALLY
+            // This gets the file name (e.g., "ourchapterS17N.html")
+            let pageName = window.location.pathname;
+            // Remove leading "/" if present
+            if(pageName.startsWith('/')) pageName = pageName.substring(1); 
+            // Default if empty
+            if(!pageName) pageName = "videos.html"; 
+
             const dataToSave = {
                 id: window.currentEpData.id,
                 title: window.currentEpData.title,
                 image: window.currentEpData.image,
                 currentTime: player.currentTime,
                 duration: player.duration || 0,
-                timestamp: now
+                timestamp: now,
+                page: pageName // <--- THIS SAVES THE SPECIFIC PAGE
             };
             
             // Write to Cloud
