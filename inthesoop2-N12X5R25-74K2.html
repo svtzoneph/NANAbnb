@@ -345,6 +345,9 @@
 </div> 
 
 <script>
+// --- 1. CONFIGURATION & DATA ---
+// The "id" here is the unique number that will appear in the link (e.g., ?v=1)
+// It MUST match the ID in your Firebase Database (inthesoop2/1)
 const playlistData = [
   { 
     id: "1", 
@@ -386,85 +389,57 @@ const mainTitle = document.getElementById('main-title');
 // Global variable to store current ep data
 window.currentEpData = null;
 
-playlistData.forEach(ep => {
-  const epDiv = document.createElement('div');
-  // Add glass class instead of manual styles
-  epDiv.className = 'playlist-item';
-   
-  const today = new Date();
-  let isLocked = false;
-  if (ep.date) {
-      const releaseDate = new Date(ep.date);
-      if (releaseDate > today) isLocked = true;
-  }
-
-  if (isLocked) {
-      epDiv.classList.add('locked');
-  }
-
-  const thumb = document.createElement('img');
-  thumb.src = ep.image;
-  thumb.style.width = "120px";  
-  thumb.style.height = "68px";   
-  thumb.style.objectFit = "cover"; 
-  thumb.style.borderRadius = "4px";
-  
-  const textDiv = document.createElement('div');
-  textDiv.style.display = "flex";
-  textDiv.style.flexDirection = "column"; 
-  
-  const title = document.createElement('span');
-  title.textContent = ep.title;
-  title.style.fontSize = "15px";
-  title.style.fontWeight = "500";
-  title.style.textShadow = "0 1px 2px rgba(0,0,0,0.8)"; // Added text shadow
-
-  textDiv.appendChild(title);
-
-  if (ep.date) {
-      const dateSpan = document.createElement('span');
-      dateSpan.textContent = isLocked ? `Available: ${ep.date}` : ep.date;
-      dateSpan.style.fontSize = "12px";
-      dateSpan.style.color = isLocked ? "#ff5252" : "#ccc";
-      dateSpan.style.marginTop = "2px";
-      dateSpan.style.textShadow = "0 1px 1px rgba(0,0,0,0.8)";
-      textDiv.appendChild(dateSpan);
-  }
-
-  epDiv.appendChild(thumb);
-  epDiv.appendChild(textDiv);
-
-  epDiv.addEventListener('click', () => {
-    if (isLocked) {
-        alert(`This episode is not yet available.\nRelease Date: ${ep.date}`);
-        return; 
+// --- 2. CORE FUNCTION: PLAY EPISODE ---
+// usage: loadAndPlayEpisode("1", true) -> true means update the URL
+function loadAndPlayEpisode(epId, updateUrl = true) {
+    // A. Find the episode
+    const ep = playlistData.find(item => item.id === epId);
+    
+    if (!ep) {
+        console.warn("Episode ID not found:", epId);
+        return;
     }
-   
-    // SET DATA FOR HISTORY
-    window.currentEpData = ep;
 
+    // B. Check Date Locking
+    const today = new Date();
+    if (ep.date) {
+        const releaseDate = new Date(ep.date);
+        if (releaseDate > today) {
+            alert(`This episode is not yet available.\nRelease Date: ${ep.date}`);
+            return; 
+        }
+    }
+
+    // C. Update the Browser Link (The Unique URL part)
+    // This creates links like: videos.html?v=1
+    if (updateUrl) {
+        const newUrl = window.location.pathname + '?v=' + ep.id;
+        // pushState changes the URL without reloading the page
+        history.pushState({id: ep.id}, '', newUrl);
+    }
+
+    // D. Set Data & UI
+    window.currentEpData = ep;
     posterContainer.style.display = "none";
     playerContainer.style.display = "block";
 
+    // E. Load Video from Firebase
     db.ref(`inthesoop2/${ep.id}`).once('value').then(snapshot => {
       const data = snapshot.val();
       if(!data || !data.url) { alert("Video unavailable"); return; }
 
       if(typeof hls !== 'undefined' && hls){ hls.destroy(); hls = null; }
 
-      // --- RESUME LOGIC (Cloud First) ---
+      // Resume Logic
       const resumePlayback = () => {
           const user = auth.currentUser;
           if (!window.currentEpData || !user) {
-             player.play(); // Just play if no user or ep data
+             player.play(); 
              return;
           }
-
-          // Check Firebase for last position
           db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).once('value').then(snap => {
               const saved = snap.val();
               if (saved && saved.currentTime > 0) {
-                  console.log("Resuming from cloud at:", saved.currentTime);
                   player.currentTime = saved.currentTime;
               }
               player.play();
@@ -483,6 +458,7 @@ playlistData.forEach(ep => {
         video.addEventListener('loadedmetadata', resumePlayback, { once: true });
       }
 
+      // Subtitles
       video.querySelectorAll("track").forEach(t => t.remove());
       if(data.subtitles){
         Object.entries(data.subtitles).forEach(([lang,url])=>{
@@ -496,6 +472,7 @@ playlistData.forEach(ep => {
         });
       }
       
+      // Title
       if(data.title){
         mainTitle.textContent = data.title;
       } else {
@@ -503,9 +480,85 @@ playlistData.forEach(ep => {
       }
 
     }).catch(err => console.error("Firebase Error:", err));
+}
+
+// --- 3. HANDLE BROWSER BACK BUTTON ---
+window.addEventListener('popstate', (event) => {
+    if (event.state && event.state.id) {
+        // If user presses back, play the previous video WITHOUT adding to history stack again
+        loadAndPlayEpisode(event.state.id, false);
+    } else {
+        // If back leads to the start, maybe show poster? 
+        posterContainer.style.display = "flex";
+        playerContainer.style.display = "none";
+        player.pause();
+    }
+});
+
+// --- 4. GENERATE PLAYLIST UI ---
+playlistData.forEach(ep => {
+  const epDiv = document.createElement('div');
+  epDiv.className = 'playlist-item';
+   
+  const today = new Date();
+  let isLocked = false;
+  if (ep.date) {
+      const releaseDate = new Date(ep.date);
+      if (releaseDate > today) isLocked = true;
+  }
+  if (isLocked) epDiv.classList.add('locked');
+
+  const thumb = document.createElement('img');
+  thumb.src = ep.image;
+  thumb.style.width = "120px";  
+  thumb.style.height = "68px";   
+  thumb.style.objectFit = "cover"; 
+  thumb.style.borderRadius = "4px";
+  
+  const textDiv = document.createElement('div');
+  textDiv.style.display = "flex";
+  textDiv.style.flexDirection = "column"; 
+  
+  const title = document.createElement('span');
+  title.textContent = ep.title;
+  title.style.fontSize = "15px";
+  title.style.fontWeight = "500";
+  title.style.textShadow = "0 1px 2px rgba(0,0,0,0.8)";
+
+  textDiv.appendChild(title);
+
+  if (ep.date) {
+      const dateSpan = document.createElement('span');
+      dateSpan.textContent = isLocked ? `Available: ${ep.date}` : ep.date;
+      dateSpan.style.fontSize = "12px";
+      dateSpan.style.color = isLocked ? "#ff5252" : "#ccc";
+      dateSpan.style.marginTop = "2px";
+      dateSpan.style.textShadow = "0 1px 1px rgba(0,0,0,0.8)";
+      textDiv.appendChild(dateSpan);
+  }
+
+  epDiv.appendChild(thumb);
+  epDiv.appendChild(textDiv);
+
+  // When clicked, play and update URL
+  epDiv.addEventListener('click', () => {
+    loadAndPlayEpisode(ep.id, true);
   });
 
   playlistContainer.appendChild(epDiv);
+});
+
+// --- 5. CHECK URL ON PAGE LOAD ---
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const videoId = urlParams.get('v'); // Looks for ?v=1
+    
+    if (videoId) {
+        // Delay slightly to ensure Firebase is ready
+        setTimeout(() => {
+            loadAndPlayEpisode(videoId, false); // false because URL is already there
+        }, 500);
+    }
 });
 </script>
 
