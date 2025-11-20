@@ -15,7 +15,6 @@
 <link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
 <link rel="apple-touch-startup-image" href="splash.png">
 
-<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -25,8 +24,36 @@
   gtag('config', 'G-1B2RJ659GL');
 </script>
 
-  <title>Zone Vault - Gallery</title>
+<script>
+  (function() {
+    const savedTheme = localStorage.getItem('zoneVaultTheme');
+    if(savedTheme) {
+      const style = document.createElement('style');
+      style.innerHTML = `
+        body { 
+          background: ${savedTheme} !important; 
+          background-size: cover !important;
+          background-attachment: fixed !important;
+          background-repeat: no-repeat !important;
+          min-height: 100vh;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  })();
+</script>
+
+  <title>Gallery - Zone Vault</title>
  <style>
+    /* --- CSS VARIABLES FOR GLASS --- */
+    :root {
+        --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        --glass-blur: blur(20px);
+        --text-shadow: 0 1px 2px rgba(0,0,0,0.8); /* Ensure text is readable on any bg */
+    }
+
     * {
         box-sizing: border-box;
     }
@@ -34,13 +61,14 @@
     body {
         margin: 0;
         font-family: 'Segoe UI', Arial, sans-serif;
-        background: black;
-        color: white; /* or #b490e5 */
+        background: black; /* Fallback */
+        color: white; 
         overflow-x: hidden;
         font-size: 16px;
+        transition: background 0.5s ease;
     }
 
-    /* --- HEADER GLASSMORPHISM --- */
+    /* --- HEADER GLASSMORPHISM (UPDATED) --- */
     header {
         padding: 30px 20px 4px 20px; /* top right bottom left */
         display: flex;
@@ -50,11 +78,12 @@
         top: 0;
         z-index: 100;
         
-        /* Glass Effect */
-        background: rgba(255, 255, 255, 0.02);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        /* Hyper Glass Effect */
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
     }
 
@@ -93,15 +122,17 @@
         filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
     }
 
-    /* --- LINKS GLASSMORPHISM --- */
+    /* --- LINKS GLASSMORPHISM (UPDATED) --- */
     .category-link {
         padding: 8px 16px;
         
-        /* Glass Effect added to Links */
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        /* Hyper Glass Buttons */
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: 1px solid rgba(255, 255, 255, 0.4); /* Highlight */
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         
         color: #fff;
         border-radius: 12px;
@@ -110,6 +141,7 @@
         font-weight: bold;
         transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
         position: relative;
+        text-shadow: var(--text-shadow);
     }
 
     .category-link::before {
@@ -127,8 +159,8 @@
         color: #fff;
         transform: scale(1.05);
         /* Hover Glass Brightness */
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.5);
     }
 
     .category-link:hover::before {
@@ -140,6 +172,7 @@
         background: #fff;
         color: #000;
         backdrop-filter: none;
+        text-shadow: none;
     }
 
     .category-link.flash {
@@ -148,12 +181,13 @@
         transition: background 0.6s ease, color 0.6s ease;
     }
 
-    /* --- GALLERY STYLES (Preserved) --- */
+    /* --- GALLERY STYLES (Preserved Layout) --- */
     h1 {
         text-align: center;
         color: #ff3366;
         margin-bottom: 1.5rem;
         font-size: 1.5rem;
+        text-shadow: var(--text-shadow);
     }
 
     .divider {
@@ -162,6 +196,13 @@
         margin: 2rem 0 1rem;
         border-left: 4px solid #ff3366;
         padding-left: 10px;
+        text-shadow: var(--text-shadow);
+        /* Added subtle glass background to divider for readability */
+        background: rgba(0,0,0,0.2);
+        backdrop-filter: blur(5px);
+        border-radius: 0 8px 8px 0;
+        display: inline-block;
+        padding-right: 15px;
     }
 
     .gallery {
@@ -178,7 +219,8 @@
         aspect-ratio: 2 / 3;
         overflow: hidden;
         border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255,255,255,0.15); /* Glass border for images */
     }
 
     .gallery a img {
@@ -193,11 +235,12 @@
     }
 
     .lg-backdrop {
-        backdrop-filter: blur(6px);
+        backdrop-filter: blur(10px); /* Stronger blur for lightbox bg */
+        -webkit-backdrop-filter: blur(10px);
         background-color: rgba(0, 0, 0, 0.85) !important;
     }
 
-    /* --- SIDEBAR GLASSMORPHISM --- */
+    /* --- SIDEBAR GLASSMORPHISM (UPDATED) --- */
     .sidebar {
         display: flex;
         flex-direction: column;
@@ -208,18 +251,18 @@
         max-width: 300px;
         height: 100%;
         
-        /* Improved Glassmorphism */
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        /* Deep Dark Glass */
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
         
         z-index: 9999;
         padding: 20px;
         gap: 10px;
         transition: left 0.3s ease;
         justify-content: space-between;
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6);
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.6);
         overflow-y: auto;
         overscroll-behavior: contain;
     }
@@ -269,12 +312,13 @@
         font-size: 26px;
         font-weight: 700;
         text-align: center;
-        color: #f1f1f1; /* or #b490e5 */
+        color: #f1f1f1; 
         margin-bottom: 20px;
         text-transform: uppercase;
         letter-spacing: 1px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         padding-bottom: 10px;
+        text-shadow: var(--text-shadow);
     }
 
     .sidebar-nav a {
@@ -283,17 +327,17 @@
         font-size: 15px;
         font-weight: 500;
         padding: 10px;
-        border-radius: 6px;
+        border-radius: 8px;
         transition: all 0.3s ease;
-        /* Consistent Link Glass */
+        /* Sidebar Item Glass */
         background: rgba(255, 255, 255, 0.05);
-        border: 1px solid transparent;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .sidebar-nav a:hover {
         background: rgba(255, 255, 255, 0.15);
         padding-left: 20px;
-        border-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
     }
 
     .sidebar-footer {
@@ -321,7 +365,7 @@
         color: #00bfff;
     }
 
-    /* --- MOBILE HEADER GLASSMORPHISM --- */
+    /* --- MOBILE HEADER GLASSMORPHISM (UPDATED) --- */
     .mobile-header {
         display: none;
     }
@@ -340,11 +384,12 @@
             position: sticky;
             top: 0;
 
-            /* Mobile Glass Effect */
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            /* Mobile Hyper Glass */
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .hamburger {
@@ -353,6 +398,7 @@
             border: none;
             color: white;
             cursor: pointer;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
 
         .sidebar {
@@ -389,48 +435,42 @@
 </head>
 <body>
   
-<!-- Mobile hamburger header -->
 <div class="mobile-header">
   <button class="hamburger" onclick="toggleSidebar()">☰</button>
 </div>
 
-<!-- Desktop header (scrollable) -->
 <header id="scrollHeader">
   <div class="header-links">
       <div class="header-logo">
     <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
   </div>
-    <a class="category-link" href="index">LOGIN</a>
-    <a class="category-link" href="profile">PROFILE</a>
-    <a class="category-link" href="home">HOME</a>
-    <a class="category-link" href="live">LIVE</a>
-    <a class="category-link" href="gallery">GALLERY</a>
-    <a class="category-link" href="videos">VIDEOS</a>
+    <a class="category-link" href="index.html">LOGIN</a>
+    <a class="category-link" href="profile.html">PROFILE</a>
+    <a class="category-link" href="home.html">HOME</a>
+    <a class="category-link" href="live.html">LIVE</a>
+    <a class="category-link" href="gallery.html">GALLERY</a>
+    <a class="category-link" href="videos.html">VIDEOS</a>
 </header>
 
-<!-- Sidebar for mobile -->
 <div id="mobileSidebar" class="sidebar">
   <button class="close-btn" onclick="toggleSidebar()">✖</button>
   
-  <!-- Sidebar Title -->
   <div class="sidebar-title">Zone Vault</div>
 
   <nav class="sidebar-nav">
-    <a href="index">LOGIN</a>
-    <a href="profile">PROFILE</a>
-    <a href="home">HOME</a>
-    <a href="live">LIVE</a>
-    <a href="gallery">GALLERY</a>
-    <a href="videos">VIDEOS</a>
+    <a href="index.html">LOGIN</a>
+    <a href="profile.html">PROFILE</a>
+    <a href="home.html">HOME</a>
+    <a href="live.html">LIVE</a>
+    <a href="gallery.html">GALLERY</a>
+    <a href="videos.html">VIDEOS</a>
   </nav>
 
   <div class="sidebar-footer">
-    <!-- Logo Bottom Left -->
     <div class="sidebar-logo">
       <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
     </div>
     
-    <!-- Email Bottom Right -->
     <div class="sidebar-email">
       <a href="zonevaultph@gmail.com" title="Send Email">
         <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
@@ -531,7 +571,6 @@
 
 </div>
 
-  <!-- LightGallery JS -->
   <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/lightgallery.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/plugins/thumbnail/lg-thumbnail.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/plugins/zoom/lg-zoom.umd.min.js"></script>
@@ -633,7 +672,6 @@ window.addEventListener("beforeunload", () => {
 });
 </script>
 
-<!-- Service Worker Update Script -->
 <script>
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').then(reg => {
@@ -732,7 +770,6 @@ linksContainer.addEventListener('wheel', (e) => {
 </script>
   
 
-
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').then(reg => {
@@ -759,39 +796,6 @@ linksContainer.addEventListener('wheel', (e) => {
   }
 </script>
 
-<!-- Fully Responsive Footer -->
-<footer style="
-  width: 100%;
-  color: #ccc;
-  padding: 40px 10px 30px; /* top, left/right, bottom padding */
-  font-size: 14px;
-  line-height: 1.6;
-  box-sizing: border-box;
-  position: relative;
-  margin-top: 10px; /* space above the footer */
-  margin-bottom: 20px; /* change this value to adjust bottom spacing */
-">
-  <div style="
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    text-align: center;
-    position: relative;
-  ">
-    <!-- Bottom border line, slightly lowered -->
-    <div style="
-      height: 1px;
-      background: #333;
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      transform: translateY(-20px);
-    "></div>
-
-    <p style="margin: 30px 0 0;">&copy; 2025 <strong>Zone Vault</strong>. All rights reserved.</p>
-  </div>
-</footer>
 
 <script>
   let lastScrollY = window.scrollY;
@@ -962,4 +966,4 @@ linksContainer.addEventListener('wheel', (e) => {
 </script>
 
 </body>
-</html> 
+</html>
