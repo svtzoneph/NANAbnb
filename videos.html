@@ -1,4 +1,3 @@
-
 <!Doctype html>
 <html lang="en">
 <head>
@@ -29,14 +28,38 @@
 
   gtag('config', 'G-1B2RJ659GL');
 </script>
+
+<script>
+  (function() {
+    const savedTheme = localStorage.getItem('zoneVaultTheme');
+    if(savedTheme) {
+      const style = document.createElement('style');
+      style.innerHTML = `
+        body { 
+          background: ${savedTheme} !important; 
+          background-size: cover !important;
+          background-attachment: fixed !important;
+          background-repeat: no-repeat !important;
+          min-height: 100vh;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  })();
+</script>
+
 <style>
+    /* --- CSS VARIABLES FOR GLASS --- */
     :root {
+        --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        --glass-blur: blur(20px);
+        --text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        
         --bg: black;
-        --card-bg: rgba(255, 255, 255, 0.03);
         --muted: white;
         --accent: white;
-        --badge-bg: linear-gradient(135deg, #1743ff, #4b7bff);
-        --shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
         --radius: 12px;
     }
 
@@ -47,8 +70,9 @@
     body {
         margin: 0;
         font-family: Inter, system-ui;
-        background: black;
+        background: black; /* Fallback */
         color: #ffffff;
+        transition: background 0.5s ease;
     }
 
     .container {
@@ -81,7 +105,7 @@
         }
     }
 
-    /* --- HEADER GLASSMORPHISM --- */
+    /* --- HEADER GLASSMORPHISM (UPDATED) --- */
     header {
         padding: 30px 20px 4px 20px;
         display: flex;
@@ -90,10 +114,14 @@
         position: sticky;
         top: 0;
         z-index: 100;
-        background: rgba(255, 255, 255, 0.02);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        
+        /* Hyper Glass Effect */
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        
         transition: transform 0.6s ease-out;
     }
 
@@ -129,13 +157,18 @@
         filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
     }
 
-    /* --- LINKS GLASSMORPHISM --- */
+    /* --- LINKS GLASSMORPHISM (UPDATED) --- */
     .category-link {
         padding: 8px 16px;
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        
+        /* Hyper Glass Button */
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        
         color: #fff;
         border-radius: 12px;
         font-size: 12px;
@@ -143,6 +176,7 @@
         font-weight: bold;
         transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
         position: relative;
+        text-shadow: var(--text-shadow);
     }
 
     .category-link::before {
@@ -159,8 +193,8 @@
     .category-link:hover {
         color: #fff;
         transform: scale(1.05);
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.5);
     }
 
     .category-link:hover::before {
@@ -171,6 +205,7 @@
         background: #fff;
         color: #000;
         backdrop-filter: none;
+        text-shadow: none;
     }
 
     .category-link.flash {
@@ -179,14 +214,17 @@
         transition: background 0.6s ease, color 0.6s ease;
     }
 
-    /* --- CARD GLASSMORPHISM --- */
+    /* --- CARD GLASSMORPHISM (UPDATED) --- */
     .card {
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        /* Card Hyper Glass */
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border: var(--glass-border);
+        border-top: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: var(--glass-shadow);
+        
         border-radius: var(--radius);
-        box-shadow: var(--shadow);
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -195,9 +233,9 @@
 
     .card:hover {
         transform: translateY(-6px);
-        box-shadow: 0 14px 38px rgba(0, 0, 0, 0.5);
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 14px 38px rgba(0, 0, 0, 0.6);
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.5);
     }
 
     .thumb img {
@@ -216,9 +254,10 @@
     }
 
     .meta {
-        color: #ddd;
+        color: #eee;
         font-size: 10px;
         font-weight: 500;
+        text-shadow: var(--text-shadow);
     }
 
     .title {
@@ -226,11 +265,13 @@
         font-size: 18px;
         font-weight: 700;
         color: white;
+        text-shadow: var(--text-shadow);
     }
 
     .hashtags {
-        color: #aaa;
+        color: #ddd;
         font-size: 13px;
+        text-shadow: var(--text-shadow);
     }
 
     .bottom {
@@ -248,8 +289,12 @@
         font-weight: 700;
         font-size: 14px;
         color: #fff;
-        background: linear-gradient(135deg, #000000, #1a1a1a);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        
+        /* Button Glass Style */
+        background: rgba(0,0,0,0.6);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(5px);
+        
         border-radius: 8px;
         cursor: pointer;
         transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
@@ -259,6 +304,7 @@
     .btn:hover {
         transform: translateY(-3px);
         box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        background: rgba(255,255,255,0.2);
     }
 
     .btn:active {
@@ -299,18 +345,20 @@
         border-radius: 5px;
         cursor: pointer;
         border: 1px solid rgba(255, 255, 255, 0.2);
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.1);
         color: #fff;
         font-weight: 600;
         backdrop-filter: blur(4px);
+        text-shadow: var(--text-shadow);
     }
     #pagination button.active {
         border: 1px solid white;
         background: white;
         color: black;
+        text-shadow: none;
     }
 
-    /* --- SIDEBAR GLASSMORPHISM --- */
+    /* --- SIDEBAR GLASSMORPHISM (UPDATED) --- */
     .sidebar {
         display: flex;
         flex-direction: column;
@@ -320,15 +368,18 @@
         width: 80%;
         max-width: 300px;
         height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        
+        /* Deep Dark Glass */
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        
         z-index: 9999;
         padding: 20px;
         gap: 10px;
         transition: left 0.3s ease;
         justify-content: space-between;
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6);
         overflow-y: auto;
         overscroll-behavior: contain;
@@ -383,6 +434,7 @@
         letter-spacing: 1px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         padding-bottom: 10px;
+        text-shadow: var(--text-shadow);
     }
 
     .sidebar-nav a {
@@ -393,14 +445,15 @@
         padding: 10px;
         border-radius: 6px;
         transition: all 0.3s ease;
+        /* Sidebar Item Glass */
         background: rgba(255, 255, 255, 0.05);
-        border: 1px solid transparent;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .sidebar-nav a:hover {
         background: rgba(255, 255, 255, 0.15);
         padding-left: 20px;
-        border-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
     }
 
     .sidebar-footer {
@@ -443,10 +496,14 @@
             align-items: center;
             justify-content: space-between;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            
+            /* Mobile Hyper Glass */
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            
             position: sticky;
             top: 0;
         }
@@ -486,6 +543,7 @@
         font-size: 22px;
         cursor: pointer;
         transition: transform 0.2s ease;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
     }
 
     .fav-btn:hover {
@@ -498,11 +556,13 @@
         text-align: center;
         margin-top: 8px;
         font-weight: bold;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     }
 
     .favorite-btn {
-        background: transparent;
-        border: 2px solid white;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.3);
+        backdrop-filter: blur(5px);
         color: white;
         font-weight: bold;
         font-size: 13px;
@@ -513,21 +573,21 @@
     }
 
     .favorite-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
+        background: rgba(255, 255, 255, 0.25);
+        border-color: white;
     }
 
-    /* --- FAVORITE MODAL GLASSMORPHISM --- */
+    /* --- FAVORITE MODAL GLASSMORPHISM (UPDATED) --- */
     .favorite-modal {
         display: none;
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
-        /* Lighter overlay to let blur show */
-        background: rgba(0,0,0,0.6);
+        background: rgba(0,0,0,0.7);
         z-index: 99999;
         align-items: center;
         justify-content: center;
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(15px); /* Overlay Blur */
+        -webkit-backdrop-filter: blur(15px);
     }
 
     .favorite-modal.active {
@@ -537,9 +597,9 @@
     .favorite-content {
         /* Strong Glass Modal */
         background: rgba(20, 20, 20, 0.75);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         
         color: white;
         padding: 20px;
@@ -549,7 +609,7 @@
         max-height: 80vh;
         overflow-y: auto;
         position: relative;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.6);
         scroll-behavior: smooth;
     }
 
@@ -572,6 +632,7 @@
     .favorite-content h2 {
         text-align: center;
         margin-top: 0;
+        text-shadow: var(--text-shadow);
     }
 
     .close-fav {
@@ -602,7 +663,7 @@
         top: 0;
         padding: 15px 0;
         z-index: 10;
-        
+        text-shadow: var(--text-shadow);
     }
 
     .favorite-box {
@@ -610,9 +671,8 @@
         overflow-y: auto;
         padding: 10px;
         border-radius: 12px;
-        /* Inner Glass Box */
         background: rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .favorite-box::-webkit-scrollbar {
@@ -643,7 +703,7 @@
         /* Glass Item Cards */
         background: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(5px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 10px;
         padding: 10px;
         text-align: center;
@@ -654,7 +714,7 @@
     .favorite-list .fav-item:hover {
         transform: translateY(-4px);
         background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
     }
     .favorite-list img {
         width: 100%;
@@ -683,6 +743,7 @@
         color: white;
         font-size: 14px;
         margin-top: 5px;
+        text-shadow: var(--text-shadow);
     }
     @media (min-width: 1980px) {
         .countdown {
@@ -690,19 +751,20 @@
         }
     }
 
-    /* --- INFO MODAL GLASSMORPHISM --- */
+    /* --- INFO MODAL GLASSMORPHISM (UPDATED) --- */
     .info-modal {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.6);
+        background: rgba(0, 0, 0, 0.7);
         display: none;
         align-items: center;
         justify-content: center;
         z-index: 9999;
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
     }
 
     .info-modal.active {
@@ -710,10 +772,10 @@
     }
 
     .info-content {
-        background: rgba(20, 20, 20, 0.75);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(20, 20, 20, 0.8);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         
         color: white;
         border-radius: 14px;
@@ -724,7 +786,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.6);
     }
 
     .info-title {
@@ -732,9 +794,10 @@
         font-weight: bold;
         margin: 0;
         text-align: center;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255,255,255,0.15);
         padding-bottom: 10px;
         width: 100%;
+        text-shadow: var(--text-shadow);
     }
 
     .spacer {
@@ -742,8 +805,8 @@
     }
 
     .scroll-box {
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 10px;
         padding: 15px;
         width: 100%;
@@ -764,34 +827,36 @@
     .scroll-box::-webkit-scrollbar-thumb:hover {
         background: rgba(255,255,255,0.5);
     }
+    
+    .scroll-box p, .scroll-box b, .scroll-box strong {
+        text-shadow: 0 1px 1px rgba(0,0,0,0.8);
+    }
 
     .close-info {
         margin-top: 15px;
         padding: 10px 20px;
         background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         color: white;
         border-radius: 6px;
         cursor: pointer;
         font-size: 14px;
         transition: background 0.3s;
+        backdrop-filter: blur(5px);
     }
     .close-info:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.25);
     }
 </style>
 </head>
 <body>
   
-<!-- Info Modal -->
 <div id="infoModal" class="info-modal">
   <div class="info-content">
     <h2 class="info-title">Important Notice</h2>
 
-    <!-- space below title -->
     <div class="spacer"></div>
 
-    <!-- Scrollable text box -->
     <div class="scroll-box">
 
 <p><b>Player Update:</b></p>
@@ -848,43 +913,38 @@ window.addEventListener('DOMContentLoaded', () => {
   </div>
 </div>
 
-<!-- Desktop header (scrollable) -->
 <header id="scrollHeader">
   <div class="header-links">
       <div class="header-logo">
     <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
   </div>
-    <a class="category-link" href="index">LOGIN</a>
-    <a class="category-link" href="profile">PROFILE</a>
-    <a class="category-link" href="home">HOME</a>
-    <a class="category-link" href="live">LIVE</a>
-    <a class="category-link" href="gallery">GALLERY</a>
-    <a class="category-link" href="videos">VIDEOS</a>
+    <a class="category-link" href="index.html">LOGIN</a>
+    <a class="category-link" href="profile.html">PROFILE</a>
+    <a class="category-link" href="home.html">HOME</a>
+    <a class="category-link" href="live.html">LIVE</a>
+    <a class="category-link" href="gallery.html">GALLERY</a>
+    <a class="category-link" href="videos.html">VIDEOS</a>
 </header>
 
-<!-- Sidebar for mobile -->
 <div id="mobileSidebar" class="sidebar">
   <button class="close-btn" onclick="toggleSidebar()">✖</button>
   
-  <!-- Sidebar Title -->
   <div class="sidebar-title">Zone Vault</div>
 
   <nav class="sidebar-nav">
-    <a href="index">LOGIN</a>
-    <a href="profile">PROFILE</a>
-    <a href="home">HOME</a>
-    <a href="live">LIVE</a>
-    <a href="gallery">GALLERY</a>
-    <a href="videos">VIDEOS</a>
+    <a href="index.html">LOGIN</a>
+    <a href="profile.html">PROFILE</a>
+    <a href="home.html">HOME</a>
+    <a href="live.html">LIVE</a>
+    <a href="gallery.html">GALLERY</a>
+    <a href="videos.html">VIDEOS</a>
   </nav>
 
   <div class="sidebar-footer">
-    <!-- Logo Bottom Left -->
     <div class="sidebar-logo">
       <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
     </div>
     
-    <!-- Email Bottom Right -->
     <div class="sidebar-email">
       <a href="zonevaultph@gmail.com" title="Send Email">
         <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
@@ -894,7 +954,6 @@ window.addEventListener('DOMContentLoaded', () => {
 </div>
 
 
-<!-- Favorite Modal -->
 <div id="favoriteModal" class="favorite-modal">
   <div class="favorite-content">
     <button class="close-fav" onclick="closeFavoriteModal()">✖</button>
@@ -912,7 +971,6 @@ window.addEventListener('DOMContentLoaded', () => {
 </div>
 
 
-<!-- Firebase scripts -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -961,20 +1019,20 @@ function saveFavoritesToFirebase() {
 
 /* ==================== Video Data ==================== */
 const data = [
-  {id:"v0.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png", category:"Get ready to experience SEVENTEEN’s relaxing and heartwarming moments once again.", title:"IN THE SOOP SEVENTEEN ver. Season2", hashtags:"NEW ADDED", link:"inthesoop2-N12X5R25-74K2", releaseDate: "2025-11-14T21:00:00"},
-  {id:"v0.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svt_ourchapter.jpg", category:"After 10 years together, Seventeen look back at where they've been to uncover where they'll go next.", title:"SEVENTEEN: OUR CHAPTER", hashtags:"NEW ADDED", link:"ourchapterS17N-111025-6B4"},
-  {id:"v1.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN CONCERT 'POWER OF LOVE'", hashtags:"", link:"svtreaming1"},
-  {id:"v1.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN WORLD TOUR [BE THE SUN] - SEOUL", hashtags:"", link:"svtreaming2"},
-  {id:"v1.3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN TOUR 'FOLLOW' TO SEOUL", hashtags:"", link:"svtreaming3"},
-  {id:"v1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN [NEW_] WORLD TOUR IN INCHEON", hashtags:"", link:"newtour"},
-  {id:"v2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_gwangju.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN GWANGJU", hashtags:"", link:"hxwingwangju"},
-  {id:"v3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_seoul.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN SEOUL", hashtags:"", link:"hxwfanconcert"},
-  {id:"v4", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/nana_bnb.png", category:"VIDEOS", title:"NANA bnb with SEVENTEEN", hashtags:"", link:"nanabnb"},
-  {id:"v5", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/holiday.png", category:"VIDEOS", title:"SEVENTEEN 2025 JAPAN FAN MEETING 'HOLIDAY", hashtags:"", link:"svtholiday"},
-  {id:"v6", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.png", category:"VIDEOS", title:"SEVENTEEN 'RIGHT HERE' WORLD TOUR IN GOYANG", hashtags:"", link:"rightheregoyang"},
-  {id:"v7", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/arena-tour.png", category:"VIDEOS", title:"SEVENTEEN 2018 JAPAN ARENA TOUR 'SVT'", hashtags:"", link:"arenatour"},
-  {id:"v8", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/japan-concert.png", category:"VIDEOS", title:"17 JAPAN CONCERT Say the name #SEVENTEEN", hashtags:"", link:"svtjapanconcert"},
-  {id:"v9", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/disney.png", category:"VIDEOS", title:"SEVENTEEN TOUR AGAIN DISNEY+", hashtags:"", link:"touragain"}
+  {id:"v0.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png", category:"Get ready to experience SEVENTEEN’s relaxing and heartwarming moments once again.", title:"IN THE SOOP SEVENTEEN ver. Season2", hashtags:"NEW ADDED", link:"inthesoop2.html", releaseDate: "2025-11-14T21:00:00"},
+  {id:"v0.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svt_ourchapter.jpg", category:"After 10 years together, Seventeen look back at where they've been to uncover where they'll go next.", title:"SEVENTEEN: OUR CHAPTER", hashtags:"NEW ADDED", link:"ourchapter.html"},
+  {id:"v1.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN CONCERT 'POWER OF LOVE'", hashtags:"", link:"svtreaming1.html"},
+  {id:"v1.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN WORLD TOUR [BE THE SUN] - SEOUL", hashtags:"", link:"svtreaming2.html"},
+  {id:"v1.3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"SEVENTEEN TOUR 'FOLLOW' TO SEOUL", hashtags:"", link:"svtreaming3.html"},
+  {id:"v1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN [NEW_] WORLD TOUR IN INCHEON", hashtags:"", link:"newtour.html"},
+  {id:"v2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_gwangju.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN GWANGJU", hashtags:"", link:"hxwingwangju.html"},
+  {id:"v3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_seoul.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN SEOUL", hashtags:"", link:"hxwfanconcert.html"},
+  {id:"v4", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/nana_bnb.png", category:"VIDEOS", title:"NANA bnb with SEVENTEEN", hashtags:"", link:"nanabnb.html"},
+  {id:"v5", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/holiday.png", category:"VIDEOS", title:"SEVENTEEN 2025 JAPAN FAN MEETING 'HOLIDAY", hashtags:"", link:"svtholiday.html"},
+  {id:"v6", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.png", category:"VIDEOS", title:"SEVENTEEN 'RIGHT HERE' WORLD TOUR IN GOYANG", hashtags:"", link:"rightheregoyang.html"},
+  {id:"v7", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/arena-tour.png", category:"VIDEOS", title:"SEVENTEEN 2018 JAPAN ARENA TOUR 'SVT'", hashtags:"", link:"arenatour.html"},
+  {id:"v8", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/japan-concert.png", category:"VIDEOS", title:"17 JAPAN CONCERT Say the name #SEVENTEEN", hashtags:"", link:"svtjapanconcert.html"},
+  {id:"v9", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/disney.png", category:"VIDEOS", title:"SEVENTEEN TOUR AGAIN DISNEY+", hashtags:"", link:"touragain.html"}
 ];
 
 let currentPaginationPage = 1;
