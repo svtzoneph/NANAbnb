@@ -15,11 +15,13 @@ const firebaseConfig = {
   measurementId: "G-VFNH70R4D9"
 };
 
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-
 const messaging = firebase.messaging();
 
 // This handles the notification when the browser is CLOSED or in BACKGROUND
+// Note: If your sender script sends a "notification" block, this might be skipped 
+// by the browser in favor of the default display. That is normal behavior.
 messaging.onBackgroundMessage((payload) => {
   console.log('[sw.js] Received background message ', payload);
   
@@ -27,19 +29,17 @@ messaging.onBackgroundMessage((payload) => {
   const notificationOptions = {
     body: payload.notification.body,
     icon: payload.notification.icon || 'https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png',
-    badge: '/badge.png', // Ensure you have this image or remove this line
-    // We store the URL in the 'data' property so the click handler can use it
+    // data handles the click action URL
     data: { url: payload.data?.click_action || '/' } 
   };
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-
 // ============================
-// 2. CACHING (Your existing setup)
+// 2. CACHING
 // ============================
-const CACHE_NAME = 'zonevault-v105'; // I incremented this for you
+const CACHE_NAME = 'zonevault-v106'; // UPDATED VERSION
 const urlsToCache = [
   './',
   './index.html',
@@ -53,10 +53,10 @@ const urlsToCache = [
   './bdaymessage'
 ];
 
-// INSTALL: cache files
+// INSTALL: Cache files immediately
 self.addEventListener('install', event => {
-  console.log('[sw.js] Installing...');
-  self.skipWaiting();
+  console.log('[sw.js] Installing new version:', CACHE_NAME);
+  self.skipWaiting(); // Forces this new SW to become active immediately
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(urlsToCache))
@@ -64,7 +64,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// ACTIVATE: remove old caches
+// ACTIVATE: Remove old caches
 self.addEventListener('activate', event => {
   console.log('[sw.js] Activating...');
   event.waitUntil(
@@ -79,11 +79,11 @@ self.addEventListener('activate', event => {
           })
         )
       )
-      .then(() => self.clients.claim())
+      .then(() => self.clients.claim()) // Take control of all open tabs immediately
   );
 });
 
-// FETCH: respond from cache or network
+// FETCH: Respond from cache or network
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
@@ -93,30 +93,34 @@ self.addEventListener('fetch', event => {
 });
 
 // ============================
-// 3. NOTIFICATION CLICK (Updated to work with Firebase)
+// 3. NOTIFICATION CLICK
 // ============================
 self.addEventListener('notificationclick', event => {
   console.log('[sw.js] Notification clicked');
-  event.notification.close();
+  event.notification.close(); // Close the notification
 
-  // Retrieve the URL we stored in the data object above
-  // Firebase typically sends it in payload.data.click_action
+  // Get the URL from the data payload
   let urlToOpen = '/';
   if (event.notification.data && event.notification.data.url) {
     urlToOpen = event.notification.data.url;
   }
 
+  // Logic to open the window or focus an existing one
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })
       .then(windowClients => {
-        // Focus if already open
+        // 1. If a tab with the URL is already open, focus it
         for (let client of windowClients) {
           if (client.url.includes(urlToOpen) && 'focus' in client) {
             return client.focus();
           }
         }
-        // Otherwise open new tab
+        // 2. Otherwise, open a new tab
         if (clients.openWindow) {
+          // Handle relative vs absolute URLs
+          if (urlToOpen.startsWith('/')) {
+            urlToOpen = self.registration.scope.replace(/\/$/, '') + urlToOpen;
+          }
           return clients.openWindow(urlToOpen);
         }
       })
