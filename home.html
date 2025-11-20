@@ -30,8 +30,36 @@
   gtag('config', 'G-1B2RJ659GL');
 </script>
 
+<script>
+  (function() {
+    const savedTheme = localStorage.getItem('zoneVaultTheme');
+    if(savedTheme) {
+      const style = document.createElement('style');
+      style.innerHTML = `
+        body { 
+          background: ${savedTheme} !important; 
+          background-size: cover !important;
+          background-attachment: fixed !important;
+          background-repeat: no-repeat !important;
+          min-height: 100vh;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  })();
+</script>
+
   <title>Home | Zone Vault</title>
   <style>
+    /* --- CSS VARIABLES FOR GLASS --- */
+    :root {
+        --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        --glass-blur: blur(20px);
+        --text-shadow: 0 1px 2px rgba(0,0,0,0.8); /* Readability on any bg */
+    }
+
     * {
         box-sizing: border-box;
     }
@@ -43,14 +71,14 @@
     body {
         margin: 0;
         font-family: 'Segoe UI', Arial, sans-serif;
-        /* Removed glass/gradient on background, reverted to black */
-        background: black;
+        background: black; /* Fallback */
         color: white;
         overflow-x: hidden;
         font-size: 16px;
+        transition: background 0.5s ease; /* Smooth transition if theme changes */
     }
 
-    /* --- HEADER GLASSMORPHISM --- */
+    /* --- HEADER GLASSMORPHISM (UPDATED) --- */
     header {
         padding: 30px 20px 4px 20px;
         display: flex;
@@ -60,11 +88,12 @@
         top: 0;
         z-index: 100;
         
-        /* Glass Effect added to Header */
-        background: rgba(255, 255, 255, 0.02);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        /* Hyper Glass Effect */
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     }
 
     .header-links {
@@ -100,23 +129,26 @@
         filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
     }
 
-    /* --- LINKS GLASSMORPHISM --- */
+    /* --- LINKS GLASSMORPHISM (UPDATED) --- */
     .category-link {
         padding: 8px 16px;
         
-        /* Glass Effect added to Links */
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        /* Button Glass - Hyper */
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: 1px solid rgba(255, 255, 255, 0.4); /* Highlight */
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         
         color: #fff;
         border-radius: 12px;
         font-size: 14px;
         text-decoration: none;
         font-weight: bold;
-        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+        transition: all 0.3s ease;
         position: relative;
+        text-shadow: var(--text-shadow);
     }
 
     .category-link::before {
@@ -133,8 +165,8 @@
     .category-link:hover {
         color: #fff;
         transform: scale(1.05);
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.25);
+        border-color: rgba(255, 255, 255, 0.5);
     }
 
     .category-link:hover::before {
@@ -144,8 +176,8 @@
     .category-link.active {
         background: #fff;
         color: #000;
-        /* Remove transparency for active state */
         backdrop-filter: none;
+        text-shadow: none;
     }
 
     .category-link.flash {
@@ -162,18 +194,21 @@
         gap: 20px;
     }
 
-    /* Keeping Hero Glassmorphism as previously requested */
+    /* --- HERO GLASSMORPHISM (UPDATED) --- */
     .hero-left, .hero-right {
         flex: 1 1 calc(50% - 20px);
         min-width: 300px;
         padding: 40px 30px;
         
-        /* Hero Glass Styles */
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        /* Hyper Glass Styles */
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border: var(--glass-border);
+        border-top: 1px solid rgba(255, 255, 255, 0.5); /* Top Highlight */
+        border-left: 1px solid rgba(255, 255, 255, 0.5); /* Left Highlight */
         border-radius: 24px;
+        box-shadow: var(--glass-shadow);
     }
 
     .hero-left {
@@ -186,13 +221,15 @@
         font-size: clamp(40px, 9vw, 34px);
         margin-bottom: 50px;
         align-items: center;
-        color: #f1f1f1;
+        color: #fff;
+        text-shadow: var(--text-shadow);
     }
 
     .hero-left p {
         font-size: clamp(14px, 6vw, 18px);
         color: #f1f1f1;
         margin-bottom: 100px;
+        text-shadow: var(--text-shadow);
     }
 
     .hero-right {
@@ -207,6 +244,9 @@
         margin-bottom: 20px;
         border-radius: 16px;
         overflow: hidden;
+        /* Image Glass Border */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
     }
 
     .main-image img {
@@ -246,18 +286,23 @@
         aspect-ratio: 1 / 1; /* square */
         border-radius: 12px;
         overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        background: rgba(255, 255, 255, 0.05);
+        
+        /* Glassy Thumbnails */
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(5px);
+        
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: border 0.3s ease, background-color 0.3s ease;
+        transition: all 0.3s ease;
     }
 
     .thumb-box.active,
     .thumb-box:hover {
-        border-color: #ffc107;
-        background: rgba(255, 255, 255, 0.1);
+        border-color: #fff;
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
     }
 
     .thumb {
@@ -283,15 +328,18 @@
         gap: 20px;
     }
 
+    /* --- ACCORDION GLASSMORPHISM (UPDATED) --- */
     .accordion {
         border-radius: 20px;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        /* Accordion Glass */
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        
+        /* Accordion Hyper Glass */
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: var(--glass-shadow);
     }
 
     .accordion-header {
@@ -301,18 +349,25 @@
         align-items: center;
         cursor: pointer;
         background: rgba(255, 255, 255, 0.05);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: background 0.2s;
+    }
+    
+    .accordion-header:hover {
+        background: rgba(255, 255, 255, 0.1);
     }
 
     .accordion-header h3 {
         margin: 0;
         font-size: clamp(14px, 4vw, 18px);
-        color: #f1f1f1;
+        color: #fff;
+        text-shadow: var(--text-shadow);
     }
 
     .arrow {
         transition: transform 0.3s ease;
         font-size: 16px;
+        text-shadow: var(--text-shadow);
     }
 
     .accordion.open .arrow {
@@ -336,11 +391,12 @@
         transform: scaleY(1);
     }
 
-    .accordion-content p {
+    .accordion-content p, .accordion-content li {
         margin: 0;
         line-height: 1.6;
         font-size: clamp(12px, 2.5vw, 14px);
         color: #f1f1f1;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.8);
     }
 
     .accordion-content.scrollable {
@@ -358,7 +414,7 @@
         border-radius: 10px;
     }
 
-    /* --- SIDEBAR --- */
+    /* --- SIDEBAR GLASSMORPHISM (UPDATED) --- */
     .sidebar {
         display: flex;
         flex-direction: column;
@@ -368,17 +424,19 @@
         width: 80%;
         max-width: 300px;
         height: 100%;
-        /* Sidebar Glass */
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        
+        /* Deep Dark Glass */
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        
         z-index: 9999;
         padding: 20px;
         gap: 10px;
         transition: left 0.3s ease;
         justify-content: space-between;
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6);
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.6);
         overflow-y: auto;
         overscroll-behavior: contain;
     }
@@ -440,14 +498,17 @@
         font-size: 15px;
         font-weight: 500;
         padding: 10px;
-        border-radius: 6px;
+        border-radius: 8px;
         transition: all 0.3s ease;
+        /* Sidebar Item Glass */
         background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .sidebar-nav a:hover {
         background: rgba(255, 255, 255, 0.15);
         padding-left: 20px;
+        border-color: rgba(255, 255, 255, 0.3);
     }
 
     .sidebar-footer {
@@ -519,7 +580,7 @@
         position: fixed;
         top: 0; left: 0;
         width: 100%; height: 100%;
-        background: rgba(0,0,0,0.7);
+        background: rgba(0,0,0,0.8); /* Darker overlay */
         display: none;
         align-items: center;
         justify-content: center;
@@ -529,26 +590,30 @@
         font-family: Arial, sans-serif;
         opacity: 0;
         transition: opacity 0.6s ease;
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(15px); /* Strong Blur on overlay */
+        -webkit-backdrop-filter: blur(15px);
     }
 
     #noticeBox,
     #secondBox {
         position: relative;
         z-index: 10;
-        background: rgba(30, 30, 30, 0.6);
+        
+        /* Modal Glass */
+        background: rgba(30, 30, 30, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        
         padding: 18px;
         border-radius: 12px;
         width: 100%;
         max-width: 500px;
         text-align: center;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-        border: 1px solid rgba(255, 255, 255, 0.1);
         overflow-y: auto;
         max-height: 90vh;
         color: white;
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
     }
 
     #noticeBox::before,
@@ -560,10 +625,10 @@
     #noticeBox .btn-link,
     #secondBox button,
     #secondBox .btn-link {
-        background: rgba(0,0,0,0.5);
+        background: rgba(255,255,255,0.1);
         color: white;
         padding: 10px 18px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
         border-radius: 6px;
         cursor: pointer;
         font-size: 14px;
@@ -573,12 +638,14 @@
         margin: 6px;
         position: relative;
         z-index: 20;
+        backdrop-filter: blur(5px);
     }
     #noticeBox button:hover,
     #noticeBox .btn-link:hover,
     #secondBox button:hover,
     #secondBox .btn-link:hover{
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.25);
+        border-color: white;
     }
 
     /* Responsive */
@@ -632,14 +699,15 @@
             padding: 10px 9px;
             align-items: center;
             justify-content: space-between;
-            /* Mobile Header Glass */
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            /* Mobile Header Hyper Glass */
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
             position: sticky;
             top: 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .hamburger {
@@ -648,6 +716,7 @@
             border: none;
             color: white;
             cursor: pointer;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
 
         .sidebar {
@@ -700,7 +769,6 @@
 </head>
 <body>
   
-<!-- First Modal -->
 <div id="noticeModal">
   <div id="noticeBox">
     <h3 class="modal-title">⚠️ Notice</h3>
@@ -721,7 +789,6 @@
 </div>
 
 
-<!-- Second Modal -->
 <div id="secondModal">
   <div id="secondBox">
     <p style="line-height: 1.5; font-size: 14px;">
@@ -741,48 +808,42 @@
   </div>
 </div>
 
-<!-- Mobile hamburger header -->
 <div class="mobile-header">
   <button class="hamburger" onclick="toggleSidebar()">☰</button>
 </div>
 
-<!-- Desktop header (scrollable) -->
 <header id="scrollHeader">
   <div class="header-links">
       <div class="header-logo">
     <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
   </div>
-    <a class="category-link" href="index">LOGIN</a>
-    <a class="category-link" href="profile">PROFILE</a>
-    <a class="category-link" href="home">HOME</a>
-    <a class="category-link" href="live">LIVE</a>
-    <a class="category-link" href="gallery">GALLERY</a>
-    <a class="category-link" href="videos">VIDEOS</a>
+    <a class="category-link" href="index.html">LOGIN</a>
+    <a class="category-link" href="profile.html">PROFILE</a>
+    <a class="category-link" href="home.html">HOME</a>
+    <a class="category-link" href="live.html">LIVE</a>
+    <a class="category-link" href="gallery.html">GALLERY</a>
+    <a class="category-link" href="videos.html">VIDEOS</a>
 </header>
 
-<!-- Sidebar for mobile -->
 <div id="mobileSidebar" class="sidebar">
   <button class="close-btn" onclick="toggleSidebar()">✖</button>
   
-  <!-- Sidebar Title -->
   <div class="sidebar-title">Zone Vault</div>
 
   <nav class="sidebar-nav">
-    <a href="index">LOGIN</a>
-    <a href="profile">PROFILE</a>
-    <a href="home">HOME</a>
-    <a href="live">LIVE</a>
-    <a href="gallery">GALLERY</a>
-    <a href="videos">VIDEOS</a>
+    <a href="index.html">LOGIN</a>
+    <a href="profile.html">PROFILE</a>
+    <a href="home.html">HOME</a>
+    <a href="live.html">LIVE</a>
+    <a href="gallery.html">GALLERY</a>
+    <a href="videos.html">VIDEOS</a>
   </nav>
 
   <div class="sidebar-footer">
-    <!-- Logo Bottom Left -->
     <div class="sidebar-logo">
       <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
     </div>
     
-    <!-- Email Bottom Right -->
     <div class="sidebar-email">
       <a href="zonevaultph@gmail.com" title="Send Email">
         <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
@@ -791,7 +852,6 @@
   </div>
 </div>
 
-  <!-- Hero Section -->
   <div class="hero-section">
     <div class="hero-left">
       <h1>Welcome to Zone Vault</h1>
@@ -824,8 +884,7 @@
     </div>
   </div>
 
- <!-- Accordion Section -->
-<div class="container">
+ <div class="container">
   <div class="grid">
     <div class="accordion">
       <div class="accordion-header">
@@ -1038,7 +1097,6 @@ window.addEventListener("beforeunload", () => {
 </script>
 
 
-<!-- Service Worker Update Script -->
 <script>
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').then(reg => {
@@ -1197,7 +1255,6 @@ function switchImage(box) {
   }
 </script>
 
-<!-- Fully Responsive Footer -->
 <footer style="
   width: 100%;
   color: #ccc;
@@ -1216,7 +1273,6 @@ function switchImage(box) {
     text-align: center;
     position: relative;
   ">
-    <!-- Bottom border line, slightly lowered -->
     <div style="
       height: 1px;
       background: #333;
@@ -1435,4 +1491,4 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
     
 </body>
-</html> 
+</html>
