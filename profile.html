@@ -99,6 +99,9 @@
         -webkit-backdrop-filter: blur(25px);
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     header.show { transform: translateY(0); transition: transform 0.6s ease-out; }
@@ -140,6 +143,9 @@
         transition: all 0.3s ease;
         position: relative;
         text-shadow: var(--text-shadow);
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     .category-link::before {
@@ -183,6 +189,9 @@
         border-right: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 10px 0 30px rgba(0, 0, 0, 0.6);
         overflow-y: auto;
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     .sidebar.open { left: 0; }
@@ -294,6 +303,9 @@
             position: sticky;
             top: 0;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            /* SMOOTHNESS BOOSTER */
+            transform: translateZ(0);
+            will-change: transform, backdrop-filter;
         }
 
         .hamburger { 
@@ -336,7 +348,10 @@
         box-shadow: var(--glass-shadow);
         border-radius: 16px; overflow: hidden; position: relative;
         border-top: 1px solid rgba(255, 255, 255, 0.5); 
-        border-left: 1px solid rgba(255, 255, 255, 0.5); 
+        border-left: 1px solid rgba(255, 255, 255, 0.5);
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     .banner-bg {
@@ -382,6 +397,9 @@
         color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px;
         cursor: pointer; margin-top: 10px; transition: all 0.2s;
         backdrop-filter: blur(4px);
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
     .edit-btn:hover { background: rgba(255,255,255,0.3); border-color: white; }
 
@@ -389,6 +407,9 @@
         width: 100%; margin-top: 20px; background: rgba(0, 0, 0, 0.4);
         padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
         display: none; backdrop-filter: blur(10px);
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     .form-group { margin-bottom: 15px; text-align: left; }
@@ -423,6 +444,9 @@
         border-radius: 50%; display: flex; align-items: center; justify-content: center;
         cursor: pointer; color: white; position: relative;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
@@ -433,6 +457,9 @@
         box-shadow: var(--glass-shadow); border-radius: 16px; padding: 25px;
         display: flex; flex-direction: column;
         border-top: 1px solid rgba(255, 255, 255, 0.5); border-left: 1px solid rgba(255, 255, 255, 0.5);
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
     .info-card h3 {
         font-size: 16px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);
@@ -445,6 +472,9 @@
         display: flex; gap: 15px; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px);
         border-radius: 8px; overflow: hidden; margin-bottom: 15px; cursor: pointer;
         transition: all 0.2s; border: 1px solid rgba(255,255,255,0.1);
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
     .history-card:hover {
         background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.4);
@@ -499,6 +529,9 @@
         display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0,0,0,0.8); z-index: 10001; justify-content: center; align-items: center;
         backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
     .avatar-modal-content, .banner-color-modal-content {
         background: rgba(30, 30, 30, 0.9); 
@@ -736,6 +769,7 @@
             img.src = src;
             img.className = 'avatar-option';
             img.onclick = () => selectAvatar(src);
+            img.loading = 'lazy'; // SMOOTHNESS BOOSTER
             grid.appendChild(img);
         });
         document.getElementById('avatarModal').style.display = "flex";
@@ -880,7 +914,7 @@
                     ${n.timestamp ? new Date(n.timestamp).toLocaleDateString() + ' ' + new Date(n.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}
                 </div>
                 
-                ${n.imageUrl ? `<img src="${n.imageUrl}" style="width:100%; max-height:150px; object-fit:cover; border-radius:6px; margin-bottom:8px; border:1px solid rgba(255,255,255,0.2);">` : ''}
+                ${n.imageUrl ? `<img src="${n.imageUrl}" loading="lazy" style="width:100%; max-height:150px; object-fit:cover; border-radius:6px; margin-bottom:8px; border:1px solid rgba(255,255,255,0.2);">` : ''}
 
                 <p style="margin:0; font-size:13px; color:#eee; line-height:1.4; white-space: pre-wrap; text-shadow: 0 1px 1px rgba(0,0,0,0.5);">${n.message || ""}</p>
               </div>
@@ -994,7 +1028,7 @@
                           historyHTML += `
                              <div class="history-card" onclick="window.location.href='${targetLink}'">
                                 <div class="history-thumb-wrapper">
-                                   <img src="${item.image || 'https://via.placeholder.com/160x90'}" class="history-thumb-img" alt="${item.title}">
+                                   <img src="${item.image || 'https://via.placeholder.com/160x90'}" loading="lazy" class="history-thumb-img" alt="${item.title}">
                                    <div class="progress-bar-bg">
                                       <div class="progress-bar-fill" style="width: ${percent}%"></div>
                                    </div>
@@ -1120,6 +1154,9 @@
     display: flex; align-items: center; justify-content: center;
     z-index: 9999; text-align: center; padding: 20px;
     opacity: 0; animation: fadeIn 0.5s forwards; flex-direction: column;
+    /* SMOOTHNESS BOOSTER */
+    transform: translateZ(0);
+    will-change: transform, backdrop-filter;
   }
   .access-denied-modal strong { font-size: 24px; margin-bottom: 10px; }
   .access-denied-modal button {
