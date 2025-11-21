@@ -114,17 +114,19 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-top: 1px solid rgba(255, 255, 255, 0.5);
     
-    padding: 15px 25px;
+    /* UPDATED: Reduced padding to make the border smaller */
+    padding: 8px 16px; 
     border-radius: 50px;
     color: white;
     font-weight: bold;
-    font-size: 18px;
+    font-size: 16px; /* Slightly smaller text to fit better */
     pointer-events: none; 
     max-width: 90%;
     text-align: center;
     margin: 0 auto;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     text-shadow: var(--text-shadow);
+    line-height: 1.4; 
   }
 
   #player-container {
@@ -159,8 +161,8 @@
         opacity: 0.9;
     }
     #poster-overlay { 
-        font-size: 14px; 
-        padding: 10px 15px;
+        font-size: 13px; 
+        padding: 6px 12px; /* Smaller padding on mobile */
         border-radius: 35px;
         border-width: 1px;
     }
@@ -366,12 +368,14 @@ const playlistData = [
     id: "4", 
     title: "EP3. SEVENTEEN: OUR CHAPTER", 
     date: "November 21, 2025", 
+    time: "8:30 PM PHT",
     image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svt_ourchapter.jpg" 
   },
   { 
     id: "5", 
     title: "EP4. SEVENTEEN: OUR CHAPTER", 
     date: "November 28, 2025", 
+    time: "8:30 PM PHT",
     image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svt_ourchapter.jpg" 
   }
 ];
@@ -380,14 +384,21 @@ const playlistContainer = document.getElementById('playlist-items');
 const posterContainer = document.getElementById('poster-container');
 const playerContainer = document.getElementById('player-container');
 const mainTitle = document.getElementById('main-title');
+const posterOverlay = document.getElementById('poster-overlay');
 
 // Global variable to store current ep data
 window.currentEpData = null;
 
+// --- HELPER: CALCULATE RELEASE DATE ---
+function getReleaseDate(dateStr, timeStr) {
+    if (!timeStr) return new Date(dateStr);
+    const cleanTime = timeStr.replace(/pht/gi, '').trim();
+    const combinedString = `${dateStr} ${cleanTime}`;
+    return new Date(combinedString);
+}
+
 // --- 2. CORE FUNCTION: PLAY EPISODE ---
-// Usage: loadAndPlayEpisode("1", true) -> true means update the URL
 function loadAndPlayEpisode(epId, updateUrl = true) {
-    // A. Find the episode
     const ep = playlistData.find(item => item.id === epId);
     
     if (!ep) {
@@ -395,36 +406,48 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
         return;
     }
 
-    // B. Check Date Locking
+    // B. Check Date & TIME Locking
     const today = new Date();
     if (ep.date) {
-        const releaseDate = new Date(ep.date);
+        const releaseDate = getReleaseDate(ep.date, ep.time);
+        
         if (releaseDate > today) {
-            alert(`This episode is not yet available.\nRelease Date: ${ep.date}`);
+            posterContainer.style.display = "flex";
+            playerContainer.style.display = "none";
+            
+            let htmlContent = "COMING SOON<br><br>" + ep.date;
+            if (ep.time) htmlContent += "<br>" + ep.time;
+            
+            posterOverlay.innerHTML = htmlContent;
+            posterOverlay.style.border = "1px solid #ff5252";
+            posterOverlay.style.color = "#ff5252";
+
+            mainTitle.textContent = `[LOCKED] ${ep.title}`;
             return; 
         }
     }
 
-    // C. Update the Browser Link (Deep Linking)
+    // C. If Unlocked: Reset Overlay Style
+    posterOverlay.textContent = "Loading...";
+    posterOverlay.style.border = "1px solid rgba(255, 255, 255, 0.3)";
+    posterOverlay.style.color = "white";
+
+    // D. Update the Browser Link
     if (updateUrl) {
         const newUrl = window.location.pathname + '?v=' + ep.id;
-        // pushState changes the URL without reloading the page
         history.pushState({id: ep.id}, '', newUrl);
     }
 
-    // D. Set Data & UI
     window.currentEpData = ep;
     posterContainer.style.display = "none";
     playerContainer.style.display = "block";
 
-    // E. Load Video from Firebase (Path: ourchapter)
     db.ref(`ourchapter/${ep.id}`).once('value').then(snapshot => {
       const data = snapshot.val();
       if(!data || !data.url) { alert("Video unavailable"); return; }
 
       if(typeof hls !== 'undefined' && hls){ hls.destroy(); hls = null; }
 
-      // Resume Logic
       const resumePlayback = () => {
           const user = auth.currentUser;
           if (!window.currentEpData || !user) {
@@ -445,14 +468,13 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
         hls.loadSource(data.url);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => { 
-             setTimeout(resumePlayback, 100);
+              setTimeout(resumePlayback, 100);
         });
       } else {
         video.src = data.url;
         video.addEventListener('loadedmetadata', resumePlayback, { once: true });
       }
 
-      // Subtitles
       video.querySelectorAll("track").forEach(t => t.remove());
       if(data.subtitles){
         Object.entries(data.subtitles).forEach(([lang,url])=>{
@@ -466,7 +488,6 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
         });
       }
       
-      // Title Update
       if(data.title){
         mainTitle.textContent = data.title;
       } else {
@@ -481,9 +502,11 @@ window.addEventListener('popstate', (event) => {
     if (event.state && event.state.id) {
         loadAndPlayEpisode(event.state.id, false);
     } else {
-        // Reset to poster if back goes to start
         posterContainer.style.display = "flex";
         playerContainer.style.display = "none";
+        posterOverlay.textContent = "Select an Episode to Watch";
+        posterOverlay.style.border = "1px solid rgba(255, 255, 255, 0.3)";
+        posterOverlay.style.color = "white";
         player.pause();
     }
 });
@@ -496,7 +519,7 @@ playlistData.forEach(ep => {
   const today = new Date();
   let isLocked = false;
   if (ep.date) {
-      const releaseDate = new Date(ep.date);
+      const releaseDate = getReleaseDate(ep.date, ep.time);
       if (releaseDate > today) isLocked = true;
   }
 
@@ -525,7 +548,14 @@ playlistData.forEach(ep => {
 
   if (ep.date) {
       const dateSpan = document.createElement('span');
-      dateSpan.textContent = isLocked ? `Available: ${ep.date}` : ep.date;
+      
+      let dateTimeString = ep.date;
+      if (ep.time) {
+          dateTimeString += ` | ${ep.time}`;
+      }
+
+      dateSpan.textContent = isLocked ? `Available: ${dateTimeString}` : dateTimeString;
+      
       dateSpan.style.fontSize = "12px";
       dateSpan.style.color = isLocked ? "#ff5252" : "#ccc";
       dateSpan.style.marginTop = "2px";
@@ -536,7 +566,6 @@ playlistData.forEach(ep => {
   epDiv.appendChild(thumb);
   epDiv.appendChild(textDiv);
 
-  // CHANGED: Call the loadAndPlayEpisode function
   epDiv.addEventListener('click', () => {
     loadAndPlayEpisode(ep.id, true);
   });
@@ -547,10 +576,9 @@ playlistData.forEach(ep => {
 // --- 5. CHECK URL ON PAGE LOAD ---
 window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const videoId = urlParams.get('v'); // Looks for ?v=1
+    const videoId = urlParams.get('v'); 
     
     if (videoId) {
-        // Delay slightly to ensure Firebase is ready
         setTimeout(() => {
             console.log("Auto-playing from link ID:", videoId);
             loadAndPlayEpisode(videoId, false);
