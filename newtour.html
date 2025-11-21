@@ -125,6 +125,10 @@
     margin: 0 auto;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     text-shadow: var(--text-shadow);
+
+    /* SMOOTHNESS BOOSTER */
+    transform: translateZ(0);
+    will-change: transform, backdrop-filter;
   }
 
   #player-container {
@@ -199,6 +203,10 @@
     text-decoration: none; z-index: 3000;
     transition: all 0.3s ease;
     box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+
+    /* SMOOTHNESS BOOSTER */
+    transform: translateZ(0);
+    will-change: transform;
   }
   .back-btn:hover { 
     background: rgba(255,255,255,0.25); 
@@ -240,6 +248,9 @@
     width: 80px;
     height: 80px;
     z-index: 20; 
+
+    /* SMOOTHNESS BOOSTER */
+    will-change: transform, opacity;
   }
   .seek-overlay.visible {
     transform: translate(-50%, -50%) scale(1);
@@ -275,6 +286,10 @@
       
       color: white;
       cursor: pointer;
+
+      /* SMOOTHNESS BOOSTER */
+      transform: translateZ(0);
+      backface-visibility: hidden;
   }
   .playlist-item:hover {
       background: rgba(255, 255, 255, 0.15);
@@ -300,7 +315,13 @@
     .video-wrapper-left { flex: 2; }
     #playlist { flex: 1; margin-top: 0 !important; margin-bottom: 0 !important; max-width: none !important; }
     h3.playlist-header { margin-top: 0 !important; line-height: 1; }
-    #playlist-items { max-height: 410px !important; padding-right: 10px; }
+    #playlist-items { 
+        max-height: 410px !important; 
+        padding-right: 10px;
+        /* SMOOTH SCROLL */
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
   }
 </style>
 </head>
@@ -308,7 +329,7 @@
 <body>
 
 <div class="center-logo">
-  <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault Logo">
+  <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" loading="lazy" alt="Zone Vault Logo">
 </div>
 
 <div class="main-layout">
@@ -338,6 +359,9 @@
         max-height: 410px; 
         overflow-y: auto; 
         padding-right: 10px;
+        /* SMOOTH SCROLL FALLBACK */
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
     ">
     </div>
   </div>
@@ -349,7 +373,8 @@
 const playlistData = [
   { 
     id: "1", 
-    title: "DAY 1 - SEVENTEEN [NEW_] WORLD TOUR IN INCHEON", 
+    title: "DAY 2 - SEVENTEEN [NEW_] WORLD TOUR IN INCHEON'", 
+    date: "NOT AVAILABLE",
     image: "https://uploads.onecompiler.io/43ddry4jt/43wkywbqe/Screenshot%202025-09-13%2021-01-14.png" 
   },
   { 
@@ -493,6 +518,10 @@ playlistData.forEach(ep => {
   thumb.style.height = "68px";   
   thumb.style.objectFit = "cover"; 
   thumb.style.borderRadius = "4px";
+  
+  // SMOOTH LOADING: Lazy load images
+  thumb.loading = "lazy";
+  thumb.decoding = "async";
   
   const textDiv = document.createElement('div');
   textDiv.style.display = "flex";
@@ -741,6 +770,9 @@ player.on("timeupdate", () => {
     z-index: 9999; text-align: center; padding: 20px;
     opacity: 0; animation: fadeIn 0.5s forwards; flex-direction: column;
     backdrop-filter: blur(15px);
+    /* SMOOTHNESS BOOSTER */
+    transform: translateZ(0);
+    will-change: opacity, backdrop-filter;
   }
   .access-denied-modal strong { font-size: 24px; margin-bottom: 10px; text-shadow: var(--text-shadow); }
   .access-denied-modal button {
@@ -755,12 +787,66 @@ player.on("timeupdate", () => {
   @keyframes fadeIn { to { opacity: 1; } }
 </style>
 
+ <style>
+  /* Access Denied Modal */
+  .access-denied-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 11000;
+    text-align: center;
+    padding: 20px;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+    flex-direction: column;
+  }
+
+  .access-denied-modal strong {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .access-denied-modal button {
+    margin-top: 15px;
+    padding: 10px 25px;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+
+  .access-denied-modal button:hover {
+    background: white;
+    color: black;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+</style>
+
 <script>
   const allowedPaths = [
-    '/index.html', '/home.html', '/nanabnb.html', '/newtour.html',
-    '/hxwfanconcert.html', '/svtholiday.html', '/arenatour.html',
-    '/svtjapanconcert.html', '/touragain.html', '/gallery.html',
-    '/profile.html', '/soon.html', '/videos.html'
+    '/index.html',
+    '/home.html',
+    '/nanabnb.html',
+    '/newtour.html',
+    '/hxwfanconcert.html',
+    '/svtholiday.html',
+    '/arenatour.html',
+    '/svtjapanconcert.html',
+    '/touragain.html',
+    '/gallery.html',
+    '/profile.html',
+    '/soon.html'
   ];
 
   const currentPage = window.location.pathname;
