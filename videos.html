@@ -1,4 +1,3 @@
-
 <!Doctype html>
 <html lang="en">
 <head>
@@ -124,6 +123,10 @@
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         
         transition: transform 0.6s ease-out;
+        
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     .header-links {
@@ -178,6 +181,10 @@
         transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
         position: relative;
         text-shadow: var(--text-shadow);
+
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     .category-link::before {
@@ -230,6 +237,10 @@
         display: flex;
         flex-direction: column;
         transition: 0.3s ease;
+
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     .card:hover {
@@ -300,6 +311,9 @@
         cursor: pointer;
         transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
         box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
     }
 
     .btn:hover {
@@ -384,6 +398,10 @@
         box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6);
         overflow-y: auto;
         overscroll-behavior: contain;
+
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     .sidebar-nav {
@@ -394,6 +412,10 @@
         max-height: 450px;
         overflow-y: auto;
         padding-right: 5px;
+        
+        /* SMOOTH SCROLL */
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
     }
 
     .sidebar-nav::-webkit-scrollbar {
@@ -507,6 +529,10 @@
             
             position: sticky;
             top: 0;
+
+            /* SMOOTHNESS BOOSTER */
+            transform: translateZ(0);
+            will-change: transform, backdrop-filter;
         }
 
         .hamburger {
@@ -574,6 +600,9 @@
         transition: all 0.3s ease;
         /* Added Text Shadow Here */
         text-shadow: 0 1px 2px rgba(0,0,0,0.8); 
+        
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
     }
 
     .favorite-btn:hover {
@@ -592,6 +621,10 @@
         justify-content: center;
         backdrop-filter: blur(15px); /* Overlay Blur */
         -webkit-backdrop-filter: blur(15px);
+        
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: opacity, backdrop-filter;
     }
 
     .favorite-modal.active {
@@ -677,6 +710,10 @@
         border-radius: 12px;
         background: rgba(0, 0, 0, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.1);
+        
+        /* SMOOTH SCROLL */
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
     }
 
     .favorite-box::-webkit-scrollbar {
@@ -713,6 +750,9 @@
         text-align: center;
         color: white;
         transition: transform 0.2s ease, background 0.3s;
+        
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
     }
 
     .favorite-list .fav-item:hover {
@@ -741,6 +781,10 @@
         z-index: 9999;
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
+        
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: opacity, backdrop-filter;
     }
 
     .info-modal.active {
@@ -792,6 +836,10 @@
         text-align: left;
         scrollbar-width: thin;
         scrollbar-color: rgba(255,255,255,0.3) transparent;
+        
+        /* SMOOTH SCROLL */
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
     }
     .scroll-box::-webkit-scrollbar {
         width: 8px;
@@ -1024,8 +1072,9 @@ function renderGrid(page) {
   pageData.forEach(item => {
     const el = document.createElement("div");
     el.className = "card";
+    // SMOOTH LOADING: Added loading="lazy" and decoding="async"
     el.innerHTML = `
-      <div class="thumb"><img src="${item.thumb}" alt=""></div>
+      <div class="thumb"><img src="${item.thumb}" loading="lazy" decoding="async" alt=""></div>
       <div class="card-body">
       <div class="countdown" data-date="${item.releaseDate || ''}"></div>
         <div class="meta">${item.category}</div>
@@ -1127,7 +1176,8 @@ function reorderFavorites() {
     sorted.forEach(item=>{
       const el=document.createElement("div");
       el.className="card";
-      el.innerHTML=`<div class="thumb"><img src="${item.thumb}" alt=""></div>
+      // SMOOTH LOADING: Added loading="lazy"
+      el.innerHTML=`<div class="thumb"><img src="${item.thumb}" loading="lazy" decoding="async" alt=""></div>
       <div class="card-body">
       <div class="countdown" data-date="${item.releaseDate || ''}"></div>
         <div class="meta">${item.category}</div>
@@ -1164,7 +1214,8 @@ function checkResponsive() {
     data.forEach(item=>{
       const el=document.createElement("div");
       el.className="card";
-      el.innerHTML = `<div class="thumb"><img src="${item.thumb}" alt=""></div>
+      // SMOOTH LOADING: Added loading="lazy"
+      el.innerHTML = `<div class="thumb"><img src="${item.thumb}" loading="lazy" decoding="async" alt=""></div>
       <div class="card-body">
       <div class="countdown" data-date="${item.releaseDate || ''}"></div>
         <div class="meta">${item.category}</div>
@@ -1207,7 +1258,8 @@ function openFavoriteModal() {
       if (item) {
         const el = document.createElement('div');
         el.className = 'fav-item';
-        el.innerHTML = `<img src="${item.thumb}" alt="${item.title}">
+        // SMOOTH LOADING: Added loading="lazy"
+        el.innerHTML = `<img src="${item.thumb}" loading="lazy" decoding="async" alt="${item.title}">
           <div style="margin-top:8px;font-weight:bold;">${item.title}</div>
           <div class="countdown" data-date="${item.releaseDate || ''}"></div>
           <button class="btn" style="margin-top:8px;" onclick="window.location.href='${item.link}'">WATCH</button>`;
@@ -1279,12 +1331,16 @@ document.querySelector('.sidebar-nav').addEventListener('wheel', e=>{
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
+    z-index: 11000;
     text-align: center;
     padding: 20px;
     opacity: 0;
     animation: fadeIn 0.5s forwards;
     flex-direction: column;
+    
+    /* SMOOTHNESS BOOSTER */
+    transform: translateZ(0);
+    will-change: opacity;
   }
 
   .access-denied-modal strong {
