@@ -94,6 +94,10 @@
         -webkit-backdrop-filter: blur(25px);
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     .header-links {
@@ -149,6 +153,10 @@
         transition: all 0.3s ease;
         position: relative;
         text-shadow: var(--text-shadow);
+
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     .category-link::before {
@@ -209,6 +217,10 @@
         border-left: 1px solid rgba(255, 255, 255, 0.5); /* Left Highlight */
         border-radius: 24px;
         box-shadow: var(--glass-shadow);
+
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     .hero-left {
@@ -269,6 +281,8 @@
         scroll-behavior: smooth;
         width: 100%;
         justify-content: center;
+        /* SMOOTH SCROLL */
+        -webkit-overflow-scrolling: touch;
     }
 
     .thumbnail-row::-webkit-scrollbar {
@@ -296,6 +310,10 @@
         align-items: center;
         justify-content: center;
         transition: all 0.3s ease;
+
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform;
     }
 
     .thumb-box.active,
@@ -340,6 +358,10 @@
         border: 1px solid rgba(255, 255, 255, 0.2);
         border-top: 1px solid rgba(255, 255, 255, 0.4);
         box-shadow: var(--glass-shadow);
+        
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     .accordion-header {
@@ -403,6 +425,7 @@
         overflow-y: auto;
         scroll-behavior: smooth;
         padding-right: 10px;
+        -webkit-overflow-scrolling: touch;
     }
 
     .accordion-content.scrollable::-webkit-scrollbar {
@@ -439,6 +462,10 @@
         box-shadow: 10px 0 30px rgba(0, 0, 0, 0.6);
         overflow-y: auto;
         overscroll-behavior: contain;
+
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: transform, backdrop-filter;
     }
 
     .sidebar-nav {
@@ -449,6 +476,9 @@
         max-height: 450px;
         overflow-y: auto;
         padding-right: 5px;
+        /* SMOOTH SCROLL */
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
     }
 
     .sidebar-nav::-webkit-scrollbar {
@@ -592,6 +622,10 @@
         transition: opacity 0.6s ease;
         backdrop-filter: blur(15px); /* Strong Blur on overlay */
         -webkit-backdrop-filter: blur(15px);
+        
+        /* SMOOTHNESS BOOSTER */
+        transform: translateZ(0);
+        will-change: opacity, backdrop-filter;
     }
 
     #noticeBox,
@@ -708,6 +742,10 @@
             position: sticky;
             top: 0;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+
+            /* SMOOTHNESS BOOSTER */
+            transform: translateZ(0);
+            will-change: transform, backdrop-filter;
         }
 
         .hamburger {
@@ -841,12 +879,12 @@
 
   <div class="sidebar-footer">
     <div class="sidebar-logo">
-      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" loading="lazy" alt="Logo" />
     </div>
     
     <div class="sidebar-email">
       <a href="zonevaultph@gmail.com" title="Send Email">
-        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
+        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" loading="lazy" alt="Email" />
       </a>
     </div>
   </div>
@@ -864,22 +902,22 @@
       </div>
       <div class="thumbnail-row" id="thumbScroll">
         <div class="thumb-box active" onclick="switchImage(this)">
-          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/1.png" class="thumb">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/1.png" loading="lazy" class="thumb">
         </div>
         <div class="thumb-box" onclick="switchImage(this)">
-          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/2.png" class="thumb">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/2.png" loading="lazy" class="thumb">
         </div>
         <div class="thumb-box" onclick="switchImage(this)">
-          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/3.png" class="thumb">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/3.png" loading="lazy" class="thumb">
         </div>
         <div class="thumb-box" onclick="switchImage(this)">
-          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/4.png" class="thumb">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/4.png" loading="lazy" class="thumb">
         </div>
         <div class="thumb-box" onclick="switchImage(this)">
-          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/5.png" class="thumb">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/5.png" loading="lazy" class="thumb">
         </div>
         <div class="thumb-box" onclick="switchImage(this)">
-          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/6.png" class="thumb">
+          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/6.png" loading="lazy" class="thumb">
       </div>
     </div>
   </div>
@@ -1092,7 +1130,7 @@ window.addEventListener("beforeunload", () => {
 
 // Example:
 // document.getElementById("downloadBtn").addEventListener("click", () =>
-//   logActivityAuth("download", "/video.html")
+//    logActivityAuth("download", "/video.html")
 // );
 </script>
 
@@ -1192,12 +1230,16 @@ function switchImage(box) {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
+    z-index: 11000;
     text-align: center;
     padding: 20px;
     opacity: 0;
     animation: fadeIn 0.5s forwards;
     flex-direction: column;
+    
+    /* SMOOTHNESS BOOSTER */
+    transform: translateZ(0);
+    will-change: opacity;
   }
 
   .access-denied-modal strong {
@@ -1394,6 +1436,9 @@ document.addEventListener("DOMContentLoaded", () => {
     opacity: 0;
     animation: fadeIn 0.5s forwards;
     flex-direction: column;
+    /* SMOOTHNESS BOOSTER */
+    transform: translateZ(0);
+    will-change: opacity;
   }
 
   .access-denied-modal strong {
