@@ -373,8 +373,8 @@
 const playlistData = [
   { 
     id: "1", 
-    title: "DAY 2 - SEVENTEEN [NEW_] WORLD TOUR IN INCHEON'", 
-    date: "NOT AVAILABLE",
+    title: "DAY 1 - SEVENTEEN [NEW_] WORLD TOUR IN INCHEON", 
+    status: "NOT AVAILABLE", // CHANGED: Added this field for the requested text
     image: "https://uploads.onecompiler.io/43ddry4jt/43wkywbqe/Screenshot%202025-09-13%2021-01-14.png" 
   },
   { 
@@ -545,6 +545,18 @@ playlistData.forEach(ep => {
       textDiv.appendChild(dateSpan);
   }
 
+  // CHANGED: Added logic to show "NOT AVAILABLE" below the title
+  if (ep.status) {
+      const statusSpan = document.createElement('span');
+      statusSpan.textContent = ep.status;
+      statusSpan.style.fontSize = "12px";
+      statusSpan.style.color = "#ff5252"; // Red color for visibility
+      statusSpan.style.fontWeight = "bold";
+      statusSpan.style.marginTop = "2px";
+      statusSpan.style.textShadow = "0 1px 1px rgba(0,0,0,0.8)";
+      textDiv.appendChild(statusSpan);
+  }
+
   epDiv.appendChild(thumb);
   epDiv.appendChild(textDiv);
 
@@ -590,13 +602,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-  authDomain: "tvnstream-b4497.firebaseapp.com",
-  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-  projectId: "tvnstream-b4497",
-  storageBucket: "tvnstream-b4497.appspot.com",
-  messagingSenderId: "308384754214",
-  appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+  authDomain: "tvnstream-b4497.firebaseapp.com",
+  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+  projectId: "tvnstream-b4497",
+  storageBucket: "tvnstream-b4497.appspot.com",
+  messagingSenderId: "308384754214",
+  appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth(); // Initialized Auth
@@ -606,298 +618,298 @@ const video = document.getElementById("videoPlayer");
 let hls;
 
 const player = new Plyr(video, {
-  captions: { active: true, update: true, language: "en" },
-  controls: ["play-large","play","progress","current-time","duration","mute","settings","fullscreen"],
-  settings: ["captions","speed","quality"],
-  clickToPlay: false, 
-  dblclickFullscreen: false
+  captions: { active: true, update: true, language: "en" },
+  controls: ["play-large","play","progress","current-time","duration","mute","settings","fullscreen"],
+  settings: ["captions","speed","quality"],
+  clickToPlay: false, 
+  dblclickFullscreen: false
 });
 
 const isMobileOrTablet = /Mobi|Android|iPad|Tablet/i.test(navigator.userAgent);
 
 function enterFullscreen(el) {
-  if (el.requestFullscreen) el.requestFullscreen();
-  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  else if (el.msRequestFullscreen) el.msRequestFullscreen();
+  if (el.requestFullscreen) el.requestFullscreen();
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  else if (el.msRequestFullscreen) el.msRequestFullscreen();
 }
 
 player.on('enterfullscreen', () => {
-  if (isMobileOrTablet) {
-    if (screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('landscape').catch(err => {});
-    } else if (window.screen.lockOrientation) {
-      window.screen.lockOrientation('landscape');
-    }
-  }
+  if (isMobileOrTablet) {
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(err => {});
+    } else if (window.screen.lockOrientation) {
+      window.screen.lockOrientation('landscape');
+    }
+  }
 });
 
 player.on('exitfullscreen', () => {
-  if (isMobileOrTablet) {
-    if (screen.orientation && screen.orientation.unlock) {
-      screen.orientation.unlock();
-    }
-  }
+  if (isMobileOrTablet) {
+    if (screen.orientation && screen.orientation.unlock) {
+      screen.orientation.unlock();
+    }
+  }
 });
 
 player.on('ready', () => {
-    const videoContainer = player.elements.container;
-    const videoWrapper = videoContainer.querySelector('.plyr__video-wrapper');
-    if (!videoWrapper) return;
+    const videoContainer = player.elements.container;
+    const videoWrapper = videoContainer.querySelector('.plyr__video-wrapper');
+    if (!videoWrapper) return;
 
-    const rewindIcon = document.getElementById('rewind-icon-overlay');
-    const forwardIcon = document.getElementById('forward-icon-overlay');
-    const playPauseIcon = document.getElementById('play-pause-icon-overlay');
-    const playSvg = document.getElementById('svg-play') ? document.getElementById('svg-play').cloneNode(true) : null;
-    const pauseSvg = document.getElementById('svg-pause') ? document.getElementById('svg-pause').cloneNode(true) : null;
-    
-    if(playSvg) playSvg.style.display = 'block';
-    if(pauseSvg) pauseSvg.style.display = 'block';
+    const rewindIcon = document.getElementById('rewind-icon-overlay');
+    const forwardIcon = document.getElementById('forward-icon-overlay');
+    const playPauseIcon = document.getElementById('play-pause-icon-overlay');
+    const playSvg = document.getElementById('svg-play') ? document.getElementById('svg-play').cloneNode(true) : null;
+    const pauseSvg = document.getElementById('svg-pause') ? document.getElementById('svg-pause').cloneNode(true) : null;
+    
+    if(playSvg) playSvg.style.display = 'block';
+    if(pauseSvg) pauseSvg.style.display = 'block';
 
-    if (rewindIcon) videoWrapper.appendChild(rewindIcon);
-    if (forwardIcon) videoWrapper.appendChild(forwardIcon);
-    if (playPauseIcon) videoWrapper.appendChild(playPauseIcon);
+    if (rewindIcon) videoWrapper.appendChild(rewindIcon);
+    if (forwardIcon) videoWrapper.appendChild(forwardIcon);
+    if (playPauseIcon) videoWrapper.appendChild(playPauseIcon);
 
-    let lastTapTime = 0, tapTimeout = null, iconHideTimeout = null;
+    let lastTapTime = 0, tapTimeout = null, iconHideTimeout = null;
 
-    function showSeekIcon(type) {
-        if (iconHideTimeout) clearTimeout(iconHideTimeout);
-        if(rewindIcon) rewindIcon.classList.remove('visible');
-        if(forwardIcon) forwardIcon.classList.remove('visible');
-        if(playPauseIcon) playPauseIcon.classList.remove('visible');
+    function showSeekIcon(type) {
+        if (iconHideTimeout) clearTimeout(iconHideTimeout);
+        if(rewindIcon) rewindIcon.classList.remove('visible');
+        if(forwardIcon) forwardIcon.classList.remove('visible');
+        if(playPauseIcon) playPauseIcon.classList.remove('visible');
 
-        let iconToShow;
-        if (type === 'rewind') iconToShow = rewindIcon;
-        else if (type === 'forward') iconToShow = forwardIcon;
-        else if (type === 'play-pause') {
-            iconToShow = playPauseIcon;
-            if(playPauseIcon) {
-                playPauseIcon.innerHTML = '';
-                if (player.paused && pauseSvg) playPauseIcon.appendChild(pauseSvg); 
-                else if (!player.paused && playSvg) playPauseIcon.appendChild(playSvg);
-            }
-        }
-        if (iconToShow) {
-            iconToShow.classList.add('visible');
-            iconHideTimeout = setTimeout(() => { iconToShow.classList.remove('visible'); }, 500);
-        }
-    }
+        let iconToShow;
+        if (type === 'rewind') iconToShow = rewindIcon;
+        else if (type === 'forward') iconToShow = forwardIcon;
+        else if (type === 'play-pause') {
+            iconToShow = playPauseIcon;
+            if(playPauseIcon) {
+                playPauseIcon.innerHTML = '';
+                if (player.paused && pauseSvg) playPauseIcon.appendChild(pauseSvg); 
+                else if (!player.paused && playSvg) playPauseIcon.appendChild(playSvg);
+            }
+        }
+        if (iconToShow) {
+            iconToShow.classList.add('visible');
+            iconHideTimeout = setTimeout(() => { iconToShow.classList.remove('visible'); }, 500);
+        }
+    }
 
-    function handleDoubleTap(event) {
-        const rect = videoWrapper.getBoundingClientRect();
-        const tapX = event.clientX - rect.left;
-        const zoneWidth = rect.width;
-        if (tapX < zoneWidth * 0.35) { player.rewind(10); showSeekIcon('rewind'); }
-        else if (tapX > zoneWidth * 0.65) { player.forward(10); showSeekIcon('forward'); }
-        else { showSeekIcon('play-pause'); player.togglePlay(); }
-    }
+    function handleDoubleTap(event) {
+        const rect = videoWrapper.getBoundingClientRect();
+        const tapX = event.clientX - rect.left;
+        const zoneWidth = rect.width;
+        if (tapX < zoneWidth * 0.35) { player.rewind(10); showSeekIcon('rewind'); }
+        else if (tapX > zoneWidth * 0.65) { player.forward(10); showSeekIcon('forward'); }
+        else { showSeekIcon('play-pause'); player.togglePlay(); }
+    }
 
-    videoWrapper.addEventListener('click', (event) => {
-        if (event.target.closest('.plyr__controls')) return;
-        event.stopPropagation();
-        const currentTime = new Date().getTime();
-        const timeSinceLastTap = currentTime - lastTapTime;
-        if (tapTimeout) { clearTimeout(tapTimeout); tapTimeout = null; }
+    videoWrapper.addEventListener('click', (event) => {
+        if (event.target.closest('.plyr__controls')) return;
+        event.stopPropagation();
+        const currentTime = new Date().getTime();
+        const timeSinceLastTap = currentTime - lastTapTime;
+        if (tapTimeout) { clearTimeout(tapTimeout); tapTimeout = null; }
 
-        if (timeSinceLastTap > 0 && timeSinceLastTap < 300) {
-            event.preventDefault(); handleDoubleTap(event); lastTapTime = 0;
-        } else {
-            event.preventDefault();
-            tapTimeout = setTimeout(() => { player.toggleControls(); }, 300);
-        }
-        lastTapTime = currentTime;
-    });
+        if (timeSinceLastTap > 0 && timeSinceLastTap < 300) {
+            event.preventDefault(); handleDoubleTap(event); lastTapTime = 0;
+        } else {
+            event.preventDefault();
+            tapTimeout = setTimeout(() => { player.toggleControls(); }, 300);
+        }
+        lastTapTime = currentTime;
+    });
 
-    videoWrapper.addEventListener('dblclick', (e) => { e.preventDefault(); e.stopPropagation(); });
+    videoWrapper.addEventListener('dblclick', (e) => { e.preventDefault(); e.stopPropagation(); });
 });
 
 // --- CLOUD SAVING LOGIC (SAVES TO FIREBASE) ---
 let lastSaveTime = 0; // Throttle saves
 
 player.on("timeupdate", () => {
-    const user = auth.currentUser;
-    
-    // Check every 5 seconds (throttle) to avoid spamming DB
-    const now = Date.now();
-    if (user && window.currentEpData && !player.paused && player.currentTime > 5) {
-        if (now - lastSaveTime > 5000) { // Save every 5s
-            
-            // --- UPGRADE: AUTO DETECT CURRENT PAGE NAME ---
-            let pageName = window.location.pathname;
-            if(pageName.startsWith('/')) pageName = pageName.substring(1); // Remove /
-            if(!pageName) pageName = "videos.html"; // Fallback
+    const user = auth.currentUser;
+    
+    // Check every 5 seconds (throttle) to avoid spamming DB
+    const now = Date.now();
+    if (user && window.currentEpData && !player.paused && player.currentTime > 5) {
+        if (now - lastSaveTime > 5000) { // Save every 5s
+            
+            // --- UPGRADE: AUTO DETECT CURRENT PAGE NAME ---
+            let pageName = window.location.pathname;
+            if(pageName.startsWith('/')) pageName = pageName.substring(1); // Remove /
+            if(!pageName) pageName = "videos.html"; // Fallback
 
-            const dataToSave = {
-                id: window.currentEpData.id,
-                title: window.currentEpData.title,
-                image: window.currentEpData.image,
-                currentTime: player.currentTime,
-                duration: player.duration || 0,
-                timestamp: now,
-                page: pageName // SAVES THE PAGE NAME
-            };
-            
-            // Write to Cloud
-            db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).update(dataToSave);
-            lastSaveTime = now;
-        }
-    }
+            const dataToSave = {
+                id: window.currentEpData.id,
+                title: window.currentEpData.title,
+                image: window.currentEpData.image,
+                currentTime: player.currentTime,
+                duration: player.duration || 0,
+                timestamp: now,
+                page: pageName // SAVES THE PAGE NAME
+            };
+            
+            // Write to Cloud
+            db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).update(dataToSave);
+            lastSaveTime = now;
+        }
+    }
 });
 </script>
 
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      reg.onupdatefound = () => {
-        const newSW = reg.installing;
-        newSW.onstatechange = () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            window.location.reload();
-          }
-        };
-      };
-    }).catch(err => {});
-  }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      reg.onupdatefound = () => {
+        const newSW = reg.installing;
+        newSW.onstatechange = () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            window.location.reload();
+          }
+        };
+      };
+    }).catch(err => {});
+  }
 </script>
 
 <style>
-  /* Access Denied Modal - Hyper Glass */
-  .access-denied-modal {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.8); 
-    color: #fff;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex; align-items: center; justify-content: center;
-    z-index: 9999; text-align: center; padding: 20px;
-    opacity: 0; animation: fadeIn 0.5s forwards; flex-direction: column;
-    backdrop-filter: blur(15px);
-    /* SMOOTHNESS BOOSTER */
-    transform: translateZ(0);
-    will-change: opacity, backdrop-filter;
-  }
-  .access-denied-modal strong { font-size: 24px; margin-bottom: 10px; text-shadow: var(--text-shadow); }
-  .access-denied-modal button {
-    margin-top: 15px; padding: 10px 25px; 
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white; border-radius: 50px;
-    cursor: pointer; font-weight: bold; transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
-  }
-  .access-denied-modal button:hover { background: rgba(255,255,255,0.25); color: white; }
-  @keyframes fadeIn { to { opacity: 1; } }
+  /* Access Denied Modal - Hyper Glass */
+  .access-denied-modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.8); 
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; text-align: center; padding: 20px;
+    opacity: 0; animation: fadeIn 0.5s forwards; flex-direction: column;
+    backdrop-filter: blur(15px);
+    /* SMOOTHNESS BOOSTER */
+    transform: translateZ(0);
+    will-change: opacity, backdrop-filter;
+  }
+  .access-denied-modal strong { font-size: 24px; margin-bottom: 10px; text-shadow: var(--text-shadow); }
+  .access-denied-modal button {
+    margin-top: 15px; padding: 10px 25px; 
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white; border-radius: 50px;
+    cursor: pointer; font-weight: bold; transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+  }
+  .access-denied-modal button:hover { background: rgba(255,255,255,0.25); color: white; }
+  @keyframes fadeIn { to { opacity: 1; } }
 </style>
 
- <style>
-  /* Access Denied Modal */
-  .access-denied-modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 11000;
-    text-align: center;
-    padding: 20px;
-    opacity: 0;
-    animation: fadeIn 0.5s forwards;
-    flex-direction: column;
-  }
+ <style>
+  /* Access Denied Modal */
+  .access-denied-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 11000;
+    text-align: center;
+    padding: 20px;
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+    flex-direction: column;
+  }
 
-  .access-denied-modal strong {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
+  .access-denied-modal strong {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
 
-  .access-denied-modal button {
-    margin-top: 15px;
-    padding: 10px 25px;
-    background: transparent;
-    color: white;
-    border: 2px solid white;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-  }
+  .access-denied-modal button {
+    margin-top: 15px;
+    padding: 10px 25px;
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
 
-  .access-denied-modal button:hover {
-    background: white;
-    color: black;
-  }
+  .access-denied-modal button:hover {
+    background: white;
+    color: black;
+  }
 
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
 </style>
 
 <script>
-  const allowedPaths = [
-    '/index.html',
-    '/home.html',
-    '/nanabnb.html',
-    '/newtour.html',
-    '/hxwfanconcert.html',
-    '/svtholiday.html',
-    '/arenatour.html',
-    '/svtjapanconcert.html',
-    '/touragain.html',
-    '/gallery.html',
-    '/profile.html',
-    '/soon.html'
-  ];
+  const allowedPaths = [
+    '/index.html',
+    '/home.html',
+    '/nanabnb.html',
+    '/newtour.html',
+    '/hxwfanconcert.html',
+    '/svtholiday.html',
+    '/arenatour.html',
+    '/svtjapanconcert.html',
+    '/touragain.html',
+    '/gallery.html',
+    '/profile.html',
+    '/soon.html'
+  ];
 
-  const currentPage = window.location.pathname;
+  const currentPage = window.location.pathname;
 
-  // Check if user already has internalAccess flag
-  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+  // Check if user already has internalAccess flag
+  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
 
-  // Check if user came from an allowed page
-  const referrer = document.referrer;
-  const refPath = referrer ? new URL(referrer).pathname : null;
-  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+  // Check if user came from an allowed page
+  const referrer = document.referrer;
+  const refPath = referrer ? new URL(referrer).pathname : null;
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
 
-  // Grant internalAccess if coming from allowed page
-  if (cameFromAllowedPage) {
-    sessionStorage.setItem('internalAccess', 'true');
-    hasInternalAccess = true;
-  }
+  // Grant internalAccess if coming from allowed page
+  if (cameFromAllowedPage) {
+    sessionStorage.setItem('internalAccess', 'true');
+    hasInternalAccess = true;
+  }
 
-  // Allow access if user already has internalAccess or is on index page
-  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
-  if (!hasInternalAccess && !isIndexPage) {
-    showAccessDeniedModal();
-  }
+  // Allow access if user already has internalAccess or is on index page
+  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
+  if (!hasInternalAccess && !isIndexPage) {
+    showAccessDeniedModal();
+  }
 
-  function showAccessDeniedModal() {
-    const modal = document.createElement('div');
-    modal.className = 'access-denied-modal';
-    modal.innerHTML = `
-      <strong>🚫 Access Denied</strong>
-      <div>You cannot access this page directly.<br>
-      Please go through the homepage or allowed sections.</div>
-      <div id="redirectTimer">Redirecting in 3 seconds...</div>
-      <button onclick="goBack()">Go Back</button>
-    `;
-    document.body.appendChild(modal);
+  function showAccessDeniedModal() {
+    const modal = document.createElement('div');
+    modal.className = 'access-denied-modal';
+    modal.innerHTML = `
+      <strong>🚫 Access Denied</strong>
+      <div>You cannot access this page directly.<br>
+      Please go through the homepage or allowed sections.</div>
+      <div id="redirectTimer">Redirecting in 3 seconds...</div>
+      <button onclick="goBack()">Go Back</button>
+    `;
+    document.body.appendChild(modal);
 
-    let countdown = 3;
-    const timer = document.getElementById('redirectTimer');
-    const interval = setInterval(() => {
-      countdown--;
-      timer.textContent = `Redirecting in ${countdown} seconds...`;
-      if (countdown <= 0) {
-        clearInterval(interval);
-        window.location.href = "index.html";
-      }
-    }, 1000);
-  }
+    let countdown = 3;
+    const timer = document.getElementById('redirectTimer');
+    const interval = setInterval(() => {
+      countdown--;
+      timer.textContent = `Redirecting in ${countdown} seconds...`;
+      if (countdown <= 0) {
+        clearInterval(interval);
+        window.location.href = "index.html";
+      }
+    }, 1000);
+  }
 
-  function goBack() {
-    window.history.back();
-  }
+  function goBack() {
+    window.history.back();
+  }
 </script>
 
 </body>
