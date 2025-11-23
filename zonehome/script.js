@@ -1,6 +1,6 @@
 // ==========================================
 // 1. GLOBAL SETTINGS & GTAG LOGIC
-// ==========================================
+// =========================================
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
