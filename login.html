@@ -257,7 +257,7 @@ window.googleLogin = async function(){
         sessionStorage.setItem("internalAccess","true");
         sessionStorage.setItem("fromIndex","true");
         show("approved");
-        setTimeout(()=> window.location.href="home",1500);
+        setTimeout(()=> window.location.href="zonehome/home",1500);
       }else if(data.status==="pending"){
         show("waiting");
       }else{
@@ -290,7 +290,7 @@ function checkJoinRequest(user){
       sessionStorage.setItem("internalAccess","true");
       sessionStorage.setItem("fromIndex","true");
       show("approved");
-      setTimeout(()=>window.location.href="home",1500);
+      setTimeout(()=>window.location.href="zonehome/home",1500);
     }else if(data.status==="pending") show("waiting");
     else{
       alert("❌ Your request was denied.");
