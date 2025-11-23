@@ -5,12 +5,10 @@
 <title>Zone Vault - Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js"></script>
 
-<!-- Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <link rel="manifest" href="manifest.json">
@@ -149,7 +147,6 @@
   </div>
 </div>
 
-<!-- Put AFTER you initialize Firebase auth & db -->
 <script type="module">
 import { getDatabase, ref, set, push } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
@@ -339,8 +336,6 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 
-<!-- Put this just before </body> -->
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
@@ -421,7 +416,8 @@ function checkJoinRequest(user) {
     else if (data.status === "approved") {
       sessionStorage.setItem("internalAccess", "true");
       show("approved");
-      setTimeout(() => window.location.href = "home", 1500);
+      // ✅ UPDATED HERE TO MATCH YOUR REQUEST
+      setTimeout(() => window.location.href = "zonehome/home", 1500);
     } else if (data.status === "pending") show("waiting");
     else {
       alert("❌ Your request was denied.");
