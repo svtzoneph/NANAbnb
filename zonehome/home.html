@@ -616,41 +616,31 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <script>
-  const allowedPaths = [
-    '/index.html',
-    '/home.html',
-    '/nanabnb.html',
-    '/newtour.html',
-    '/hxwfanconcert.html',
-    '/svtholiday.html',
-    '/arenatour.html',
-    '/svtjapanconcert.html',
-    '/touragain.html',
-    '/gallery.html',
-    '/profile.html',
-    '/soon.html'
-  ];
+  // 1. Get the current filename specifically (ignores folders/server paths)
+  const path = window.location.pathname;
+  // This grabs just "index.html" or "home.html" from the end of the URL
+  const pageName = path.substring(path.lastIndexOf('/') + 1).toLowerCase();
+  
+  // Handle root access (e.g. zonevault.site/) being treated as index
+  const currentFile = (pageName === '' || pageName === 'index.html') ? 'index.html' : pageName;
 
-  const currentPage = window.location.pathname;
-
-  // Check if user already has internalAccess flag
+  // 2. Check existing access
   let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
 
-  // Check if user came from an allowed page
-  const referrer = document.referrer;
-  const refPath = referrer ? new URL(referrer).pathname : null;
-  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
-
-  // Grant internalAccess if coming from allowed page
-  if (cameFromAllowedPage) {
+  // 3. Logic: Grant Access if on Login Page
+  // If the user is currently on index.html, we give them the "key"
+  if (currentFile === 'index.html') {
     sessionStorage.setItem('internalAccess', 'true');
     hasInternalAccess = true;
   }
 
-  // Allow access if user already has internalAccess or is on index page
-  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
-  if (!hasInternalAccess && !isIndexPage) {
+  // 4. Check Access for other pages
+  // If they don't have the key AND they are not on the index page...
+  if (!hasInternalAccess && currentFile !== 'index.html') {
+    console.log("Access Denied: No internal access token found.");
     showAccessDeniedModal();
+  } else {
+    console.log("Access Granted.");
   }
 
   function showAccessDeniedModal() {
@@ -659,11 +649,14 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.innerHTML = `
       <strong>🚫 Access Denied</strong>
       <div>You cannot access this page directly.<br>
-      Please go through the homepage or allowed sections.</div>
+      Please go through the Login page.</div>
       <div id="redirectTimer">Redirecting in 3 seconds...</div>
-      <button onclick="goBack()">Go Back</button>
+      <button onclick="goToLogin()">Go to Login</button>
     `;
     document.body.appendChild(modal);
+    
+    // Force body content to hide so they can't peek
+    document.body.style.overflow = 'hidden'; 
 
     let countdown = 3;
     const timer = document.getElementById('redirectTimer');
@@ -677,8 +670,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1000);
   }
 
-  function goBack() {
-    window.history.back();
+  function goToLogin() {
+    window.location.href = "index.html";
   }
 </script>
     
