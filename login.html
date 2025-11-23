@@ -5,12 +5,6 @@
 <title>Zone Vault - Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js"></script>
-
-<!-- Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <link rel="manifest" href="manifest.json">
@@ -18,80 +12,80 @@
 <meta name="theme-color" content="#2196f3">
 
 <style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: black;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    color: white;
-  }
-  .container {
-    background: rgba(34, 34, 34, 0.85);
-    padding: 32px 24px;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-    width: 100%;
-    max-width: 420px;
-    backdrop-filter: blur(12px);
-    animation: fadeIn 0.6s ease-in-out;
-    margin: 16px;
-    text-align: center;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  h2, h3 { text-align: center; margin-bottom: 20px; font-size: 1.5rem; }
-  input, button {
-    width: 100%;
-    padding: 14px 16px 14px 42px;
-    font-size: 16px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 8px;
-    box-sizing: border-box;
-    outline: none;
-    transition: 0.3s;
-  }
-  input { background: white; color: black; }
-  input::placeholder { color: black; }
-  button { background-color: black; color: white; font-weight: bold; cursor: pointer; }
-  button:hover { background-color: black; }
-  .hidden { display: none; }
-  .input-icon-group { position: relative; }
-  .input-icon-group i {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #999;
-    font-size: 16px;
-    pointer-events: none;
-  }
-  p { font-size: 14px; color: #ccc; text-align: center; margin-top: 6px; }
-  .button-row { display: flex; gap: 10px; margin: 12px 0; }
-  .button-row button { flex: 1; padding: 14px 0; font-weight: bold; border-radius: 8px; cursor: pointer; border: none; transition: 0.3s; }
-  .login-btn { background: black; color: white; }
-  .google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: white; color: black; }
-  .google-btn img { height: 18px; }
-  #back-btn {
-    position: fixed; top: 16px; left: 12px;
-    border: none; color: white; font-size: 24px; font-weight: bold;
-    width: 40px; height: 40px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; z-index: 9999;
-  }
-  @media (max-width: 480px) {
-    .container { padding: 24px 16px; margin: 12px; }
-    h2, h3 { font-size: 1.3rem; }
-    input, button { font-size: 15px; padding: 12px 14px 12px 40px; }
-    .input-icon-group i { font-size: 15px; left: 12px; }
-    #back-btn { top: 12px; left: 2px; width: 36px; height: 36px; font-size: 20px; }
-  }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: black;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: white;
+  }
+  .container {
+    background: rgba(34, 34, 34, 0.85);
+    padding: 32px 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    width: 100%;
+    max-width: 420px;
+    backdrop-filter: blur(12px);
+    animation: fadeIn 0.6s ease-in-out;
+    margin: 16px;
+    text-align: center;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  h2, h3 { text-align: center; margin-bottom: 20px; font-size: 1.5rem; }
+  input, button {
+    width: 100%;
+    padding: 14px 16px 14px 42px;
+    font-size: 16px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 8px;
+    box-sizing: border-box;
+    outline: none;
+    transition: 0.3s;
+  }
+  input { background: white; color: black; }
+  input::placeholder { color: black; }
+  button { background-color: black; color: white; font-weight: bold; cursor: pointer; }
+  button:hover { background-color: black; }
+  .hidden { display: none; }
+  .input-icon-group { position: relative; }
+  .input-icon-group i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 16px;
+    pointer-events: none;
+  }
+  p { font-size: 14px; color: #ccc; text-align: center; margin-top: 6px; }
+  .button-row { display: flex; gap: 10px; margin: 12px 0; }
+  .button-row button { flex: 1; padding: 14px 0; font-weight: bold; border-radius: 8px; cursor: pointer; border: none; transition: 0.3s; }
+  .login-btn { background: black; color: white; }
+  .google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: white; color: black; }
+  .google-btn img { height: 18px; }
+  #back-btn {
+    position: fixed; top: 16px; left: 12px;
+    border: none; color: white; font-size: 24px; font-weight: bold;
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 9999;
+  }
+  @media (max-width: 480px) {
+    .container { padding: 24px 16px; margin: 12px; }
+    h2, h3 { font-size: 1.3rem; }
+    input, button { font-size: 15px; padding: 12px 14px 12px 40px; }
+    .input-icon-group i { font-size: 15px; left: 12px; }
+    #back-btn { top: 12px; left: 2px; width: 36px; height: 36px; font-size: 20px; }
+  }
 </style>
 </head>
 <body>
@@ -99,423 +93,301 @@
 <button id="back-btn" onclick="window.history.back()">✕</button>
 
 <div class="container">
-  <div id="auth-section">
-    <h2>Zone Vault</h2>
-    <div class="input-icon-group">
-      <i class="fas fa-envelope"></i>
-      <input type="email" id="email" placeholder="Email" required>
-    </div>
-    <div class="input-icon-group">
-      <i class="fas fa-lock"></i>
-      <input type="password" id="password" placeholder="Password" required>
-    </div>
-    <div class="button-row">
-      <button class="login-btn" onclick="login()">Login</button>
-      <button class="google-btn" onclick="googleLogin()">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
-        Google
-      </button>
-    </div>
-    <p>or <a href="register.html">Register</a></p>
-  </div>
+  <div id="auth-section">
+    <h2>Zone Vault</h2>
+    <div class="input-icon-group">
+      <i class="fas fa-envelope"></i>
+      <input type="email" id="email" placeholder="Email" required>
+    </div>
+    <div class="input-icon-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" id="password" placeholder="Password" required>
+    </div>
+    <div class="button-row">
+      <button class="login-btn" onclick="login()">Login</button>
+      <button class="google-btn" onclick="googleLogin()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+        Google
+      </button>
+    </div>
+    <p>or <a href="register.html">Register</a></p>
+  </div>
 
-  <div id="verify-section" class="hidden">
-    <h3>📧 Please verify your email.</h3>
-    <p>We sent a verification link to your email.</p>
-    <button onclick="reloadAndCheck()">🔄 Reload & Check</button>
-  </div>
+  <div id="verify-section" class="hidden">
+    <h3>📧 Please verify your email.</h3>
+    <p>We sent a verification link to your email.</p>
+    <button onclick="reloadAndCheck()">🔄 Reload & Check</button>
+  </div>
 
-  <div id="form-section" class="hidden">
-    <h2>Request Access</h2>
-    <div class="input-icon-group">
-      <i class="fas fa-user"></i>
-      <input type="text" id="name" placeholder="Telegram Username" required>
-    </div>
-    <div class="input-icon-group">
-      <i class="fas fa-key"></i>
-      <input type="text" id="reason" placeholder="CODE" required>
-    </div>
-    <button onclick="submitRequest()">📩 Submit Request</button>
-  </div>
+  <div id="form-section" class="hidden">
+    <h2>Request Access</h2>
+    <div class="input-icon-group">
+      <i class="fas fa-user"></i>
+      <input type="text" id="name" placeholder="Telegram Username" required>
+    </div>
+    <div class="input-icon-group">
+      <i class="fas fa-key"></i>
+      <input type="text" id="reason" placeholder="CODE" required>
+    </div>
+    <button onclick="submitRequest()">📩 Submit Request</button>
+  </div>
 
-  <div id="waiting" class="hidden">
-    <h3>⏳ Waiting for admin approval...</h3>
-    <p>This page will redirect once approved.</p>
-    <p>Message Hoskwi_17 on Telegram for fast approval</p>
-  </div>
+  <div id="waiting" class="hidden">
+    <h3>⏳ Waiting for admin approval...</h3>
+    <p>This page will redirect once approved.</p>
+    <p>Message Hoskwi_17 on Telegram for fast approval</p>
+  </div>
 
-  <div id="approved" class="hidden">
-    <h3>✅ Approved! Redirecting to Home</h3>
-  </div>
+  <div id="approved" class="hidden">
+    <h3>✅ Approved! Redirecting to Home</h3>
+  </div>
 </div>
 
-<!-- Put AFTER you initialize Firebase auth & db -->
 <script type="module">
-import { getDatabase, ref, set, push } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
+  // 1. Imports (Using the newer version 10.12.2 for everything)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth, signInWithEmailAndPassword, onAuthStateChanged,
+    reload, signInWithPopup, GoogleAuthProvider, signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getDatabase, ref, onValue, get, set, update, push, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  import {
+    getMessaging, getToken, onMessage
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 
-const db = getDatabase(); // if you used const db = getDatabase(app) earlier, reuse same
-const auth = getAuth();
+  // 2. Configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+    authDomain: "tvnstream-b4497.firebaseapp.com",
+    databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+    projectId: "tvnstream-b4497",
+    storageBucket: "tvnstream-b4497.appspot.com",
+    messagingSenderId: "308384754214",
+    appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+    measurementId: "G-VFNH70R4D9"
+  };
 
-function logActivity(action, page){
-  try {
-    const user = auth.currentUser;
-    const uid = user?.uid || sessionStorage.getItem('currentUid') || 'anonymous';
-    const rec = {
-      email: user?.email || 'anonymous',
-      uid,
-      action: action || page || 'page_view',
-      page: page || window.location.pathname,
-      timestamp: Date.now(),
-      userAgent: navigator.userAgent || '',
-      platform: navigator.platform || '',
-      screen: `${screen.width}x${screen.height}`,
-      referrer: document.referrer || ''
-    };
-    // push under userActivities/{uid}/{pushId}
-    const node = ref(db, `userActivities/${uid}/${Date.now()}_${Math.random().toString(36).slice(2,8)}`);
-    set(node, rec).catch(e=> console.error('logActivity err', e));
-  } catch(e){ console.error(e); }
-}
+  // 3. Initialize
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+  const provider = new GoogleAuthProvider();
+  const messaging = getMessaging(app);
 
-// call on page load
-window.addEventListener('load', ()=> {
-  logActivity('page_load', window.location.pathname);
-});
+  let currentUid = null;
+  // Fallback userId for anonymous tracking
+  let localUserId = localStorage.getItem("userId");
+  if (!localUserId) {
+    localUserId = "user_" + Math.random().toString(36).substring(2, 10);
+    localStorage.setItem("userId", localUserId);
+  }
 
-// optionally call when user clicks specific actions
-// e.g. document.getElementById('downloadBtn').addEventListener('click', ()=> logActivity('download','/video.html'));
+  // 4. UI Functions
+  function show(id) {
+    document.querySelectorAll(".container > div").forEach(div => div.classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
+  }
+
+  // 5. CORE LOGIC (Attached to window so HTML buttons work)
+
+  window.login = function() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    if (!email || !password) return alert("Please enter email and password.");
+    
+    signInWithEmailAndPassword(auth, email, password)
+      .then(userCred => {
+        // Trigger reload to check verification status
+        reload(userCred.user).then(() => {
+             if(userCred.user.emailVerified) {
+                 checkJoinRequest(userCred.user);
+             } else {
+                 show("verify-section");
+             }
+        });
+      })
+      .catch(e => alert("Login error: " + e.message));
+  };
+
+  window.googleLogin = async function() {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      currentUid = user.uid;
+      checkJoinRequest(user);
+    } catch (e) {
+      alert("Google login error: " + e.message);
+    }
+  };
+
+  window.reloadAndCheck = function() {
+    const user = auth.currentUser;
+    if (user) {
+      reload(user).then(() => {
+        if (user.emailVerified) checkJoinRequest(user);
+        else alert("❌ Your email is still not verified.");
+      });
+    }
+  };
+
+  window.submitRequest = function() {
+    const name = document.getElementById("name").value;
+    const reason = document.getElementById("reason").value;
+    const user = auth.currentUser;
+    
+    if (!name || !reason) return alert("Please fill out all fields.");
+    
+    set(ref(db, 'joinRequests/' + currentUid), {
+      name, 
+      reason, 
+      email: user.email,
+      provider: user.providerData[0]?.providerId || "password",
+      status: "pending"
+    }).then(() => show("waiting"));
+  };
+
+  // 6. Helper Functions (Check Request & Logging)
+
+  function checkJoinRequest(user) {
+    currentUid = user.uid;
+    const reqRef = ref(db, 'joinRequests/' + currentUid);
+    
+    onValue(reqRef, snapshot => {
+      const data = snapshot.val();
+      if (!data) {
+        show("form-section");
+      } else if (data.status === "approved") {
+        sessionStorage.setItem("internalAccess", "true");
+        sessionStorage.setItem("fromIndex", "true");
+        show("approved");
+        setTimeout(() => window.location.href = "home", 1500);
+      } else if (data.status === "pending") {
+        show("waiting");
+      } else {
+        alert("❌ Your request was denied.");
+        signOut(auth).then(() => show("auth-section"));
+      }
+    });
+  }
+
+  // --- MERGED LOGGING LOGIC ---
+  // This combines the "Activity" log from Script 1 and "Session" log from Script 2
+
+  const deviceInfo = navigator.userAgent;
+
+  // This function runs both logging styles to ensure no data is lost
+  function logActivity(action, pageOrDetails) {
+    try {
+        const uid = currentUid || localUserId;
+        
+        // Style 1: userActivities (From your first script)
+        const rec = {
+          email: auth.currentUser?.email || 'anonymous',
+          uid: uid,
+          action: action || 'page_view',
+          page: typeof pageOrDetails === 'string' && pageOrDetails.startsWith('/') ? pageOrDetails : window.location.pathname,
+          timestamp: Date.now(),
+          userAgent: navigator.userAgent || '',
+          platform: navigator.platform || '',
+          screen: `${screen.width}x${screen.height}`,
+          referrer: document.referrer || ''
+        };
+        const node = ref(db, `userActivities/${uid}/${Date.now()}_${Math.random().toString(36).slice(2,8)}`);
+        set(node, rec).catch(e=> console.error('logActivity Old err', e));
+
+        // Style 2: userSessions (From your second script)
+        const sessionRef = ref(db, "userSessions/" + uid);
+        update(sessionRef, {
+          lastAction: action,
+          lastDetails: pageOrDetails || "",
+          lastActive: new Date().toLocaleString(),
+          device: deviceInfo,
+          currentPage: window.location.pathname
+        });
+        const activityRef = push(ref(db, "userSessions/" + uid + "/activityLog"));
+        set(activityRef, {
+          action, details: pageOrDetails || "", timestamp: serverTimestamp(), page: window.location.pathname
+        });
+
+    } catch(e){ console.error("Logging Error:", e); }
+  }
+
+  function trackUserSession(uid) {
+    update(ref(db, "userSessions/" + uid), {
+      loginTime: new Date().toLocaleString(),
+      device: deviceInfo,
+      page: window.location.pathname
+    });
+  }
+
+  // 7. Event Listeners & Auth State
+
+  window.addEventListener("load", () => logActivity("Page Visit", document.title));
+  // Note: Global click listener can be noisy, but keeping it as requested
+  document.addEventListener("click", e => logActivity("Click", `Clicked ${e.target.tagName}`)); 
+  window.addEventListener("beforeunload", () => logActivity("Left Page", document.title));
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      currentUid = user.uid;
+      reload(user).then(() => {
+        // If Google login OR Email verified
+        if (user.emailVerified || user.providerData.some(p => p.providerId === "google.com")) {
+          checkJoinRequest(user);
+          trackUserSession(user.uid);
+          subscribeToNotifications(user.uid);
+        } else {
+          show("verify-section");
+        }
+      });
+    } else {
+      show("auth-section");
+    }
+  });
+
+  // 8. Notifications (FCM)
+  async function subscribeToNotifications(userId) {
+    try {
+      if(Notification.permission === "default") {
+          const permission = await Notification.requestPermission();
+          if (permission !== "granted") return;
+      }
+      
+      const token = await getToken(messaging, {
+        vapidKey: "BKIRidsAoqVkU5UwhUq17FGUMLriCTBs9407EC6BNuZ6zgiyaypFVGD7UNGN5JT1SB7iry0t9_jmqJwe94n_T6g"
+      });
+      
+      if (token) await set(ref(db, "users/" + userId + "/fcmToken"), token);
+    } catch (err) {
+      console.error("Notification error:", err);
+    }
+  }
+
+  onMessage(messaging, payload => {
+    new Notification(payload.notification?.title || "New Notification", {
+      body: payload.notification?.body || "",
+      icon: payload.notification?.image || "/favicon-new.png"
+    });
+  });
+
 </script>
-
 
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').then(reg => {
-    reg.onupdatefound = () => {
-      const newSW = reg.installing;
-      newSW.onstatechange = () => {
-        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-          window.location.reload();
-        }
-      };
-    };
-  }).catch(err => {
-    console.error('Service Worker registration failed:', err);
-  });
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    reg.onupdatefound = () => {
+      const newSW = reg.installing;
+      newSW.onstatechange = () => {
+        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+          window.location.reload();
+        }
+      };
+    };
+  }).catch(err => console.error('Service Worker registration failed:', err));
 }
 </script>
 
-  
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
-import {
-  getAuth, signInWithEmailAndPassword, onAuthStateChanged,
-  reload, signInWithPopup, GoogleAuthProvider, signOut
-} from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
-import { getDatabase, ref, onValue, get, set } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-  authDomain: "tvnstream-b4497.firebaseapp.com",
-  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-  projectId: "tvnstream-b4497",
-  storageBucket: "tvnstream-b4497.appspot.com",
-  messagingSenderId: "308384754214",
-  appId: "1:308384754214:web:2938e76cd29b288f75d4e7"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-const provider = new GoogleAuthProvider();
-let currentUid = null;
-
-function show(id){
-  document.querySelectorAll(".container > div").forEach(div=>div.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-}
-
-window.login = function(){
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  if(!email || !password) return alert("Please enter email and password.");
-  signInWithEmailAndPassword(auth,email,password)
-    .then(userCred=> reload(userCred.user).then(()=> show("verify-section")))
-    .catch(e=> alert("Login error: "+e.message));
-};
-
-window.googleLogin = async function(){
-  try{
-    const result = await signInWithPopup(auth,provider);
-    const user = result.user;
-    currentUid = user.uid;
-    const reqRef = ref(db,'joinRequests/'+currentUid);
-    const snapshot = await get(reqRef);
-    const data = snapshot.val();
-    if(data){
-      if(data.status==="approved"){
-        sessionStorage.setItem("internalAccess","true");
-        sessionStorage.setItem("fromIndex","true");
-        show("approved");
-        setTimeout(()=> window.location.href="home",1500);
-      }else if(data.status==="pending"){
-        show("waiting");
-      }else{
-        alert("❌ Your request was denied.");
-        signOut(auth).then(()=> show("auth-section"));
-      }
-    }else{
-      show("form-section");
-    }
-  }catch(e){ alert("Google login error: "+e.message);}
-};
-
-window.reloadAndCheck = function(){
-  const user = auth.currentUser;
-  if(user){
-    reload(user).then(()=>{
-      if(user.emailVerified) checkJoinRequest(user);
-      else alert("❌ Your email is still not verified.");
-    });
-  }
-};
-
-function checkJoinRequest(user){
-  currentUid = user.uid;
-  const reqRef = ref(db,'joinRequests/'+currentUid);
-  onValue(reqRef,snapshot=>{
-    const data = snapshot.val();
-    if(!data) show("form-section");
-    else if(data.status==="approved"){
-      sessionStorage.setItem("internalAccess","true");
-      sessionStorage.setItem("fromIndex","true");
-      show("approved");
-      setTimeout(()=>window.location.href="home",1500);
-    }else if(data.status==="pending") show("waiting");
-    else{
-      alert("❌ Your request was denied.");
-      signOut(auth).then(()=>show("auth-section"));
-    }
-  });
-}
-
-window.submitRequest = function(){
-  const name = document.getElementById("name").value;
-  const reason = document.getElementById("reason").value;
-  const user = auth.currentUser;
-  if(!name || !reason) return alert("Please fill out all fields.");
-  set(ref(db,'joinRequests/'+currentUid),{
-    name,
-    reason,
-    email:user.email,
-    provider:user.providerData[0]?.providerId || "password",
-    status:"pending"
-  }).then(()=> show("waiting"));
-};
-
-onAuthStateChanged(auth,user=>{
-  if(user){
-    reload(user).then(()=>{
-      if(user.emailVerified || user.providerData.some(p=>p.providerId==="google.com")){
-        checkJoinRequest(user);
-      }else show("verify-section");
-    });
-  }else show("auth-section");
-});
-</script>
-
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').then(reg => {
-    reg.onupdatefound = () => {
-      const newSW = reg.installing;
-      newSW.onstatechange = () => {
-        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-          window.location.reload();
-        }
-      };
-    };
-  }).catch(err => console.error('Service Worker registration failed:', err));
-}
-</script>
-
-<!-- Put this just before </body> -->
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getAuth, signInWithEmailAndPassword, onAuthStateChanged,
-  reload, signInWithPopup, GoogleAuthProvider, signOut
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {
-  getDatabase, ref, onValue, get, set, update, push, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import {
-  getMessaging, getToken, onMessage
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
-
-// ✅ Initialize Firebase once
-const firebaseConfig = {
-  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-  authDomain: "tvnstream-b4497.firebaseapp.com",
-  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-  projectId: "tvnstream-b4497",
-  storageBucket: "tvnstream-b4497.appspot.com",
-  messagingSenderId: "308384754214",
-  appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-  measurementId: "G-VFNH70R4D9"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-const provider = new GoogleAuthProvider();
-const messaging = getMessaging(app);
-
-// ------------------------------------------------
-// 🔹 User Login / Request / Approval Flow
-// ------------------------------------------------
-let currentUid = null;
-
-function show(id) {
-  document.querySelectorAll(".container > div").forEach(div => div.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-}
-
-window.login = function() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  if (!email || !password) return alert("Please enter email and password.");
-  signInWithEmailAndPassword(auth, email, password)
-    .then(userCred => reload(userCred.user).then(() => show("verify-section")))
-    .catch(e => alert("Login error: " + e.message));
-};
-
-window.googleLogin = async function() {
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    currentUid = user.uid;
-    checkJoinRequest(user);
-  } catch (e) {
-    alert("Google login error: " + e.message);
-  }
-};
-
-window.reloadAndCheck = function() {
-  const user = auth.currentUser;
-  if (user) {
-    reload(user).then(() => {
-      if (user.emailVerified) checkJoinRequest(user);
-      else alert("❌ Your email is still not verified.");
-    });
-  }
-};
-
-function checkJoinRequest(user) {
-  currentUid = user.uid;
-  const reqRef = ref(db, 'joinRequests/' + currentUid);
-  onValue(reqRef, snapshot => {
-    const data = snapshot.val();
-    if (!data) show("form-section");
-    else if (data.status === "approved") {
-      sessionStorage.setItem("internalAccess", "true");
-      show("approved");
-      setTimeout(() => window.location.href = "home", 1500);
-    } else if (data.status === "pending") show("waiting");
-    else {
-      alert("❌ Your request was denied.");
-      signOut(auth).then(() => show("auth-section"));
-    }
-  });
-}
-
-window.submitRequest = function() {
-  const name = document.getElementById("name").value;
-  const reason = document.getElementById("reason").value;
-  const user = auth.currentUser;
-  if (!name || !reason) return alert("Please fill out all fields.");
-  set(ref(db, 'joinRequests/' + currentUid), {
-    name, reason, email: user.email,
-    provider: user.providerData[0]?.providerId || "password",
-    status: "pending"
-  }).then(() => show("waiting"));
-};
-
-onAuthStateChanged(auth, user => {
-  if (user) {
-    reload(user).then(() => {
-      if (user.emailVerified || user.providerData.some(p => p.providerId === "google.com")) {
-        checkJoinRequest(user);
-        trackUserSession(user.uid);
-        subscribeToNotifications(user.uid);
-      } else show("verify-section");
-    });
-  } else show("auth-section");
-});
-
-// ------------------------------------------------
-// 🔹 Realtime Activity & Session Tracking
-// ------------------------------------------------
-let userId = localStorage.getItem("userId");
-if (!userId) {
-  userId = "user_" + Math.random().toString(36).substring(2, 10);
-  localStorage.setItem("userId", userId);
-}
-
-const deviceInfo = navigator.userAgent;
-
-function logActivity(action, details = "") {
-  const uid = currentUid || userId;
-  const sessionRef = ref(db, "userSessions/" + uid);
-  update(sessionRef, {
-    lastAction: action,
-    lastDetails: details,
-    lastActive: new Date().toLocaleString(),
-    device: deviceInfo,
-    currentPage: window.location.pathname
-  });
-  const activityRef = push(ref(db, "userSessions/" + uid + "/activityLog"));
-  set(activityRef, {
-    action, details, timestamp: serverTimestamp(), page: window.location.pathname
-  });
-}
-
-window.addEventListener("load", () => logActivity("Page Visit", document.title));
-document.addEventListener("click", e => logActivity("Click", `Clicked ${e.target.tagName}`));
-window.addEventListener("beforeunload", () => logActivity("Left Page", document.title));
-
-function trackUserSession(uid) {
-  update(ref(db, "userSessions/" + uid), {
-    loginTime: new Date().toLocaleString(),
-    device: deviceInfo,
-    page: window.location.pathname
-  });
-}
-
-// ------------------------------------------------
-// 🔹 Firebase Cloud Messaging Notifications
-// ------------------------------------------------
-async function subscribeToNotifications(userId) {
-  try {
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") return;
-    const token = await getToken(messaging, {
-      vapidKey: "BKIRidsAoqVkU5UwhUq17FGUMLriCTBs9407EC6BNuZ6zgiyaypFVGD7UNGN5JT1SB7iry0t9_jmqJwe94n_T6g"
-    });
-    if (token) await set(ref(db, "users/" + userId + "/fcmToken"), token);
-  } catch (err) {
-    console.error("Notification error:", err);
-  }
-}
-
-onMessage(messaging, payload => {
-  new Notification(payload.notification?.title || "New Notification", {
-    body: payload.notification?.body || "",
-    icon: payload.notification?.image || "/favicon-new.png"
-  });
-});
-</script>
-  
 </body>
 </html>
