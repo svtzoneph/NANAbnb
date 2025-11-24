@@ -215,41 +215,7 @@
   }
   .back-btn svg { display: block; }
 
-/* --- 1. Container: Strictly Transparent (No Dimming) --- */
-.plyr__captions {
-  font-size: 18px;
-  font-weight: bold;
-  color: white;
-  bottom: 40px !important;
-  text-align: center;
-  padding: 0 !important;
-  
-  /* Force transparent background and remove any gradient overlays */
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
-}
 
-/* --- 2. The Text: Outline/Shadow Effect --- */
-.plyr__caption {
-  /* Ensure the text box itself is transparent */
-  background: transparent !important;
-  background-color: transparent !important;
-  
-  /* THE SHADOW MAGIC:
-     The first 4 lines create a sharp black outline.
-     The last line adds a soft drop shadow for depth. 
-  */
-  text-shadow: 
-    -2px -2px 0 #000,  
-     2px -2px 0 #000,
-    -2px  2px 0 #000,
-     2px  2px 0 #000,
-     4px  4px 8px black; /* Soft shadow behind the outline */
-     
-  /* Optional: Spacing for better readability */
-  padding: 0 !important; 
-}
   /* --- GLASSMORPHISM SEEK OVERLAY --- */
   .seek-overlay {
     position: absolute;
