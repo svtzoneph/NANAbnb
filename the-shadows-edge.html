@@ -215,40 +215,41 @@
   }
   .back-btn svg { display: block; }
 
-/* --- 1. The Container (Keeps the screen transparent) --- */
+/* --- 1. Container: Strictly Transparent (No Dimming) --- */
 .plyr__captions {
   font-size: 18px;
   font-weight: bold;
   color: white;
   bottom: 40px !important;
   text-align: center;
+  padding: 0 !important;
   
-  /* Ensure the big box holding the captions is invisible */
+  /* Force transparent background and remove any gradient overlays */
   background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* --- 2. The Text: Outline/Shadow Effect --- */
+.plyr__caption {
+  /* Ensure the text box itself is transparent */
+  background: transparent !important;
+  background-color: transparent !important;
+  
+  /* THE SHADOW MAGIC:
+     The first 4 lines create a sharp black outline.
+     The last line adds a soft drop shadow for depth. 
+  */
+  text-shadow: 
+    -2px -2px 0 #000,  
+     2px -2px 0 #000,
+    -2px  2px 0 #000,
+     2px  2px 0 #000,
+     4px  4px 8px black; /* Soft shadow behind the outline */
+     
+  /* Optional: Spacing for better readability */
   padding: 0 !important; 
 }
-
-/* --- 2. The Actual Text (Adds the background box) --- */
-.plyr__caption {
-  /* Semi-transparent black background (Red, Green, Blue, Alpha/Opacity) */
-  background-color: rgba(0, 0, 0, 0.75) !important; 
-  
-  /* Add padding so the black box isn't hugging the letters too tightly */
-  padding: 4px 8px;
-  
-  /* Rounded corners for a modern look */
-  border-radius: 4px;
-  
-  /* CRITICAL: Ensures the background wraps the text lines individually 
-     rather than making a big block */
-  display: inline;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-  
-  /* Keep text shadow if you want extra contrast, or remove it if the box is enough */
-  text-shadow: none !important; 
-}
-
   /* --- GLASSMORPHISM SEEK OVERLAY --- */
   .seek-overlay {
     position: absolute;
