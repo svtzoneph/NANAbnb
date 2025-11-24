@@ -78,6 +78,75 @@
         transition: background 0.5s ease; /* Smooth transition if theme changes */
     }
 
+    /* --- LOADING SCREEN STYLES --- */
+    #global-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #000000;
+        z-index: 999999; /* Highest priority */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+    }
+
+    #global-loader.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .loader-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .loader-logo {
+        width: 80px;
+        height: auto;
+        margin-bottom: 20px;
+        animation: pulseLoad 2s infinite ease-in-out;
+        filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+    }
+
+    .loader-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255,255,255,0.1);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spinLoad 1s linear infinite;
+        margin-bottom: 15px;
+    }
+
+    .loader-text {
+        font-size: 14px;
+        letter-spacing: 2px;
+        color: rgba(255,255,255,0.7);
+        animation: blinkLoad 1.5s infinite;
+        text-transform: uppercase;
+    }
+
+    @keyframes pulseLoad {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes spinLoad {
+        to { transform: rotate(360deg); }
+    }
+    @keyframes blinkLoad {
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 1; }
+    }
+    /* --- END LOADING SCREEN STYLES --- */
+
     /* --- HEADER GLASSMORPHISM (UPDATED) --- */
     header {
         padding: 30px 20px 4px 20px;
@@ -806,7 +875,14 @@
 </style>
 </head>
 <body>
-  
+
+<div id="global-loader">
+    <div class="loader-content">
+        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Loading..." class="loader-logo">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">ENTERING VAULT...</div>
+    </div>
+</div>
 <div id="noticeModal">
   <div id="noticeBox">
     <h3 class="modal-title">⚠️ Notice</h3>
@@ -1127,11 +1203,6 @@ window.addEventListener("beforeunload", () => {
   logActivity("Left Page", document.title);
   logActivityAuth("page_unload", window.location.pathname);
 });
-
-// Example:
-// document.getElementById("downloadBtn").addEventListener("click", () =>
-//    logActivityAuth("download", "/video.html")
-// );
 </script>
 
 
@@ -1388,17 +1459,123 @@ function switchImage(box) {
 document.addEventListener("DOMContentLoaded", () => {
   const noticeModal = document.getElementById("noticeModal");
   const secondModal = document.getElementById("secondModal");
+  const loader = document.getElementById("global-loader");
 
-  // Check if modal has already been shown in this session
-  if (!sessionStorage.getItem("modalShown")) {
-    // Show the first modal automatically when page loads
-    setTimeout(() => {
-      noticeModal.style.display = "flex";
-      setTimeout(() => (noticeModal.style.opacity = "1"), 100);
-    }, 500); // delay for smooth load
+  // --- CONFIGURATION ---
+  const MIN_WAIT_TIME = 3000; // 3 seconds minimum (change to 5000 for 5 seconds)
+  
+  // Record when the script started running
+  const startTime = Date.now();
 
-    // Mark modal as shown
-    sessionStorage.setItem("modalShown", "true");
+  function showNoticesAfterLoad() {
+      // Check if modal has already been shown in this session
+      if (!sessionStorage.getItem("modalShown")) {
+        noticeModal.style.display = "flex";
+        setTimeout(() => (noticeModal.style.opacity = "1"), 100);
+        // Mark modal as shown
+        sessionStorage.setItem("modalShown", "true");
+      }
+  }
+
+  // Define Access Check Logic Function
+  function checkAndEnforceAccess() {
+      const allowedPaths = [
+        '/index.html',
+        '/home.html',
+        '/nanabnb.html',
+        '/newtour.html',
+        '/hxwfanconcert.html',
+        '/svtholiday.html',
+        '/arenatour.html',
+        '/svtjapanconcert.html',
+        '/touragain.html',
+        '/gallery.html',
+        '/profile.html',
+        '/soon.html'
+      ];
+
+      const currentPage = window.location.pathname;
+
+      // Check if user already has internalAccess flag
+      let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+
+      // Check if user came from an allowed page
+      const referrer = document.referrer;
+      const refPath = referrer ? new URL(referrer).pathname : null;
+      const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+
+      // Grant internalAccess if coming from allowed page
+      if (cameFromAllowedPage) {
+        sessionStorage.setItem('internalAccess', 'true');
+        hasInternalAccess = true;
+      }
+
+      // Allow access if user already has internalAccess or is on index page
+      const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
+      
+      if (!hasInternalAccess && !isIndexPage) {
+        // DENIED: Show modal and return false
+        showAccessDeniedModal();
+        return false;
+      }
+      
+      // ALLOWED: Return true
+      return true;
+  }
+
+  // Event: When page content (images/scripts) is fully loaded
+  window.addEventListener("load", () => {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - startTime;
+      
+      const remainingTime = Math.max(0, MIN_WAIT_TIME - elapsedTime);
+
+      setTimeout(() => {
+          // 1. RUN ACCESS CHECK NOW (After the loader waits)
+          const isAllowed = checkAndEnforceAccess();
+
+          // 2. Hide loader
+          loader.classList.add('hidden');
+          
+          // 3. If allowed, show the notices. 
+          // If denied, checkAndEnforceAccess already triggered the modal.
+          if (isAllowed) {
+             setTimeout(showNoticesAfterLoad, 500);
+          }
+      }, remainingTime);
+  });
+
+  // Access Denied Helper
+  function showAccessDeniedModal() {
+    const modal = document.createElement('div');
+    modal.className = 'access-denied-modal';
+    modal.innerHTML = `
+      <strong>🚫 Access Denied</strong>
+      <div>You cannot access this page directly.<br>
+      Please go through the homepage or allowed sections.</div>
+      <div id="redirectTimer">Redirecting in 3 seconds...</div>
+      <button onclick="goBack()">Go Back</button>
+    `;
+    document.body.appendChild(modal);
+
+    // Make sure modal is visible immediately
+    setTimeout(() => { modal.style.opacity = '1'; }, 50);
+
+    let countdown = 3;
+    const timer = document.getElementById('redirectTimer');
+    const interval = setInterval(() => {
+      countdown--;
+      timer.textContent = `Redirecting in ${countdown} seconds...`;
+      if (countdown <= 0) {
+        clearInterval(interval);
+        window.location.href = "index.html";
+      }
+    }, 1000);
+  }
+
+  // Go Back Helper
+  window.goBack = function() {
+    window.history.back();
   }
 
   // Function for "I Understand"
@@ -1417,122 +1594,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => (secondModal.style.display = "none"), 400);
   };
 });
-</script>
-
- <style>
-  /* Access Denied Modal */
-  .access-denied-modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 11000;
-    text-align: center;
-    padding: 20px;
-    opacity: 0;
-    animation: fadeIn 0.5s forwards;
-    flex-direction: column;
-    /* SMOOTHNESS BOOSTER */
-    transform: translateZ(0);
-    will-change: opacity;
-  }
-
-  .access-denied-modal strong {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-
-  .access-denied-modal button {
-    margin-top: 15px;
-    padding: 10px 25px;
-    background: transparent;
-    color: white;
-    border: 2px solid white;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-  }
-
-  .access-denied-modal button:hover {
-    background: white;
-    color: black;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-</style>
-
-<script>
-  const allowedPaths = [
-    '/index.html',
-    '/home.html',
-    '/nanabnb.html',
-    '/newtour.html',
-    '/hxwfanconcert.html',
-    '/svtholiday.html',
-    '/arenatour.html',
-    '/svtjapanconcert.html',
-    '/touragain.html',
-    '/gallery.html',
-    '/profile.html',
-    '/soon.html'
-  ];
-
-  const currentPage = window.location.pathname;
-
-  // Check if user already has internalAccess flag
-  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
-
-  // Check if user came from an allowed page
-  const referrer = document.referrer;
-  const refPath = referrer ? new URL(referrer).pathname : null;
-  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
-
-  // Grant internalAccess if coming from allowed page
-  if (cameFromAllowedPage) {
-    sessionStorage.setItem('internalAccess', 'true');
-    hasInternalAccess = true;
-  }
-
-  // Allow access if user already has internalAccess or is on index page
-  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
-  if (!hasInternalAccess && !isIndexPage) {
-    showAccessDeniedModal();
-  }
-
-  function showAccessDeniedModal() {
-    const modal = document.createElement('div');
-    modal.className = 'access-denied-modal';
-    modal.innerHTML = `
-      <strong>🚫 Access Denied</strong>
-      <div>You cannot access this page directly.<br>
-      Please go through the homepage or allowed sections.</div>
-      <div id="redirectTimer">Redirecting in 3 seconds...</div>
-      <button onclick="goBack()">Go Back</button>
-    `;
-    document.body.appendChild(modal);
-
-    let countdown = 3;
-    const timer = document.getElementById('redirectTimer');
-    const interval = setInterval(() => {
-      countdown--;
-      timer.textContent = `Redirecting in ${countdown} seconds...`;
-      if (countdown <= 0) {
-        clearInterval(interval);
-        window.location.href = "index.html";
-      }
-    }, 1000);
-  }
-
-  function goBack() {
-    window.history.back();
-  }
 </script>
     
 </body>
