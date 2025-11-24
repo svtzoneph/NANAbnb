@@ -215,14 +215,21 @@
   }
   .back-btn svg { display: block; }
 
+  /* --- FIX FOR SUBTITLES (UPDATED) --- */
   .plyr__captions {
     font-size: 18px;
     font-weight: bold;
     color: white;
-    text-shadow: 5px 5px 14px black;
+    /* Removed the heavy 14px blur that was causing the 'cloud' */
     padding: 4px 8px;
     bottom: 40px !important;
     text-align: center;
+  }
+  
+  /* New rule to force transparency on the text background */
+  .plyr__caption {
+    background: transparent !important;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.9) !important; /* Tighter shadow */
   }
 
   /* --- GLASSMORPHISM SEEK OVERLAY --- */
