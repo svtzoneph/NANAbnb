@@ -196,7 +196,7 @@ video {
   display: block;
 }
 
-/* --- UPDATED CAPTION CSS TO REMOVE DIMMING --- */
+/* --- PLYR CAPTIONS CSS (FIXED) --- */
 .plyr__captions {
   font-size: 18px;
   font-weight: bold;
@@ -206,7 +206,7 @@ video {
   bottom: 40px !important;
   text-align: center;
   
-  /* FIX: Force background to be transparent */
+  /* FIX: Force background to be transparent to avoid dimming */
   background: transparent !important;
   background-color: transparent !important;
 }
@@ -365,6 +365,10 @@ gtag('config', 'G-1B2RJ659GL');
 })();
 </script>
 
+<div class="center-logo">
+  <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/logo/svtzone-logo.png" alt="Logo">
+</div>
+
 <div class="main-layout">
   <div class="video-wrapper-left">
     <div id="poster-container">
@@ -394,6 +398,10 @@ gtag('config', 'G-1B2RJ659GL');
     </div>
   </div>
 </div>
+
+<a href="index.html" class="back-btn">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+</a>
 
 <script>
 // --- 1. CONFIGURATION & DATA ---
@@ -787,4 +795,3 @@ if ('serviceWorker' in navigator) {
 
 </body>
 </html>
-
