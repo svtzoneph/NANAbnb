@@ -215,15 +215,68 @@
   }
   .back-btn svg { display: block; }
 
-  .plyr__captions {
-    font-size: 18px;
-    font-weight: bold;
-    color: white;
-    text-shadow: 5px 5px 14px black;
-    padding: 4px 8px;
-    bottom: 40px !important;
-    text-align: center;
-  }
+/* --- 1. OVERRIDE PLYR VARIABLES (The Root Cause) --- */
+:root, .plyr {
+  /* This kills the default grey box behind captions */
+  --plyr-captions-background: transparent !important; 
+  
+  /* This kills the "dimming" gradient at the bottom of the video */
+  --plyr-video-controls-background: transparent !important; 
+}
+
+/* --- 2. CONTAINER: Force Transparency & Remove Gradient --- */
+.plyr__captions {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important; /* Removes the gradient image */
+  box-shadow: none !important;
+  padding: 0 !important;
+  
+  /* Reset positioning if needed */
+  bottom: 40px !important; 
+}
+
+/* --- 3. KILL THE CONTROL GRADIENT OVERLAY --- */
+/* Plyr adds a 'fade' behind controls that looks like screen dimming. */
+.plyr__controls::before {
+  background: transparent !important;
+  background-image: none !important;
+  display: none !important; 
+}
+
+/* --- 4. YOUR TEXT STYLE (Choose Option A or B below) --- */
+
+/* OPTION A: Text Shadow Only (No Box) */
+.plyr__caption {
+  background: transparent !important;
+  text-shadow: 
+    -2px -2px 0 #000,
+     2px -2px 0 #000,
+    -2px  2px 0 #000,
+     2px  2px 0 #000,
+     4px  4px 8px black; /* Deep shadow */
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  padding: 0 !important;
+}
+
+/* OPTION B: Box Background (Like Netflix) - Uncomment to use
+.plyr__caption {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: none !important; 
+  
+  /* MAGIC: Wraps box around text only */
+  display: inline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+*/
 
   /* --- GLASSMORPHISM SEEK OVERLAY --- */
   .seek-overlay {
