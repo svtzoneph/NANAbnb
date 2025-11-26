@@ -229,24 +229,87 @@
   </div>
 
   <!-- About Modal -->
-  <div class="modal-overlay" id="aboutModal" style="display:none;">
-    <div class="modal">
-      <div class="modal-header">
-        About Zone Vault
-        <span class="close-btn" onclick="closeAbout()">&times;</span>
-      </div>
-      <div class="modal-content">
-        <h2>How Zone Vault Works?</h2>
-        <h3>How to Login/Register</h3>
-        <p>To join, you must first be part of a <strong>private livestream group</strong>...</p>
-        <h3>Additional Guidelines & Tips</h3>
-        <ul>
-          <li>Use a <strong>modern browser</strong> for the best viewing experience.</li>
-          <li>Contact the admin via email for support or technical issues.</li>
-        </ul>
-      </div>
+<div class="modal-overlay" id="aboutModal" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      About Zone Vault
+      <span class="close-btn" onclick="closeAbout()">&times;</span>
+    </div>
+
+    <div class="modal-content">
+
+      <h2>How Zone Vault Works</h2>
+      <p>
+        Zone Vault is a private platform created for <strong>exclusive VODs.</strong>. 
+        We use a secure <strong>permission-based system</strong> to verify each user and ensure that only 
+        approved accounts can access this site.
+      </p>
+
+      <h2>How Can I Get Access?</h2>
+      <p>
+      To access this site, you need to <strong>join one of the private streams</strong> we host. Before the stream day, the admin will <strong>send you a complete step-by-step guide</strong> on how to register, log in, and access the site properly.
+      </p>
+
+      <h2>How can i make sure my Information is Secured?</h2>
+      <p>
+        Your privacy and safety are our top priority. We do not store personal information on the site itself.
+        All user data—including your email and profile details—is securely stored in our 
+        <strong>database</strong>.
+      </p>
+      <p>
+        For safety, please create a <strong>unique password</strong> specifically for Zone Vault and avoid reusing your email password.
+      </p>
+
+      <h2>How the Videos Works?</h2>
+      <p>
+        Zone Vault uses <strong>HLS (HTTP Live Streaming)</strong> with <strong>Plyr</strong>, providing smooth, adaptive 
+        playback on all devices. Video sources are protected through database, preventing copying and sharing.
+      </p>
+   
+<p> To improve performance and flexibility, we are now separating subtitles from the video files.</p>
+ 
+  
+
+      <h3>Player Features</h3>
+      <ul>
+        <li>Double-tap left → rewind</li>
+        <li>Double-tap right → fast-forward</li>
+        <li>Double-tap center → pause/play</li>
+        <li>Hold for 3 seconds on desktop → show full controls</li>
+        <li>Auto-adjusting video quality based on internet speed</li>
+        <li>Responsive UI for all devices</li>
+      </ul>
+
+      <h2>How Can I Access the Videos?</h2>
+      <p>
+        Some videos are <strong>free</strong>, while others require access code.  
+        But we have upgraded from access codes to a <strong>permission-access</strong>, allowing us (the admin)
+        to control or give the user a access on specific videos.
+        
+        This upgrade ensures fairness for everyone, and keeps the system more secure and organized.
+      </p>
+
+      <h2>Profile Features</h2>
+      <p>You can now personalize your profile with:</p>
+      <ul>
+        <li>Custom display name</li>
+        <li>Editable bio</li>
+        <li>Uploadable banner image</li>
+        <li>Auto-color adapting background based on your banner</li>
+      </ul>
+
+      <h2>Tips for the Best Experience</h2>
+      <ul>
+        <li>Use modern browsers like <strong>Chrome, Edge, or Safari</strong>.</li>
+        <li>Keep your browser updated for smooth playback.</li>
+        <li>Use a stable internet connection for the best video quality.</li>
+        <li>For support, contact the admin via email.</li>
+      </ul>
+
     </div>
   </div>
+</div>
+
 
   <!-- UI Logic Scripts -->
   <script>
