@@ -78,7 +78,7 @@
         transition: background 0.5s ease; /* Smooth transition if theme changes */
     }
 
-    /* --- LOADING SCREEN STYLES --- */
+    /* --- UPDATED LOADING SCREEN STYLES (Real Internet Speed Logic) --- */
     #global-loader {
         position: fixed;
         top: 0;
@@ -91,7 +91,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
     }
 
     #global-loader.hidden {
@@ -105,41 +105,58 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        width: 80%;
+        max-width: 300px;
     }
 
     .loader-logo {
         width: 80px;
         height: auto;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         animation: pulseLoad 2s infinite ease-in-out;
-        filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+        filter: drop-shadow(0 0 15px rgba(255,255,255,0.4));
     }
 
-    .loader-spinner {
-        width: 40px;
-        height: 40px;
-        border: 3px solid rgba(255,255,255,0.1);
-        border-top-color: #fff;
-        border-radius: 50%;
-        animation: spinLoad 1s linear infinite;
-        margin-bottom: 15px;
+    /* New Progress Bar Container */
+    .loader-progress-container {
+        width: 100%;
+        height: 4px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* The Moving Bar */
+    .loader-progress-bar {
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, #fff, #00bfff, transparent);
+        position: absolute;
+        left: -50%;
+        animation: progressMove 1.5s infinite ease-in-out;
+        box-shadow: 0 0 10px #00bfff;
     }
 
     .loader-text {
-        font-size: 14px;
-        letter-spacing: 2px;
-        color: rgba(255,255,255,0.7);
-        animation: blinkLoad 1.5s infinite;
+        font-size: 13px;
+        letter-spacing: 3px;
+        color: rgba(255,255,255,0.6);
+        animation: blinkLoad 2s infinite;
         text-transform: uppercase;
+        margin-top: 10px;
     }
 
     @keyframes pulseLoad {
         0% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.1); opacity: 0.8; }
+        50% { transform: scale(1.05); opacity: 0.8; }
         100% { transform: scale(1); opacity: 1; }
     }
-    @keyframes spinLoad {
-        to { transform: rotate(360deg); }
+    @keyframes progressMove {
+        0% { left: -50%; }
+        100% { left: 150%; }
     }
     @keyframes blinkLoad {
         0%, 100% { opacity: 0.4; }
@@ -879,10 +896,13 @@
 <div id="global-loader">
     <div class="loader-content">
         <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Loading..." class="loader-logo">
-        <div class="loader-spinner"></div>
+        <div class="loader-progress-container">
+            <div class="loader-progress-bar"></div>
+        </div>
         <div class="loader-text">ENTERING ZONE VAULT...</div>
     </div>
 </div>
+
 <div id="noticeModal">
   <div id="noticeBox">
     <h3 class="modal-title">⚠️ Notice</h3>
@@ -1461,84 +1481,85 @@ document.addEventListener("DOMContentLoaded", () => {
   const secondModal = document.getElementById("secondModal");
   const loader = document.getElementById("global-loader");
 
-  // --- CONFIGURATION ---
-  const MIN_WAIT_TIME = 3000; // 3 seconds minimum (change to 5000 for 5 seconds)
+  // --- 1. INTELLIGENT LOADING LOGIC ---
+  const referrer = document.referrer;
   
-  // Record when the script started running
+  // Pages that trigger the full "Entering Zone Vault" animation
+  // (Add any other entry pages like register.html here)
+  const entryPages = ['index.html', 'login.html', 'register.html', '']; 
+  
+  // Check if user came from an entry page
+  const cameFromEntry = entryPages.some(page => referrer.includes(page));
+
+  // If user is navigating internally (e.g. Home -> Profile), HIDE loader immediately
+  // unless they are explicitly coming from a login page.
+  if (!cameFromEntry && referrer.includes(window.location.hostname)) {
+      loader.style.display = 'none'; // Instant hide
+  }
+
+  // --- 2. CONFIGURATION ---
+  // We keep a tiny buffer only for the 'Entry' animation to make it look smooth
+  // otherwise, we rely on actual internet speed (window.load)
+  const MIN_ANIMATION_TIME = cameFromEntry ? 2000 : 0; 
+  
   const startTime = Date.now();
 
   function showNoticesAfterLoad() {
-      // Check if modal has already been shown in this session
       if (!sessionStorage.getItem("modalShown")) {
         noticeModal.style.display = "flex";
         setTimeout(() => (noticeModal.style.opacity = "1"), 100);
-        // Mark modal as shown
         sessionStorage.setItem("modalShown", "true");
       }
   }
 
-  // Define Access Check Logic Function
+  // --- 3. ACCESS CHECK LOGIC ---
   function checkAndEnforceAccess() {
       const allowedPaths = [
-        '/index.html',
-        '/home.html',
-        '/nanabnb.html',
-        '/newtour.html',
-        '/hxwfanconcert.html',
-        '/svtholiday.html',
-        '/arenatour.html',
-        '/svtjapanconcert.html',
-        '/touragain.html',
-        '/gallery.html',
-        '/profile.html',
-        '/soon.html'
+        '/index.html', '/home.html', '/nanabnb.html', '/newtour.html',
+        '/hxwfanconcert.html', '/svtholiday.html', '/arenatour.html',
+        '/svtjapanconcert.html', '/touragain.html', '/gallery.html',
+        '/profile.html', '/soon.html'
       ];
 
       const currentPage = window.location.pathname;
-
-      // Check if user already has internalAccess flag
       let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
-
-      // Check if user came from an allowed page
-      const referrer = document.referrer;
       const refPath = referrer ? new URL(referrer).pathname : null;
       const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
 
-      // Grant internalAccess if coming from allowed page
       if (cameFromAllowedPage) {
         sessionStorage.setItem('internalAccess', 'true');
         hasInternalAccess = true;
       }
 
-      // Allow access if user already has internalAccess or is on index page
       const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
       
       if (!hasInternalAccess && !isIndexPage) {
-        // DENIED: Show modal and return false
         showAccessDeniedModal();
         return false;
       }
-      
-      // ALLOWED: Return true
       return true;
   }
 
-  // Event: When page content (images/scripts) is fully loaded
+  // --- 4. REAL INTERNET SPEED LOAD EVENT ---
   window.addEventListener("load", () => {
       const currentTime = Date.now();
       const elapsedTime = currentTime - startTime;
       
-      const remainingTime = Math.max(0, MIN_WAIT_TIME - elapsedTime);
+      // Calculate remaining time based on minimum animation requirement
+      const remainingTime = Math.max(0, MIN_ANIMATION_TIME - elapsedTime);
 
       setTimeout(() => {
-          // 1. RUN ACCESS CHECK NOW (After the loader waits)
+          // A. Run Access Check
           const isAllowed = checkAndEnforceAccess();
 
-          // 2. Hide loader
-          loader.classList.add('hidden');
+          // B. Hide Loader (Fade out effect)
+          if(loader.style.display !== 'none') {
+             loader.classList.add('hidden');
+             // Remove from DOM after fade to allow clicking underneath
+             setTimeout(() => { loader.style.display = 'none'; }, 600);
+          }
           
-          // 3. If allowed, show the notices. 
-          // If denied, checkAndEnforceAccess already triggered the modal.
+          // C. Show Notices if allowed
           if (isAllowed) {
              setTimeout(showNoticesAfterLoad, 500);
           }
@@ -1558,7 +1579,6 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     document.body.appendChild(modal);
 
-    // Make sure modal is visible immediately
     setTimeout(() => { modal.style.opacity = '1'; }, 50);
 
     let countdown = 3;
@@ -1573,12 +1593,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1000);
   }
 
-  // Go Back Helper
   window.goBack = function() {
     window.history.back();
   }
 
-  // Function for "I Understand"
   window.showSecondModal = function() {
     noticeModal.style.opacity = "0";
     setTimeout(() => {
@@ -1588,7 +1606,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 400);
   };
 
-  // Function for "Close"
   window.closeSecondModal = function() {
     secondModal.style.opacity = "0";
     setTimeout(() => (secondModal.style.display = "none"), 400);
