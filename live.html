@@ -2,472 +2,95 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>VIDEOS</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-
+<title>Admin Page Access Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-
-<link rel="icon" href="favicon-new.png" type="image/png" />
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <meta name="theme-color" content="#000000">
-
-<meta name="apple-mobile-web-app-title" content="Zone Vault">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
-<link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
-<link rel="apple-touch-startup-image" href="splash.png">
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-1B2RJ659GL');
-</script>
-
-<script>
-  (function() {
-    const savedTheme = localStorage.getItem('zoneVaultTheme');
-    if(savedTheme) {
-      const style = document.createElement('style');
-      style.innerHTML = `
-        body { 
-          background: ${savedTheme} !important; 
-          background-size: cover !important;
-          background-attachment: fixed !important;
-          background-repeat: no-repeat !important;
-          min-height: 100vh;
-        }
-      `;
-      document.head.appendChild(style);
-    }
-  })();
-</script>
-
 <style>
-  /* --- CSS VARIABLES FOR GLASS --- */
-  :root {
-      --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-      --glass-border: 1px solid rgba(255, 255, 255, 0.2);
-      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-      --glass-blur: blur(20px);
-      --text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-      
-      --plyr-color-main: gray;
-      --plyr-control-bg: rgba(255,255,255,0.1);
-      --plyr-control-hover-bg: rgba(255,255,255,0.2);
-  }
-
-  * { box-sizing: border-box; }
-
-  body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: black; /* Fallback */
-    text-align: center;
-    /* CHANGED: Reduced side padding to 0 */
-    padding: 20px 0px;
-    margin: 0;
-    transition: background 0.5s ease;
-  }
-
-  .main-layout {
-    /* CHANGED: Max-width is now 100% to fill the screen */
-    max-width: 100%;
-    margin: 0 auto;
-    width: 100%;
-    /* CHANGED: Added small padding so content doesn't hit the screen bezel */
-    padding: 0 20px; 
-  }
-
-  .video-wrapper-left {
-    width: 100%;
-    position: relative; 
-  }
-
-  #poster-container {
-    width: 100%;
-    aspect-ratio: 16/9;
-    background-size: cover;
-    background-position: center;
-    background-image: url('https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png'); 
-    border-radius: 0px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    position: relative;
-    
-    /* Poster Hyper Glass Border */
-    box-shadow: var(--glass-shadow);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  /* --- GLASSMORPHISM POSTER OVERLAY --- */
-  #poster-overlay {
-    /* Hyper Glass Style */
-    background: rgba(0, 0, 0, 0.5); 
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-top: 1px solid rgba(255, 255, 255, 0.5);
-    
-    padding: 15px 25px;
-    border-radius: 50px;
-    color: white;
-    font-weight: bold;
-    font-size: 18px;
-    pointer-events: none; 
-    max-width: 90%;
-    text-align: center;
-    margin: 0 auto;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    text-shadow: var(--text-shadow);
-
-    /* SMOOTHNESS BOOSTER */
-    transform: translateZ(0);
-    will-change: transform, backdrop-filter;
-  }
-
-  #player-container {
-    display: none; 
-    width: 100%;
-    box-shadow: var(--glass-shadow);
-  }
-
-  h2 {
-    font-size: 24px;
-    color: white;
-    margin-top: 15px;
-    margin-bottom: 5px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    text-align: left; 
-    text-shadow: var(--text-shadow);
-  }
-
-  h3.playlist-header {
-    color: white; 
-    margin-bottom: 10px; 
-    font-size: 20px;
-    text-shadow: var(--text-shadow);
-  }
-
-  @media (max-width: 600px) {
-    h2 { font-size: 18px; }
-    h3.playlist-header { 
-        font-size: 16px; 
-        margin-top: 20px; 
-        opacity: 0.9;
-    }
-    #poster-overlay { 
-        font-size: 14px; 
-        padding: 10px 15px;
-        border-radius: 35px;
-        border-width: 1px;
-    }
-    .center-logo img { width: 40px; }
-  }
-
-  .center-logo { display: flex; justify-content: center; margin-bottom: 20px; }
-  .center-logo img { width: 50px; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-
-  .plyr {
-    width: 100%;
-    aspect-ratio: 16/9;
-    background: #000;
-    border-radius: 0px;
-    overflow: hidden;
-  }
-    
-  video { width: 100%; }
-
-  /* --- GLASSMORPHISM BACK BUTTON (Hyper) --- */
-  .back-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px; height: 50px;
-    
-    /* Hyper Glass Style */
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-top: 1px solid rgba(255, 255, 255, 0.5);
-    
-    border-radius: 50%;
-    display: flex; justify-content: center; align-items: center;
-    text-decoration: none; z-index: 3000;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-
-    /* SMOOTHNESS BOOSTER */
-    transform: translateZ(0);
-    will-change: transform;
-  }
-  .back-btn:hover { 
-    background: rgba(255,255,255,0.25); 
-    transform: scale(1.1); 
-    border-color: white;
-  }
-  .back-btn svg { display: block; }
-
-/* --- 1. OVERRIDE PLYR VARIABLES (The Root Cause) --- */
-:root, .plyr {
-  /* This kills the default grey box behind captions */
-  --plyr-captions-background: transparent !important; 
+  body { background: #0f0f0f; color: white; font-family: sans-serif; padding: 20px; max-width: 1200px; margin: 0 auto; }
+  h1 { text-align: center; border-bottom: 1px solid #333; padding-bottom: 20px; }
   
-  /* This kills the "dimming" gradient at the bottom of the video */
-  --plyr-video-controls-background: transparent !important; 
-}
-
-/* --- 2. CONTAINER: Force Transparency & Remove Gradient --- */
-.plyr__captions {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important; /* Removes the gradient image */
-  box-shadow: none !important;
-  padding: 0 !important;
+  /* Grid & Cards */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 30px; }
   
-  /* Reset positioning if needed */
-  bottom: 40px !important; 
-}
-
-/* --- 3. KILL THE CONTROL GRADIENT OVERLAY --- */
-/* Plyr adds a 'fade' behind controls that looks like screen dimming. */
-.plyr__controls::before {
-  background: transparent !important;
-  background-image: none !important;
-  display: none !important; 
-}
-
-/* --- 4. YOUR TEXT STYLE (Choose Option A or B below) --- */
-
-/* OPTION A: Text Shadow Only (No Box) */
-.plyr__caption {
-  background: transparent !important;
-  text-shadow: 
-    -2px -2px 0 #000,
-     2px -2px 0 #000,
-    -2px  2px 0 #000,
-     2px  2px 0 #000,
-     4px  4px 8px black; /* Deep shadow */
-  font-size: 18px;
-  font-weight: bold;
-  color: white;
-  padding: 0 !important;
-}
-
-  /* --- GLASSMORPHISM SEEK OVERLAY --- */
-  .seek-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Glass Style */
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    
-    border-radius: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 80px;
-    height: 80px;
-    z-index: 20; 
-
-    /* SMOOTHNESS BOOSTER */
-    will-change: transform, opacity;
+  /* Updated Card Style */
+  .card { 
+    background: #1f1f1f; 
+    border: 1px solid #333; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    transition: 0.2s; 
+    text-align: center; 
+    overflow: hidden; /* Ensures image corners stay rounded */
+    padding: 0; /* Removed padding so image touches edges */
   }
-  .seek-overlay.visible {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-  }
-  .seek-overlay svg {
-    width: 40px;
-    height: 40px;
-    fill: white;
+  .card:hover { transform: translateY(-5px); border-color: #00bcd4; }
+  
+  /* New Image Style */
+  .card-img {
+    width: 100%;
+    height: 140px; /* Fixed height for uniformity */
+    object-fit: cover; /* Ensures image doesn't stretch weirdly */
     display: block;
-  }
-    
-  /* Scrollbar Styling */
-  #playlist-items::-webkit-scrollbar { width: 8px; }
-  #playlist-items::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }
-  #playlist-items::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 4px; border: 1px solid rgba(0,0,0,0.2); }
-  #playlist-items::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
-
-  /* --- PLAYLIST ITEMS GLASS CLASS --- */
-  .playlist-item {
-      display: flex; 
-      align-items: center; 
-      gap: 15px; 
-      padding: 10px;
-      border-radius: 8px;
-      transition: all 0.2s;
-      
-      /* Hyper Glass */
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      
-      color: white;
-      cursor: pointer;
-
-      /* SMOOTHNESS BOOSTER */
-      transform: translateZ(0);
-      backface-visibility: hidden;
-  }
-  .playlist-item:hover {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.3);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  }
-  .playlist-item.locked {
-      opacity: 0.5; 
-      cursor: not-allowed; 
-      filter: grayscale(1);
+    border-bottom: 1px solid #333;
   }
 
-  /* --- NEW STATUS BADGE DESIGNS --- */
-  .status-badge {
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    margin-top: 6px;
-    width: fit-content;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    transition: all 0.3s ease;
-  }
+  /* Wrapper for the text inside the card */
+  .card-content { padding: 15px; }
+  .card h3 { margin: 0 0 5px 0; font-size: 16px; }
+  
+  /* Modal Styles */
+  #modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; }
+  .modal-content { background: #222; width: 100%; max-width: 500px; height: 80vh; border-radius: 12px; display: flex; flex-direction: column; border: 1px solid #444; padding: 20px; }
+  
+  /* Search Bar Style */
+  .search-bar { width: 100%; padding: 12px; margin: 15px 0 5px 0; background: #333; border: 1px solid #444; color: white; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 14px; }
+  .search-bar:focus { border-color: #00bcd4; }
 
-  /* Design for "LIVE" status (Red + Pulse Animation) */
-  .status-live {
-    background: rgba(255, 0, 0, 0.15);
-    color: #ff4444;
-    border: 1px solid rgba(255, 68, 68, 0.3);
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
-    animation: livePulse 2s infinite;
-  }
-
-  /* Design for other statuses (Blue/Neutral) */
-  .status-replay {
-    background: rgba(255, 255, 255, 0.1);
-    color: #ccc;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  /* The Pulse Animation Keyframes */
-  @keyframes livePulse {
-    0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4); border-color: rgba(255, 68, 68, 0.4); }
-    70% { box-shadow: 0 0 0 6px rgba(255, 68, 68, 0); border-color: rgba(255, 68, 68, 0.1); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); border-color: rgba(255, 68, 68, 0.4); }
-  }
-
-  @media (min-width: 900px) {
-    .main-layout {
-      display: flex;
-      flex-direction: row;
-      align-items: flex-start;
-      gap: 10px; 
-      /* CHANGED: Adjusted padding for wide screens */
-      padding: 0 20px; 
-      text-align: left;
-    }
-    .video-wrapper-left { flex: 2; }
-    #playlist { flex: 1; margin-top: 0 !important; margin-bottom: 0 !important; max-width: none !important; }
-    h3.playlist-header { margin-top: 0 !important; line-height: 1; }
-    #playlist-items { 
-        max-height: 410px !important; 
-        padding-right: 10px;
-        /* SMOOTH SCROLL */
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch;
-    }
-  }
+  /* User List */
+  .user-list { flex: 1; overflow-y: auto; margin: 10px 0 20px 0; border-top: 1px solid #333; }
+  .user-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #333; }
+  .user-info small { color: #888; display: block; }
+  
+  /* Toggle Switch */
+  .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: .4s; border-radius: 34px; }
+  .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+  input:checked + .slider { background-color: #00bcd4; }
+  input:checked + .slider:before { transform: translateX(20px); }
+  
+  .close-btn { width: 100%; padding: 12px; background: #e53935; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
 </style>
 </head>
-
 <body>
 
-<div class="center-logo">
-  <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" loading="lazy" alt="Zone Vault Logo">
+<h1>Admin Page Access Control</h1>
+<p style="text-align: center; color: #aaa;">Click a Category Card to manage user access to the full page.</p>
+
+<div class="grid" id="grid"></div>
+
+<div id="modal">
+  <div class="modal-content">
+    <h3 id="modal-title" style="margin:0">Manage Access</h3>
+    <p id="modal-subtitle" style="color:#aaa; font-size:12px; margin:5px 0 0 0;"></p>
+    
+    <input type="text" id="search-input" class="search-bar" placeholder="🔍 Search user by name or email...">
+    
+    <div class="user-list" id="user-list">
+      Loading users...
+    </div>
+    
+    <button class="close-btn" onclick="document.getElementById('modal').style.display='none'">CLOSE PANEL</button>
+  </div>
 </div>
 
-<div class="main-layout">
-
-  <div class="video-wrapper-left">
-    
-    <div id="poster-container">
-      <div id="poster-overlay">Select an Episode to Watch</div>
-    </div>
-
-    <div id="player-container">
-      <div class="plyr__video-wrapper">
-        <video id="videoPlayer" playsinline controls crossorigin="anonymous"></video>
-      </div>
-    </div>
-
-    <h2 id="main-title">Select Episode</h2>
-  </div>
-
-  <div id="playlist" style="width: 100%; max-width: 1000px; margin: 20px auto; text-align: left;">
-    <h3 class="playlist-header">Other Episodes</h3>
-    
-    <div id="playlist-items" style="
-        display: flex; 
-        flex-direction: column; 
-        gap: 10px;
-        max-height: 410px; 
-        overflow-y: auto; 
-        padding-right: 10px;
-        /* SMOOTH SCROLL FALLBACK */
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch;
-    ">
-    </div>
-  </div>
-
-</div> 
-
 <script>
-// --- 1. CONFIGURATION & DATA ---
-const playlistData = [
-  { 
-    id: "1", 
-    title: "SEVENTEEN WOLRD TOUR [NEW_] IN OSAKA JAPAN SHOW", 
-    status: "LIVE", 
-    image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png",
-  },
-];
-
-const playlistContainer = document.getElementById('playlist-items');
-const posterContainer = document.getElementById('poster-container');
-const playerContainer = document.getElementById('player-container');
-const mainTitle = document.getElementById('main-title');
-
-// Global variable to store current ep data
-window.currentEpData = null;
-</script>
-
-<script>
+// 1. FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
   authDomain: "tvnstream-b4497.firebaseapp.com",
@@ -478,607 +101,124 @@ const firebaseConfig = {
   appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
 };
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth(); // Initialized Auth
 const db = firebase.database();
 
-// =========================================================================
-// !!! 🚨 START OF NEW PAGE-LEVEL SECURITY SCRIPT (UPDATED DESIGN) 🚨 !!!
-// =========================================================================
 
-// ** 🚨 IMPORTANT: CHANGE THIS ID TO MATCH YOUR ADMIN PANEL ID 🚨 **
-const PAGE_ID = "live_OSAKA_NEW_TOUR"; 
+const pageCategories = [
+  { 
+    id: "jpnnewtour", 
+    name: "SEVENTEEN WORLD TOUR IN JAPAN", 
+    filename: "japannewtour",
+    image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png" // Put your real image URL here
+  },
+  { 
+    id: "jpnnewtour", 
+    name: "LIVE ACCESS", 
+    filename: "live",
+    image: "https://placehold.co/600x400/1f1f1f/00bcd4?text=LIVE+STREAM" // Put your real image URL here
+  },
+];
 
-// Function to show the denial screen (UPDATED DESIGN)
-function showAccessDeniedModal(message) {
-    document.body.style.overflow = 'hidden';
+// 3. RENDER CARDS
+const grid = document.getElementById('grid');
+pageCategories.forEach(p => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  // If the image link fails, it falls back to a grey box
+  const imgSrc = p.image || "https://placehold.co/600x400/333/white?text=No+Image";
 
-    const modal = document.createElement('div');
-    modal.className = 'access-denied-modal';
-    modal.style.opacity = '1';
-    modal.style.animation = 'none';
-
-    // The new HTML structure for enhanced design
-    modal.innerHTML = `
-        <strong style="color: #FF4444; font-size: 36px; margin-bottom: 20px;">Access Denied</strong>
-        <div style="margin-top: 15px; font-size: 18px; max-width: 90%; line-height: 1.4; text-shadow: var(--text-shadow);">
-            ${message}
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 30px; width: 80%; max-width: 300px;">
-            <button onclick="window.history.back()" 
-                    style="background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3); color: white;">
-                GO BACK
-            </button>
-        </div>
-    `;
-    document.body.appendChild(modal);
-
-    throw new Error("Access Denied by Page Security Check.");
-}
-
-// Check on page load
-auth.onAuthStateChanged(user => {
-    if (!user) {
-        showAccessDeniedModal("You must be logged in to view this content.");
-        return;
-    }
-
-    db.ref(`page_access/${PAGE_ID}/${user.uid}`).once('value')
-    .then(snapshot => {
-        const isAllowed = snapshot.val();
-        
-        if (isAllowed !== true) {
-            showAccessDeniedModal("The Admin has not granted your account access to the " + PAGE_ID.toUpperCase() + " collection.");
-        }
-    })
-    .catch(error => {
-        console.error("Firebase Permission Check Failed:", error);
-        showAccessDeniedModal(
-          "This content is restricted and your account does not have permission to view it.<br>" +
-          "Access is now based on account approval — only users who joined the stream and were approved by the admin can view this content.<br>" +
-          "If you believe this is a mistake, please contact the admin."
-        );
-    });
-});
-// =========================================================================
-// !!! 🚨 END OF NEW PAGE-LEVEL SECURITY SCRIPT (UPDATED DESIGN) 🚨 !!!
-// =========================================================================
-
-const video = document.getElementById("videoPlayer");
-let hls;
-
-const player = new Plyr(video, {
-  captions: { active: true, update: true, language: "en" },
-  controls: ["play-large","play","current-time","duration","mute","pip","airplay","settings","fullscreen"],
-  settings: ["captions","speed","quality"],
-  clickToPlay: false, 
-  dblclickFullscreen: false
+  card.innerHTML = `
+    <img src="${imgSrc}" class="card-img" alt="${p.name}">
+    <div class="card-content">
+      <h3>${p.name}</h3>
+      <small>Page: ${p.filename}</small>
+    </div>
+  `;
+  card.onclick = () => openModal(p);
+  grid.appendChild(card);
 });
 
-// --- EXISTING CODE CONTINUES BELOW (loadAndPlayEpisode, Handlers, etc.) ---
+// 4. MODAL LOGIC
+let currentPageId = null;
+const searchInput = document.getElementById('search-input');
 
-// --- 2. CORE FUNCTION: PLAY EPISODE ---
-// Usage: loadAndPlayEpisode("1", true) -> true means update the URL
-function loadAndPlayEpisode(epId, updateUrl = true) {
-    // A. Find the episode
-    const ep = playlistData.find(item => item.id === epId);
-    
-    if (!ep) {
-        console.warn("Episode ID not found:", epId);
-        return;
-    }
-
-    // B. Check Date Locking
-    const today = new Date();
-    if (ep.date) {
-        const releaseDate = new Date(ep.date);
-        if (releaseDate > today) {
-            alert(`This episode is not yet available.\nRelease Date: ${ep.date}`);
-            return; 
-        }
-    }
-
-    // C. Update the Browser Link (Deep Linking)
-    if (updateUrl) {
-        const newUrl = window.location.pathname + '?v=' + ep.id;
-        // pushState changes the URL without reloading the page
-        history.pushState({id: ep.id}, '', newUrl);
-    }
-
-    // D. Set Data & UI
-    window.currentEpData = ep;
-    posterContainer.style.display = "none";
-    playerContainer.style.display = "block";
-
-    // E. Load Video from Firebase (Path: ourchapter)
-    db.ref(`live/${ep.id}`).once('value').then(snapshot => {
-      const data = snapshot.val();
-      if(!data || !data.url) { alert("Video unavailable"); return; }
-
-      if(typeof hls !== 'undefined' && hls){ hls.destroy(); hls = null; }
-
-      // Resume Logic
-      const resumePlayback = () => {
-          const user = auth.currentUser;
-          if (!window.currentEpData || !user) {
-             player.play(); 
-             return;
-          }
-          db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).once('value').then(snap => {
-              const saved = snap.val();
-              if (saved && saved.currentTime > 0) {
-                  player.currentTime = saved.currentTime;
-              }
-              player.play();
-          });
-      };
-
-      if(typeof Hls !== 'undefined' && Hls.isSupported()){
-        hls = new Hls();
-        hls.loadSource(data.url);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => { 
-              setTimeout(resumePlayback, 100);
-        });
-      } else {
-        video.src = data.url;
-        video.addEventListener('loadedmetadata', resumePlayback, { once: true });
-      }
-
-      // Subtitles
-      video.querySelectorAll("track").forEach(t => t.remove());
-      if(data.subtitles){
-        Object.entries(data.subtitles).forEach(([lang,url])=>{
-          const track = document.createElement("track");
-          track.kind = "subtitles";
-          track.label = lang.toUpperCase();
-          track.srclang = lang;
-          track.src = url;
-          if(lang==="en") track.default = true;
-          video.appendChild(track);
-        });
-      }
-      
-      // Title Update
-      if(data.title){
-        mainTitle.textContent = data.title;
-      } else {
-        mainTitle.textContent = ep.title;
-      }
-
-    }).catch(err => console.error("Firebase Error:", err));
-}
-
-// --- 3. HANDLE BROWSER BACK BUTTON ---
-window.addEventListener('popstate', (event) => {
-    if (event.state && event.state.id) {
-        loadAndPlayEpisode(event.state.id, false);
-    } else {
-        // Reset to poster if back goes to start
-        posterContainer.style.display = "flex";
-        playerContainer.style.display = "none";
-        player.pause();
-    }
-});
-
-// --- 4. GENERATE PLAYLIST UI ---
-playlistData.forEach(ep => {
-  const epDiv = document.createElement('div');
-  epDiv.className = 'playlist-item';
-   
-  const today = new Date();
-  let isLocked = false;
-  if (ep.date) {
-      const releaseDate = new Date(ep.date);
-      if (releaseDate > today) isLocked = true;
-  }
-
-  if (isLocked) {
-      epDiv.classList.add('locked');
-  }
-
-  const thumb = document.createElement('img');
-  thumb.src = ep.image;
-  thumb.style.width = "120px";  
-  thumb.style.height = "68px";   
-  thumb.style.objectFit = "cover"; 
-  thumb.style.borderRadius = "4px";
+function openModal(page) {
+  currentPageId = page.id;
   
-  // SMOOTH LOADING: Lazy load images
-  thumb.loading = "lazy";
-  thumb.decoding = "async";
+  document.getElementById('modal-title').textContent = "Access for: " + page.name;
+  document.getElementById('modal-subtitle').textContent = "Database Node: page_access/" + page.id;
+  document.getElementById('modal').style.display = 'flex';
   
-  const textDiv = document.createElement('div');
-  textDiv.style.display = "flex";
-  textDiv.style.flexDirection = "column"; 
+  searchInput.value = '';
   
-  const title = document.createElement('span');
-  title.textContent = ep.title;
-  title.style.fontSize = "15px";
-  title.style.fontWeight = "500";
-  title.style.textShadow = "0 1px 2px rgba(0,0,0,0.8)"; 
+  const list = document.getElementById('user-list');
+  list.innerHTML = '<div style="text-align:center; padding:20px;">Loading Database...</div>';
 
-  textDiv.appendChild(title);
-
-  // --- CHANGED: NEW STATUS BADGE LOGIC ---
-  if (ep.status) {
-      const statusSpan = document.createElement('span');
-      statusSpan.textContent = ep.status;
-      
-      // Add the base badge class
-      statusSpan.classList.add('status-badge');
-
-      // Check if it is LIVE or something else to apply specific color
-      if (ep.status.toUpperCase() === "LIVE") {
-          statusSpan.classList.add('status-live');
-          
-          // Add a "rec" dot icon for extra detail if it's live
-          statusSpan.innerHTML = '● &nbsp;' + ep.status;
-      } else {
-          statusSpan.classList.add('status-replay');
-      }
-
-      // Handle "Not Available" opacity
-      if(ep.status === "NOT AVAILABLE") {
-         epDiv.style.opacity = "0.6";
-      }
-
-      textDiv.appendChild(statusSpan);
-  }
-  // ----------------------------------------
-
-  epDiv.appendChild(thumb);
-  epDiv.appendChild(textDiv);
-
-  // CHANGED: Call the loadAndPlayEpisode function
-  epDiv.addEventListener('click', () => {
-    // PREVENT CLICK IF STATUS IS NOT AVAILABLE
-    if (ep.status === "NOT AVAILABLE") {
-        alert("This episode is currently unavailable.");
-        return;
-    }
-    loadAndPlayEpisode(ep.id, true);
+  Promise.all([
+    db.ref('users').once('value'), 
+    db.ref('page_access/' + page.id).once('value')
+  ]).then(([userSnap, permSnap]) => {
+    const users = userSnap.val() || {};
+    const perms = permSnap.val() || {};
+    renderUserList(users, perms);
   });
-
-  playlistContainer.appendChild(epDiv);
-});
-
-// --- 5. CHECK URL ON PAGE LOAD ---
-window.addEventListener('DOMContentLoaded', () => {
-    // Wait for auth to be ready before auto-playing
-    auth.onAuthStateChanged(user => {
-        if(user) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const videoId = urlParams.get('v'); // Looks for ?v=1
-            
-            if (videoId) {
-                setTimeout(() => {
-                    console.log("Auto-playing from link ID:", videoId);
-                    loadAndPlayEpisode(videoId, false);
-                }, 500);
-            }
-        }
-    });
-});
-
-const isMobileOrTablet = /Mobi|Android|iPad|Tablet/i.test(navigator.userAgent);
-
-function enterFullscreen(el) {
-  if (el.requestFullscreen) el.requestFullscreen();
-  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  else if (el.msRequestFullscreen) el.msRequestFullscreen();
 }
 
-player.on('enterfullscreen', () => {
-  if (isMobileOrTablet) {
-    if (screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('landscape').catch(err => {});
-    } else if (window.screen.lockOrientation) {
-      window.screen.lockOrientation('landscape');
-    }
-  }
+function renderUserList(users, perms) {
+  const list = document.getElementById('user-list');
+  list.innerHTML = '';
+  
+  Object.entries(users).forEach(([uid, userData]) => {
+    const hasAccess = perms[uid] === true;
+    const row = document.createElement('div');
+    row.className = 'user-row';
+    row.innerHTML = `
+      <div class="user-info">
+        <strong>${userData.name || 'Unknown User'}</strong>
+        <small>${userData.email || uid}</small>
+      </div>
+      <label class="switch">
+        <input type="checkbox" ${hasAccess ? 'checked' : ''} onchange="toggleAccess('${uid}', this.checked)">
+        <span class="slider"></span>
+      </label>
+    `;
+    list.appendChild(row);
+  });
+}
+
+searchInput.addEventListener('keyup', (e) => {
+  const term = e.target.value.toLowerCase();
+  const rows = document.querySelectorAll('.user-row');
+  rows.forEach(row => {
+    const text = row.innerText.toLowerCase();
+    row.style.display = text.includes(term) ? 'flex' : 'none';
+  });
 });
 
-player.on('exitfullscreen', () => {
-  if (isMobileOrTablet) {
-    if (screen.orientation && screen.orientation.unlock) {
-      screen.orientation.unlock();
-    }
-  }
-});
-
-player.on('ready', () => {
-    const videoContainer = player.elements.container;
-    const videoWrapper = videoContainer.querySelector('.plyr__video-wrapper');
-    if (!videoWrapper) return;
-
-    const rewindIcon = document.getElementById('rewind-icon-overlay');
-    const forwardIcon = document.getElementById('forward-icon-overlay');
-    const playPauseIcon = document.getElementById('play-pause-icon-overlay');
-    const playSvg = document.getElementById('svg-play') ? document.getElementById('svg-play').cloneNode(true) : null;
-    const pauseSvg = document.getElementById('svg-pause') ? document.getElementById('svg-pause').cloneNode(true) : null;
-    
-    if(playSvg) playSvg.style.display = 'block';
-    if(pauseSvg) pauseSvg.style.display = 'block';
-
-    if (rewindIcon) videoWrapper.appendChild(rewindIcon);
-    if (forwardIcon) videoWrapper.appendChild(forwardIcon);
-    if (playPauseIcon) videoWrapper.appendChild(playPauseIcon);
-
-    let lastTapTime = 0, tapTimeout = null, iconHideTimeout = null;
-
-    function showSeekIcon(type) {
-        if (iconHideTimeout) clearTimeout(iconHideTimeout);
-        if(rewindIcon) rewindIcon.classList.remove('visible');
-        if(forwardIcon) forwardIcon.classList.remove('visible');
-        if(playPauseIcon) playPauseIcon.classList.remove('visible');
-
-        let iconToShow;
-        if (type === 'rewind') iconToShow = rewindIcon;
-        else if (type === 'forward') iconToShow = forwardIcon;
-        else if (type === 'play-pause') {
-            iconToShow = playPauseIcon;
-            if(playPauseIcon) {
-                playPauseIcon.innerHTML = '';
-                if (player.paused && pauseSvg) playPauseIcon.appendChild(pauseSvg); 
-                else if (!player.paused && playSvg) playPauseIcon.appendChild(playSvg);
-            }
-        }
-        if (iconToShow) {
-            iconToShow.classList.add('visible');
-            iconHideTimeout = setTimeout(() => { iconToShow.classList.remove('visible'); }, 500);
-        }
-    }
-
-    function handleDoubleTap(event) {
-        const rect = videoWrapper.getBoundingClientRect();
-        const tapX = event.clientX - rect.left;
-        const zoneWidth = rect.width;
-        if (tapX < zoneWidth * 0.35) { player.rewind(10); showSeekIcon('rewind'); }
-        else if (tapX > zoneWidth * 0.65) { player.forward(10); showSeekIcon('forward'); }
-        else { showSeekIcon('play-pause'); player.togglePlay(); }
-    }
-
-    videoWrapper.addEventListener('click', (event) => {
-        if (event.target.closest('.plyr__controls')) return;
-        event.stopPropagation();
-        const currentTime = new Date().getTime();
-        const timeSinceLastTap = currentTime - lastTapTime;
-        if (tapTimeout) { clearTimeout(tapTimeout); tapTimeout = null; }
-
-        if (timeSinceLastTap > 0 && timeSinceLastTap < 300) {
-            event.preventDefault(); handleDoubleTap(event); lastTapTime = 0;
-        } else {
-            event.preventDefault();
-            tapTimeout = setTimeout(() => { player.toggleControls(); }, 300);
-        }
-        lastTapTime = currentTime;
-    });
-
-    videoWrapper.addEventListener('dblclick', (e) => { e.preventDefault(); e.stopPropagation(); });
-});
-
-// --- CLOUD SAVING LOGIC (SAVES TO FIREBASE) ---
-let lastSaveTime = 0; // Throttle saves
-
-player.on("timeupdate", () => {
-    const user = auth.currentUser;
-    
-    // Check every 5 seconds (throttle) to avoid spamming DB
-    const now = Date.now();
-    if (user && window.currentEpData && !player.paused && player.currentTime > 5) {
-        if (now - lastSaveTime > 5000) { // Save every 5s
-            
-            // 1. GET CURRENT PAGE NAME AUTOMATICALLY
-            let path = window.location.pathname;
-            let pageName = path.substring(path.lastIndexOf('/') + 1);
-            if(!pageName) pageName = "videos.html"; 
-
-            const dataToSave = {
-                id: window.currentEpData.id,
-                title: window.currentEpData.title,
-                image: window.currentEpData.image,
-                currentTime: player.currentTime,
-                duration: player.duration || 0,
-                timestamp: now,
-                page: pageName // <--- THIS SAVES THE SPECIFIC PAGE
-            };
-            
-            // Write to Cloud
-            db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).update(dataToSave);
-            lastSaveTime = now;
-        }
-    }
-});
+window.toggleAccess = function(uid, isGranted) {
+  if (!currentPageId) return;
+  db.ref(`page_access/${currentPageId}/${uid}`).set(isGranted);
+}
 </script>
 
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      reg.onupdatefound = () => {
-        const newSW = reg.installing;
-        newSW.onstatechange = () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            window.location.reload();
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js").then((registration) => {
+      registration.update();
+      registration.onupdatefound = () => {
+        const installingWorker = registration.installing;
+        installingWorker.onstatechange = () => {
+          if (installingWorker.state === "installed") {
+            if (navigator.serviceWorker.controller) {
+              console.log("New content available, reloading...");
+              window.location.reload();
+            }
           }
         };
       };
-    }).catch(err => {});
+    });
   }
 </script>
-
-<style>
-  /* Access Denied Modal - Hyper Glass */
-  .access-denied-modal {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.8); 
-    color: #fff;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex; align-items: center; justify-content: center;
-    z-index: 9999; text-align: center; padding: 20px;
-    opacity: 0; animation: fadeIn 0.5s forwards; flex-direction: column;
-    backdrop-filter: blur(15px);
-    /* SMOOTHNESS BOOSTER */
-    transform: translateZ(0);
-    will-change: opacity, backdrop-filter;
-  }
-  .access-denied-modal strong { font-size: 24px; margin-bottom: 10px; text-shadow: var(--text-shadow); }
-  .access-denied-modal button {
-    margin-top: 15px; padding: 10px 25px; 
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white; border-radius: 50px;
-    cursor: pointer; font-weight: bold; transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
-  }
-  .access-denied-modal button:hover { background: rgba(255,255,255,0.25); color: white; }
-  @keyframes fadeIn { to { opacity: 1; } }
-</style>
-
- <style>
-  /* Access Denied Modal */
-  .access-denied-modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 11000;
-    text-align: center;
-    padding: 20px;
-    opacity: 0;
-    animation: fadeIn 0.5s forwards;
-    flex-direction: column;
-  }
-
-  .access-denied-modal strong {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-
-  .access-denied-modal button {
-    margin-top: 15px;
-    padding: 10px 25px;
-    background: transparent;
-    color: white;
-    border: 2px solid white;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-  }
-
-  .access-denied-modal button:hover {
-    background: white;
-    color: black;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-</style>
-
-<a href="videos.html" class="back-btn">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
-    <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-</a>
-
-<div id="rewind-icon-overlay" class="seek-overlay">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.9998 1.5V6.4428C5.5598 6.9048 2.4418 10.3368 2.4418 14.8828C2.4418 19.8288 6.4418 23.8288 11.3878 23.8288C15.8278 23.8288 19.4678 20.4968 20.0758 16.1988H17.5558C17.0098 18.9888 14.4838 21.3288 11.3878 21.3288C7.8118 21.3288 4.9418 18.4588 4.9418 14.8828C4.9418 11.6688 7.3738 9.0708 10.4998 8.6148V13.4998L17.4998 7.4998L9.9998 1.5Z"/></svg>
-</div>
-<div id="forward-icon-overlay" class="seek-overlay">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.0002 1.5L6.50016 7.49984L14.0002 13.4998V8.61484C17.1262 9.07084 19.5582 11.6688 19.5582 14.8828C19.5582 18.4588 16.6882 21.3288 13.1122 21.3288C10.0162 21.3288 7.49016 18.9888 6.94416 16.1988H4.42416C5.03216 20.4968 8.67216 23.8288 13.1122 23.8288C18.0582 23.8288 22.0582 19.8288 22.0582 14.8828C22.0582 10.3368 18.9402 6.90484 14.5002 6.44284V1.5Z"/></svg>
-</div>
-<div id="play-pause-icon-overlay" class="seek-overlay"></div>
-
-<svg id="svg-play" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14V19.14L19 12.14L8 5.14Z"/></svg>
-<svg id="svg-pause" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19H10V5H6V19ZM14 5V19H18V5H14Z"/></svg>
-
-<script>
-  const allowedPaths = [
-    '/index.html',
-    '/home.html',
-    '/nanabnb.html',
-    '/newtour.html',
-    '/hxwfanconcert.html',
-    '/svtholiday.html',
-    '/arenatour.html',
-    '/svtjapanconcert.html',
-    '/touragain.html',
-    '/gallery.html',
-    '/profile.html',
-    '/soon.html'
-  ];
-
-  const currentPage = window.location.pathname;
-
-  // Check if user already has internalAccess flag
-  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
-
-  // Check if user came from an allowed page
-  const referrer = document.referrer;
-  const refPath = referrer ? new URL(referrer).pathname : null;
-  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
-
-  // Grant internalAccess if coming from allowed page
-  if (cameFromAllowedPage) {
-    sessionStorage.setItem('internalAccess', 'true');
-    hasInternalAccess = true;
-  }
-
-  function goBack() {
-    window.history.back();
-  }
-</script>
-
-<script>
-// --- CONTENT PROTECTION SCRIPT ---
-
-// 1. Disable Right Click
-document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    // Optional: You can alert the user here if you want
-    // alert("Right-click is disabled on Zone Vault.");
-});
-
-// 2. Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U (View Source)
-document.onkeydown = function(e) {
-    // F12
-    if(event.keyCode == 123) {
-       return false;
-    }
-    // Ctrl+Shift+I (Inspect)
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
-       return false;
-    }
-    // Ctrl+Shift+C (Inspect Element)
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
-       return false;
-    }
-    // Ctrl+Shift+J (Console)
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
-       return false;
-    }
-    // Ctrl+U (View Source)
-    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
-       return false;
-    }
-}
-
-// 3. Disable Image Dragging (prevents saving images by dragging)
-window.ondragstart = function() { return false; } 
-
-// 4. Disable Text Selection (optional - makes it feel like an app)
-document.addEventListener('selectstart', function(e) {
-    // Allow selection only on input fields (like search bars)
-    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-        e.preventDefault();
-    }
-});
-</script>
-
+  
 </body>
 </html>
