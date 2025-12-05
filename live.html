@@ -1,800 +1,316 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Zone Vault - Live</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="icon" href="favicon-new.png" type="image/png" />
+<meta charset="UTF-8">
+<title>VIDEOS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<link rel="icon" href="favicon-new.png" type="image/png" />
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2196f3">
+<meta name="theme-color" content="#000000">
 
 <meta name="apple-mobile-web-app-title" content="Zone Vault">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#1a1a1a">
 <link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
 <link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.min.js"></script>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-1B2RJ659GL');
 </script>
 
-  <style>
-    * {
-      box-sizing: border-box;
+<script>
+  (function() {
+    const savedTheme = localStorage.getItem('zoneVaultTheme');
+    if(savedTheme) {
+      const style = document.createElement('style');
+      style.innerHTML = `
+        body { 
+          background: ${savedTheme} !important; 
+          background-size: cover !important;
+          background-attachment: fixed !important;
+          background-repeat: no-repeat !important;
+          min-height: 100vh;
+        }
+      `;
+      document.head.appendChild(style);
     }
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: black;
-      color: #d6b4fc; /* or #b490e5 */
-      overflow-x: hidden;
-      font-size: 16px;
-    }
+  })();
+</script>
 
-header {
-  padding: 30px 20px 4px 20px; /* top right bottom left */
-  display: flex;
-  align-items: center;
-  justify-content: center; /* center all links + logo */
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: transparent;
-  backdrop-filter: blur(6px);
-}
-
-/* Centered links + logo */
-.header-links {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  justify-content: center;
-  overflow-x: auto;
-  white-space: nowrap;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-
-/* Header show/hide animations */
-header.show {
-  transform: translateY(0);
-  transition: transform 0.6s ease-out;
-}
-
-header.hide {
-  transform: translateY(-100%);
-}
-
-.header-logo {
-  width: 40px;       /* smaller logo to fit nicely beside LOGIN */
-  height: auto;
-  flex: 0 0 auto;    /* don't stretch */
-}
-
-.header-logo img {
-  width: 40px;
-  height: auto;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
-}
-
-/* Centered links container */
-.header-links {
-  display: flex;
-  gap: 10px;
-  justify-content: center; /* center links horizontally */
-  flex: 1; /* take remaining space */
-  overflow-x: auto;
-  white-space: nowrap;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Category link styles */
-.category-link {
-  padding: 8px 16px;
-  background: transparent;
-  color: #fff;
-  border-radius: 12px;
-  font-size: 14px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
-  position: relative;
-}
-
-.category-link::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  opacity: 0;
-  transition: opacity 0.3s;
-  z-index: -1;
-}
-
-.category-link:hover {
-  color: #fff;
-  transform: scale(1.05);
-}
-
-.category-link:hover::before {
-  opacity: 1;
-}
-
-/* Active & flash effects */
-.category-link.active {
-  background: #fff;
-  color: #000;
-}
-
-.category-link.flash {
-  background: #fff;
-  color: #000;
-  transition: background 0.6s ease, color 0.6s ease;
-}
-
-  h1 {
-      text-align: center;
-      color: #ff3366;
-      margin-bottom: 1.5rem;
-      font-size: 1.5rem;
-    }
-
-    .divider {
-      font-size: 1.1rem;
-      color: #ff6699;
-      margin: 2rem 0 1rem;
-      border-left: 4px solid #ff3366;
-      padding-left: 10px;
-    }
-
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .gallery a {
-      display: block;
-      width: 100%;
-      aspect-ratio: 2 / 3;
-      overflow: hidden;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    }
-
-    .gallery a img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-
-    .gallery a:hover img {
-      transform: scale(1.02);
-    }
-
-    .lg-backdrop {
-      backdrop-filter: blur(6px);
-      background-color: rgba(0, 0, 0, 0.85) !important;
-    }
-    
-    header {
-  transition: all 0.3s ease;
-}
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.3rem;
-      }
-
-      .gallery {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-      }
-    }
-    
- body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    filter: blur(7px) brightness(0.5);
-    z-index: -1;
+<style>
+  /* --- CSS VARIABLES FOR GLASS --- */
+  :root {
+      --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --glass-blur: blur(20px);
+      --text-shadow: 0 1px 2px rgba(0,0,0,0.8);
   }
 
-  .code-verify {
+  * { box-sizing: border-box; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; } /* NO TEXT SELECTION */
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: black;
+    text-align: center;
+    padding: 20px 0px;
+    margin: 0;
+    transition: background 0.5s ease;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    height: 100vh;
-    text-align: center;
-    padding: 20px;
-    border-radius: 12px;
-    margin: auto;
-    max-width: 90%;
   }
 
-  input[type="text"] {
-    padding: 12px;
-    font-size: 16px;
-    margin: 10px;
-    width: 260px;
-    border-radius: 8px;
-    border: none;
-    text-align: center;
+  .center-logo { 
+      display: flex; 
+      justify-content: center; 
+      margin-bottom: 20px; 
+      width: 100%;
+  }
+  .center-logo img { 
+      width: 50px; 
+      height: auto; 
+      border-radius: 12px; 
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3); 
   }
 
-  button {
-    padding: 10px 24px;
-    font-size: 16px;
-    border-radius: 6px;
-    background-color: #00c9a7;
+  .main-layout {
+    max-width: 1100px;
+    width: 100%;
+    padding: 0 20px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* --- IFRAME RESPONSIVE CONTAINER --- */
+  .iframe-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+      height: 0;
+      box-shadow: var(--glass-shadow);
+      background: black;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* Added 'pointer-events: none' to block clicking on iframe to get URL (optional, remove if controls needed) */
+  .iframe-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+  }
+
+  h2 {
+    font-size: 24px;
     color: white;
-    border: none;
-    cursor: pointer;
-  }
-
-  .video-container {
-    display: none;
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 30px 20px;
-    text-align: center;
-    border-radius: 12px;
-  }
-
-  h2.title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 32px;
-  font-weight: 700;
-  color: #d9d9d9;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-  margin-bottom: 30px;
-  letter-spacing: 1px;
-}
-  .videos {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 40px;
-    justify-content: center;
-  }
-
-  .video-box {
+    margin-top: 25px;
+    margin-bottom: 5px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-align: center; 
+    text-shadow: var(--text-shadow);
     width: 100%;
-  }
-
-  .player {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border-radius: 10px;
-    overflow: hidden;
-    background-color: #000; 
-  }
-
-  .video-label {
-    margin-top: 10px;
-    font-size: 17px;
-    color: #ccc;
   }
 
   @media (max-width: 600px) {
-    .videos {
-      grid-template-columns: 1fr;
-    }
+    h2 { font-size: 18px; margin-top: 15px; }
+    .center-logo img { width: 40px; }
+    .main-layout { padding: 0 10px; }
   }
 
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0;
-  left: -100%;
-  width: 80%;
-  max-width: 300px;
-  height: 100%;
-  background: black;
-  backdrop-filter: blur(20px); /* Glassmorphism */
-  z-index: 9999;
-  padding: 20px;
-  gap: 10px;
-  transition: left 0.3s ease;
-  justify-content: space-between;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6);
-    overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
+  /* --- BACK BUTTON --- */
+  .back-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px; height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    text-decoration: none; z-index: 3000;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  }
+  .back-btn:hover { 
+    background: rgba(255,255,255,0.25); 
+    transform: scale(1.1); 
+    border-color: white; 
+  }
+  .back-btn svg { display: block; }
   
-  /* ✅ Make only the link section scrollable */
-  max-height: 450px;
-  overflow-y: auto;
-  padding-right: 5px;
-}
-
-/* Optional: prettier scrollbar */
-.sidebar-nav::-webkit-scrollbar {
-  width: 6px;
-}
-.sidebar-nav::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-}
-.sidebar-nav:hover::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.4);
-}
-
-.sidebar.open {
-  left: 0;
-}
-
-.sidebar .close-btn {
-  align-self: flex-end;
-  background: none;
-  border: none;
-  font-size: 26px;
-  color: #fff;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.sidebar .close-btn:hover {
-  transform: rotate(90deg);
-}
-
-.sidebar-title {
-  font-size: 26px;
-  font-weight: 700;
-  text-align: center;
-  color: 	#f1f1f1; /* or #b490e5 */
-  margin-bottom: 20px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding-bottom: 10px;
-}
-
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.sidebar-nav a {
-  text-decoration: none;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 500;
-  padding: 10px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.sidebar-nav a:hover {
-  background: rgba(255, 255, 255, 0.15);
-  padding-left: 20px;
-}
-
-.sidebar-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.sidebar-logo img {
-  width: 50px;
-  height: auto;
-}
-
-.sidebar-email a {
-  color: white;
-  font-size: 18px;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.sidebar-email a:hover {
-  color: #00bfff;
-}
-
-/* Mobile header & hamburger */
-.mobile-header {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  #scrollHeader {
-    display: none;
+  /* Access Denied Modal */
+  .access-denied-modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.95); /* Darker background */
+    color: #fff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 99999; text-align: center; padding: 20px;
+    opacity: 0; animation: fadeIn 0.5s forwards; flex-direction: column;
+    backdrop-filter: blur(20px);
   }
-
-  .mobile-header {
-    display: flex;
-    padding: 3px 0px;
-    align-items: center;
-    justify-content: space-between;
-    background: transparent;
-    z-index: 1000;
+  .access-denied-modal strong { font-size: 24px; margin-bottom: 10px; }
+  .access-denied-modal button {
+    margin-top: 15px; padding: 10px 25px;
+    background: transparent; color: white;
+    border: 2px solid white; border-radius: 50px;
+    cursor: pointer; font-weight: bold; transition: all 0.3s ease;
   }
-
-  .hamburger {
-    font-size: 26px;
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-  }
-
-  .sidebar {
-    display: flex;
-  }
-
-  .sidebar-email img {
-    width: 30px;
-    height: 30px;
-  }
-
-  .sidebar-logo img {
-    width: 60px;
-    height: auto;
-  }
-
-  .sidebar-title {
-    font-size: 30px;
-    margin-bottom: 15px;
-  }
-}
-
-:root {
-  --plyr-color-main: #d9d9d9;
-}
-
-.plyr__control {
-  background-color: #d9d9d9 !important; 
-  color: #000 !important;               
-}
-
-
-h2.title {
-  background: #000; 
-  padding: 12px 20px; 
-  border-radius: 8px; 
-  display: inline-block; 
-}
-
-
-.player {
-  background: #000 !important; 
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-
-.plyr {
-  background: #000 !important; 
-}
-
-@media screen and (max-width: 480px) {
-  .plyr__controls .plyr__control {
-    padding: 1px 2px;   
-    margin: 1.5px;         
-    font-size: 7px;      
-  }
-
-  .plyr__progress {
-    height: 15px;        
-  }
-
-  .plyr__control.plyr__play-large {
-    width: 50px;
-    height: 50px;
-  }
-}
-
-@media screen and (min-width: 769px) {
-  .plyr__controls .plyr__control {
-    padding: 6px 10px;  
-    margin: 1px;        
-    font-size: 14px;     
-  }
-
-  .plyr__progress {
-    height: 4px;       
-  }
-
-  .plyr__control.plyr__play-large {
-    width: 60px;
-    height: 60px;
-  }
-}
-
-  </style>
+  .access-denied-modal button:hover { background: white; color: black; }
+  @keyframes fadeIn { to { opacity: 1; } }
+</style>
 </head>
-<body>
 
-<!-- Mobile hamburger header -->
-<div class="mobile-header">
-  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+<body oncontextmenu="return false;">
+
+<div class="center-logo">
+  <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" loading="lazy" alt="Zone Vault Logo">
 </div>
 
-<!-- Desktop header (scrollable) -->
-<header id="scrollHeader">
-  <div class="header-links">
-      <div class="header-logo">
-    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
-  </div>
-    <a class="category-link" href="index">LOGIN</a>
-    <a class="category-link" href="home">HOME</a>
-    <a class="category-link" href="live">LIVE</a>
-    <a class="category-link" href="gallery">GALLERY</a>
-    <a class="category-link" href="videos">VIDEOS</a>
-</header>
-
-<!-- Sidebar for mobile -->
-<div id="mobileSidebar" class="sidebar">
-  <button class="close-btn" onclick="toggleSidebar()">✖</button>
-  
-  <!-- Sidebar Title -->
-  <div class="sidebar-title">Zone Vault</div>
-
-  <nav class="sidebar-nav">
-    <a href="index">LOGIN</a>
-    <a href="home">HOME</a>
-    <a href="live">LIVE</a>
-    <a href="gallery">GALLERY</a>
-    <a href="videos">VIDEOS</a>
-  </nav>
-
-  <div class="sidebar-footer">
-    <!-- Logo Bottom Left -->
-    <div class="sidebar-logo">
-      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
-    </div>
+<div class="main-layout">
     
-    <!-- Email Bottom Right -->
-    <div class="sidebar-email">
-      <a href="zonevaultph@gmail.com" title="Send Email">
-        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
-      </a>
+    <div class="iframe-container" id="secureVideoContainer">
+        <iframe src="https://player.livepush.io/live/emWB8gpZ8_gUc2-t" allowFullScreen="1" frameBorder="0"></iframe>
     </div>
-  </div>
-</div>
 
-<div class="code-verify" id="codePrompt">
-  <h2>🔐 Enter Access Code</h2>
-  <input type="text" id="codeInput" placeholder="Enter code..." />
-  <button onclick="verifyCode()">Unlock</button>
-  <p id="errorMsg" style="color: red; display: none;">Incorrect code. Please try again.</p>
-</div>
+    <h2 id="main-title">SEVENTEEN WORLD TOUR [NEW_] IN OSAKA JAPAN SHOW</h2>
 
-<div class="video-container" id="videoPage">
-  <div class="videos">
-     <div class="video-box">
-       <video id="player1" class="player" playsinline controls poster="https://uploads.onecompiler.io/43ddry4jt/43wkywbqe/Screenshot%202025-09-13%2021-01-14.png"></video>
-       <h4 class="video-label">DAY 2 SEVENTEEN [NEW_] WORLD TOUR IN INCHEON</h4>
-     </div>
-  </div>
-</div>
-
-  <!-- Activity Logger Script -->
-<script type="module">
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js";
-
-const db = getDatabase();
-const auth = getAuth();
-
-// Detect device type
-function getDeviceType() {
-  const ua = navigator.userAgent;
-  if (/Mobi|Android/i.test(ua)) return 'Mobile';
-  if (/Tablet|iPad/i.test(ua)) return 'Tablet';
-  return 'Desktop';
-}
-
-function logActivity(action, page) {
-  try {
-    const user = auth.currentUser;
-    const uid = user?.uid || sessionStorage.getItem('currentUid') || 'anonymous';
-
-    const rec = {
-      email: user?.email || 'anonymous',
-      uid,
-      action: action || page || 'page_view',
-      page: page || window.location.pathname,
-      timestamp: Date.now(),
-      userAgent: navigator.userAgent || 'Unknown',
-      platform: navigator.platform || 'Unknown',
-      screen: `${screen.width}x${screen.height}`,
-      deviceType: getDeviceType(),
-      referrer: document.referrer || 'Direct'
-    };
-
-    const node = ref(db, `userActivities/${uid}/${Date.now()}_${Math.random().toString(36).slice(2,8)}`);
-    set(node, rec).catch(e => console.error('logActivity error:', e));
-  } catch(e) {
-    console.error('logActivity exception:', e);
-  }
-}
-
-// log on page load
-window.addEventListener('load', () => logActivity('page_load', window.location.pathname));
-
-// example: log clicks
-// document.getElementById('downloadBtn').addEventListener('click', () => logActivity('download','/video.html'));
-</script>
-
-<!-- Service Worker Update Script -->
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').then(reg => {
-    console.log('Service Worker registered');
-
-    reg.onupdatefound = () => {
-      const newSW = reg.installing;
-      newSW.onstatechange = () => {
-        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-          console.log('New content available, reloading...');
-          window.location.reload();
-        }
-      };
-    };
-  }).catch(err => console.error('Service Worker registration failed:', err));
-}
-</script>
-
-
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+</div> 
 
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-    authDomain: "tvnstream-b4497.firebaseapp.com",
-    databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-    projectId: "tvnstream-b4497",
-    storageBucket: "tvnstream-b4497.appspot.com",
-    messagingSenderId: "308384754214",
-    appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-    measurementId: "G-VFNH70R4D9"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+  authDomain: "tvnstream-b4497.firebaseapp.com",
+  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+  projectId: "tvnstream-b4497",
+  storageBucket: "tvnstream-b4497.appspot.com",
+  messagingSenderId: "308384754214",
+  appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth(); 
+const db = firebase.database();
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+// =========================================================================
+// !!! ENHANCED SECURITY SCRIPT !!!
+// =========================================================================
+const PAGE_ID = "live_OSAKA_NEW_TOUR"; 
 
-  function verifyCode() {
-    const input = document.getElementById("codeInput").value.trim();
-    const errorMsg = document.getElementById("errorMsg");
+function nukeContent() {
+    // Physically remove the video so it stops playing and cannot be inspected
+    const videoContainer = document.getElementById('secureVideoContainer');
+    if(videoContainer) videoContainer.remove();
+}
 
-    db.ref("live/code").once("value").then(snapshot => {
-      const correctCode = snapshot.val();
-      if (input === correctCode) {
-        localStorage.setItem("access_live", "true");
-        showVideoPage();
-      } else {
-        errorMsg.style.display = "block";
-      }
-    });
-  }
+function showAccessDeniedModal(message) {
+    nukeContent(); // DELETE VIDEO IMMEDIATELY
+    
+    document.body.style.overflow = 'hidden';
+    const modal = document.createElement('div');
+    modal.className = 'access-denied-modal';
+    modal.style.opacity = '1';
+    modal.style.animation = 'none';
 
-  function showVideoPage() {
-    document.getElementById("codePrompt").style.display = "none";
-    document.getElementById("videoPage").style.display = "block";
+    modal.innerHTML = `
+        <strong style="color: #FF4444; font-size: 36px; margin-bottom: 20px;">🚫 Access Denied</strong>
+        <div style="margin-top: 15px; font-size: 18px; max-width: 90%; line-height: 1.4; text-shadow: var(--text-shadow);">
+            ${message}
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 30px; width: 80%; max-width: 300px;">
+            <button onclick="window.location.href='index.html'" 
+                    style="background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3); color: white;">
+                EXIT
+            </button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
 
-    const sources = [
-      {
-        id: "player1",
-        url: "https://play.boxcast.com/p/etgrrhexowdem5heenqb/v/all-ext.m3u8?Expires=2147483647&Signature=fZH9XDv0JvVdHjeI16~qgKG2UzwP4084hVtCGHzu1nkls4VTYyG4JZjKXSyrg0uefbqpH6TNkgnkIWcmMzH~WtE~56Sh5qJBwgF4jZdv2k0TfjrOUb0ignv6X21Mo94e6hfOR~k084DwpGjrQ1W6L5DtCPbUtZljcN0Cfd7bi4DAzgL8svLtWMVg03n7ITEu47U3xzXzxJACpTI0~jguC-rxgdd3UkgGKXhHrZw1SetQM-ufIh0uruyzlzWcYc-LGcJBngx8E5DTVVXnkFdK07~Y292vYldrw3g~VCEU9K06MaLEOtti-TCbJimwXvFBgMma~CWTD7ZcyBQphh9N2A__&Key-Pair-Id=APKAJ7GUCBQUK6NTWZCA",
-      }
-    ];
-
-    sources.forEach(src => {
-      const video = document.getElementById(src.id);
-      if (!video) return;
-
-      try {
-        if (Hls.isSupported()) {
-          const hls = new Hls({ capLevelToPlayerSize: true, maxLoadingDelay: 4 });
-          hls.loadSource(src.url);
-          hls.attachMedia(video);
-
-          hls.on(Hls.Events.MANIFEST_PARSED, function () {
-            const availableQualities = hls.levels.map(l => l.height).sort((a, b) => b - a);
-            const player = new Plyr(video, {
-              autoplay: true,
-              seekTime: 10,
-              controls: [
-               "play-large",
-               "rewind",        // ⏪ rewind button
-               "play",
-               "fast-forward",  // ⏩ fast forward button
-               "progress",      // timeline / seek bar
-               "current-time",
-               "mute",
-               "volume",
-               "captions",
-               "settings",
-               "pip",
-               "airplay",
-               "fullscreen"
-                ],
-              settings: ['quality','speed','captions'],
-              quality: {
-                default: availableQualities[0],
-                options: availableQualities,
-                forced: true,
-                onChange: (newQuality) => {
-                  const levelIndex = hls.levels.findIndex(l => l.height === newQuality);
-                  hls.currentLevel = levelIndex;
-                }
-              }
-            });
-
-            // Optional: skip initial seconds if skipTime is set
-            if (src.skipTime) {
-              video.currentTime = src.skipTime;
-            }
-          });
-        } else {
-          console.error("HLS not supported in this browser.");
-        }
-      } catch (err) {
-        console.error("Player init error:", err);
-      }
-    });
-  }
-
-  window.onload = function () {
-    if (localStorage.getItem("access_live") === "true") {
-      showVideoPage();
+// 1. CHECK INTERNAL REFERRER (Must come from allowed pages)
+const allowedReferrers = ['index', 'home', 'live', 'videos', 'gallery', 'profile'];
+const referrer = document.referrer;
+let isInternal = false;
+if (referrer) {
+    if (allowedReferrers.some(path => referrer.includes(path))) {
+        isInternal = true;
+        sessionStorage.setItem('internalAccess', 'true');
     }
-  };
-</script>
+}
 
+// 2. FIREBASE AUTH CHECK
+auth.onAuthStateChanged(user => {
+    // A. Must be logged in
+    if (!user) {
+        showAccessDeniedModal("You must be logged in to view this content.");
+        return;
+    }
 
-<script>
-const linksContainer = document.querySelector('.header-links');
-linksContainer.addEventListener('wheel', (e) => {
-  if (e.deltaY === 0) return;
-  e.preventDefault();
-  linksContainer.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
+    // B. Must have Session Flag (Anti-Copy/Paste)
+    // Comment this out if you want to allow direct link sharing for logged in users
+    if (!sessionStorage.getItem('internalAccess') && !isInternal) {
+        // showAccessDeniedModal("Direct link access is forbidden. Please navigate via Home.");
+        // return; 
+    }
+
+    // C. Database Permission Check
+    db.ref(`page_access/${PAGE_ID}/${user.uid}`).once('value')
+    .then(snapshot => {
+        const isAllowed = snapshot.val();
+        if (isAllowed !== true) {
+            showAccessDeniedModal("The Admin has not granted your account access to the " + PAGE_ID.toUpperCase() + " collection.");
+        }
+    })
+    .catch(error => {
+        console.error("Check Failed");
+        showAccessDeniedModal("Security check failed.");
+    });
 });
-</script>
-  
 
+// 3. DISABLE DEVTOOLS (F12, Ctrl+Shift+I, etc)
+document.addEventListener('keydown', function(e) {
+    if (
+        e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+        (e.ctrlKey && e.shiftKey && e.key === 'J') || 
+        (e.ctrlKey && e.key === 'U')
+    ) {
+        e.preventDefault();
+        alert("Protected Content");
+        return false;
+    }
+});
+
+// 4. DEBUGGER TRAP (Freezes browser if console is opened)
+setInterval(function() {
+    const start = new Date().getTime();
+    debugger; 
+    const end = new Date().getTime();
+    if (end - start > 100) {
+        // If execution took too long, they probably had devtools open
+        nukeContent();
+        window.location.href = "index.html";
+    }
+}, 1000);
+</script>
 
 <script>
   if ('serviceWorker' in navigator) {
@@ -807,181 +323,15 @@ linksContainer.addEventListener('wheel', (e) => {
           }
         };
       };
-    }).catch(err => {
-      console.error('Service Worker registration failed:', err);
-    });
+    }).catch(err => {});
   }
 </script>
 
-<script>
-  function toggleSidebar() {
-    const sidebar = document.getElementById('mobileSidebar');
-    sidebar.classList.toggle('open');
-  }
-</script>
-
-<script>
-  let lastScrollY = window.scrollY;
-  const scrollHeader = document.getElementById('scrollHeader');
-
-  window.addEventListener('scroll', () => {
-    const currentScrollY = window.scrollY;
-
-    if (currentScrollY > lastScrollY && currentScrollY > 50) {
-      scrollHeader.classList.add('hide');
-    } else {
-      scrollHeader.classList.remove('hide');
-    }
-
-    lastScrollY = currentScrollY;
-  });
-</script>
-
-<script>
-  const categoryLinks = document.querySelectorAll('.category-link');
-
-  categoryLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-
-      categoryLinks.forEach(l => l.classList.remove('flash'));
-
-      link.classList.add('flash');
-
-      setTimeout(() => {
-        link.classList.remove('flash');
-
-        window.location.href = link.href;
-      }, 800); 
-    });
-  });
-</script>
-
-<script>
-  const sidebarNav = document.querySelector('.sidebar-nav');
-
-  sidebarNav.addEventListener('wheel', function (e) {
-    const isAtTop = sidebarNav.scrollTop === 0;
-    const isAtBottom = sidebarNav.scrollHeight - sidebarNav.scrollTop === sidebarNav.clientHeight;
-
-    if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
-      e.preventDefault();
-    }
-  }, { passive: false });
-</script>
-
-<style>
-  /* Access Denied Modal */
-  .access-denied-modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    text-align: center;
-    padding: 20px;
-    opacity: 0;
-    animation: fadeIn 0.5s forwards;
-    flex-direction: column;
-  }
-
-  .access-denied-modal strong {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-
-  .access-denied-modal button {
-    margin-top: 15px;
-    padding: 10px 25px;
-    background: transparent;
-    color: white;
-    border: 2px solid white;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-  }
-
-  .access-denied-modal button:hover {
-    background: white;
-    color: black;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-</style>
-
-<script>
-  const allowedPaths = [
-    '/index.html',
-    '/home.html',
-    '/nanabnb.html',
-    '/newtour.html',
-    '/hxwfanconcert.html',
-    '/svtholiday.html',
-    '/arenatour.html',
-    '/svtjapanconcert.html',
-    '/touragain.html',
-    '/gallery.html',
-    '/profile.html',
-    '/soon.html'
-  ];
-
-  const currentPage = window.location.pathname;
-
-  // Check if user already has internalAccess flag
-  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
-
-  // Check if user came from an allowed page
-  const referrer = document.referrer;
-  const refPath = referrer ? new URL(referrer).pathname : null;
-  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
-
-  // Grant internalAccess if coming from allowed page
-  if (cameFromAllowedPage) {
-    sessionStorage.setItem('internalAccess', 'true');
-    hasInternalAccess = true;
-  }
-
-  // Allow access if user already has internalAccess or is on index page
-  const isIndexPage = currentPage.endsWith('index') || currentPage === '/';
-  if (!hasInternalAccess && !isIndexPage) {
-    showAccessDeniedModal();
-  }
-
-  function showAccessDeniedModal() {
-    const modal = document.createElement('div');
-    modal.className = 'access-denied-modal';
-    modal.innerHTML = `
-      <strong>🚫 Access Denied</strong>
-      <div>You cannot access this page directly.<br>
-      Please go through the homepage or allowed sections.</div>
-      <div id="redirectTimer">Redirecting in 3 seconds...</div>
-      <button onclick="goBack()">Go Back</button>
-    `;
-    document.body.appendChild(modal);
-
-    let countdown = 3;
-    const timer = document.getElementById('redirectTimer');
-    const interval = setInterval(() => {
-      countdown--;
-      timer.textContent = `Redirecting in ${countdown} seconds...`;
-      if (countdown <= 0) {
-        clearInterval(interval);
-        window.location.href = "index.html";
-      }
-    }, 1000);
-  }
-
-  function goBack() {
-    window.history.back();
-  }
-</script>
+<a href="videos.html" class="back-btn">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
+    <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</a>
 
 </body>
-</html> 
+</html>
