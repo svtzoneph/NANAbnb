@@ -52,7 +52,7 @@
 </script>
 
 <style>
-  /* --- CSS VARIABLES FOR GLASS --- */
+  /* --- CSS VARIABLES --- */
   :root {
       --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
       --glass-border: 1px solid rgba(255, 255, 255, 0.2);
@@ -60,9 +60,7 @@
       --glass-blur: blur(20px);
       --text-shadow: 0 1px 2px rgba(0,0,0,0.8);
       
-      --plyr-color-main: gray;
-      --plyr-control-bg: rgba(255,255,255,0.1);
-      --plyr-control-hover-bg: rgba(255,255,255,0.2);
+      --plyr-color-main: #ff0033; /* Red Accent */
   }
 
   * { box-sizing: border-box; }
@@ -100,8 +98,6 @@
     justify-content: center;
     cursor: pointer;
     position: relative;
-    
-    /* Poster Hyper Glass Border */
     box-shadow: var(--glass-shadow);
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
@@ -113,7 +109,6 @@
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-top: 1px solid rgba(255, 255, 255, 0.5);
-    
     padding: 15px 25px;
     border-radius: 50px;
     color: white;
@@ -125,7 +120,6 @@
     margin: 0 auto;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     text-shadow: var(--text-shadow);
-
     transform: translateZ(0);
     will-change: transform, backdrop-filter;
   }
@@ -190,19 +184,17 @@
     bottom: 20px;
     right: 20px;
     width: 50px; height: 50px;
-    
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-top: 1px solid rgba(255, 255, 255, 0.5);
-    
     border-radius: 50%;
     display: flex; justify-content: center; align-items: center;
     text-decoration: none; z-index: 3000;
     transition: all 0.3s ease;
+    cursor: pointer;
     box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-
     transform: translateZ(0);
     will-change: transform;
   }
@@ -213,37 +205,97 @@
   }
   .back-btn svg { display: block; }
 
-/* --- PLYR OVERRIDES --- */
-:root, .plyr {
-  --plyr-captions-background: transparent !important; 
-  --plyr-video-controls-background: transparent !important; 
+/* --- REALISTIC STREAMING CONTROLS (Center Time / Mute Right) --- */
+
+/* 1. Enhanced Gradient Background & Flex Container */
+.plyr__controls {
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0) 100%) !important;
+  padding: 20px 15px !important;
+  display: flex !important;
+  align-items: center;
+  position: relative; /* Essential for absolute centering */
 }
+
+/* 2. Push Mute & Friends to Right */
+/* This selects the volume container and pushes it to the far right */
+.plyr__volume {
+   margin-left: auto !important;
+}
+
+/* 3. Center Time & Duration (Absolute Positioning) */
+.plyr__time {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  color: rgba(255,255,255,0.95);
+  text-shadow: 0 2px 2px rgba(0,0,0,0.8);
+  pointer-events: none; /* Allows clicks to pass through if overlapping */
+  margin: 0 !important;
+}
+
+/* Position Current Time slightly Left of Center */
+.plyr__time--current {
+  left: 50%;
+  transform: translate(-100%, -50%); /* Moves it to the left of the 50% mark */
+  padding-right: 5px; 
+}
+
+/* Position Duration slightly Right of Center */
+.plyr__time--duration {
+  left: 50%;
+  transform: translate(0, -50%); /* Starts exactly at 50% mark */
+  padding-left: 5px;
+}
+
+/* Add the slash divider manually */
+.plyr__time--duration::before {
+  content: "/";
+  position: absolute;
+  left: -4px;
+  color: rgba(255,255,255,0.5);
+}
+
+/* 4. Control Buttons */
+.plyr__control {
+  background: transparent;
+  border-radius: 8px !important;
+  transition: transform 0.2s ease, background 0.2s ease;
+  padding: 7px !important;
+}
+.plyr__control:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: scale(1.15);
+}
+.plyr__control svg {
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+}
+
+/* 5. Big Play Button (Overlay) */
+.plyr__control--overlaid {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255,255,255,0.4);
+  backdrop-filter: blur(8px);
+  width: 70px; height: 70px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+.plyr__control--overlaid:hover {
+  background: var(--plyr-color-main) !important;
+  border-color: var(--plyr-color-main);
+  transform: scale(1.1);
+}
+
+/* 6. Captions */
 .plyr__captions {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important; 
-  box-shadow: none !important;
-  padding: 0 !important;
-  bottom: 40px !important; 
-}
-.plyr__controls::before {
-  background: transparent !important;
-  background-image: none !important;
-  display: none !important; 
-}
-.plyr__caption {
-  background: transparent !important;
-  text-shadow: 
-    -2px -2px 0 #000,
-     2px -2px 0 #000,
-    -2px  2px 0 #000,
-     2px  2px 0 #000,
-     4px  4px 8px black;
+  font-family: 'Segoe UI', sans-serif;
   font-size: 18px;
-  font-weight: bold;
-  color: white;
-  padding: 0 !important;
+  font-weight: 600;
+  text-shadow: 0 0 4px black, 0 0 8px black;
+  padding-bottom: 60px !important; 
 }
+.plyr__caption { background: transparent !important; }
 
   /* --- GLASSMORPHISM SEEK OVERLAY --- */
   .seek-overlay {
@@ -254,12 +306,10 @@
     opacity: 0;
     pointer-events: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    
     background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    
     border-radius: 100%;
     display: flex;
     align-items: center;
@@ -267,7 +317,6 @@
     width: 80px;
     height: 80px;
     z-index: 20; 
-
     will-change: transform, opacity;
   }
   .seek-overlay.visible {
@@ -295,12 +344,10 @@
       padding: 10px;
       border-radius: 8px;
       transition: all 0.2s;
-      
       background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      
       color: white;
       cursor: pointer;
       transform: translateZ(0);
@@ -531,6 +578,16 @@ const db = firebase.database();
 
 const PAGE_ID = "jpnnewtour"; 
 
+// --- SMART GO BACK FUNCTION (Centralized) ---
+// If there is history, go back. If not (direct link), go to videos.html
+function smartGoBack() {
+    if (document.referrer && window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = 'videos.html';
+    }
+}
+
 // Function to show the denial screen
 function showAccessDeniedModal(message) {
     // 1. Pause the player immediately
@@ -555,7 +612,7 @@ function showAccessDeniedModal(message) {
             ${message}
         </div>
         <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 30px; width: 80%; max-width: 300px;">
-            <button onclick="window.history.back()" 
+            <button onclick="smartGoBack()" 
                     style="background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3); color: white;">
                 GO BACK
             </button>
@@ -601,8 +658,9 @@ auth.onAuthStateChanged(user => {
             // Immediate Block
             console.warn("Access Revoked in Realtime");
             showAccessDeniedModal(
-                "This content is restricted.<br>" +
-                "The Admin has revoked your access to this stream.<br><br>" +
+                "<span style='color: red; font-weight: bold;'>You have violated Admin rules.</span><br>" +
+                "Your access to this stream has been revoked.<br><br>" +
+                "Please message us if you are sure this is an error.<br>" +
                 "Your UID: <small>" + user.uid + "</small>"
             );
         }
@@ -615,9 +673,17 @@ auth.onAuthStateChanged(user => {
 const video = document.getElementById("videoPlayer");
 let hls;
 
+// --- PLYR CONFIG UPDATED: Order adjusted for Layout ---
 const player = new Plyr(video, {
   captions: { active: true, update: true, language: "en" },
-  controls: ["play-large","play","current-time","duration","mute","settings","fullscreen"],
+  controls: [
+    'play-large',   
+    'play',         
+    'current-time', 
+    'duration',    
+    'mute', // Will be pushed to right via CSS
+    'fullscreen'
+  ],
   settings: ["captions","speed","quality"],
   clickToPlay: false, 
   dblclickFullscreen: false
@@ -1006,7 +1072,7 @@ player.on("timeupdate", () => {
   @keyframes fadeIn { to { opacity: 1; } }
 </style>
 
-<a href="videos.html" class="back-btn">
+<a href="#" onclick="smartGoBack(); return false;" class="back-btn">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
     <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
@@ -1050,10 +1116,6 @@ player.on("timeupdate", () => {
   if (cameFromAllowedPage) {
     sessionStorage.setItem('internalAccess', 'true');
     hasInternalAccess = true;
-  }
-
-  function goBack() {
-    window.history.back();
   }
 </script>
 
