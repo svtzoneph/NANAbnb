@@ -71,18 +71,15 @@
     font-family: 'Segoe UI', Arial, sans-serif;
     background: black; /* Fallback */
     text-align: center;
-    /* CHANGED: Reduced side padding to 0 */
     padding: 20px 0px;
     margin: 0;
     transition: background 0.5s ease;
   }
 
   .main-layout {
-    /* CHANGED: Max-width is now 100% to fill the screen */
     max-width: 100%;
     margin: 0 auto;
     width: 100%;
-    /* CHANGED: Added small padding so content doesn't hit the screen bezel */
     padding: 0 20px; 
   }
 
@@ -111,7 +108,6 @@
 
   /* --- GLASSMORPHISM POSTER OVERLAY --- */
   #poster-overlay {
-    /* Hyper Glass Style */
     background: rgba(0, 0, 0, 0.5); 
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
@@ -130,7 +126,6 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     text-shadow: var(--text-shadow);
 
-    /* SMOOTHNESS BOOSTER */
     transform: translateZ(0);
     will-change: transform, backdrop-filter;
   }
@@ -139,7 +134,7 @@
     display: none; 
     width: 100%;
     box-shadow: var(--glass-shadow);
-    position: relative; /* Essential for overlaying the badge */
+    position: relative; 
   }
 
   h2 {
@@ -196,7 +191,6 @@
     right: 20px;
     width: 50px; height: 50px;
     
-    /* Hyper Glass Style */
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
@@ -209,7 +203,6 @@
     transition: all 0.3s ease;
     box-shadow: 0 10px 25px rgba(0,0,0,0.4);
 
-    /* SMOOTHNESS BOOSTER */
     transform: translateZ(0);
     will-change: transform;
   }
@@ -220,38 +213,24 @@
   }
   .back-btn svg { display: block; }
 
-/* --- 1. OVERRIDE PLYR VARIABLES (The Root Cause) --- */
+/* --- PLYR OVERRIDES --- */
 :root, .plyr {
-  /* This kills the default grey box behind captions */
   --plyr-captions-background: transparent !important; 
-  
-  /* This kills the "dimming" gradient at the bottom of the video */
   --plyr-video-controls-background: transparent !important; 
 }
-
-/* --- 2. CONTAINER: Force Transparency & Remove Gradient --- */
 .plyr__captions {
   background: transparent !important;
   background-color: transparent !important;
-  background-image: none !important; /* Removes the gradient image */
+  background-image: none !important; 
   box-shadow: none !important;
   padding: 0 !important;
-  
-  /* Reset positioning if needed */
   bottom: 40px !important; 
 }
-
-/* --- 3. KILL THE CONTROL GRADIENT OVERLAY --- */
-/* Plyr adds a 'fade' behind controls that looks like screen dimming. */
 .plyr__controls::before {
   background: transparent !important;
   background-image: none !important;
   display: none !important; 
 }
-
-/* --- 4. YOUR TEXT STYLE (Choose Option A or B below) --- */
-
-/* OPTION A: Text Shadow Only (No Box) */
 .plyr__caption {
   background: transparent !important;
   text-shadow: 
@@ -259,7 +238,7 @@
      2px -2px 0 #000,
     -2px  2px 0 #000,
      2px  2px 0 #000,
-     4px  4px 8px black; /* Deep shadow */
+     4px  4px 8px black;
   font-size: 18px;
   font-weight: bold;
   color: white;
@@ -276,7 +255,6 @@
     pointer-events: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     
-    /* Glass Style */
     background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -290,7 +268,6 @@
     height: 80px;
     z-index: 20; 
 
-    /* SMOOTHNESS BOOSTER */
     will-change: transform, opacity;
   }
   .seek-overlay.visible {
@@ -310,7 +287,7 @@
   #playlist-items::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 4px; border: 1px solid rgba(0,0,0,0.2); }
   #playlist-items::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
 
-  /* --- PLAYLIST ITEMS GLASS CLASS --- */
+  /* --- PLAYLIST ITEMS --- */
   .playlist-item {
       display: flex; 
       align-items: center; 
@@ -319,7 +296,6 @@
       border-radius: 8px;
       transition: all 0.2s;
       
-      /* Hyper Glass */
       background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
@@ -327,8 +303,6 @@
       
       color: white;
       cursor: pointer;
-
-      /* SMOOTHNESS BOOSTER */
       transform: translateZ(0);
       backface-visibility: hidden;
   }
@@ -358,8 +332,6 @@
     -webkit-backdrop-filter: blur(4px);
     transition: all 0.3s ease;
   }
-
-  /* Design for "LIVE" status (Red + Pulse Animation) - USED IN PLAYLIST */
   .status-live {
     background: rgba(255, 0, 0, 0.3); 
     color: #ff4444;
@@ -367,64 +339,75 @@
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
     animation: livePulse 2s infinite;
   }
-
-  /* Design for other statuses (Blue/Neutral) */
   .status-replay {
     background: rgba(255, 255, 255, 0.1);
     color: #ccc;
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
-
-  /* --- NEW: WATERMARK STYLE FOR UID ON PLAYER (UPDATED) --- */
   .status-uid {
-    /* Very transparent black background (Ghost look) */
     background: rgba(0, 0, 0, 0.15); 
-    
-    /* White text, good opacity */
     color: rgba(255, 255, 255, 0.7); 
-    
-    /* Faint border */
     border: 1px solid rgba(255, 255, 255, 0.1);
-    
     font-family: monospace; 
-    
-    /* Strong text shadow to ensure it is READABLE on any background */
     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-    
-    /* Subtle blur to separate text from video */
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
-
-    /* --- KEY FIX: PREVENT ALL CAPS --- */
     text-transform: none !important;
   }
 
-  /* The Pulse Animation Keyframes */
   @keyframes livePulse {
     0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4); border-color: rgba(255, 68, 68, 0.4); }
     70% { box-shadow: 0 0 0 6px rgba(255, 68, 68, 0); border-color: rgba(255, 68, 68, 0.1); }
     100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); border-color: rgba(255, 68, 68, 0.4); }
   }
 
-  /* --- PLAYER OVERLAY STATUS BADGE (Desktop Default) --- */
+  /* --- PLAYER OVERLAY STATUS BADGE --- */
   #player-status-badge {
     position: absolute;
-    top: 35px;  /* Desktop: More space from corner */
-    left: 35px; /* Desktop: More space from corner */
-    z-index: 100; /* Ensure it is above the video */
-    display: none; /* Hidden by default */
-    pointer-events: none; /* Allows clicking through it */
+    top: 35px; 
+    left: 35px;
+    z-index: 100;
+    display: none;
+    pointer-events: none;
     font-size: 14px; 
     padding: 5px 12px;
   }
 
-  /* --- NEW: PHONE FRIENDLY ADJUSTMENTS FOR BADGE --- */
+  /* --- NEW: PLAYER OVERLAY TITLE --- */
+  .player-overlay-title {
+    position: absolute;
+    top: 20px; 
+    left: 0; 
+    right: 0;
+    text-align: center;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0; /* Hidden by default */
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    padding: 0 60px; /* Space to avoid overlap */
+  }
+  /* Visible Class for Title */
+  .player-overlay-title.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
   @media (max-width: 600px) {
     #player-status-badge {
-        top: 15px !important;    /* Closer to top on phone */
-        left: 15px !important;   /* Closer to left on phone */
-        font-size: 10px !important; /* Smaller text on phone */
-        padding: 4px 8px !important; /* Smaller padding */
+        top: 15px !important; 
+        left: 15px !important;
+        font-size: 10px !important;
+        padding: 4px 8px !important;
+    }
+    .player-overlay-title {
+        font-size: 14px;
+        top: 15px;
+        padding: 0 40px;
     }
   }
 
@@ -434,7 +417,6 @@
       flex-direction: row;
       align-items: flex-start;
       gap: 10px; 
-      /* CHANGED: Adjusted padding for wide screens */
       padding: 0 20px; 
       text-align: left;
     }
@@ -444,7 +426,6 @@
     #playlist-items { 
         max-height: 410px !important; 
         padding-right: 10px;
-        /* SMOOTH SCROLL */
         scroll-behavior: smooth;
         -webkit-overflow-scrolling: touch;
     }
@@ -468,6 +449,7 @@
 
     <div id="player-container">
       <div id="player-status-badge" class="status-badge"></div>
+      <div id="player-overlay-title" class="player-overlay-title"></div>
       
       <div class="plyr__video-wrapper">
         <video id="videoPlayer" playsinline controls crossorigin="anonymous"></video>
@@ -487,7 +469,6 @@
         max-height: 410px; 
         overflow-y: auto; 
         padding-right: 10px;
-        /* SMOOTH SCROLL FALLBACK */
         scroll-behavior: smooth;
         -webkit-overflow-scrolling: touch;
     ">
@@ -523,7 +504,8 @@ const playlistContainer = document.getElementById('playlist-items');
 const posterContainer = document.getElementById('poster-container');
 const playerContainer = document.getElementById('player-container');
 const mainTitle = document.getElementById('main-title');
-const playerBadge = document.getElementById('player-status-badge'); // Select the new badge
+const playerBadge = document.getElementById('player-status-badge');
+const overlayTitle = document.getElementById('player-overlay-title'); // NEW
 
 // Global variable to store current ep data
 window.currentEpData = null;
@@ -540,19 +522,27 @@ const firebaseConfig = {
   appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
 };
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth(); // Initialized Auth
+const auth = firebase.auth(); 
 const db = firebase.database();
 
 // =========================================================================
-// !!! 🚨 START OF PAGE-LEVEL SECURITY SCRIPT (FIREBASE CHECK) 🚨 !!!
+// !!! 🚨 START OF PAGE-LEVEL SECURITY SCRIPT (REAL-TIME) 🚨 !!!
 // =========================================================================
 
-// ** 🚨 IMPORTANT: CHANGE THIS ID TO MATCH YOUR ADMIN PANEL ID 🚨 **
 const PAGE_ID = "jpnnewtour"; 
 
 // Function to show the denial screen
 function showAccessDeniedModal(message) {
+    // 1. Pause the player immediately
+    if(typeof player !== 'undefined') {
+        player.pause();
+        if(player.fullscreen.active) player.fullscreen.exit();
+    }
+
     document.body.style.overflow = 'hidden';
+
+    // Check if modal already exists
+    if(document.querySelector('.access-denied-modal')) return;
 
     const modal = document.createElement('div');
     modal.className = 'access-denied-modal';
@@ -572,44 +562,50 @@ function showAccessDeniedModal(message) {
         </div>
     `;
     document.body.appendChild(modal);
-
-    throw new Error("Access Denied by Page Security Check.");
 }
 
-// Check on page load (DYNAMIC FROM FIREBASE)
+// Function to remove modal (if access is given back in real-time)
+function removeAccessDeniedModal() {
+    const modal = document.querySelector('.access-denied-modal');
+    if(modal) {
+        modal.remove();
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Check on page load AND listen for changes
 auth.onAuthStateChanged(user => {
     if (!user) {
         showAccessDeniedModal("You must be logged in to view this content.");
         return;
     }
 
-    // --- NEW: SET PLAYER BADGE TO USER UID (WATERMARK) ---
+    // Set Badge UID
     if(playerBadge) {
         playerBadge.textContent = "ID: " + user.uid;
-        playerBadge.style.display = "block"; // Always show
-        playerBadge.classList.add('status-uid'); // Use Watermark Style
+        playerBadge.style.display = "block"; 
+        playerBadge.classList.add('status-uid');
     }
-    // ----------------------------------------------------
 
-    // Check specifically for THIS user's UID in the 'page_access/PAGE_ID' folder
-    db.ref(`page_access/${PAGE_ID}/${user.uid}`).once('value')
-    .then(snapshot => {
+    // --- REALTIME LISTENER (.on instead of .once) ---
+    const accessRef = db.ref(`page_access/${PAGE_ID}/${user.uid}`);
+    
+    accessRef.on('value', (snapshot) => {
         const isAllowed = snapshot.val();
         
-        // If value is TRUE, they are allowed. If null or false, denied.
-        if (isAllowed !== true) {
+        // If value is TRUE, they are allowed.
+        if (isAllowed === true) {
+            console.log("Access Granted/Verified for:", user.uid);
+            removeAccessDeniedModal(); // Unblock if they were blocked
+        } else {
+            // Immediate Block
+            console.warn("Access Revoked in Realtime");
             showAccessDeniedModal(
                 "This content is restricted.<br>" +
-                "The Admin has not granted your account access to this stream.<br><br>" +
+                "The Admin has revoked your access to this stream.<br><br>" +
                 "Your UID: <small>" + user.uid + "</small>"
             );
-        } else {
-            console.log("Access Granted for:", user.uid);
         }
-    })
-    .catch(error => {
-        console.error("Firebase Permission Check Failed:", error);
-        showAccessDeniedModal("System Error. Please verify your internet connection.");
     });
 });
 // =========================================================================
@@ -627,12 +623,8 @@ const player = new Plyr(video, {
   dblclickFullscreen: false
 });
 
-// --- EXISTING CODE CONTINUES BELOW (loadAndPlayEpisode, Handlers, etc.) ---
-
 // --- 2. CORE FUNCTION: PLAY EPISODE ---
-// Usage: loadAndPlayEpisode("1", true) -> true means update the URL
 function loadAndPlayEpisode(epId, updateUrl = true) {
-    // A. Find the episode
     const ep = playlistData.find(item => item.id === epId);
     
     if (!ep) {
@@ -640,7 +632,6 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
         return;
     }
 
-    // B. Check Date Locking
     const today = new Date();
     if (ep.date) {
         const releaseDate = new Date(ep.date);
@@ -650,26 +641,28 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
         }
     }
 
-    // C. Update the Browser Link (Deep Linking)
     if (updateUrl) {
         const newUrl = window.location.pathname + '?v=' + ep.id;
-        // pushState changes the URL without reloading the page
         history.pushState({id: ep.id}, '', newUrl);
     }
 
     // D. Set Data & UI
     window.currentEpData = ep;
+    
+    // --- NEW: Update Overlay Title ---
+    if(overlayTitle) {
+        overlayTitle.textContent = ep.title;
+    }
+
     posterContainer.style.display = "none";
     playerContainer.style.display = "block";
 
-    // E. Load Video from Firebase (Path: ourchapter)
     db.ref(`live/${ep.id}`).once('value').then(snapshot => {
       const data = snapshot.val();
       if(!data || !data.url) { alert("Video unavailable"); return; }
 
       if(typeof hls !== 'undefined' && hls){ hls.destroy(); hls = null; }
 
-      // Resume Logic
       const resumePlayback = () => {
           const user = auth.currentUser;
           if (!window.currentEpData || !user) {
@@ -697,7 +690,6 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
         video.addEventListener('loadedmetadata', resumePlayback, { once: true });
       }
 
-      // Subtitles
       video.querySelectorAll("track").forEach(t => t.remove());
       if(data.subtitles){
         Object.entries(data.subtitles).forEach(([lang,url])=>{
@@ -711,9 +703,10 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
         });
       }
       
-      // Title Update
       if(data.title){
         mainTitle.textContent = data.title;
+        // Update overlay title if dynamic
+        if(overlayTitle) overlayTitle.textContent = data.title;
       } else {
         mainTitle.textContent = ep.title;
       }
@@ -726,7 +719,6 @@ window.addEventListener('popstate', (event) => {
     if (event.state && event.state.id) {
         loadAndPlayEpisode(event.state.id, false);
     } else {
-        // Reset to poster if back goes to start
         posterContainer.style.display = "flex";
         playerContainer.style.display = "none";
         player.pause();
@@ -756,7 +748,6 @@ playlistData.forEach(ep => {
   thumb.style.objectFit = "cover"; 
   thumb.style.borderRadius = "4px";
   
-  // SMOOTH LOADING: Lazy load images
   thumb.loading = "lazy";
   thumb.decoding = "async";
   
@@ -772,39 +763,29 @@ playlistData.forEach(ep => {
 
   textDiv.appendChild(title);
 
-  // --- CHANGED: NEW STATUS BADGE LOGIC ---
   if (ep.status) {
       const statusSpan = document.createElement('span');
       statusSpan.textContent = ep.status;
-      
-      // Add the base badge class
       statusSpan.classList.add('status-badge');
 
-      // Check if it is LIVE or something else to apply specific color
       if (ep.status.toUpperCase() === "LIVE") {
           statusSpan.classList.add('status-live');
-          
-          // Add a "rec" dot icon for extra detail if it's live
           statusSpan.innerHTML = '● &nbsp;' + ep.status;
       } else {
           statusSpan.classList.add('status-replay');
       }
 
-      // Handle "Not Available" opacity
       if(ep.status === "NOT AVAILABLE") {
          epDiv.style.opacity = "0.6";
       }
 
       textDiv.appendChild(statusSpan);
   }
-  // ----------------------------------------
 
   epDiv.appendChild(thumb);
   epDiv.appendChild(textDiv);
 
-  // CHANGED: Call the loadAndPlayEpisode function
   epDiv.addEventListener('click', () => {
-    // PREVENT CLICK IF STATUS IS NOT AVAILABLE
     if (ep.status === "NOT AVAILABLE") {
         alert("This episode is currently unavailable.");
         return;
@@ -817,11 +798,10 @@ playlistData.forEach(ep => {
 
 // --- 5. CHECK URL ON PAGE LOAD ---
 window.addEventListener('DOMContentLoaded', () => {
-    // Wait for auth to be ready before auto-playing
     auth.onAuthStateChanged(user => {
         if(user) {
             const urlParams = new URLSearchParams(window.location.search);
-            const videoId = urlParams.get('v'); // Looks for ?v=1
+            const videoId = urlParams.get('v'); 
             
             if (videoId) {
                 setTimeout(() => {
@@ -864,12 +844,31 @@ player.on('ready', () => {
     const videoWrapper = videoContainer.querySelector('.plyr__video-wrapper');
     if (!videoWrapper) return;
     
-    // --- NEW: MOVE BADGE INTO PLYR CONTAINER (Fixes Fullscreen Issue) ---
-    // If we are in fullscreen, the wrapper goes fullscreen. 
-    // Moving the badge inside wrapper ensures it stays visible.
+    // --- NEW: MOVE BADGE & TITLE TO WRAPPER ---
     const badge = document.getElementById('player-status-badge');
+    const overlayTitle = document.getElementById('player-overlay-title');
+    
     if(badge) videoWrapper.appendChild(badge);
+    if(overlayTitle) videoWrapper.appendChild(overlayTitle);
 
+    // --- NEW: SYNC TITLE VISIBILITY WITH CONTROLS ---
+    // Show title when controls are shown
+    player.on('controlsshown', () => {
+        if(overlayTitle) overlayTitle.classList.add('visible');
+    });
+
+    // Hide title when controls are hidden
+    player.on('controlshidden', () => {
+        if(overlayTitle && !player.paused) { 
+            // Only hide if playing. If paused, we keep info visible.
+            overlayTitle.classList.remove('visible');
+        }
+    });
+    
+    // Initial State: Show title
+    if(overlayTitle) overlayTitle.classList.add('visible');
+
+    // --- DOUBLE TAP LOGIC ---
     const rewindIcon = document.getElementById('rewind-icon-overlay');
     const forwardIcon = document.getElementById('forward-icon-overlay');
     const playPauseIcon = document.getElementById('play-pause-icon-overlay');
@@ -936,18 +935,14 @@ player.on('ready', () => {
     videoWrapper.addEventListener('dblclick', (e) => { e.preventDefault(); e.stopPropagation(); });
 });
 
-// --- CLOUD SAVING LOGIC (SAVES TO FIREBASE) ---
-let lastSaveTime = 0; // Throttle saves
+// --- CLOUD SAVING LOGIC ---
+let lastSaveTime = 0; 
 
 player.on("timeupdate", () => {
     const user = auth.currentUser;
-    
-    // Check every 5 seconds (throttle) to avoid spamming DB
     const now = Date.now();
     if (user && window.currentEpData && !player.paused && player.currentTime > 5) {
-        if (now - lastSaveTime > 5000) { // Save every 5s
-            
-            // 1. GET CURRENT PAGE NAME AUTOMATICALLY
+        if (now - lastSaveTime > 5000) { 
             let path = window.location.pathname;
             let pageName = path.substring(path.lastIndexOf('/') + 1);
             if(!pageName) pageName = "videos.html"; 
@@ -959,10 +954,9 @@ player.on("timeupdate", () => {
                 currentTime: player.currentTime,
                 duration: player.duration || 0,
                 timestamp: now,
-                page: pageName // <--- THIS SAVES THE SPECIFIC PAGE
+                page: pageName 
             };
             
-            // Write to Cloud
             db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).update(dataToSave);
             lastSaveTime = now;
         }
@@ -989,14 +983,13 @@ player.on("timeupdate", () => {
   /* Access Denied Modal - Hyper Glass */
   .access-denied-modal {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.8); 
+    background: rgba(0, 0, 0, 0.85); 
     color: #fff;
     font-family: 'Segoe UI', Arial, sans-serif;
     display: flex; align-items: center; justify-content: center;
-    z-index: 9999; text-align: center; padding: 20px;
+    z-index: 11000; text-align: center; padding: 20px;
     opacity: 0; animation: fadeIn 0.5s forwards; flex-direction: column;
     backdrop-filter: blur(15px);
-    /* SMOOTHNESS BOOSTER */
     transform: translateZ(0);
     will-change: opacity, backdrop-filter;
   }
@@ -1011,52 +1004,6 @@ player.on("timeupdate", () => {
   }
   .access-denied-modal button:hover { background: rgba(255,255,255,0.25); color: white; }
   @keyframes fadeIn { to { opacity: 1; } }
-</style>
-
- <style>
-  /* Access Denied Modal */
-  .access-denied-modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 11000;
-    text-align: center;
-    padding: 20px;
-    opacity: 0;
-    animation: fadeIn 0.5s forwards;
-    flex-direction: column;
-  }
-
-  .access-denied-modal strong {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-
-  .access-denied-modal button {
-    margin-top: 15px;
-    padding: 10px 25px;
-    background: transparent;
-    color: white;
-    border: 2px solid white;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-  }
-
-  .access-denied-modal button:hover {
-    background: white;
-    color: black;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
 </style>
 
 <a href="videos.html" class="back-btn">
@@ -1094,15 +1041,12 @@ player.on("timeupdate", () => {
 
   const currentPage = window.location.pathname;
 
-  // Check if user already has internalAccess flag
   let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
 
-  // Check if user came from an allowed page
   const referrer = document.referrer;
   const refPath = referrer ? new URL(referrer).pathname : null;
   const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
 
-  // Grant internalAccess if coming from allowed page
   if (cameFromAllowedPage) {
     sessionStorage.setItem('internalAccess', 'true');
     hasInternalAccess = true;
@@ -1114,44 +1058,16 @@ player.on("timeupdate", () => {
 </script>
 
 <script>
-/**
- * CONTENT PROTECTION SCRIPT
- * Disables: Right-Click, DevTools, Image Dragging, and TEXT Dragging/Selection
- */
-
-// 1. Disable Right-Click
-document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-});
-
-// 2. Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+// Content Protection
+document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 document.onkeydown = function(e) {
-    // F12 key
-    if(e.keyCode == 123) {
-        return false;
-    }
-    // Ctrl+Shift+I (Inspect)
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
-        return false;
-    }
-    // Ctrl+Shift+C (Inspect Element)
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
-        return false;
-    }
-    // Ctrl+Shift+J (Console)
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
-        return false;
-    }
-    // Ctrl+U (View Source)
-    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
-        return false;
-    }
+    if(e.keyCode == 123) return false;
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
 }
-
-// 3. Disable Dragging (Prevents dragging images and other elements)
 window.ondragstart = function() { return false; } 
-
-// 4. Disable Text Selection (Prevents highlighting text to drag it)
 document.onselectstart = function() { return false; }
 </script>
 
