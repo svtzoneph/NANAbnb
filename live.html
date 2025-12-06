@@ -394,6 +394,9 @@
     /* Subtle blur to separate text from video */
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
+
+    /* --- KEY FIX: PREVENT ALL CAPS --- */
+    text-transform: none !important;
   }
 
   /* The Pulse Animation Keyframes */
@@ -1096,6 +1099,48 @@ player.on("timeupdate", () => {
   function goBack() {
     window.history.back();
   }
+</script>
+
+<script>
+/**
+ * CONTENT PROTECTION SCRIPT
+ * Disables: Right-Click, DevTools, Image Dragging, and TEXT Dragging/Selection
+ */
+
+// 1. Disable Right-Click
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+});
+
+// 2. Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+document.onkeydown = function(e) {
+    // F12 key
+    if(e.keyCode == 123) {
+        return false;
+    }
+    // Ctrl+Shift+I (Inspect)
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+        return false;
+    }
+    // Ctrl+Shift+C (Inspect Element)
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
+        return false;
+    }
+    // Ctrl+Shift+J (Console)
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+        return false;
+    }
+    // Ctrl+U (View Source)
+    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+        return false;
+    }
+}
+
+// 3. Disable Dragging (Prevents dragging images and other elements)
+window.ondragstart = function() { return false; } 
+
+// 4. Disable Text Selection (Prevents highlighting text to drag it)
+document.onselectstart = function() { return false; }
 </script>
 
 </body>
