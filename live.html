@@ -59,7 +59,7 @@
       --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
       --glass-blur: blur(20px);
       --text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-      
+       
       --plyr-color-main: #ff0033; /* Red Accent */
   }
 
@@ -392,13 +392,13 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
   .status-uid {
-    background: rgba(0, 0, 0, 0.15); 
+    background: rgba(0, 0, 0, 0.20); 
     color: rgba(255, 255, 255, 0.7); 
     border: 1px solid rgba(255, 255, 255, 0.1);
     font-family: monospace; 
     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(5px);
     text-transform: none !important;
   }
 
@@ -416,7 +416,7 @@
     z-index: 100;
     display: none;
     pointer-events: none;
-    font-size: 14px; 
+    font-size: 16px; 
     padding: 5px 12px;
   }
 
@@ -444,6 +444,86 @@
     transform: translateY(0);
   }
 
+  /* --- NEW: BUFFERING OVERLAY STYLES --- */
+  .buffering-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 50;
+    pointer-events: none;
+    display: none; /* Hidden by default */
+  }
+  .buffering-overlay.visible {
+    display: block;
+  }
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--plyr-color-main);
+    animation: spin 1s ease-in-out infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* --- NEW: REALTIME VIEW COUNTER STYLES --- */
+  .views-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-top: 15px; /* Space between player and views */
+    margin-bottom: 5px;
+    color: #a1a1a1; /* Light gray text like the screenshot */
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0; /* Hidden initially */
+    transition: opacity 0.5s ease;
+  }
+  .views-container.visible {
+    opacity: 1;
+  }
+  .views-icon {
+    width: 18px;
+    height: 18px;
+    fill: #a1a1a1; /* Match text color */
+  }
+
+  /* --- NEW: LIVE CONTROL BADGE STYLES (In Player) --- */
+  .live-control-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 0, 0, 0.15);
+    border: 1px solid rgba(255, 0, 0, 0.4);
+    color: #ff4444;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 10px;
+    pointer-events: none;
+    height: 24px;
+    user-select: none;
+  }
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    background: #ff4444;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ff4444;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(0.95); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.7; }
+  }
+
   @media (max-width: 600px) {
     #player-status-badge {
         top: 15px !important; 
@@ -455,6 +535,12 @@
         font-size: 14px;
         top: 15px;
         padding: 0 40px;
+    }
+    .live-control-badge {
+        font-size: 9px;
+        padding: 1px 6px;
+        height: 20px;
+        margin-left: 6px;
     }
   }
 
@@ -491,23 +577,32 @@
   <div class="video-wrapper-left">
     
     <div id="poster-container">
-      <div id="poster-overlay">Select an Episode to Watch</div>
+      <div id="poster-overlay">Select the Live to Watch</div>
     </div>
 
     <div id="player-container">
       <div id="player-status-badge" class="status-badge"></div>
       <div id="player-overlay-title" class="player-overlay-title"></div>
       
+      <div id="buffering-overlay" class="buffering-overlay">
+        <div class="spinner"></div>
+      </div>
+      
       <div class="plyr__video-wrapper">
         <video id="videoPlayer" playsinline controls crossorigin="anonymous"></video>
       </div>
     </div>
 
-    <h2 id="main-title">Select Episode</h2>
+    <div id="views-display" class="views-container">
+      <svg class="views-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      <span id="view-count-text">0</span>
+    </div>
+
+    <h2 id="main-title">Select Live</h2>
   </div>
 
   <div id="playlist" style="width: 100%; max-width: 1000px; margin: 20px auto; text-align: left;">
-    <h3 class="playlist-header">Other Episodes</h3>
+    <h3 class="playlist-header">Other Live</h3>
     
     <div id="playlist-items" style="
         display: flex; 
@@ -527,24 +622,20 @@
 <script>
 // --- 1. CONFIGURATION & DATA ---
 const playlistData = [
-  { 
-    id: "2", 
-    title: "DAY 1 - SEVENTEEN [NEW_] WORLD TOUR IN OSAKA", 
-    status: "DONE", 
-    image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png",
-  },
     { 
     id: "1", 
     title: "DAY 2 - SEVENTEEN [NEW_] WORLD TOUR IN OSAKA", 
-    status: "LIVE", 
+    status: "TODAY", 
+    date: "December 6, 2025 4:30 PM",
     image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png",
   },
   { 
     id: "3", 
     title: "DAY 3 - SEVENTEEN [NEW_] WORLD TOUR IN OSAKA", 
-    status: "TOMORROW", 
+    status: "TOMORROW",
+    date: "December 7, 2025 4:40 PM",
     image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png",
-  },
+  }
 ];
 
 const playlistContainer = document.getElementById('playlist-items');
@@ -552,7 +643,15 @@ const posterContainer = document.getElementById('poster-container');
 const playerContainer = document.getElementById('player-container');
 const mainTitle = document.getElementById('main-title');
 const playerBadge = document.getElementById('player-status-badge');
-const overlayTitle = document.getElementById('player-overlay-title'); // NEW
+const overlayTitle = document.getElementById('player-overlay-title'); 
+
+// NEW: Globals for Views and Buffering
+const bufferingOverlay = document.getElementById('buffering-overlay');
+const viewsDisplay = document.getElementById('views-display');
+const viewCountText = document.getElementById('view-count-text');
+
+let currentViewListenerRef = null;
+let currentPresenceRef = null; // New for Presence
 
 // Global variable to store current ep data
 window.currentEpData = null;
@@ -646,7 +745,7 @@ auth.onAuthStateChanged(user => {
 
     // --- REALTIME LISTENER (.on instead of .once) ---
     const accessRef = db.ref(`page_access/${PAGE_ID}/${user.uid}`);
-    
+     
     accessRef.on('value', (snapshot) => {
         const isAllowed = snapshot.val();
         
@@ -679,8 +778,6 @@ const player = new Plyr(video, {
   controls: [
     'play-large',   
     'play',         
-    'current-time', 
-    'duration',    
     'mute', // Will be pushed to right via CSS
     'fullscreen'
   ],
@@ -688,6 +785,33 @@ const player = new Plyr(video, {
   clickToPlay: false, 
   dblclickFullscreen: false
 });
+
+// --- HELPER: UPDATE LIVE BADGE IN PLAYER ---
+function updatePlayerLiveBadge(status) {
+    if (!player || !player.elements || !player.elements.controls) return;
+    const controls = player.elements.controls;
+    let badge = controls.querySelector('.live-control-badge');
+
+    if(status && status.toUpperCase() === 'LIVE') {
+        if(!badge) {
+            badge = document.createElement('div');
+            badge.className = 'live-control-badge';
+            badge.innerHTML = '<span class="live-dot"></span>LIVE';
+            
+            // Try to find the Play button (small one) to insert after
+            const playBtn = controls.querySelector('[data-plyr="play"]');
+            if(playBtn) {
+                playBtn.after(badge);
+            } else {
+                // Fallback: prepend to volume or controls
+                controls.insertBefore(badge, controls.firstChild);
+            }
+        }
+        badge.style.display = 'flex';
+    } else {
+        if(badge) badge.style.display = 'none';
+    }
+}
 
 // --- 2. CORE FUNCTION: PLAY EPISODE ---
 function loadAndPlayEpisode(epId, updateUrl = true) {
@@ -702,7 +826,7 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
     if (ep.date) {
         const releaseDate = new Date(ep.date);
         if (releaseDate > today) {
-            alert(`This episode is not yet available.\nRelease Date: ${ep.date}`);
+            alert(`\nLIVE STREAM DATE: ${ep.date}`);
             return; 
         }
     }
@@ -715,24 +839,84 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
     // D. Set Data & UI
     window.currentEpData = ep;
     
-    // --- NEW: Update Overlay Title ---
+    // Update Overlay Title
     if(overlayTitle) {
         overlayTitle.textContent = ep.title;
     }
 
+    // Update Live Badge in Player Controls
+    updatePlayerLiveBadge(ep.status);
+
     posterContainer.style.display = "none";
     playerContainer.style.display = "block";
 
+    // =========================================================
+    // --- LIVE VIEWERS LOGIC (Presence System) ---
+    // =========================================================
+    
+    const user = auth.currentUser;
+
+    // 1. CLEANUP: If user was watching another video, remove them from that count
+    if (currentPresenceRef) {
+        currentPresenceRef.remove(); // Remove from DB
+        currentPresenceRef.onDisconnect().cancel(); // Cancel auto-remove for old reference
+        currentPresenceRef = null;
+    }
+
+    // 2. CLEANUP: Stop listening to the old video's count
+    if (currentViewListenerRef) {
+        currentViewListenerRef.off(); 
+    }
+
+    if (user) {
+        // 3. PRESENCE: Add user to 'active_viewers' for this episode
+        const presencePath = `active_viewers/${epId}/${user.uid}`;
+        currentPresenceRef = db.ref(presencePath);
+
+        // a. Tell Firebase: "If I disconnect (close tab/internet loss), remove this node"
+        currentPresenceRef.onDisconnect().remove();
+
+        // b. Add myself to the list right now
+        currentPresenceRef.set({
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            device: navigator.userAgent
+        });
+    }
+
+    // 4. LISTEN: Count how many children are in this episode's folder
+    const viewsRef = db.ref(`active_viewers/${epId}`);
+    currentViewListenerRef = viewsRef;
+    
+    currentViewListenerRef.on('value', (snapshot) => {
+        const viewersData = snapshot.val();
+        // If data exists, count keys. If null, count is 0.
+        const count = viewersData ? Object.keys(viewersData).length : 0;
+        
+        // Format number (e.g., 1,234)
+        viewCountText.textContent = new Intl.NumberFormat().format(count) + "";
+        viewsDisplay.classList.add('visible');
+    });
+    // =========================================================
+
     db.ref(`live/${ep.id}`).once('value').then(snapshot => {
       const data = snapshot.val();
-      if(!data || !data.url) { alert("Video unavailable"); return; }
+      if(!data || !data.url) { alert("Live unavailable"); return; }
 
       if(typeof hls !== 'undefined' && hls){ hls.destroy(); hls = null; }
 
       const resumePlayback = () => {
-          const user = auth.currentUser;
+          // --- FIX: FORCE SOUND ON ---
+          player.volume = 1;    // Set volume to 100%
+          player.muted = false; // Force Unmute
+          // ---------------------------
+
           if (!window.currentEpData || !user) {
-             player.play(); 
+             var playPromise = player.play();
+             if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Autoplay blocked.");
+                });
+             }
              return;
           }
           db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).once('value').then(snap => {
@@ -740,7 +924,13 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
               if (saved && saved.currentTime > 0) {
                   player.currentTime = saved.currentTime;
               }
-              player.play();
+              
+              var playPromise = player.play();
+              if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Autoplay blocked.");
+                });
+              }
           });
       };
 
@@ -905,19 +1095,39 @@ player.on('exitfullscreen', () => {
   }
 });
 
+// --- NEW: BUFFERING EVENTS & OVERLAY MANAGEMENT ---
+player.on('waiting', () => {
+    if (bufferingOverlay) bufferingOverlay.classList.add('visible');
+});
+
+player.on('playing', () => {
+    if (bufferingOverlay) bufferingOverlay.classList.remove('visible');
+});
+
+player.on('pause', () => {
+    // Hide spinner if user manually pauses
+    if (bufferingOverlay) bufferingOverlay.classList.remove('visible');
+});
+
+player.on('canplay', () => {
+    if (bufferingOverlay) bufferingOverlay.classList.remove('visible');
+});
+
 player.on('ready', () => {
     const videoContainer = player.elements.container;
     const videoWrapper = videoContainer.querySelector('.plyr__video-wrapper');
     if (!videoWrapper) return;
     
-    // --- NEW: MOVE BADGE & TITLE TO WRAPPER ---
+    // --- MOVE ELEMENTS INTO WRAPPER (So they appear in Fullscreen) ---
     const badge = document.getElementById('player-status-badge');
     const overlayTitle = document.getElementById('player-overlay-title');
+    const buffer = document.getElementById('buffering-overlay');
     
     if(badge) videoWrapper.appendChild(badge);
     if(overlayTitle) videoWrapper.appendChild(overlayTitle);
+    if(buffer) videoWrapper.appendChild(buffer);
 
-    // --- NEW: SYNC TITLE VISIBILITY WITH CONTROLS ---
+    // --- SYNC TITLE VISIBILITY WITH CONTROLS ---
     // Show title when controls are shown
     player.on('controlsshown', () => {
         if(overlayTitle) overlayTitle.classList.add('visible');
@@ -1022,10 +1232,17 @@ player.on("timeupdate", () => {
                 timestamp: now,
                 page: pageName 
             };
-            
+             
             db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).update(dataToSave);
             lastSaveTime = now;
         }
+    }
+});
+
+// --- REMOVE VIEWER ON TAB CLOSE ---
+window.addEventListener('beforeunload', () => {
+    if (currentPresenceRef) {
+        currentPresenceRef.remove();
     }
 });
 </script>
