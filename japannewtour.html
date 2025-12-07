@@ -708,18 +708,46 @@ playlistData.forEach(ep => {
 });
 
 // --- 5. CHECK URL ON PAGE LOAD ---
+// --- REPLACE THIS ENTIRE BLOCK ---
 window.addEventListener('DOMContentLoaded', () => {
-    // Wait for auth to be ready before auto-playing
     auth.onAuthStateChanged(user => {
         if(user) {
             const urlParams = new URLSearchParams(window.location.search);
-            const videoId = urlParams.get('v'); // Looks for ?v=1
+            const videoParam = urlParams.get('v'); // This is the Title Slug
             
-            if (videoId) {
-                setTimeout(() => {
-                    console.log("Auto-playing from link ID:", videoId);
-                    loadAndPlayEpisode(videoId, false);
-                }, 500);
+            // --- NEW: ADD USER SESSION ID TO URL ---
+            // This ensures &id=USER_UID is always in the address bar
+            if (user.uid && urlParams.get('id') !== user.uid) {
+                urlParams.set('id', user.uid);
+                const newUrl = window.location.pathname + '?' + urlParams.toString();
+                
+                // Update the URL bar immediately without refreshing the page
+                history.replaceState(null, '', newUrl);
+            }
+            // ---------------------------------------
+            
+            if (videoParam) {
+                // Find the episode where the formatted title matches the URL
+                const foundEp = playlistData.find(item => {
+                    // We must format the item.title exactly like we did in Step 1 to match
+                    const itemSlug = encodeURIComponent(item.title.trim().replace(/\s+/g, '-'));
+                    return itemSlug === videoParam;
+                });
+
+                // Fallback: Check ID just in case old links are used
+                const foundEpById = playlistData.find(item => item.id === videoParam);
+
+                const targetEp = foundEp || foundEpById;
+
+                if (targetEp) {
+                    setTimeout(() => {
+                        console.log("Auto-playing from Link:", targetEp.title);
+                        // We still pass the ID to the player function because Firebase needs it
+                        loadAndPlayEpisode(targetEp.id, false); 
+                    }, 500);
+                } else {
+                    console.warn("No episode found for:", videoParam);
+                }
             }
         }
     });
