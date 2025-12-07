@@ -6,7 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
@@ -58,7 +59,7 @@
       --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
       --glass-blur: blur(20px);
       --text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-      
+       
       --plyr-color-main: gray;
       --plyr-control-bg: rgba(255,255,255,0.1);
       --plyr-control-hover-bg: rgba(255,255,255,0.2);
@@ -209,6 +210,7 @@
     /* SMOOTHNESS BOOSTER */
     transform: translateZ(0);
     will-change: transform;
+    cursor: pointer;
   }
   .back-btn:hover { 
     background: rgba(255,255,255,0.25); 
@@ -262,23 +264,6 @@
   color: white;
   padding: 0 !important;
 }
-
-/* OPTION B: Box Background (Like Netflix) - Uncomment to use
-.plyr__caption {
-  background-color: rgba(0, 0, 0, 0.75) !important;
-  border-radius: 4px;
-  padding: 4px 8px;
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
-  text-shadow: none !important; 
-  
-  /* MAGIC: Wraps box around text only */
-  display: inline;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-}
-*/
 
   /* --- GLASSMORPHISM SEEK OVERLAY --- */
   .seek-overlay {
@@ -474,6 +459,15 @@ function getReleaseDate(dateStr, timeStr) {
     return new Date(combinedString);
 }
 
+// --- HELPER: SMART GO BACK ---
+function smartGoBack() {
+    if (document.referrer && window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = 'videos.html';
+    }
+}
+
 // --- 2. CORE FUNCTION: PLAY EPISODE ---
 function loadAndPlayEpisode(epId, updateUrl = true) {
     const ep = playlistData.find(item => item.id === epId);
@@ -509,9 +503,21 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
     posterOverlay.style.border = "1px solid rgba(255, 255, 255, 0.3)";
     posterOverlay.style.color = "white";
 
-    // D. Update the Browser Link
+    // D. Update the Browser Link (Enhanced Logic)
     if (updateUrl) {
-        const newUrl = window.location.pathname + '?v=' + ep.id;
+        const titleSlug = encodeURIComponent(ep.title.trim().replace(/\s+/g, '-'));
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        urlParams.set('title', titleSlug);
+        
+        const user = auth.currentUser;
+        if(user) {
+            urlParams.set('id', user.uid);
+        }
+        urlParams.set('session', Date.now());
+
+        const newUrl = window.location.pathname + '?' + urlParams.toString();
+        
         history.pushState({id: ep.id}, '', newUrl);
     }
 
@@ -522,6 +528,16 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
     db.ref(`ourchapter/${ep.id}`).once('value').then(snapshot => {
       const data = snapshot.val();
       if(!data || !data.url) { alert("Video unavailable"); return; }
+
+      // --- NEW: ADD TOKEN TO M3U8 URL ---
+      let finalUrl = data.url;
+      const user = auth.currentUser;
+      if (user) {
+          // Check if URL has params already (like ?alt=media)
+          const separator = finalUrl.includes('?') ? '&' : '?';
+          finalUrl += `${separator}token=${user.uid}`;
+      }
+      // ----------------------------------
 
       if(typeof hls !== 'undefined' && hls){ hls.destroy(); hls = null; }
 
@@ -542,13 +558,13 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
 
       if(typeof Hls !== 'undefined' && Hls.isSupported()){
         hls = new Hls();
-        hls.loadSource(data.url);
+        hls.loadSource(finalUrl); // Use finalUrl
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => { 
               setTimeout(resumePlayback, 100);
         });
       } else {
-        video.src = data.url;
+        video.src = finalUrl; // Use finalUrl
         video.addEventListener('loadedmetadata', resumePlayback, { once: true });
       }
 
@@ -656,19 +672,74 @@ playlistData.forEach(ep => {
 
 // --- 5. CHECK URL ON PAGE LOAD ---
 window.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const videoId = urlParams.get('v'); 
-    
-    if (videoId) {
-        setTimeout(() => {
-            console.log("Auto-playing from link ID:", videoId);
-            loadAndPlayEpisode(videoId, false);
-        }, 500);
-    }
+    auth.onAuthStateChanged(user => {
+        if(user) {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // --- FIX: Look for 'title' OR 'v'
+            const videoParam = urlParams.get('title') || urlParams.get('v'); 
+            let urlChanged = false;
+
+            // 1. ADD USER ID
+            if (user.uid && urlParams.get('id') !== user.uid) {
+                urlParams.set('id', user.uid);
+                urlChanged = true;
+            }
+
+            // 2. ADD SESSION ID
+            if (!urlParams.has('session')) {
+                const timeSessionID = Date.now();
+                urlParams.set('session', timeSessionID);
+                urlChanged = true;
+            }
+
+            // --- VIDEO PLAYING LOGIC ---
+            if (videoParam) {
+                // Try to find by Title Slug
+                const foundEp = playlistData.find(item => {
+                    const itemSlug = encodeURIComponent(item.title.trim().replace(/\s+/g, '-'));
+                    return itemSlug === videoParam;
+                });
+                
+                // Fallback: Try to find by ID
+                const foundEpById = playlistData.find(item => item.id === videoParam);
+
+                const targetEp = foundEp || foundEpById;
+
+                if (targetEp) {
+                    // --- FIX: FORCE URL TO NEW FORMAT ---
+                    const correctSlug = encodeURIComponent(targetEp.title.trim().replace(/\s+/g, '-'));
+                    if (urlParams.get('title') !== correctSlug || urlParams.has('v')) {
+                        urlParams.delete('v'); 
+                        urlParams.set('title', correctSlug); 
+                        urlChanged = true;
+                    }
+
+                    // Apply all URL changes
+                    if (urlChanged) {
+                        const newUrl = window.location.pathname + '?' + urlParams.toString();
+                        history.replaceState(null, '', newUrl);
+                    }
+
+                    setTimeout(() => {
+                        console.log("Auto-playing:", targetEp.title);
+                        loadAndPlayEpisode(targetEp.id, false); 
+                    }, 500);
+                } else {
+                    console.warn("No episode found for:", videoParam);
+                }
+            } else {
+                if (urlChanged) {
+                    const newUrl = window.location.pathname + '?' + urlParams.toString();
+                    history.replaceState(null, '', newUrl);
+                }
+            }
+        }
+    });
 });
 </script>
 
-<a href="videos.html" class="back-btn">
+<a href="#" onclick="smartGoBack(); return false;" class="back-btn">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
     <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
@@ -698,6 +769,86 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth(); // Initialized Auth
 const db = firebase.database();
+
+// =========================================================================
+// !!! 🚨 START OF PAGE-LEVEL SECURITY SCRIPT (REAL-TIME UPDATE) 🚨 !!!
+// =========================================================================
+
+// ** 🚨 IMPORTANT: CHANGE THIS ID TO MATCH YOUR ADMIN PANEL ID 🚨 **
+const PAGE_ID = "ourchapter"; // Set based on playlist context
+
+// Function to show the denial screen (UPDATED DESIGN)
+function showAccessDeniedModal(message) {
+    if(typeof player !== 'undefined') {
+        player.pause();
+        if(player.fullscreen.active) player.fullscreen.exit();
+    }
+    
+    document.body.style.overflow = 'hidden';
+
+    // Check if modal already exists
+    if(document.querySelector('.access-denied-modal')) return;
+
+    const modal = document.createElement('div');
+    modal.className = 'access-denied-modal';
+    modal.style.opacity = '1';
+    modal.style.animation = 'none';
+
+    modal.innerHTML = `
+        <strong style="color: #FF4444; font-size: 36px; margin-bottom: 20px;">Access Denied</strong>
+        <div style="margin-top: 15px; font-size: 18px; max-width: 90%; line-height: 1.4; text-shadow: var(--text-shadow);">
+            ${message}
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 30px; width: 80%; max-width: 300px;">
+            <button onclick="smartGoBack()" 
+                    style="background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3); color: white;">
+                GO BACK
+            </button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+// Function to remove modal (if access is given back in real-time)
+function removeAccessDeniedModal() {
+    const modal = document.querySelector('.access-denied-modal');
+    if(modal) {
+        modal.remove();
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Check on page load
+auth.onAuthStateChanged(user => {
+    if (!user) {
+        showAccessDeniedModal("You must be logged in to view this content.");
+        return;
+    }
+
+    // --- REALTIME LISTENER (.on instead of .once) ---
+    const accessRef = db.ref(`page_access/${PAGE_ID}/${user.uid}`);
+    
+    accessRef.on('value', (snapshot) => {
+        const isAllowed = snapshot.val();
+        
+        // If value is TRUE, they are allowed.
+        if (isAllowed === true) {
+            console.log("Access Granted/Verified for:", user.uid);
+            removeAccessDeniedModal(); // Unblock if they were blocked
+        } else {
+            // Immediate Block
+            console.warn("Access Revoked in Realtime");
+            showAccessDeniedModal(
+                "This content is restricted and your account does not have permission to view it.<br>" +
+                "Access is now based on account approval — only users who joined the stream and were approved by the admin can view this content.<br>" +
+                "Your UID: <small>" + user.uid + "</small>"
+            );
+        }
+    });
+});
+// =========================================================================
+// !!! 🚨 END OF PAGE-LEVEL SECURITY SCRIPT 🚨 !!!
+// =========================================================================
 
 const video = document.getElementById("videoPlayer");
 let hls;
@@ -819,11 +970,8 @@ player.on("timeupdate", () => {
         if (now - lastSaveTime > 5000) { // Save every 5s
             
             // 1. GET CURRENT PAGE NAME AUTOMATICALLY
-            // This gets the file name (e.g., "ourchapterS17N.html")
             let pageName = window.location.pathname;
-            // Remove leading "/" if present
             if(pageName.startsWith('/')) pageName = pageName.substring(1); 
-            // Default if empty
             if(!pageName) pageName = "videos.html"; 
 
             const dataToSave = {
@@ -833,7 +981,7 @@ player.on("timeupdate", () => {
                 currentTime: player.currentTime,
                 duration: player.duration || 0,
                 timestamp: now,
-                page: pageName // <--- THIS SAVES THE SPECIFIC PAGE
+                page: pageName 
             };
             
             // Write to Cloud
@@ -872,7 +1020,7 @@ player.on("timeupdate", () => {
     backdrop-filter: blur(15px);
     /* SMOOTHNESS BOOSTER */
     transform: translateZ(0);
-    will-change: transform, backdrop-filter;
+    will-change: opacity, backdrop-filter;
   }
   .access-denied-modal strong { font-size: 24px; margin-bottom: 10px; text-shadow: var(--text-shadow); }
   .access-denied-modal button {
