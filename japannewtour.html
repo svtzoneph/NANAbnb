@@ -714,22 +714,31 @@ window.addEventListener('DOMContentLoaded', () => {
         if(user) {
             const urlParams = new URLSearchParams(window.location.search);
             const videoParam = urlParams.get('v'); // This is the Title Slug
-            
-            // --- NEW: ADD USER SESSION ID TO URL ---
-            // This ensures &id=USER_UID is always in the address bar
+            let urlChanged = false;
+
+            // 1. ADD USER ID (If missing or incorrect)
             if (user.uid && urlParams.get('id') !== user.uid) {
                 urlParams.set('id', user.uid);
+                urlChanged = true;
+            }
+
+            // 2. ADD SESSION ID (Time/Date Timestamp)
+            if (!urlParams.has('session')) {
+                const timeSessionID = Date.now();
+                urlParams.set('session', timeSessionID);
+                urlChanged = true;
+            }
+
+            // Apply changes to URL bar without refreshing
+            if (urlChanged) {
                 const newUrl = window.location.pathname + '?' + urlParams.toString();
-                
-                // Update the URL bar immediately without refreshing the page
                 history.replaceState(null, '', newUrl);
             }
-            // ---------------------------------------
             
+            // --- VIDEO PLAYING LOGIC ---
             if (videoParam) {
                 // Find the episode where the formatted title matches the URL
                 const foundEp = playlistData.find(item => {
-                    // We must format the item.title exactly like we did in Step 1 to match
                     const itemSlug = encodeURIComponent(item.title.trim().replace(/\s+/g, '-'));
                     return itemSlug === videoParam;
                 });
@@ -742,7 +751,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (targetEp) {
                     setTimeout(() => {
                         console.log("Auto-playing from Link:", targetEp.title);
-                        // We still pass the ID to the player function because Firebase needs it
                         loadAndPlayEpisode(targetEp.id, false); 
                     }, 500);
                 } else {
