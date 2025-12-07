@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>VIDEOS</title>
+<title>Live | Zone Vault </title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -59,7 +59,7 @@
       --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
       --glass-blur: blur(20px);
       --text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-       
+        
       --plyr-color-main: #ff0033; /* Red Accent */
   }
 
@@ -91,7 +91,7 @@
     aspect-ratio: 16/9;
     background-size: cover;
     background-position: center;
-    background-image: url('https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png'); 
+    background-image: url('https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/end.jpg'); 
     border-radius: 0px;
     display: flex;
     align-items: center;
@@ -581,7 +581,7 @@
   <div class="video-wrapper-left">
     
     <div id="poster-container">
-      <div id="poster-overlay">Select the Live to Watch</div>
+      <div id="poster-overlay">Thank you for joining!!</div>
     </div>
 
     <div id="player-container">
@@ -627,11 +627,11 @@
 // --- 1. CONFIGURATION & DATA ---
 const playlistData = [
   { 
-    id: "1", 
-    title: "DAY 3 - SEVENTEEN [NEW_] WORLD TOUR IN OSAKA", 
-    status: "LIVE",
-    date: "December 7, 2025 4:40 PM",
-    image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png",
+    id: "", 
+    title: "UP NEXT", 
+    status: "CXM DOUBLE UP PARTY IN INCHEON", 
+    date: "January 23, 2025 ",
+    image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/end.jpg",
   },
 ];
 
@@ -742,7 +742,7 @@ auth.onAuthStateChanged(user => {
 
     // --- REALTIME LISTENER (.on instead of .once) ---
     const accessRef = db.ref(`page_access/${PAGE_ID}/${user.uid}`);
-     
+      
     accessRef.on('value', (snapshot) => {
         const isAllowed = snapshot.val();
         
@@ -775,7 +775,7 @@ const player = new Plyr(video, {
   controls: [
     'play-large',   
     'play',         
-    'mute', // Will be pushed to right via CSS
+    'mute',
     'fullscreen'
   ],
   settings: ["captions","speed","quality"],
@@ -829,7 +829,12 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
     }
 
     if (updateUrl) {
-        const newUrl = window.location.pathname + '?v=' + ep.id;
+        // --- MODIFIED: Use Title Slug for URL instead of ID ---
+        // 1. Convert title to safe slug (e.g. "UP NEXT" -> "UP-NEXT")
+        const titleSlug = encodeURIComponent(ep.title.trim().replace(/\s+/g, '-'));
+        const newUrl = window.location.pathname + '?v=' + titleSlug;
+        
+        // 2. Push state (we keep ID in the state object for history navigation)
         history.pushState({id: ep.id}, '', newUrl);
     }
 
@@ -1054,13 +1059,29 @@ window.addEventListener('DOMContentLoaded', () => {
     auth.onAuthStateChanged(user => {
         if(user) {
             const urlParams = new URLSearchParams(window.location.search);
-            const videoId = urlParams.get('v'); 
+            const videoParam = urlParams.get('v'); // Can be ID or Title Slug
             
-            if (videoId) {
-                setTimeout(() => {
-                    console.log("Auto-playing from link ID:", videoId);
-                    loadAndPlayEpisode(videoId, false);
-                }, 500);
+            if (videoParam) {
+                // --- MODIFIED: FIND VIDEO BY TITLE ---
+                // Try to find by matching title slug
+                const foundEp = playlistData.find(item => {
+                    const itemSlug = encodeURIComponent(item.title.trim().replace(/\s+/g, '-'));
+                    return itemSlug === videoParam;
+                });
+
+                // Fallback: Try to find by ID (in case old links are used)
+                const foundEpById = playlistData.find(item => item.id === videoParam);
+
+                const targetEp = foundEp || foundEpById;
+
+                if (targetEp) {
+                    setTimeout(() => {
+                        console.log("Auto-playing from link:", targetEp.title);
+                        loadAndPlayEpisode(targetEp.id, false);
+                    }, 500);
+                } else {
+                    console.warn("Video not found for param:", videoParam);
+                }
             }
         }
     });
@@ -1229,7 +1250,7 @@ player.on("timeupdate", () => {
                 timestamp: now,
                 page: pageName 
             };
-             
+              
             db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).update(dataToSave);
             lastSaveTime = now;
         }
