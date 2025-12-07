@@ -529,16 +529,6 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
       const data = snapshot.val();
       if(!data || !data.url) { alert("Video unavailable"); return; }
 
-      // --- NEW: ADD TOKEN TO M3U8 URL ---
-      let finalUrl = data.url;
-      const user = auth.currentUser;
-      if (user) {
-          // Check if URL has params already (like ?alt=media)
-          const separator = finalUrl.includes('?') ? '&' : '?';
-          finalUrl += `${separator}token=${user.uid}`;
-      }
-      // ----------------------------------
-
       if(typeof hls !== 'undefined' && hls){ hls.destroy(); hls = null; }
 
       const resumePlayback = () => {
@@ -558,13 +548,13 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
 
       if(typeof Hls !== 'undefined' && Hls.isSupported()){
         hls = new Hls();
-        hls.loadSource(finalUrl); // Use finalUrl
+        hls.loadSource(data.url);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => { 
               setTimeout(resumePlayback, 100);
         });
       } else {
-        video.src = finalUrl; // Use finalUrl
+        video.src = data.url;
         video.addEventListener('loadedmetadata', resumePlayback, { once: true });
       }
 
