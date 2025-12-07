@@ -708,12 +708,13 @@ playlistData.forEach(ep => {
 });
 
 // --- 5. CHECK URL ON PAGE LOAD ---
-// --- REPLACE THIS ENTIRE BLOCK ---
+// --- 5. CHECK URL ON PAGE LOAD ---
 window.addEventListener('DOMContentLoaded', () => {
     auth.onAuthStateChanged(user => {
         if(user) {
             const urlParams = new URLSearchParams(window.location.search);
-            const videoParam = urlParams.get('v'); // This is the Title Slug
+            // --- MODIFIED: Read 'title' instead of 'v'
+            const videoParam = urlParams.get('title'); 
             let urlChanged = false;
 
             // 1. ADD USER ID (If missing or incorrect)
@@ -742,8 +743,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     const itemSlug = encodeURIComponent(item.title.trim().replace(/\s+/g, '-'));
                     return itemSlug === videoParam;
                 });
-
-                // Fallback: Check ID just in case old links are used
+                // Fallback: Check ID just in case
                 const foundEpById = playlistData.find(item => item.id === videoParam);
 
                 const targetEp = foundEp || foundEpById;
