@@ -409,9 +409,11 @@
   }
 
   /* --- PLAYER OVERLAY STATUS BADGE --- */
+  /* MODIFIED: Position changed to Bottom Left */
   #player-status-badge {
     position: absolute;
-    top: 35px; 
+    top: auto;      /* Changed from 35px */
+    bottom: 35px;   /* Added Bottom */
     left: 35px;
     z-index: 100;
     display: none;
@@ -526,7 +528,9 @@
 
   @media (max-width: 600px) {
     #player-status-badge {
-        top: 15px !important; 
+        /* MODIFIED: Adjusted for Mobile Bottom Left (Cleared controls) */
+        top: auto !important; 
+        bottom: 60px !important; /* Pushed up to avoid mobile progress bar */
         left: 15px !important;
         font-size: 8px !important;
         padding: 4px 8px !important;
@@ -622,20 +626,13 @@
 <script>
 // --- 1. CONFIGURATION & DATA ---
 const playlistData = [
-    { 
-    id: "1", 
-    title: "DAY 2 - SEVENTEEN [NEW_] WORLD TOUR IN OSAKA", 
-    status: "LIVE", 
-    date: "December 6, 2025 4:30 PM",
-    image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png",
-  },
   { 
-    id: "3", 
+    id: "1", 
     title: "DAY 3 - SEVENTEEN [NEW_] WORLD TOUR IN OSAKA", 
-    status: "TOMORROW",
+    status: "LIVE",
     date: "December 7, 2025 4:40 PM",
     image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png",
-  }
+  },
 ];
 
 const playlistContainer = document.getElementById('playlist-items');
