@@ -59,7 +59,7 @@
       --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
       --glass-blur: blur(20px);
       --text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-      
+       
       --plyr-color-main: gray;
       --plyr-control-bg: rgba(255,255,255,0.1);
       --plyr-control-hover-bg: rgba(255,255,255,0.2);
@@ -211,6 +211,7 @@
     /* SMOOTHNESS BOOSTER */
     transform: translateZ(0);
     will-change: transform;
+    cursor: pointer;
   }
   .back-btn:hover { 
     background: rgba(255,255,255,0.25); 
@@ -464,9 +465,26 @@ const db = firebase.database();
 // ** 🚨 IMPORTANT: CHANGE THIS ID TO MATCH YOUR ADMIN PANEL ID 🚨 **
 const PAGE_ID = "jpnnewtour"; 
 
+// --- SMART GO BACK FUNCTION (Centralized) ---
+function smartGoBack() {
+    if (document.referrer && window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = 'videos.html';
+    }
+}
+
 // Function to show the denial screen (UPDATED DESIGN)
 function showAccessDeniedModal(message) {
+    if(typeof player !== 'undefined') {
+        player.pause();
+        if(player.fullscreen.active) player.fullscreen.exit();
+    }
+    
     document.body.style.overflow = 'hidden';
+
+    // Check if modal already exists
+    if(document.querySelector('.access-denied-modal')) return;
 
     const modal = document.createElement('div');
     modal.className = 'access-denied-modal';
@@ -480,15 +498,22 @@ function showAccessDeniedModal(message) {
             ${message}
         </div>
         <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 30px; width: 80%; max-width: 300px;">
-            <button onclick="window.history.back()" 
+            <button onclick="smartGoBack()" 
                     style="background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3); color: white;">
                 GO BACK
             </button>
         </div>
     `;
     document.body.appendChild(modal);
+}
 
-    throw new Error("Access Denied by Page Security Check.");
+// Function to remove modal (if access is given back in real-time)
+function removeAccessDeniedModal() {
+    const modal = document.querySelector('.access-denied-modal');
+    if(modal) {
+        modal.remove();
+        document.body.style.overflow = 'auto';
+    }
 }
 
 // Check on page load
@@ -498,21 +523,25 @@ auth.onAuthStateChanged(user => {
         return;
     }
 
-    db.ref(`page_access/${PAGE_ID}/${user.uid}`).once('value')
-    .then(snapshot => {
+    // --- REALTIME LISTENER (.on instead of .once) ---
+    const accessRef = db.ref(`page_access/${PAGE_ID}/${user.uid}`);
+    
+    accessRef.on('value', (snapshot) => {
         const isAllowed = snapshot.val();
         
-        if (isAllowed !== true) {
-            showAccessDeniedModal("The Admin has not granted your account access to the " + PAGE_ID.toUpperCase() + " collection.");
+        // If value is TRUE, they are allowed.
+        if (isAllowed === true) {
+            console.log("Access Granted/Verified for:", user.uid);
+            removeAccessDeniedModal(); // Unblock if they were blocked
+        } else {
+            // Immediate Block
+            console.warn("Access Revoked in Realtime");
+            showAccessDeniedModal(
+                "This content is restricted and your account does not have permission to view it.<br>" +
+                "Access is now based on account approval — only users who joined the stream and were approved by the admin can view this content.<br>" +
+                "Your UID: <small>" + user.uid + "</small>"
+            );
         }
-    })
-    .catch(error => {
-        console.error("Firebase Permission Check Failed:", error);
-        showAccessDeniedModal(
-          "This content is restricted and your account does not have permission to view it.<br>" +
-          "Access is now based on account approval — only users who joined the stream and were approved by the admin can view this content.<br>" +
-          "If you believe this is a mistake, please contact the admin."
-        );
     });
 });
 // =========================================================================
@@ -553,9 +582,23 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
         }
     }
 
-    // C. Update the Browser Link (Deep Linking)
+    // C. Update the Browser Link (Enhanced Logic)
     if (updateUrl) {
-        const newUrl = window.location.pathname + '?v=' + ep.id;
+        // 1. Create a "slug" from the title
+        const titleSlug = encodeURIComponent(ep.title.trim().replace(/\s+/g, '-'));
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // 2. Set URL Params
+        urlParams.set('title', titleSlug);
+        
+        const user = auth.currentUser;
+        if(user) {
+            urlParams.set('id', user.uid);
+        }
+        urlParams.set('session', Date.now());
+
+        const newUrl = window.location.pathname + '?' + urlParams.toString();
+        
         // pushState changes the URL without reloading the page
         history.pushState({id: ep.id}, '', newUrl);
     }
@@ -707,7 +750,6 @@ playlistData.forEach(ep => {
   playlistContainer.appendChild(epDiv);
 });
 
-// --- 5. CHECK URL ON PAGE LOAD ---
 // --- 5. CHECK URL ON PAGE LOAD ---
 window.addEventListener('DOMContentLoaded', () => {
     auth.onAuthStateChanged(user => {
@@ -928,14 +970,13 @@ player.on("timeupdate", () => {
   /* Access Denied Modal - Hyper Glass */
   .access-denied-modal {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.8); 
+    background: rgba(0, 0, 0, 0.85); 
     color: #fff;
     font-family: 'Segoe UI', Arial, sans-serif;
     display: flex; align-items: center; justify-content: center;
-    z-index: 9999; text-align: center; padding: 20px;
+    z-index: 11000; text-align: center; padding: 20px;
     opacity: 0; animation: fadeIn 0.5s forwards; flex-direction: column;
     backdrop-filter: blur(15px);
-    /* SMOOTHNESS BOOSTER */
     transform: translateZ(0);
     will-change: opacity, backdrop-filter;
   }
@@ -952,53 +993,7 @@ player.on("timeupdate", () => {
   @keyframes fadeIn { to { opacity: 1; } }
 </style>
 
- <style>
-  /* Access Denied Modal */
-  .access-denied-modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 11000;
-    text-align: center;
-    padding: 20px;
-    opacity: 0;
-    animation: fadeIn 0.5s forwards;
-    flex-direction: column;
-  }
-
-  .access-denied-modal strong {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-
-  .access-denied-modal button {
-    margin-top: 15px;
-    padding: 10px 25px;
-    background: transparent;
-    color: white;
-    border: 2px solid white;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-  }
-
-  .access-denied-modal button:hover {
-    background: white;
-    color: black;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-</style>
-
-<a href="videos.html" class="back-btn">
+<a href="#" onclick="smartGoBack(); return false;" class="back-btn">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="white">
     <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
@@ -1045,10 +1040,6 @@ player.on("timeupdate", () => {
   if (cameFromAllowedPage) {
     sessionStorage.setItem('internalAccess', 'true');
     hasInternalAccess = true;
-  }
-
-  function goBack() {
-    window.history.back();
   }
 </script>
 
