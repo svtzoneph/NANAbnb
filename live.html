@@ -61,6 +61,9 @@
       --text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         
       --plyr-color-main: #ff0033; /* Red Accent */
+      --plyr-video-control-color: #ffffff;
+      --plyr-menu-background: rgba(20, 20, 20, 0.9);
+      --plyr-menu-color: #fff;
   }
 
   * { box-sizing: border-box; }
@@ -175,6 +178,7 @@
     background: #000;
     border-radius: 0px;
     overflow: hidden;
+    font-family: 'Segoe UI', sans-serif; /* Update Font */
   }
     
   video { width: 100%; }
@@ -206,14 +210,35 @@
   }
   .back-btn svg { display: block; }
 
-/* --- REALISTIC STREAMING CONTROLS (Center Time / Mute Right) --- */
+/* ==========================================================
+   --- UPGRADED PLAYER CONTROLS (PREMIUM LOOK) ---
+   ========================================================== */
+
+/* 1. Control Bar Gradient & Spacing */
 .plyr__controls {
-  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0) 100%) !important;
-  padding: 20px 15px !important;
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0) 100%) !important;
+  padding: 25px 20px 20px 20px !important; /* More breathing room */
   display: flex !important;
   align-items: center;
   position: relative; 
 }
+
+/* 2. Glowing Progress Bar */
+.plyr--full-ui input[type=range] {
+    color: var(--plyr-color-main) !important;
+}
+/* The "Thumb" (Dot) */
+.plyr__progress input[type="range"]::-webkit-slider-thumb {
+    box-shadow: 0 0 10px rgba(255, 0, 51, 0.6) !important; /* Red Glow */
+    transform: scale(1.2);
+}
+/* The Buffer Bar */
+.plyr__progress__buffer {
+    background: rgba(255, 255, 255, 0.3) !important;
+    backdrop-filter: blur(5px);
+}
+
+/* 3. Center Time Display (Preserved Layout) */
 .plyr__volume { margin-left: auto !important; }
 .plyr__time {
   position: absolute;
@@ -230,34 +255,90 @@
 .plyr__time--current { left: 50%; transform: translate(-100%, -50%); padding-right: 5px; }
 .plyr__time--duration { left: 50%; transform: translate(0, -50%); padding-left: 5px; }
 .plyr__time--duration::before { content: "/"; position: absolute; left: -4px; color: rgba(255,255,255,0.5); }
+
+/* 4. Refined Control Buttons */
 .plyr__control {
   background: transparent;
   border-radius: 8px !important;
-  transition: transform 0.2s ease, background 0.2s ease;
-  padding: 7px !important;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  padding: 8px !important;
 }
-.plyr__control:hover { background: rgba(255, 255, 255, 0.2) !important; transform: scale(1.15); }
-.plyr__control svg { filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); }
+.plyr__control:hover { 
+    background: rgba(255, 255, 255, 0.15) !important; 
+    transform: scale(1.1); 
+}
+/* Drop shadow for icons */
+.plyr__control svg { 
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.6)); 
+    width: 22px; 
+    height: 22px;
+}
+
+/* 5. Big Center Play Button (Overlay) */
 .plyr__control--overlaid {
   background: rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid rgba(255,255,255,0.4);
-  backdrop-filter: blur(8px);
-  width: 70px; height: 70px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  width: 80px; height: 80px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.plyr__control--overlaid svg {
+    width: 35px; height: 35px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 .plyr__control--overlaid:hover {
   background: var(--plyr-color-main) !important;
   border-color: var(--plyr-color-main);
   transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255, 0, 51, 0.5);
 }
+
+/* 6. Settings Menu (Glassmorphism Upgrade) */
+.plyr__menu__container {
+    background: rgba(25, 25, 25, 0.85) !important; /* Dark Glass */
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6) !important;
+    color: white !important;
+}
+.plyr__menu__container .plyr__control {
+    padding: 10px 15px !important; /* Bigger tap area */
+    font-size: 14px;
+}
+.plyr__menu__container .plyr__control:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+.plyr__menu__container .plyr__control--forward:after {
+    border-left-color: rgba(255,255,255,0.5) !important;
+}
+
+/* 7. Tooltips (Hover Time) */
+.plyr__tooltip {
+    background: rgba(0, 0, 0, 0.8) !important;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.2);
+    font-family: 'Roboto Mono', monospace;
+    font-size: 12px;
+    border-radius: 4px;
+    padding: 5px 8px;
+    margin-bottom: 10px;
+}
+
+/* Captions */
 .plyr__captions {
   font-family: 'Segoe UI', sans-serif;
   font-size: 18px;
   font-weight: 600;
   text-shadow: 0 0 4px black, 0 0 8px black;
-  padding-bottom: 60px !important; 
+  padding-bottom: 70px !important; 
 }
 .plyr__caption { background: transparent !important; }
+
+/* ========================================================== */
 
   /* --- GLASSMORPHISM SEEK OVERLAY --- */
   .seek-overlay {
@@ -327,19 +408,9 @@
       /* Default cursor for the card itself */
       cursor: default;
   }
-
-  .playlist-item:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      border-color: rgba(255, 255, 255, 0.3);
-      background: rgba(45, 45, 45, 0.8);
-  }
-
-  .playlist-item.locked {
-      opacity: 0.5;
-      filter: grayscale(1);
-      cursor: not-allowed;
-  }
+  
+  /* --- HOVER REMOVED HERE --- */
+  /* The .playlist-item:hover block has been deleted as requested */
 
   /* --- TEXT STYLES (Matches Screenshot) --- */
    
@@ -382,7 +453,7 @@
       font-size: 16px;
       font-weight: 700;
       color: #fff; 
-      margin-bottom: 25px; /* Space before button */
+      margin-bottom: 10px; /* Reduced to make room for badge */
       text-transform: uppercase;
       text-shadow: 0 1px 2px rgba(0,0,0,0.8);
       opacity: 0.9;
@@ -405,12 +476,30 @@
       cursor: pointer;
   }
 
-  /* Button turns RED on hover */
-  .playlist-item:hover .watch-btn {
+  /* Button turns RED ONLY when hovering the BUTTON (Directly) */
+  .watch-btn:hover {
       background: var(--plyr-color-main); /* Your Red Color */
       border-color: var(--plyr-color-main);
       color: white;
       box-shadow: 0 0 15px rgba(255, 0, 51, 0.4);
+  }
+
+  /* --- LOCKED BUTTON STYLES (No Hover Effect) --- */
+  .watch-btn.btn-locked {
+      background: rgba(80, 80, 80, 0.4) !important;
+      border-color: rgba(120, 120, 120, 0.3) !important;
+      color: #777 !important;
+      cursor: not-allowed !important;
+      box-shadow: none !important;
+      transform: none !important;
+  }
+
+  /* Force NO RED on hover when locked */
+  .watch-btn.btn-locked:hover {
+      background: rgba(80, 80, 80, 0.4) !important;
+      border-color: rgba(120, 120, 120, 0.3) !important;
+      color: #777 !important;
+      box-shadow: none !important;
   }
    
   /* ========================================================================= */
@@ -598,6 +687,36 @@
     100% { transform: scale(0.95); opacity: 0.7; }
   }
 
+  /* --- NEW: VERIFICATION INDICATOR BADGE --- */
+  .verification-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 15px; /* Spacing: Below Time, Above Button */
+      padding: 5px 12px;
+      border-radius: 50px;
+      display: inline-block;
+      text-transform: uppercase;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+  }
+
+  /* Green Style for Verified Access */
+  .badge-verified {
+      color: #00ff88;
+      background: rgba(0, 255, 136, 0.15);
+      border: 1px solid rgba(0, 255, 136, 0.4);
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.1);
+  }
+
+  /* Red Style for No Access */
+  .badge-locked {
+      color: #ff4444;
+      background: rgba(255, 68, 68, 0.15);
+      border: 1px solid rgba(255, 68, 68, 0.4);
+  }
+
   @media (max-width: 600px) {
     #player-status-badge {
         /* Mobile adjustment for ID */
@@ -703,9 +822,10 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth(); 
 const db = firebase.database();
 
-// --- 1. CONFIGURATION & DATA (UPDATED FOR FIREBASE CONTROL PANEL) ---
+// --- 1. CONFIGURATION & DATA ---
 window.playlistData = []; // Global Storage for loaded data
 let initialLoadComplete = false;
+let globalUserAccess = false; // NEW: Tracks if user is verified
 
 const playlistContainer = document.getElementById('playlist-items');
 const posterContainer = document.getElementById('poster-container');
@@ -718,58 +838,69 @@ const overlayTitle = document.getElementById('player-overlay-title');
 const bufferingOverlay = document.getElementById('buffering-overlay');
 const viewsDisplay = document.getElementById('views-display');
 const viewCountText = document.getElementById('view-count-text');
-const dateDisplayText = document.getElementById('current-date-text'); // Global Date Ref
+const dateDisplayText = document.getElementById('current-date-text');
 
 let currentViewListenerRef = null;
-let currentPresenceRef = null; // New for Presence
-
-// Global variable to store current ep data
+let currentPresenceRef = null;
 window.currentEpData = null;
 
+// Helper to determine lock status
+function isEventTimeLocked(ep) {
+    if (ep.status === "LOCKED") return true;
+    
+    const today = new Date();
+    if (ep.date) {
+        let cleanTime = ep.time ? ep.time.trim() : "";
+        // Auto-fix time format if space is missing (e.g. "6:25PM" -> "6:25 PM")
+        if (cleanTime && !cleanTime.includes(" ") && (cleanTime.toUpperCase().includes("AM") || cleanTime.toUpperCase().includes("PM"))) {
+            cleanTime = cleanTime.replace("AM", " AM").replace("PM", " PM");
+        }
+
+        let dateTimeString = ep.date;
+        if (cleanTime) {
+            dateTimeString += " " + cleanTime;
+        }
+        
+        let eventDateObj = new Date(dateTimeString);
+        
+        if (!isNaN(eventDateObj.getTime())) {
+            // If Event is in Future, it IS locked
+            return eventDateObj > today;
+        } else {
+            // Fallback: Check just the date
+            let justDate = new Date(ep.date);
+            let todayMidnight = new Date(); 
+            todayMidnight.setHours(0,0,0,0);
+            return justDate > todayMidnight;
+        }
+    }
+    return false;
+}
+
 // ==========================================================
-// --- NEW: FIREBASE PLAYLIST LISTENER (Control Panel) ---
+// --- CENTRALIZED PLAYLIST RENDERER ---
 // ==========================================================
-db.ref('event_playlist').on('value', (snapshot) => {
-    // 1. Clear current list
+function renderPlaylist() {
     playlistContainer.innerHTML = '';
     
-    const data = snapshot.val();
-    // Convert object to array and sort by ID
-    const playlistArray = data ? Object.values(data).sort((a, b) => a.id - b.id) : [];
-    
-    // Update global data
-    window.playlistData = playlistArray; 
-
-    // --- AUTO UPDATE POSTER (NEW FEATURE) ---
-    // If we have data, set the main poster to the first item's image
-    // (This ensures when page loads, you see the thumbnail of the first video)
-    if(playlistArray.length > 0) {
-       const firstEp = playlistArray[0];
+    if(window.playlistData.length > 0 && !window.currentEpData) {
+       const firstEp = window.playlistData[0];
        if(firstEp.image) {
            document.getElementById('poster-container').style.backgroundImage = `url('${firstEp.image}')`;
        }
     }
 
-    if(playlistArray.length === 0) {
+    if(window.playlistData.length === 0) {
         playlistContainer.innerHTML = '<div style="color:white; text-align:center; padding:20px;">No events scheduled.</div>';
+        return;
     }
 
-    // 2. Build the UI
-    playlistArray.forEach(ep => {
-      // Create Card Container
+    window.playlistData.forEach(ep => {
       const epDiv = document.createElement('div');
       epDiv.className = 'playlist-item';
        
-      const today = new Date();
-      let isLocked = false;
-      
-      // LOGIC: Check Date OR Explicit "LOCKED" status
-      if (ep.date && new Date(ep.date) > today) isLocked = true;
-      if (ep.status === "LOCKED") isLocked = true;
-
-      if (isLocked) {
-          epDiv.classList.add('locked');
-      }
+      // Calculate Lock State initially
+      let isLocked = isEventTimeLocked(ep);
 
       // Top Status
       const topText = document.createElement('div');
@@ -791,39 +922,62 @@ db.ref('event_playlist').on('value', (snapshot) => {
       timeText.className = 'card-time';
       timeText.textContent = ep.time ? ep.time : ""; 
 
+      // --- VERIFICATION BADGE ---
+      const verifyBadge = document.createElement('div');
+      if (globalUserAccess) {
+          verifyBadge.textContent = "✓ ACCOUNT VERIFIED";
+          verifyBadge.className = 'verification-badge badge-verified';
+      } else {
+          verifyBadge.textContent = "AUTH REQUIRED"; 
+          verifyBadge.className = 'verification-badge badge-locked';
+      }
+
       // "WATCH NOW" Button
       const btn = document.createElement('div');
       btn.className = 'watch-btn';
+      // IMPORTANT: Add ID so we can find it for auto-updates
+      btn.dataset.id = ep.id; 
       
-      if (isLocked) {
-          btn.textContent = "LOCKED";
+      // BUTTON INITIAL STATE
+      if (!globalUserAccess) {
+          btn.textContent = "LOCKED"; 
+          btn.classList.add('btn-locked'); 
+      } else if (isLocked) {
+          btn.textContent = "LOCKED"; 
+          btn.classList.add('btn-locked'); 
       } else {
           btn.textContent = "WATCH NOW";
       }
 
-      // Append elements
       epDiv.appendChild(topText);
       epDiv.appendChild(titleText); 
       epDiv.appendChild(dateText);
       epDiv.appendChild(timeText);
+      epDiv.appendChild(verifyBadge); 
       epDiv.appendChild(btn);
 
-      // --- UPDATED: CLICK EVENT IS NOW ON THE BUTTON ONLY ---
+      // --- CLICK EVENT ---
       btn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevents clicks from affecting parent elements if needed
+        e.stopPropagation();
+
+        if (!globalUserAccess) {
+            alert("ACCESS DENIED: Your account is not verified for this page.");
+            return;
+        }
 
         if (ep.status === "NOT AVAILABLE") {
             alert("This episode is currently unavailable.");
             return;
         }
-        if (isLocked) {
-            alert(`This event starts on: ${ep.date}`);
+        
+        // RE-CHECK TIME ON CLICK (Don't rely on old variable)
+        if (isEventTimeLocked(ep)) {
+            alert(`This event starts on: ${ep.date} at ${ep.time}`);
             return;
         }
         
         loadAndPlayEpisode(ep.id, true);
         
-        // Auto-scroll to player on mobile
         if(window.innerWidth < 900) {
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
@@ -831,8 +985,43 @@ db.ref('event_playlist').on('value', (snapshot) => {
 
       playlistContainer.appendChild(epDiv);
     });
+}
 
-    // --- CHECK FOR AUTO-PLAY LINK ONCE DATA IS LOADED ---
+// ==========================================================
+// --- NEW: AUTO-UNLOCK TIMER (Every 1 Second) ---
+// ==========================================================
+setInterval(() => {
+    // Only run if user has access privileges
+    if (!globalUserAccess) return;
+
+    window.playlistData.forEach(ep => {
+        const btn = document.querySelector(`.watch-btn[data-id="${ep.id}"]`);
+        if (btn) {
+            const currentlyLocked = btn.classList.contains('btn-locked');
+            const shouldBeLocked = isEventTimeLocked(ep);
+
+            // If it IS currently locked, but SHOULD be unlocked -> UPDATE IT
+            if (currentlyLocked && !shouldBeLocked) {
+                console.log(`Auto-unlocking Event ID: ${ep.id}`);
+                btn.textContent = "WATCH NOW";
+                btn.classList.remove('btn-locked');
+            }
+            // Optional: If it is unlocked, but time reverted (unlikely) -> lock it
+            else if (!currentlyLocked && shouldBeLocked) {
+                btn.textContent = "LOCKED";
+                btn.classList.add('btn-locked');
+            }
+        }
+    });
+}, 1000); // Check every 1000ms (1 second)
+
+// ==========================================================
+// --- FIREBASE DATA LISTENER ---
+// ==========================================================
+db.ref('event_playlist').on('value', (snapshot) => {
+    const data = snapshot.val();
+    window.playlistData = data ? Object.values(data).sort((a, b) => a.id - b.id) : [];
+    renderPlaylist(); 
     if (!initialLoadComplete) {
         checkAutoPlay();
         initialLoadComplete = true;
@@ -843,7 +1032,7 @@ db.ref('event_playlist').on('value', (snapshot) => {
 // !!! 🚨 START OF PAGE-LEVEL SECURITY SCRIPT (REAL-TIME) 🚨 !!!
 // =========================================================================
 
-const PAGE_ID = "jpnnewtour"; 
+const PAGE_ID = "fukuokanewtour"; 
 
 // --- SMART GO BACK FUNCTION (Centralized) ---
 function smartGoBack() {
@@ -854,13 +1043,11 @@ function smartGoBack() {
     }
 }
 
-// Function to show the denial screen
 function showAccessDeniedModal(message) {
     if(typeof player !== 'undefined') {
         player.pause();
         if(player.fullscreen.active) player.fullscreen.exit();
     }
-
     document.body.style.overflow = 'hidden';
 
     if(document.querySelector('.access-denied-modal')) return;
@@ -885,7 +1072,6 @@ function showAccessDeniedModal(message) {
     document.body.appendChild(modal);
 }
 
-// Function to remove modal (if access is given back in real-time)
 function removeAccessDeniedModal() {
     const modal = document.querySelector('.access-denied-modal');
     if(modal) {
@@ -897,6 +1083,8 @@ function removeAccessDeniedModal() {
 // Check on page load AND listen for changes
 auth.onAuthStateChanged(user => {
     if (!user) {
+        globalUserAccess = false;
+        renderPlaylist(); // Update UI to Locked
         showAccessDeniedModal("You must be logged in to view this content.");
         return;
     }
@@ -908,19 +1096,19 @@ auth.onAuthStateChanged(user => {
         playerBadge.classList.add('status-uid');
     }
 
-    // --- REALTIME LISTENER (.on instead of .once) ---
+    // --- REALTIME LISTENER ---
     const accessRef = db.ref(`page_access/${PAGE_ID}/${user.uid}`);
       
     accessRef.on('value', (snapshot) => {
         const isAllowed = snapshot.val();
         
-        // If value is TRUE, they are allowed.
         if (isAllowed === true) {
             console.log("Access Granted/Verified for:", user.uid);
-            removeAccessDeniedModal(); // Unblock if they were blocked
+            globalUserAccess = true; // Update Global State
+            removeAccessDeniedModal();
         } else {
-            // Immediate Block
             console.warn("Access Revoked in Realtime");
+            globalUserAccess = false; // Update Global State
             showAccessDeniedModal(
                 "<span style='color: red; font-weight: bold;'>You have violated Admin rules.</span><br>" +
                 "Your access to this stream has been revoked.<br><br>" +
@@ -928,6 +1116,9 @@ auth.onAuthStateChanged(user => {
                 "Your UID: <small>" + user.uid + "</small>"
             );
         }
+        
+        // !!! IMPORTANT: RE-RENDER CARDS TO UPDATE BADGES !!!
+        renderPlaylist(); 
     });
 });
 // =========================================================================
@@ -942,7 +1133,7 @@ const player = new Plyr(video, {
   captions: { active: true, update: true, language: "en" },
   controls: [
     'play-large',   
-    'play',         
+    'play',           
     'mute',
     'fullscreen'
   ],
@@ -988,15 +1179,10 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
         return;
     }
 
-    const today = new Date();
-    // Allow playing if it's Live or Replay even if date is passed, 
-    // but block future dates if status is NOT live
-    if (ep.date && ep.status !== 'LIVE' && ep.status !== 'REPLAY') {
-        const releaseDate = new Date(ep.date);
-        if (releaseDate > today) {
-            alert(`\nLIVE STREAM DATE: ${ep.date}`);
-            return; 
-        }
+    // --- TIME CHECK BEFORE PLAYING ---
+    if (isEventTimeLocked(ep)) {
+        alert(`\nLIVE STREAM DATE: ${ep.date} at ${ep.time}`);
+        return; 
     }
 
     if (updateUrl) {
