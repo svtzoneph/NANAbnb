@@ -91,6 +91,7 @@
     aspect-ratio: 16/9;
     background-size: cover;
     background-position: center;
+    /* Default Fallback */
     background-image: url('https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/jpntour.png'); 
     border-radius: 0px;
     display: flex;
@@ -323,7 +324,8 @@
       min-height: 240px; /* Increased height to fit Title & Time */
       text-align: center;
       position: relative;
-      cursor: pointer;
+      /* Default cursor for the card itself */
+      cursor: default;
   }
 
   .playlist-item:hover {
@@ -340,7 +342,7 @@
   }
 
   /* --- TEXT STYLES (Matches Screenshot) --- */
-  
+   
   /* 1. Top Status (Small, Uppercase) */
   .card-top-text {
       font-size: 13px;
@@ -399,6 +401,8 @@
       letter-spacing: 1px;
       border-radius: 6px;
       transition: all 0.2s ease;
+      /* Ensure pointer is on the button */
+      cursor: pointer;
   }
 
   /* Button turns RED on hover */
@@ -408,7 +412,7 @@
       color: white;
       box-shadow: 0 0 15px rgba(255, 0, 51, 0.4);
   }
-  
+   
   /* ========================================================================= */
 
   /* --- STATUS BADGE DESIGNS (Still used for internal logic) --- */
@@ -678,31 +682,30 @@
   <div id="playlist" style="width: 100%; max-width: 1000px; margin: 20px auto; text-align: left;">
     
     <div id="playlist-items">
+      <div style="text-align:center; color:white; padding:20px;">Loading Event Data...</div>
     </div>
   </div>
 
 </div> 
 
 <script>
-// --- 1. CONFIGURATION & DATA (UPDATED WITH TIME) ---
-const playlistData = [
-  { 
-    id: "1", 
-    title: "DAY 1 - SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Fukuoko Show", 
-    date: "December 21, 2025",
-    time: "5:30 PM KST",
-    status: "",
-    image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/jpntour.png",
-  },
-    { 
-    id: "2", 
-    title: "DAY 2 - SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Fukuoko Show", 
-    date: "December 22, 2025 ",
-    time: "5:30 PM KST",
-    status: "",
-    image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/end.jpg",
-  }
-];
+// --- INITIALIZE FIREBASE FIRST ---
+const firebaseConfig = {
+  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+  authDomain: "tvnstream-b4497.firebaseapp.com",
+  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+  projectId: "tvnstream-b4497",
+  storageBucket: "tvnstream-b4497.appspot.com",
+  messagingSenderId: "308384754214",
+  appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth(); 
+const db = firebase.database();
+
+// --- 1. CONFIGURATION & DATA (UPDATED FOR FIREBASE CONTROL PANEL) ---
+window.playlistData = []; // Global Storage for loaded data
+let initialLoadComplete = false;
 
 const playlistContainer = document.getElementById('playlist-items');
 const posterContainer = document.getElementById('poster-container');
@@ -722,21 +725,119 @@ let currentPresenceRef = null; // New for Presence
 
 // Global variable to store current ep data
 window.currentEpData = null;
-</script>
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-  authDomain: "tvnstream-b4497.firebaseapp.com",
-  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-  projectId: "tvnstream-b4497",
-  storageBucket: "tvnstream-b4497.appspot.com",
-  messagingSenderId: "308384754214",
-  appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth(); 
-const db = firebase.database();
+// ==========================================================
+// --- NEW: FIREBASE PLAYLIST LISTENER (Control Panel) ---
+// ==========================================================
+db.ref('event_playlist').on('value', (snapshot) => {
+    // 1. Clear current list
+    playlistContainer.innerHTML = '';
+    
+    const data = snapshot.val();
+    // Convert object to array and sort by ID
+    const playlistArray = data ? Object.values(data).sort((a, b) => a.id - b.id) : [];
+    
+    // Update global data
+    window.playlistData = playlistArray; 
+
+    // --- AUTO UPDATE POSTER (NEW FEATURE) ---
+    // If we have data, set the main poster to the first item's image
+    // (This ensures when page loads, you see the thumbnail of the first video)
+    if(playlistArray.length > 0) {
+       const firstEp = playlistArray[0];
+       if(firstEp.image) {
+           document.getElementById('poster-container').style.backgroundImage = `url('${firstEp.image}')`;
+       }
+    }
+
+    if(playlistArray.length === 0) {
+        playlistContainer.innerHTML = '<div style="color:white; text-align:center; padding:20px;">No events scheduled.</div>';
+    }
+
+    // 2. Build the UI
+    playlistArray.forEach(ep => {
+      // Create Card Container
+      const epDiv = document.createElement('div');
+      epDiv.className = 'playlist-item';
+       
+      const today = new Date();
+      let isLocked = false;
+      
+      // LOGIC: Check Date OR Explicit "LOCKED" status
+      if (ep.date && new Date(ep.date) > today) isLocked = true;
+      if (ep.status === "LOCKED") isLocked = true;
+
+      if (isLocked) {
+          epDiv.classList.add('locked');
+      }
+
+      // Top Status
+      const topText = document.createElement('div');
+      topText.className = 'card-top-text';
+      topText.textContent = ep.status ? ep.status : ""; 
+
+      // Title
+      const titleText = document.createElement('div');
+      titleText.className = 'card-title-text';
+      titleText.textContent = ep.title;
+
+      // Middle Date
+      const dateText = document.createElement('div');
+      dateText.className = 'card-main-date';
+      dateText.textContent = ep.date ? ep.date : "STREAMING NOW";
+
+      // Time Text
+      const timeText = document.createElement('div');
+      timeText.className = 'card-time';
+      timeText.textContent = ep.time ? ep.time : ""; 
+
+      // "WATCH NOW" Button
+      const btn = document.createElement('div');
+      btn.className = 'watch-btn';
+      
+      if (isLocked) {
+          btn.textContent = "LOCKED";
+      } else {
+          btn.textContent = "WATCH NOW";
+      }
+
+      // Append elements
+      epDiv.appendChild(topText);
+      epDiv.appendChild(titleText); 
+      epDiv.appendChild(dateText);
+      epDiv.appendChild(timeText);
+      epDiv.appendChild(btn);
+
+      // --- UPDATED: CLICK EVENT IS NOW ON THE BUTTON ONLY ---
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevents clicks from affecting parent elements if needed
+
+        if (ep.status === "NOT AVAILABLE") {
+            alert("This episode is currently unavailable.");
+            return;
+        }
+        if (isLocked) {
+            alert(`This event starts on: ${ep.date}`);
+            return;
+        }
+        
+        loadAndPlayEpisode(ep.id, true);
+        
+        // Auto-scroll to player on mobile
+        if(window.innerWidth < 900) {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+      });
+
+      playlistContainer.appendChild(epDiv);
+    });
+
+    // --- CHECK FOR AUTO-PLAY LINK ONCE DATA IS LOADED ---
+    if (!initialLoadComplete) {
+        checkAutoPlay();
+        initialLoadComplete = true;
+    }
+});
 
 // =========================================================================
 // !!! 🚨 START OF PAGE-LEVEL SECURITY SCRIPT (REAL-TIME) 🚨 !!!
@@ -879,7 +980,8 @@ function updatePlayerLiveBadge(status) {
 
 // --- 2. CORE FUNCTION: PLAY EPISODE ---
 function loadAndPlayEpisode(epId, updateUrl = true) {
-    const ep = playlistData.find(item => item.id === epId);
+    // USE GLOBAL DATA NOW
+    const ep = window.playlistData.find(item => item.id === epId);
     
     if (!ep) {
         console.warn("Episode ID not found:", epId);
@@ -887,7 +989,9 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
     }
 
     const today = new Date();
-    if (ep.date) {
+    // Allow playing if it's Live or Replay even if date is passed, 
+    // but block future dates if status is NOT live
+    if (ep.date && ep.status !== 'LIVE' && ep.status !== 'REPLAY') {
         const releaseDate = new Date(ep.date);
         if (releaseDate > today) {
             alert(`\nLIVE STREAM DATE: ${ep.date}`);
@@ -907,6 +1011,14 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
     // D. Set Data & UI
     window.currentEpData = ep;
     
+    // --- UPDATED POSTER LOGIC ---
+    // Change the poster immediately based on the selected episode
+    if(ep.image) {
+        document.getElementById('poster-container').style.backgroundImage = `url('${ep.image}')`;
+        // Also update Plyr poster just in case
+        player.poster = ep.image;
+    }
+
     // Update Overlay Title
     if(overlayTitle) {
         overlayTitle.textContent = ep.title;
@@ -1055,86 +1167,8 @@ window.addEventListener('popstate', (event) => {
     }
 });
 
-// --- 4. GENERATE PLAYLIST UI (FIXED: SPLIT STATUS AND TITLE) ---
-playlistData.forEach(ep => {
-  // 1. Create Card Container
-  const epDiv = document.createElement('div');
-  epDiv.className = 'playlist-item';
-   
-  const today = new Date();
-  let isLocked = false;
-  if (ep.date) {
-      const releaseDate = new Date(ep.date);
-      if (releaseDate > today) isLocked = true;
-  }
-
-  if (isLocked) {
-      epDiv.classList.add('locked');
-  }
-
-  // 2. Top Status (Only shows if Status exists)
-  // e.g., "LIVE"
-  const topText = document.createElement('div');
-  topText.className = 'card-top-text';
-  topText.textContent = ep.status ? ep.status : ""; 
-
-  // 3. Title (Always shows below status)
-  // e.g., "DAY 1 - SEVENTEEN..."
-  const titleText = document.createElement('div');
-  titleText.className = 'card-title-text';
-  titleText.textContent = ep.title;
-
-  // 4. Middle Date
-  const dateText = document.createElement('div');
-  dateText.className = 'card-main-date';
-  dateText.textContent = ep.date ? ep.date : "STREAMING NOW";
-
-  // 5. Time Text
-  const timeText = document.createElement('div');
-  timeText.className = 'card-time';
-  timeText.textContent = ep.time ? ep.time : ""; 
-
-  // 6. "WATCH NOW" Button
-  const btn = document.createElement('div');
-  btn.className = 'watch-btn';
-  
-  if (isLocked) {
-      btn.textContent = "LOCKED";
-  } else {
-      btn.textContent = "WATCH NOW";
-  }
-
-  // 7. Append elements to Card (Order: Status -> Title -> Date -> Time -> Button)
-  epDiv.appendChild(topText);
-  epDiv.appendChild(titleText); // Added separate title here
-  epDiv.appendChild(dateText);
-  epDiv.appendChild(timeText);
-  epDiv.appendChild(btn);
-
-  // 8. Click Event
-  epDiv.addEventListener('click', () => {
-    if (ep.status === "NOT AVAILABLE") {
-        alert("This episode is currently unavailable.");
-        return;
-    }
-    if (isLocked) {
-        alert(`This event starts on: ${ep.date}`);
-        return;
-    }
-    
-    loadAndPlayEpisode(ep.id, true);
-    
-    // Auto-scroll to player on mobile
-    if(window.innerWidth < 900) {
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    }
-  });
-
-  playlistContainer.appendChild(epDiv);
-});
-
-// --- 5. CHECK URL ON PAGE LOAD ---
-window.addEventListener('DOMContentLoaded', () => {
+// --- 5. CHECK URL ON PAGE LOAD (Moved to Logic function) ---
+function checkAutoPlay() {
     auth.onAuthStateChanged(user => {
         if(user) {
             const urlParams = new URLSearchParams(window.location.search);
@@ -1161,15 +1195,15 @@ window.addEventListener('DOMContentLoaded', () => {
             }
             
             // --- VIDEO PLAYING LOGIC ---
-            if (videoParam) {
+            if (videoParam && window.playlistData.length > 0) {
                 // Find the episode where the formatted title matches the URL
-                const foundEp = playlistData.find(item => {
+                const foundEp = window.playlistData.find(item => {
                     const itemSlug = encodeURIComponent(item.title.trim().replace(/\s+/g, '-'));
                     return itemSlug === videoParam;
                 });
 
                 // Fallback: Check ID just in case old links are used
-                const foundEpById = playlistData.find(item => item.id === videoParam);
+                const foundEpById = window.playlistData.find(item => item.id === videoParam);
 
                 const targetEp = foundEp || foundEpById;
 
@@ -1184,7 +1218,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-});
+}
 
 const isMobileOrTablet = /Mobi|Android|iPad|Tablet/i.test(navigator.userAgent);
 
