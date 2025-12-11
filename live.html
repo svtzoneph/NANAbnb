@@ -1110,10 +1110,10 @@ auth.onAuthStateChanged(user => {
             console.warn("Access Revoked in Realtime");
             globalUserAccess = false; // Update Global State
             showAccessDeniedModal(
-                "<span style='color: red; font-weight: bold;'>You have violated Admin rules.</span><br>" +
-                "Your access to this stream has been revoked.<br><br>" +
-                "Please message us if you are sure this is an error.<br>" +
-                "Your UID: <small>" + user.uid + "</small>"
+"<span style='color: red; font-weight: bold;'>Access Denied</span><br>" +
+"You do not have permission to view this Live.<br><br>" +
+"Please contact the admin if you believe this is a mistake.<br>" +
+"Your UID: <small>" + user.uid + "</small>"
             );
         }
         
