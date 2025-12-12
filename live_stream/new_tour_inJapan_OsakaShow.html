@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>VIDEOS</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Live | Zone Vault</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> 
@@ -64,12 +64,20 @@
 
   * { box-sizing: border-box; }
 
+  /* UPDATED: Reset margins */
+  html, body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
   body {
     font-family: 'Segoe UI', Arial, sans-serif;
     background: black; /* Fallback */
     text-align: center;
-    padding: 20px 0px;
-    margin: 0;
+    padding-top: 20px; 
+    padding-bottom: 20px;
     transition: background 0.5s ease;
   }
 
@@ -148,15 +156,11 @@
     text-shadow: var(--text-shadow);
   }
 
-  /* --- MOBILE PORTRAIT (Standard) --- */
+  /* --- MOBILE PORTRAIT (Standard View) --- */
   @media (max-width: 768px) {
     /* Keep padding in portrait so it doesn't touch edges */
-    body {
-        padding: 10px 0 !important;
-    }
-    .main-layout {
-        padding: 0 15px !important;
-    }
+    body { padding: 10px 0 !important; }
+    .main-layout { padding: 0 15px !important; }
     
     h2 { font-size: 18px; }
     h3.playlist-header { 
@@ -170,64 +174,54 @@
         border-radius: 35px;
         border-width: 1px;
     }
+    .center-logo { margin-top: 15px; }
     .center-logo img { width: 40px; }
   }
 
-  /* --- 🚀 MOBILE LANDSCAPE ONLY (FULL SCREEN / YOUTUBE STYLE) --- */
+  /* --- 🚀 MOBILE LANDSCAPE ONLY (TRUE FULLSCREEN FIX) --- */
   @media screen and (max-width: 915px) and (orientation: landscape) {
-    /* 1. Remove all body padding */
-    body {
-        padding: 0 !important;
+    /* 1. Force Video Container to be Fixed Position (On Top of Everything) */
+    #player-container, #poster-container {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 9999 !important; /* Highest priority */
+        background: black !important;
         margin: 0 !important;
-        background: black !important; /* Ensure background matches video */
-    }
-
-    /* 2. Remove layout padding to allow full width */
-    .main-layout {
-        padding: 0 !important;
-        margin: 0 !important;
-        max-width: none !important;
-        width: 100% !important;
-    }
-
-    /* 3. Force Video Container to be Full Width (Edge-to-Edge) */
-    .video-wrapper-left {
-        width: 100% !important;
-        margin: 0 !important;
-    }
-
-    #poster-container, 
-    #player-container, 
-    .plyr {
-        width: 100% !important;
-        max-width: none !important;
         border-radius: 0 !important;
         border: none !important;
-        box-shadow: none !important;
-        /* Optional: Force height to viewport if you want strict fullscreen */
-        /* height: 100vh !important; */ 
     }
 
-    /* 4. Hide Header in Landscape to maximize space (Like YouTube App) */
-    .mobile-header {
-        display: none !important;
-    }
-
-    /* 5. Add Padding BACK to the text content below video so it's not hidden */
-    #views-display, 
-    #main-title, 
-    #playlist,
-    .center-logo {
-        padding-left: 20px !important;
-        padding-right: 20px !important;
-        /* Safe area for notched phones */
-        padding-left: max(20px, env(safe-area-inset-left)) !important;
-        padding-right: max(20px, env(safe-area-inset-right)) !important;
+    /* 2. Make the Plyr Element fill that fixed container */
+    .plyr {
+        width: 100% !important;
+        height: 100% !important;
     }
     
-    /* Hide top logo in landscape to focus on video */
-    .center-logo {
+    /* 3. Ensure the video element itself stretches */
+    video {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+    }
+
+    /* 4. Hide Header & Logo to clear view */
+    .mobile-header, .center-logo {
         display: none !important;
+    }
+
+    /* 5. Push the rest of the content down so it doesn't hide behind the video (if user scrolls) */
+    /* Note: Since video is fixed, content is behind it. We add padding to text elements just in case user exits fullscreen via gesture but keeps landscape */
+    .video-wrapper-left {
+        height: 100vh; /* Placeholder height */
+    }
+    
+    #views-display, 
+    #main-title, 
+    #playlist {
+        display: none !important; /* Optional: Hide details in landscape to mimic pure cinema mode */
     }
   }
 
@@ -535,7 +529,7 @@
   #player-status-badge.status-uid {
     position: absolute;
     top: auto !important;
-    bottom: 40px !important;
+    bottom: 15px !important;
     left: 15px !important;
     z-index: 1 !important;
     display: none;
@@ -670,7 +664,7 @@
   @media (max-width: 600px) {
     #player-status-badge.status-uid {
         font-size: 9px !important;
-        bottom: 30px !important; /* Low on mobile too */
+        bottom: 15px !important; /* Low on mobile too */
         left: 10px !important;
     }
     .player-overlay-title {
@@ -765,7 +759,7 @@ const playlistData = [
     id: "1", 
     title: "DAY 1 - SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Osaka Show", 
     status: "live", 
-    date: "December 12, 2025 9:11 AM", // Example: Future time to test auto-unlock
+    date: "December 12, 2025 9:00 AM", // Example: Future time to test auto-unlock
     image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png",
   },
   { 
