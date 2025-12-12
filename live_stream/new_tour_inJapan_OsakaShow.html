@@ -161,7 +161,7 @@
     /* Keep padding in portrait so it doesn't touch edges */
     body { padding: 10px 0 !important; }
     .main-layout { padding: 0 15px !important; }
-    
+     
     h2 { font-size: 18px; }
     h3.playlist-header { 
         font-size: 16px; 
@@ -199,7 +199,7 @@
         width: 100% !important;
         height: 100% !important;
     }
-    
+     
     /* 3. Ensure the video element itself stretches */
     video {
         width: 100% !important;
@@ -217,7 +217,7 @@
     .video-wrapper-left {
         height: 100vh; /* Placeholder height */
     }
-    
+     
     #views-display, 
     #main-title, 
     #playlist {
@@ -235,7 +235,7 @@
     border-radius: 0px;
     overflow: hidden;
   }
-    
+     
   video { width: 100%; }
 
   /* --- GLASSMORPHISM BACK BUTTON (Hyper) --- */
@@ -381,7 +381,7 @@
     fill: white;
     display: block;
   }
-    
+     
   /* Scrollbar Styling */
   #playlist-items::-webkit-scrollbar { width: 8px; }
   #playlist-items::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }
@@ -476,11 +476,18 @@
       color: #4db8ff; 
       border: 1px solid rgba(77, 184, 255, 0.3);
   }
-  
+   
   .ticket-status.denied { 
       background: rgba(255, 68, 68, 0.15);
       color: #ff4444; 
       border: 1px solid rgba(255, 68, 68, 0.3);
+  }
+
+  /* --- NEW: ENDED BADGE STYLE --- */
+  .ticket-status.ended-badge {
+      background: rgba(100, 100, 100, 0.15);
+      color: #888;
+      border: 1px solid rgba(100, 100, 100, 0.3);
   }
 
   .enter-btn {
@@ -511,6 +518,16 @@
       transform: scale(1.05);
   }
 
+  /* --- NEW: FINISHED EVENT BUTTON STYLE --- */
+  .enter-btn.ended {
+    background: #1a1a1a !important;
+    color: #444 !important;
+    border: 1px solid #333 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
   /* --- STATUS BADGE DESIGNS --- */
   .status-badge {
     font-size: 10px;
@@ -525,7 +542,7 @@
     -webkit-backdrop-filter: blur(4px);
     transition: all 0.3s ease;
   }
-  
+   
   #player-status-badge.status-uid {
     position: absolute;
     top: auto !important;
@@ -690,14 +707,14 @@
       text-align: left;
     }
     .video-wrapper-left { width: 100%; max-width: 1100px; margin: 0 auto; }
-    
+     
     #playlist { 
         width: 100%; 
         max-width: 1100px; 
         margin: 20px auto !important; 
         text-align: left;
     }
-    
+     
     h3.playlist-header { margin-top: 0 !important; line-height: 1; }
     #playlist-items { 
         max-height: 500px !important; 
@@ -718,7 +735,7 @@
 <div class="main-layout">
 
   <div class="video-wrapper-left">
-    
+     
     <div id="poster-container">
       <div id="poster-overlay">Select the Live to Watch</div>
     </div>
@@ -758,7 +775,7 @@ const playlistData = [
     { 
     id: "1", 
     title: "DAY 1 - SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Osaka Show", 
-    status: "live", 
+    status: "Live", 
     date: "December 12, 2025 9:00 AM", // Example: Future time to test auto-unlock
     image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png",
   },
@@ -938,7 +955,7 @@ const player = new Plyr(video, {
   captions: { active: true, update: true, language: "en" },
   controls: [
     'play-large',   
-    'play',          
+    'play',           
     'mute', // Will be pushed to right via CSS
     'fullscreen'
   ],
@@ -998,7 +1015,7 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
             const titleSlug = ep.title
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with dash
-                .replace(/(^-|-$)+/g, '');   // Remove leading/trailing dashes
+                .replace(/(^-|-$)+/g, '');    // Remove leading/trailing dashes
 
             // 2. Generate Timestamp
             const sessionTime = Date.now();
@@ -1144,7 +1161,7 @@ window.addEventListener('popstate', (event) => {
     }
 });
 
-// --- 4. NEW GENERATE PLAYLIST UI (GRID + VERIFICATION) ---
+// --- 4. NEW GENERATE PLAYLIST UI (UPDATED FOR ENDED STATUS) ---
 function renderPlaylist(isUserVerified) {
     playlistContainer.innerHTML = ''; // Clear existing items
 
@@ -1168,8 +1185,21 @@ function renderPlaylist(isUserVerified) {
         let buttonText = 'LOCKED';
         let buttonDisabled = true;
 
-        if (isUserVerified) {
-            // User Has Access
+        // CHECK 1: IS EVENT ENDED? (Priority Check)
+        const isEnded = ep.status && (ep.status.toLowerCase() === 'ended' || ep.status.toLowerCase() === 'done');
+
+        if (isEnded) {
+            // Status: ENDED (Overrides everything else)
+            badgeHtml = `
+                <div class="ticket-status ended-badge">
+                    EVENT ENDED
+                </div>`;
+            buttonText = 'ENDED';
+            buttonClass += ' ended'; // Adds dark style
+            buttonDisabled = true;
+
+        } else if (isUserVerified) {
+            // Status: VERIFIED & ACTIVE
             badgeHtml = `
                 <div class="ticket-status verified">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
@@ -1181,12 +1211,12 @@ function renderPlaylist(isUserVerified) {
                 buttonText = 'ENTER';
                 buttonDisabled = false;
             } else {
-                // Add specific class for time-sensitive buttons
                 buttonClass += ' time-locked';
                 buttonText = 'WAITING'; // Verified but too early
             }
+
         } else {
-            // User Has NO Access
+            // Status: ACCESS DENIED
             badgeHtml = `
                 <div class="ticket-status denied">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
@@ -1195,7 +1225,7 @@ function renderPlaylist(isUserVerified) {
             buttonText = 'NO ACCESS';
         }
 
-        // --- PARSE DATE FOR DISPLAY (Splitting Date and Time) ---
+        // --- PARSE DATE FOR DISPLAY ---
         let displayDate = "COMING SOON";
         let displayTime = "";
         
@@ -1229,19 +1259,25 @@ function renderPlaylist(isUserVerified) {
                     data-unlock-time="${ep.date}"
                     data-id="${ep.id}"
                     data-verified="${isUserVerified}"
-                    ${buttonDisabled && !isUserVerified ? 'disabled' : ''} 
+                    data-ended="${isEnded}"
+                    ${buttonDisabled ? 'disabled' : ''} 
                 >${buttonText}</button>
             </div>
         `;
 
-        // Click Event (Handles both states)
+        // Click Event
         const btn = card.querySelector('button');
         
         btn.addEventListener('click', (e) => {
             const isVerified = e.target.getAttribute('data-verified') === 'true';
+            const isEventEnded = e.target.getAttribute('data-ended') === 'true';
             const unlockTimeStr = e.target.getAttribute('data-unlock-time');
             const unlockTime = unlockTimeStr ? new Date(unlockTimeStr) : new Date();
             const now = new Date();
+
+            if (isEventEnded) {
+                return; // Do nothing if ended
+            }
 
             if (!isVerified) {
                 alert("Access Denied: Your account is not verified for this event.");
