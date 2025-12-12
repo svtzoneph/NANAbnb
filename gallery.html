@@ -68,12 +68,13 @@
         transition: background 0.5s ease;
     }
 
-    /* --- HEADER GLASSMORPHISM (UPDATED) --- */
+    /* --- HEADER GLASSMORPHISM (UPDATED LAYOUT) --- */
     header {
-        padding: 30px 20px 4px 20px; /* top right bottom left */
+        padding: 15px 20px; 
         display: flex;
         align-items: center;
-        justify-content: center; /* center all links + logo */
+        /* UPDATED: Push items to edges (Links Left, Profile Right) */
+        justify-content: space-between; 
         position: sticky;
         top: 0;
         z-index: 100;
@@ -97,7 +98,7 @@
         white-space: nowrap;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
-        flex: 1; /* take remaining space */
+        /* Removed flex: 1 so it doesn't push the profile widget off */
     }
 
     /* Header show/hide animations */
@@ -111,9 +112,9 @@
     }
 
     .header-logo {
-        width: 40px;       /* smaller logo to fit nicely beside LOGIN */
+        width: 40px;        /* smaller logo to fit nicely beside LOGIN */
         height: auto;
-        flex: 0 0 auto;    /* don't stretch */
+        flex: 0 0 auto;     /* don't stretch */
     }
 
     .header-logo img {
@@ -179,6 +180,70 @@
         background: #fff;
         color: #000;
         transition: background 0.6s ease, color 0.6s ease;
+    }
+
+    /* --- PC HEADER PROFILE WIDGET STYLES --- */
+    .header-user-widget {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        background: rgba(0,0,0,0.3);
+        padding: 5px 12px 5px 5px;
+        border-radius: 30px;
+        border: 1px solid rgba(255,255,255,0.1);
+        transition: all 0.2s ease;
+        margin-left: 20px;
+        flex-shrink: 0;
+    }
+    .header-user-widget:hover {
+        background: rgba(255,255,255,0.15);
+        border-color: rgba(255,255,255,0.3);
+    }
+    .header-user-img-small {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(255,255,255,0.2);
+    }
+    .header-user-name {
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        white-space: nowrap;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* --- MOBILE HEADER PROFILE WIDGET STYLES --- */
+    .mobile-user-widget {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        background: rgba(0,0,0,0.3);
+        padding: 4px 10px 4px 4px;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .mobile-user-img-small {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid rgba(255,255,255,0.4);
+    }
+    .mobile-user-name {
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+        max-width: 100px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     /* --- GALLERY STYLES (Preserved Layout) --- */
@@ -377,7 +442,7 @@
 
         .mobile-header {
             display: flex;
-            padding: 10px 9px;
+            padding: 10px 15px; /* Adjusted padding */
             align-items: center;
             justify-content: space-between;
             z-index: 1000;
@@ -437,6 +502,11 @@
   
 <div class="mobile-header">
   <button class="hamburger" onclick="toggleSidebar()">☰</button>
+  
+  <a href="profile.html" class="mobile-user-widget">
+    <img id="mobile-header-img" src="https://via.placeholder.com/30" class="mobile-user-img-small" alt="User">
+    <span id="mobile-header-name" class="mobile-user-name">...</span>
+  </a>
 </div>
 
 <header id="scrollHeader">
@@ -450,6 +520,12 @@
     <a class="category-link" href="live.html">LIVE</a>
     <a class="category-link" href="gallery.html">GALLERY</a>
     <a class="category-link" href="videos.html">VIDEOS</a>
+  </div>
+
+  <a href="profile.html" class="header-user-widget">
+    <img id="header-profile-img" src="https://via.placeholder.com/35" class="header-user-img-small" alt="Profile">
+    <span id="header-display-name" class="header-user-name">Loading...</span>
+  </a>
 </header>
 
 <div id="mobileSidebar" class="sidebar">
@@ -610,7 +686,8 @@ lightGallery(document.getElementById('lightgallery2'), {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, push, set, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
@@ -625,52 +702,44 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
 
-// Get or create unique user ID (store locally)
-let userId = localStorage.getItem("userId");
-if (!userId) {
-  userId = "user_" + Math.random().toString(36).substring(2, 10);
-  localStorage.setItem("userId", userId);
-}
+// ---------- NEW: FETCH & DISPLAY USER PROFILE ----------
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        const uid = user.uid;
+        // Fetch user data from Realtime Database
+        get(child(ref(db), `users/${uid}`)).then((snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const displayName = data.name || "Member";
+                const profilePic = data.profilePicture || "https://via.placeholder.com/35";
 
-// Track device info
-const deviceInfo = navigator.userAgent;
+                // Update PC Header
+                const pcImg = document.getElementById("header-profile-img");
+                const pcName = document.getElementById("header-display-name");
+                if(pcImg) pcImg.src = profilePic;
+                if(pcName) pcName.innerText = displayName;
 
-// Function to record an event
-function logActivity(action, details = "") {
-  const sessionRef = ref(db, "userSessions/" + userId);
-  update(sessionRef, {
-    lastAction: action,
-    lastDetails: details,
-    lastActive: new Date().toLocaleString(),
-    device: deviceInfo,
-    currentPage: window.location.pathname,
-  });
-
-  // Store individual activity logs
-  const activityRef = push(ref(db, "userSessions/" + userId + "/activityLog"));
-  set(activityRef, {
-    action,
-    details,
-    timestamp: serverTimestamp(),
-    page: window.location.pathname
-  });
-}
-
-// Record page visit
-logActivity("Page Visit", document.title);
-
-// Record all clicks
-document.addEventListener("click", (e) => {
-  const target = e.target.tagName;
-  logActivity("Click", `Clicked on ${target}`);
-});
-
-// Record when user leaves or closes tab
-window.addEventListener("beforeunload", () => {
-  logActivity("Left Page", document.title);
+                // Update Mobile Header
+                const mobImg = document.getElementById("mobile-header-img");
+                const mobName = document.getElementById("mobile-header-name");
+                if(mobImg) mobImg.src = profilePic;
+                if(mobName) mobName.innerText = displayName;
+                
+                // Update Theme (Redundant check to ensure sync)
+                if(data.bannerColor) {
+                    localStorage.setItem('zoneVaultTheme', data.bannerColor);
+                    document.body.style.background = data.bannerColor;
+                }
+            }
+        }).catch((error) => {
+            console.error(error);
+        });
+    }
 });
 </script>
+
 
 <script>
 if ('serviceWorker' in navigator) {
@@ -689,17 +758,26 @@ if ('serviceWorker' in navigator) {
   }).catch(err => console.error('Service Worker registration failed:', err));
 }
 </script>
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('mobileSidebar');
+    sidebar.classList.toggle('open');
+  }
 
-    <script>
-    const header = document.getElementById('scrollHeader');
-    header.addEventListener('wheel', (e) => {
-      if (e.deltaY === 0) return;
-      e.preventDefault();
-      header.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
-    });
-  </script>
-
-
+  // Also adding the scroll header logic just in case, as they usually go together
+  let lastScrollY = window.scrollY;
+  const scrollHeader = document.getElementById('scrollHeader');
+  window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+    if (currentScrollY > lastScrollY && currentScrollY > 50) {
+      scrollHeader.classList.add('hide');
+    } else {
+      scrollHeader.classList.remove('hide');
+    }
+    lastScrollY = currentScrollY;
+  });
+</script>
+    
   <script>
     // Accordion toggle
     document.querySelectorAll('.accordion-header').forEach(header => {
@@ -710,146 +788,55 @@ if ('serviceWorker' in navigator) {
         if (!open) acc.classList.add('open');
       });
     });
+    
+const thumbnailBoxes = document.querySelectorAll('.thumb-box');
+const mainImage = document.getElementById('mainDisplay');
+let current = 0;
 
-    // Thumbnail switching
-   const thumbnailBoxes = document.querySelectorAll('.thumb-box');
-  const mainImage = document.getElementById('mainDisplay');
-  let current = 0;
+// Extra hidden slides (these won't appear in thumbnail row)
+const extraSlides = [
+];
 
-  // Extra hidden slides (these won't appear in thumbnail row)
-  const extraSlides = [
-   
-  ];
+// Only use the combined array for cycling images, thumbnails stay separate
+const slideshowSources = [
+  ...Array.from(thumbnailBoxes).map(box => box.querySelector('img').src),
+  ...extraSlides
+];
 
-  // Combined array for slideshow (visible + hidden)
-  const slideshowSources = [
-    ...Array.from(thumbnailBoxes).map(box => box.querySelector('img').src),
-    ...extraSlides
-  ];
+function switchImageByIndex(index) {
+  const newSrc = slideshowSources[index];
+  mainImage.classList.add('fade-out');
+  setTimeout(() => {
+    mainImage.src = newSrc;
+    mainImage.classList.remove('fade-out');
+  }, 300);
 
-  function switchImageByIndex(index) {
-    const newSrc = slideshowSources[index];
-    mainImage.classList.add('fade-out');
-    setTimeout(() => {
-      mainImage.src = newSrc;
-      mainImage.classList.remove('fade-out');
-    }, 500);
-
-    // Highlight active thumbnail only if it's one of the original thumbs
-    thumbnailBoxes.forEach(b => b.classList.remove('active'));
-    if (index < thumbnailBoxes.length) {
-      thumbnailBoxes[index].classList.add('active');
-    }
+  // Only highlight thumbnails if it's one of the visible thumbs
+  thumbnailBoxes.forEach(b => b.classList.remove('active'));
+  if (index < thumbnailBoxes.length) {
+    thumbnailBoxes[index].classList.add('active');
   }
+}
 
-  setInterval(() => {
-    current = (current + 1) % slideshowSources.length;
-    switchImageByIndex(current);
-  }, 5000);
+setInterval(() => {
+  current = (current + 1) % slideshowSources.length;
+  switchImageByIndex(current);
+}, 2000);
 
-  // Manual switch from visible thumbnail
-  function switchImage(box) {
-    const img = box.querySelector('img');
-    mainImage.classList.add('fade-out');
-    setTimeout(() => {
-      mainImage.src = img.src;
-      mainImage.classList.remove('fade-out');
-    }, 500);
-    thumbnailBoxes.forEach(b => b.classList.remove('active'));
-    box.classList.add('active');
-    current = slideshowSources.indexOf(img.src);
-  }
+// Manual switch from visible thumbnail
+function switchImage(box) {
+  const img = box.querySelector('img');
+  mainImage.classList.add('fade-out');
+  setTimeout(() => {
+    mainImage.src = img.src;
+    mainImage.classList.remove('fade-out');
+  }, 300);
 
-  // Scroll header on mouse wheel
-const linksContainer = document.querySelector('.header-links');
-linksContainer.addEventListener('wheel', (e) => {
-  if (e.deltaY === 0) return;
-  e.preventDefault();
-  linksContainer.scrollBy({ left: e.deltaY < 0 ? -100 : 100 });
-});
-</script>
-  
+  thumbnailBoxes.forEach(b => b.classList.remove('active'));
+  box.classList.add('active');
+  current = slideshowSources.indexOf(img.src); // will keep cycling after this
+}
 
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      // ✅ Detect updates
-      reg.onupdatefound = () => {
-        const newSW = reg.installing;
-        newSW.onstatechange = () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            // ✅ New version is ready → force reload
-            window.location.reload();
-          }
-        };
-      };
-    }).catch(err => {
-      console.error('Service Worker registration failed:', err);
-    });
-  }
-</script>
-
-<script>
-  function toggleSidebar() {
-    const sidebar = document.getElementById('mobileSidebar');
-    sidebar.classList.toggle('open');
-  }
-</script>
-
-
-<script>
-  let lastScrollY = window.scrollY;
-  const scrollHeader = document.getElementById('scrollHeader');
-
-  window.addEventListener('scroll', () => {
-    const currentScrollY = window.scrollY;
-
-    if (currentScrollY > lastScrollY && currentScrollY > 50) {
-      // Scroll Down → Hide header
-      scrollHeader.classList.add('hide');
-    } else {
-      // Scroll Up → Show header smoothly
-      scrollHeader.classList.remove('hide');
-    }
-
-    lastScrollY = currentScrollY;
-  });
-</script>
-
-<script>
-  const categoryLinks = document.querySelectorAll('.category-link');
-
-  categoryLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault(); // prevent immediate jump
-
-      // Remove flash class from all
-      categoryLinks.forEach(l => l.classList.remove('flash'));
-
-      // Add flash class to the clicked one
-      link.classList.add('flash');
-
-      // Remove it after a short delay (fade out effect)
-      setTimeout(() => {
-        link.classList.remove('flash');
-        // Redirect after animation (if it's a real page)
-        window.location.href = link.href;
-      }, 800); // adjust delay to match transition
-    });
-  });
-</script>
-
-<script>
-  const sidebarNav = document.querySelector('.sidebar-nav');
-
-  sidebarNav.addEventListener('wheel', function (e) {
-    const isAtTop = sidebarNav.scrollTop === 0;
-    const isAtBottom = sidebarNav.scrollHeight - sidebarNav.scrollTop === sidebarNav.clientHeight;
-
-    if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
-      e.preventDefault(); // Prevent page scroll when at the edges
-    }
-  }, { passive: false });
 </script>
 
 <style>
@@ -863,7 +850,7 @@ linksContainer.addEventListener('wheel', (e) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
+    z-index: 11000;
     text-align: center;
     padding: 20px;
     opacity: 0;
@@ -964,6 +951,6 @@ linksContainer.addEventListener('wheel', (e) => {
     window.history.back();
   }
 </script>
-
+    
 </body>
 </html>
