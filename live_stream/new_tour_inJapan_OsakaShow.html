@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Live | Zone Vault</title>
+<title>VIDEOS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -148,7 +148,16 @@
     text-shadow: var(--text-shadow);
   }
 
-  @media (max-width: 600px) {
+  /* --- MOBILE PORTRAIT (Standard) --- */
+  @media (max-width: 768px) {
+    /* Keep padding in portrait so it doesn't touch edges */
+    body {
+        padding: 10px 0 !important;
+    }
+    .main-layout {
+        padding: 0 15px !important;
+    }
+    
     h2 { font-size: 18px; }
     h3.playlist-header { 
         font-size: 16px; 
@@ -162,6 +171,64 @@
         border-width: 1px;
     }
     .center-logo img { width: 40px; }
+  }
+
+  /* --- 🚀 MOBILE LANDSCAPE ONLY (FULL SCREEN / YOUTUBE STYLE) --- */
+  @media screen and (max-width: 915px) and (orientation: landscape) {
+    /* 1. Remove all body padding */
+    body {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: black !important; /* Ensure background matches video */
+    }
+
+    /* 2. Remove layout padding to allow full width */
+    .main-layout {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+    }
+
+    /* 3. Force Video Container to be Full Width (Edge-to-Edge) */
+    .video-wrapper-left {
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    #poster-container, 
+    #player-container, 
+    .plyr {
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        /* Optional: Force height to viewport if you want strict fullscreen */
+        /* height: 100vh !important; */ 
+    }
+
+    /* 4. Hide Header in Landscape to maximize space (Like YouTube App) */
+    .mobile-header {
+        display: none !important;
+    }
+
+    /* 5. Add Padding BACK to the text content below video so it's not hidden */
+    #views-display, 
+    #main-title, 
+    #playlist,
+    .center-logo {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        /* Safe area for notched phones */
+        padding-left: max(20px, env(safe-area-inset-left)) !important;
+        padding-right: max(20px, env(safe-area-inset-right)) !important;
+    }
+    
+    /* Hide top logo in landscape to focus on video */
+    .center-logo {
+        display: none !important;
+    }
   }
 
   .center-logo { display: flex; justify-content: center; margin-bottom: 20px; }
