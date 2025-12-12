@@ -5,12 +5,10 @@
 <title>Zone Vault - Register</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js"></script>
 
-<!-- Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <link rel="manifest" href="manifest.json">
@@ -196,13 +194,12 @@ function show(id) {
   document.getElementById(id).classList.remove("hidden");
 }
 
-// Generate a unique random Access ID
 function generateAccessID() {
   return (
     Math.random().toString(36).substring(2, 10) +
     Math.random().toString(36).substring(2, 10) +
     Math.random().toString(36).substring(2, 10)
-  ); // 24 chars total
+  );
 }
 
 // ---------- SESSION + HISTORY ----------
@@ -228,13 +225,12 @@ async function recordLoginHistory(user) {
 // ---------- HANDLE APPROVED USER ----------
 async function handleApprovedUser(reqRef, data) {
   const accessID = generateAccessID();
-  await update(reqRef, { accessID }); // overwrite previous accessID if any
+  await update(reqRef, { accessID });
 
   sessionStorage.setItem("internalAccess", "true");
   sessionStorage.setItem("fromIndex", "true");
   sessionStorage.setItem("accessID", accessID);
 
-  // Record session + login history
   await recordSession(auth.currentUser, accessID);
   await recordLoginHistory(auth.currentUser);
 
@@ -287,7 +283,6 @@ window.googleLogin = async function() {
   }
 };
 
-// ---------- EMAIL VERIFIED CHECK ----------
 window.reloadAndCheck = function() {
   const user = auth.currentUser;
   if (user) {
@@ -298,7 +293,6 @@ window.reloadAndCheck = function() {
   }
 };
 
-// ---------- CHECK JOIN REQUEST ----------
 function checkJoinRequest(user) {
   currentUid = user.uid;
   const reqRef = ref(db, "joinRequests/" + currentUid);
@@ -315,23 +309,41 @@ function checkJoinRequest(user) {
   });
 }
 
-// ---------- SUBMIT JOIN REQUEST ----------
+// ---------- UPDATED: SUBMIT JOIN REQUEST ----------
+// This now saves to BOTH "joinRequests" AND "users" so the name appears on profile
 window.submitRequest = function() {
   const name = document.getElementById("name").value;
   const reason = document.getElementById("reason").value;
   const user = auth.currentUser;
   if (!name || !reason) return alert("Please fill out all fields.");
 
-  set(ref(db, "joinRequests/" + currentUid), {
+  // 1. Create the Request entry (for Admins)
+  const requestPromise = set(ref(db, "joinRequests/" + currentUid), {
     name,
     reason,
     email: user.email,
     provider: user.providerData[0]?.providerId || "password",
     status: "pending"
-  }).then(() => show("waiting"));
+  });
+
+  // 2. Create the User Profile entry (for Profile Page)
+  const userProfilePromise = update(ref(db, "users/" + currentUid), {
+    name: name,
+    email: user.email,
+    bio: "New Member" // Default bio
+  });
+
+  // Wait for both to finish, then show waiting screen
+  Promise.all([requestPromise, userProfilePromise])
+    .then(() => {
+        show("waiting");
+    })
+    .catch((error) => {
+        console.error("Error saving data:", error);
+        alert("Error submitting request. Please try again.");
+    });
 };
 
-// ---------- AUTH STATE ----------
 onAuthStateChanged(auth, user => {
   if (user) {
     reload(user).then(() => {
@@ -346,7 +358,6 @@ onAuthStateChanged(auth, user => {
 });
 </script>
 
-<!-- ✅ FIXED USER ACTIVITY LOGGER (Nothing Removed, Only Fixed) -->
 <script type="module">
 import { getApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
 import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
@@ -379,12 +390,10 @@ function logActivity(action, page) {
   }
 }
 
-// Log page load
 window.addEventListener("load", () => {
   logActivity("page_load", window.location.pathname);
 });
 
-// Log auth state changes
 onAuthStateChanged(auth, user => {
   if (user) {
     sessionStorage.setItem("currentUid", user.uid);
@@ -394,7 +403,6 @@ onAuthStateChanged(auth, user => {
   }
 });
 
-// Optional global click tracker
 document.addEventListener("click", e => {
   const el = e.target;
   if (el && el.tagName) {
@@ -420,7 +428,5 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 
-
-  
 </body>
 </html>
