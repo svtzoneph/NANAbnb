@@ -78,12 +78,13 @@
         transition: background 0.5s ease; /* Smooth transition if theme changes */
     }
 
-    /* --- HEADER GLASSMORPHISM (UPDATED) --- */
+    /* --- HEADER GLASSMORPHISM (LEFT ALIGNED LAYOUT) --- */
     header {
-        padding: 30px 20px 4px 20px;
+        padding: 15px 20px;
         display: flex;
         align-items: center;
-        justify-content: center;
+        /* REVERTED: Space-between puts Links Left and Profile Right */
+        justify-content: space-between;
         position: sticky;
         top: 0;
         z-index: 100;
@@ -104,12 +105,11 @@
         display: flex;
         gap: 15px;
         align-items: center;
-        justify-content: center;
+        justify-content: center; /* Internal centering */
         overflow-x: auto;
         white-space: nowrap;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
-        flex: 1; /* take remaining space */
     }
 
     header.show {
@@ -194,6 +194,71 @@
         transition: background 0.6s ease, color 0.6s ease;
     }
 
+    /* --- PC HEADER PROFILE WIDGET STYLES (REVERTED) --- */
+    .header-user-widget {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        background: rgba(0,0,0,0.3);
+        padding: 5px 12px 5px 5px;
+        border-radius: 30px;
+        border: 1px solid rgba(255,255,255,0.1);
+        transition: all 0.2s ease;
+        margin-left: 20px;
+        flex-shrink: 0; 
+        /* No absolute positioning needed for Left/Right split */
+    }
+    .header-user-widget:hover {
+        background: rgba(255,255,255,0.15);
+        border-color: rgba(255,255,255,0.3);
+    }
+    .header-user-img-small {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(255,255,255,0.2);
+    }
+    .header-user-name {
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        white-space: nowrap;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* --- ADDED: MOBILE HEADER PROFILE WIDGET STYLES --- */
+    .mobile-user-widget {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        background: rgba(0,0,0,0.3);
+        padding: 4px 10px 4px 4px;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .mobile-user-img-small {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid rgba(255,255,255,0.4);
+    }
+    .mobile-user-name {
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+        max-width: 100px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     .hero-section {
         display: flex;
         flex-wrap: wrap;
@@ -273,6 +338,7 @@
         opacity: 0;
     }
 
+    /* --- UPDATED: THUMBNAIL ROW SCROLL --- */
     .thumbnail-row {
         display: flex;
         gap: 10px;
@@ -280,7 +346,10 @@
         padding-bottom: 5px;
         scroll-behavior: smooth;
         width: 100%;
-        justify-content: center;
+        
+        /* CHANGED: Align start to allow proper scrolling without cropping */
+        justify-content: flex-start; 
+        
         /* SMOOTH SCROLL */
         -webkit-overflow-scrolling: touch;
     }
@@ -294,12 +363,16 @@
         border-radius: 10px;
     }
 
+    /* --- UPDATED: THUMB BOX NO SHRINK --- */
     .thumb-box {
         width: 60px;
         height: 60px;
         aspect-ratio: 1 / 1; /* square */
         border-radius: 12px;
         overflow: hidden;
+        
+        /* ADDED: Prevent shrinking so they don't squeeze */
+        flex-shrink: 0; 
         
         /* Glassy Thumbnails */
         border: 1px solid rgba(255, 255, 255, 0.2);
@@ -730,7 +803,7 @@
 
         .mobile-header {
             display: flex;
-            padding: 10px 9px;
+            padding: 10px 15px; /* Adjusted padding */
             align-items: center;
             justify-content: space-between;
             /* Mobile Header Hyper Glass */
@@ -848,6 +921,11 @@
 
 <div class="mobile-header">
   <button class="hamburger" onclick="toggleSidebar()">☰</button>
+  
+  <a href="profile.html" class="mobile-user-widget">
+    <img id="mobile-header-img" src="https://via.placeholder.com/30" class="mobile-user-img-small" alt="User">
+    <span id="mobile-header-name" class="mobile-user-name">...</span>
+  </a>
 </div>
 
 <header id="scrollHeader">
@@ -861,6 +939,12 @@
     <a class="category-link" href="live.html">LIVE</a>
     <a class="category-link" href="gallery.html">GALLERY</a>
     <a class="category-link" href="videos.html">VIDEOS</a>
+  </div>
+
+  <a href="profile.html" class="header-user-widget">
+    <img id="header-profile-img" src="https://via.placeholder.com/35" class="header-user-img-small" alt="Profile">
+    <span id="header-display-name" class="header-user-name">Loading...</span>
+  </a>
 </header>
 
 <div id="mobileSidebar" class="sidebar">
@@ -918,6 +1002,18 @@
         </div>
         <div class="thumb-box" onclick="switchImage(this)">
           <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/6.png" loading="lazy" class="thumb">
+      </div>
+              <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/Trailer -Cover.jpg" loading="lazy" class="thumb">
+      </div>
+              <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png" loading="lazy" class="thumb">
+      </div>
+              <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.png" loading="lazy" class="thumb">
+      </div>
+              <div class="thumb-box" onclick="switchImage(this)">
+          <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_gwangju.png" loading="lazy" class="thumb">
       </div>
     </div>
   </div>
@@ -1006,13 +1102,12 @@ import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.12.
 import {
   getDatabase,
   ref,
-  push,
-  set,
-  update,
-  serverTimestamp
+  get,
+  child
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import {
-  getAuth
+  getAuth,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // ---------- FIREBASE CONFIG ----------
@@ -1037,101 +1132,40 @@ try {
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-// ---------- LOCAL USER IDENTIFIER ----------
-let userId = localStorage.getItem("userId");
-if (!userId) {
-  userId = "user_" + Math.random().toString(36).substring(2, 10);
-  localStorage.setItem("userId", userId);
-}
+// ---------- NEW: FETCH & DISPLAY USER PROFILE ----------
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        const uid = user.uid;
+        // Fetch user data from Realtime Database
+        get(child(ref(db), `users/${uid}`)).then((snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const displayName = data.name || "Member";
+                const profilePic = data.profilePicture || "https://via.placeholder.com/35";
 
-// ---------- DEVICE INFO ----------
-const deviceInfo = navigator.userAgent;
+                // Update PC Header
+                const pcImg = document.getElementById("header-profile-img");
+                const pcName = document.getElementById("header-display-name");
+                if(pcImg) pcImg.src = profilePic;
+                if(pcName) pcName.innerText = displayName;
 
-// ---------- FUNCTION: RECORD SESSION + ACTIVITY ----------
-function logActivity(action, details = "") {
-  try {
-    const sessionRef = ref(db, "userSessions/" + userId);
-    update(sessionRef, {
-      lastAction: action,
-      lastDetails: details,
-      lastActive: new Date().toLocaleString(),
-      device: deviceInfo,
-      currentPage: window.location.pathname,
-    });
-
-    // store individual logs under /userSessions
-    const activityRef = push(ref(db, "userSessions/" + userId + "/activityLog"));
-    set(activityRef, {
-      action,
-      details,
-      timestamp: serverTimestamp(),
-      page: window.location.pathname
-    });
-  } catch (e) {
-    console.error("Session logActivity error:", e);
-  }
-}
-
-// ---------- FUNCTION: RECORD AUTH-BASED ACTIVITY ----------
-function getDeviceType() {
-  const ua = navigator.userAgent;
-  if (/Mobi|Android/i.test(ua)) return "Mobile";
-  if (/Tablet|iPad/i.test(ua)) return "Tablet";
-  return "Desktop";
-}
-
-function logActivityAuth(action, page) {
-  try {
-    const user = auth.currentUser;
-    const uid =
-      user?.uid || sessionStorage.getItem("currentUid") || "anonymous";
-
-    const rec = {
-      email: user?.email || "anonymous",
-      uid,
-      action: action || page || "page_view",
-      page: page || window.location.pathname,
-      timestamp: Date.now(),
-      userAgent: navigator.userAgent || "Unknown",
-      platform: navigator.platform || "Unknown",
-      screen: `${screen.width}x${screen.height}`,
-      deviceType: getDeviceType(),
-      referrer: document.referrer || "Direct"
-    };
-
-    const node = ref(
-      db,
-      `userActivities/${uid}/${Date.now()}_${Math.random()
-        .toString(36)
-        .slice(2, 8)}`
-    );
-    set(node, rec).catch((e) => console.error("userActivities error:", e));
-  } catch (e) {
-    console.error("userActivities exception:", e);
-  }
-}
-
-// ---------- PAGE + CLICK LOGGING ----------
-window.addEventListener("load", () => {
-  logActivity("Page Visit", document.title);
-  logActivityAuth("page_load", window.location.pathname);
+                // Update Mobile Header
+                const mobImg = document.getElementById("mobile-header-img");
+                const mobName = document.getElementById("mobile-header-name");
+                if(mobImg) mobImg.src = profilePic;
+                if(mobName) mobName.innerText = displayName;
+                
+                // Update Theme (Redundant check to ensure sync)
+                if(data.bannerColor) {
+                    localStorage.setItem('zoneVaultTheme', data.bannerColor);
+                    document.body.style.background = data.bannerColor;
+                }
+            }
+        }).catch((error) => {
+            console.error(error);
+        });
+    }
 });
-
-document.addEventListener("click", (e) => {
-  const target = e.target.tagName;
-  logActivity("Click", `Clicked on ${target}`);
-  logActivityAuth("click", window.location.pathname);
-});
-
-window.addEventListener("beforeunload", () => {
-  logActivity("Left Page", document.title);
-  logActivityAuth("page_unload", window.location.pathname);
-});
-
-// Example:
-// document.getElementById("downloadBtn").addEventListener("click", () =>
-//    logActivityAuth("download", "/video.html")
-// );
 </script>
 
 
@@ -1152,7 +1186,25 @@ if ('serviceWorker' in navigator) {
   }).catch(err => console.error('Service Worker registration failed:', err));
 }
 </script>
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('mobileSidebar');
+    sidebar.classList.toggle('open');
+  }
 
+  // Also adding the scroll header logic just in case, as they usually go together
+  let lastScrollY = window.scrollY;
+  const scrollHeader = document.getElementById('scrollHeader');
+  window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+    if (currentScrollY > lastScrollY && currentScrollY > 50) {
+      scrollHeader.classList.add('hide');
+    } else {
+      scrollHeader.classList.remove('hide');
+    }
+    lastScrollY = currentScrollY;
+  });
+</script>
     
   <script>
     // Accordion toggle
@@ -1171,10 +1223,6 @@ let current = 0;
 
 // Extra hidden slides (these won't appear in thumbnail row)
 const extraSlides = [
-  'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/Trailer -Cover.jpg',
-  'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png',
-  'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.png',
-  'https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_gwangju.png'
 ];
 
 // Only use the combined array for cycling images, thumbnails stay separate
@@ -1220,206 +1268,6 @@ function switchImage(box) {
 </script>
 
 <style>
-  /* Access Denied Modal */
-  .access-denied-modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 11000;
-    text-align: center;
-    padding: 20px;
-    opacity: 0;
-    animation: fadeIn 0.5s forwards;
-    flex-direction: column;
-    
-    /* SMOOTHNESS BOOSTER */
-    transform: translateZ(0);
-    will-change: opacity;
-  }
-
-  .access-denied-modal strong {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-
-  .access-denied-modal button {
-    margin-top: 15px;
-    padding: 10px 25px;
-    background: transparent;
-    color: white;
-    border: 2px solid white;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-  }
-
-  .access-denied-modal button:hover {
-    background: white;
-    color: black;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-</style>
-
-
-
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      // ✅ Detect updates
-      reg.onupdatefound = () => {
-        const newSW = reg.installing;
-        newSW.onstatechange = () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            // ✅ New version is ready → force reload
-            window.location.reload();
-          }
-        };
-      };
-    }).catch(err => {
-      console.error('Service Worker registration failed:', err);
-    });
-  }
-</script>
-
-<script>
-  function toggleSidebar() {
-    const sidebar = document.getElementById('mobileSidebar');
-    sidebar.classList.toggle('open');
-  }
-</script>
-
-<footer style="
-  width: 100%;
-  color: #ccc;
-  padding: 40px 10px 30px; /* top, left/right, bottom padding */
-  font-size: 14px;
-  line-height: 1.6;
-  box-sizing: border-box;
-  position: relative;
-  margin-top: 10px; /* space above the footer */
-  margin-bottom: 20px; /* change this value to adjust bottom spacing */
-">
-  <div style="
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    text-align: center;
-    position: relative;
-  ">
-    <div style="
-      height: 1px;
-      background: #333;
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      transform: translateY(-20px);
-    "></div>
-
-    <p style="margin: 30px 0 0;">&copy; 2025 <strong>Zone Vault</strong>. All rights reserved.</p>
-  </div>
-</footer>
-
-<script>
-  let lastScrollY = window.scrollY;
-  const scrollHeader = document.getElementById('scrollHeader');
-
-  window.addEventListener('scroll', () => {
-    const currentScrollY = window.scrollY;
-
-    if (currentScrollY > lastScrollY && currentScrollY > 50) {
-      // Scroll Down → Hide header
-      scrollHeader.classList.add('hide');
-    } else {
-      // Scroll Up → Show header smoothly
-      scrollHeader.classList.remove('hide');
-    }
-
-    lastScrollY = currentScrollY;
-  });
-</script>
-
-<script>
-  const categoryLinks = document.querySelectorAll('.category-link');
-
-  categoryLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault(); // prevent immediate jump
-
-      // Remove flash class from all
-      categoryLinks.forEach(l => l.classList.remove('flash'));
-
-      // Add flash class to the clicked one
-      link.classList.add('flash');
-
-      // Remove it after a short delay (fade out effect)
-      setTimeout(() => {
-        link.classList.remove('flash');
-        // Redirect after animation (if it's a real page)
-        window.location.href = link.href;
-      }, 800); // adjust delay to match transition
-    });
-  });
-</script>
-
-<script>
-  const sidebarNav = document.querySelector('.sidebar-nav');
-
-  sidebarNav.addEventListener('wheel', function (e) {
-    const isAtTop = sidebarNav.scrollTop === 0;
-    const isAtBottom = sidebarNav.scrollHeight - sidebarNav.scrollTop === sidebarNav.clientHeight;
-
-    if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
-      e.preventDefault(); // Prevent page scroll when at the edges
-    }
-  }, { passive: false });
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const noticeModal = document.getElementById("noticeModal");
-  const secondModal = document.getElementById("secondModal");
-
-  // Check if modal has already been shown in this session
-  if (!sessionStorage.getItem("modalShown")) {
-    // Show the first modal automatically when page loads
-    setTimeout(() => {
-      noticeModal.style.display = "flex";
-      setTimeout(() => (noticeModal.style.opacity = "1"), 100);
-    }, 500); // delay for smooth load
-
-    // Mark modal as shown
-    sessionStorage.setItem("modalShown", "true");
-  }
-
-  // Function for "I Understand"
-  window.showSecondModal = function() {
-    noticeModal.style.opacity = "0";
-    setTimeout(() => {
-      noticeModal.style.display = "none";
-      secondModal.style.display = "flex";
-      setTimeout(() => (secondModal.style.opacity = "1"), 100);
-    }, 400);
-  };
-
-  // Function for "Close"
-  window.closeSecondModal = function() {
-    secondModal.style.opacity = "0";
-    setTimeout(() => (secondModal.style.display = "none"), 400);
-  };
-});
-</script>
-
- <style>
   /* Access Denied Modal */
   .access-denied-modal {
     position: fixed;
