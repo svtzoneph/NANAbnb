@@ -161,7 +161,7 @@
     /* Keep padding in portrait so it doesn't touch edges */
     body { padding: 10px 0 !important; }
     .main-layout { padding: 0 15px !important; }
-     
+      
     h2 { font-size: 18px; }
     h3.playlist-header { 
         font-size: 16px; 
@@ -199,7 +199,7 @@
         width: 100% !important;
         height: 100% !important;
     }
-     
+      
     /* 3. Ensure the video element itself stretches */
     video {
         width: 100% !important;
@@ -217,7 +217,7 @@
     .video-wrapper-left {
         height: 100vh; /* Placeholder height */
     }
-     
+      
     #views-display, 
     #main-title, 
     #playlist {
@@ -235,7 +235,7 @@
     border-radius: 0px;
     overflow: hidden;
   }
-     
+      
   video { width: 100%; }
 
   /* --- GLASSMORPHISM BACK BUTTON (Hyper) --- */
@@ -381,7 +381,7 @@
     fill: white;
     display: block;
   }
-     
+      
   /* Scrollbar Styling */
   #playlist-items::-webkit-scrollbar { width: 8px; }
   #playlist-items::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }
@@ -551,20 +551,20 @@
     z-index: 1 !important;
     display: none;
     pointer-events: none;
-    
+     
     /* UPDATED STYLE: Transparent but Readable */
     font-size: 12px !important; 
     padding: 4px 10px !important;
-    
+     
     /* 1. Background: Almost invisible black tint for contrast */
     background: rgba(0, 0, 0, 0.2) !important; 
-    
+     
     /* 2. Color: White with 60% opacity (ghostly but visible) */
     color: rgba(255, 255, 255, 0.6) !important; 
-    
+     
     /* 3. Shadow: The secret to readability on any background */
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
-    
+     
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 6px;
     font-family: 'Roboto Mono', monospace;
@@ -707,14 +707,14 @@
       text-align: left;
     }
     .video-wrapper-left { width: 100%; max-width: 1100px; margin: 0 auto; }
-     
+      
     #playlist { 
         width: 100%; 
         max-width: 1100px; 
         margin: 20px auto !important; 
         text-align: left;
     }
-     
+      
     h3.playlist-header { margin-top: 0 !important; line-height: 1; }
     #playlist-items { 
         max-height: 500px !important; 
@@ -735,7 +735,7 @@
 <div class="main-layout">
 
   <div class="video-wrapper-left">
-     
+      
     <div id="poster-container">
       <div id="poster-overlay">Select the Live to Watch</div>
     </div>
@@ -839,7 +839,7 @@ function smartGoBack() {
 
 // Function to show the denial screen
 function showAccessDeniedModal(message) {
-    if(typeof player !== 'undefined') {
+    if(typeof player !== 'undefined' && player) {
         player.pause();
         if(player.fullscreen.active) player.fullscreen.exit();
     }
@@ -942,54 +942,26 @@ auth.onAuthStateChanged(user => {
 
 const video = document.getElementById("videoPlayer");
 let hls;
+let player = null;
 
-// --- PLYR CONFIG UPDATED: Order adjusted for Layout ---
-const player = new Plyr(video, {
+// --- PLYR CONFIG ---
+const defaultPlyrOptions = {
   captions: { active: true, update: true, language: "en" },
-  controls: [
-    'play-large',   
-    'play',           
-    'mute', // Will be pushed to right via CSS
-    'fullscreen'
-  ],
+  controls: ['play-large', 'play', 'mute', 'settings', 'fullscreen'],
   settings: ["captions","speed","quality"],
   clickToPlay: false, 
-  dblclickFullscreen: false
-});
+  dblclickFullscreen: false,
+  i18n: {
+    quality: 'Quality',
+    qualityBadge: { 2160: '4K', 1440: 'HD', 1080: 'HD', 720: 'HD', 576: 'SD', 480: 'SD' }
+  }
+};
 
-// --- HELPER: UPDATE LIVE BADGE IN PLAYER ---
-function updatePlayerLiveBadge(status) {
-    if (!player || !player.elements || !player.elements.controls) return;
-    const controls = player.elements.controls;
-    let badge = controls.querySelector('.live-control-badge');
-
-    if(status && status.toUpperCase() === 'LIVE') {
-        if(!badge) {
-            badge = document.createElement('div');
-            badge.className = 'live-control-badge';
-            badge.innerHTML = '<span class="live-dot"></span>LIVE';
-            
-            const playBtn = controls.querySelector('[data-plyr="play"]');
-            if(playBtn) {
-                playBtn.after(badge);
-            } else {
-                controls.insertBefore(badge, controls.firstChild);
-            }
-        }
-        badge.style.display = 'flex';
-    } else {
-        if(badge) badge.style.display = 'none';
-    }
-}
-
-// --- 2. CORE FUNCTION: PLAY EPISODE ---
+// --- CORE FUNCTION: PLAY EPISODE ---
 function loadAndPlayEpisode(epId, updateUrl = true) {
     const ep = playlistData.find(item => item.id === epId);
     
-    if (!ep) {
-        console.warn("Episode ID not found:", epId);
-        return;
-    }
+    if (!ep) { console.warn("Episode ID not found:", epId); return; }
 
     const today = new Date();
     if (ep.date) {
@@ -1000,503 +972,266 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
         }
     }
 
-    // --- 🚨 NEW: GENERATE EXCLUSIVE SESSION URL 🚨 ---
-    if (updateUrl) {
-        const user = auth.currentUser;
-        if (user) {
-            // 1. Create a "Slug" from the title (spaces to dashes, lowercase)
-            const titleSlug = ep.title
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with dash
-                .replace(/(^-|-$)+/g, '');    // Remove leading/trailing dashes
-
-            // 2. Generate Timestamp
-            const sessionTime = Date.now();
-
-            // 3. Construct the secure URL
-            // Format: ?v=ID & session=TIME & uid=USERID & title=SLUG
-            const newUrl = window.location.pathname + 
-                           `?v=${ep.id}` + 
-                           `&session=${sessionTime}` + 
-                           `&uid=${user.uid}` + 
-                           `&title=${titleSlug}`;
-
-            history.pushState({id: ep.id, uid: user.uid}, '', newUrl);
-        }
+    // --- GENERATE URL ---
+    if (updateUrl && auth.currentUser) {
+        const titleSlug = ep.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        const newUrl = window.location.pathname + `?v=${ep.id}&session=${Date.now()}&uid=${auth.currentUser.uid}&title=${titleSlug}`;
+        history.pushState({id: ep.id, uid: auth.currentUser.uid}, '', newUrl);
     }
-    // ------------------------------------------------
 
     // D. Set Data & UI
     window.currentEpData = ep;
-    
-    if(overlayTitle) {
-        overlayTitle.textContent = ep.title;
-    }
-
-    updatePlayerLiveBadge(ep.status);
+    if(overlayTitle) overlayTitle.textContent = ep.title;
 
     posterContainer.style.display = "none";
     playerContainer.style.display = "block";
 
-    // =========================================================
-    // --- LIVE VIEWERS LOGIC (Presence System) ---
-    
+    // --- LIVE VIEWERS LOGIC ---
     const user = auth.currentUser;
-
-    if (currentPresenceRef) {
-        currentPresenceRef.remove(); 
-        currentPresenceRef.onDisconnect().cancel(); 
-        currentPresenceRef = null;
-    }
-
-    if (currentViewListenerRef) {
-        currentViewListenerRef.off(); 
-    }
+    if (currentPresenceRef) { currentPresenceRef.remove(); currentPresenceRef.onDisconnect().cancel(); currentPresenceRef = null; }
+    if (currentViewListenerRef) { currentViewListenerRef.off(); }
 
     if (user) {
-        const presencePath = `active_viewers/${epId}/${user.uid}`;
-        currentPresenceRef = db.ref(presencePath);
+        currentPresenceRef = db.ref(`active_viewers/${epId}/${user.uid}`);
         currentPresenceRef.onDisconnect().remove();
-        currentPresenceRef.set({
-            timestamp: firebase.database.ServerValue.TIMESTAMP,
-            device: navigator.userAgent
-        });
+        currentPresenceRef.set({ timestamp: firebase.database.ServerValue.TIMESTAMP, device: navigator.userAgent });
     }
 
-    const viewsRef = db.ref(`active_viewers/${epId}`);
-    currentViewListenerRef = viewsRef;
-    
+    currentViewListenerRef = db.ref(`active_viewers/${epId}`);
     currentViewListenerRef.on('value', (snapshot) => {
         const viewersData = snapshot.val();
-        const count = viewersData ? Object.keys(viewersData).length : 0;
-        viewCountText.textContent = new Intl.NumberFormat().format(count) + "";
+        viewCountText.textContent = new Intl.NumberFormat().format(viewersData ? Object.keys(viewersData).length : 0);
         viewsDisplay.classList.add('visible');
     });
-    // =========================================================
 
     db.ref(`live/${ep.id}`).once('value').then(snapshot => {
       const data = snapshot.val();
       if(!data || !data.url) { alert("Live unavailable"); return; }
-
-      if(typeof hls !== 'undefined' && hls){ hls.destroy(); hls = null; }
-
-      const resumePlayback = () => {
-          player.volume = 1;    // Set volume to 100%
-          player.muted = false; // Force Unmute
-
-          if (!window.currentEpData || !user) {
-             var playPromise = player.play();
-             if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.log("Autoplay blocked.");
-                });
-             }
-             return;
-          }
-          db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).once('value').then(snap => {
-              const saved = snap.val();
-              if (saved && saved.currentTime > 0) {
-                  player.currentTime = saved.currentTime;
-              }
-              
-              var playPromise = player.play();
-              if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.log("Autoplay blocked.");
-                });
-              }
-          });
-      };
-
-      if(typeof Hls !== 'undefined' && Hls.isSupported()){
-        hls = new Hls();
-        hls.loadSource(data.url);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => { 
-              setTimeout(resumePlayback, 100);
-        });
-      } else {
-        video.src = data.url;
-        video.addEventListener('loadedmetadata', resumePlayback, { once: true });
-      }
-
-      video.querySelectorAll("track").forEach(t => t.remove());
-      if(data.subtitles){
-        Object.entries(data.subtitles).forEach(([lang,url])=>{
-          const track = document.createElement("track");
-          track.kind = "subtitles";
-          track.label = lang.toUpperCase();
-          track.srclang = lang;
-          track.src = url;
-          if(lang==="en") track.default = true;
-          video.appendChild(track);
-        });
-      }
       
-      if(data.title){
-        mainTitle.textContent = data.title;
-        if(overlayTitle) overlayTitle.textContent = data.title;
-      } else {
-        mainTitle.textContent = ep.title;
-      }
+      // CALL THE HELPER FUNCTION TO INITIALIZE HLS & PLYR
+      setupStream(data.url, ep.status);
+
+      if(data.title) { mainTitle.textContent = data.title; if(overlayTitle) overlayTitle.textContent = data.title; } 
+      else { mainTitle.textContent = ep.title; }
 
     }).catch(err => console.error("Firebase Error:", err));
 }
 
-// --- 3. HANDLE BROWSER BACK BUTTON ---
+// --- 3. HELPER FUNCTION: SETUP STREAM (Hides HLS Complexity) ---
+function setupStream(streamUrl, status) {
+    
+    const resumePlayback = () => {
+        player.volume = 1; 
+        player.muted = false; 
+        updatePlayerLiveBadge(status);
+
+        if (!window.currentEpData || !auth.currentUser) {
+            player.play().catch(e => console.log("Autoplay blocked."));
+            return;
+        }
+        db.ref('watchHistory/' + auth.currentUser.uid + '/' + window.currentEpData.id).once('value').then(snap => {
+            const saved = snap.val();
+            if (saved && saved.currentTime > 0) player.currentTime = saved.currentTime;
+            player.play().catch(e => console.log("Autoplay blocked."));
+        });
+    };
+
+    if(typeof Hls !== 'undefined' && Hls.isSupported()){
+        if(hls) hls.destroy();
+        hls = new Hls();
+        hls.loadSource(streamUrl);
+        hls.attachMedia(video);
+        
+        hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+            const availableQualities = hls.levels.map((l) => l.height);
+            availableQualities.unshift(0);
+
+            const newOptions = Object.assign({}, defaultPlyrOptions);
+            newOptions.quality = {
+                default: 0, 
+                options: availableQualities,
+                forced: true,
+                onChange: (newQuality) => {
+                    if (newQuality === 0) hls.currentLevel = -1; 
+                    else hls.levels.forEach((level, idx) => { if (level.height === newQuality) hls.currentLevel = idx; });
+                }
+            };
+
+            if(player) player.destroy();
+            player = new Plyr(video, newOptions);
+            attachPlayerEvents();
+            setTimeout(resumePlayback, 100);
+        });
+    } else {
+        video.src = streamUrl;
+        if(player) player.destroy();
+        player = new Plyr(video, defaultPlyrOptions);
+        attachPlayerEvents();
+        video.addEventListener('loadedmetadata', resumePlayback, { once: true });
+    }
+}
+
+// --- HELPER: UPDATE LIVE BADGE IN PLAYER ---
+function updatePlayerLiveBadge(status) {
+    if (!player || !player.elements || !player.elements.controls) return;
+    const controls = player.elements.controls;
+    let badge = controls.querySelector('.live-control-badge');
+    if(status && status.toUpperCase() === 'LIVE') {
+        if(!badge) {
+            badge = document.createElement('div');
+            badge.className = 'live-control-badge';
+            badge.innerHTML = '<span class="live-dot"></span>LIVE';
+            const playBtn = controls.querySelector('[data-plyr="play"]');
+            if(playBtn) playBtn.after(badge); else controls.insertBefore(badge, controls.firstChild);
+        }
+        badge.style.display = 'flex';
+    } else { if(badge) badge.style.display = 'none'; }
+}
+
+// --- 4. HANDLE BROWSER BACK BUTTON ---
 window.addEventListener('popstate', (event) => {
     if (event.state && event.state.id) {
         loadAndPlayEpisode(event.state.id, false);
     } else {
         posterContainer.style.display = "flex";
         playerContainer.style.display = "none";
-        player.pause();
+        if(player) player.pause();
     }
 });
 
-// --- 4. NEW GENERATE PLAYLIST UI (UPDATED FOR ENDED STATUS) ---
+// --- 5. RENDER PLAYLIST UI ---
 function renderPlaylist(isUserVerified) {
-    playlistContainer.innerHTML = ''; // Clear existing items
-
+    playlistContainer.innerHTML = ''; 
     playlistData.forEach(ep => {
-        // Create Card
         const card = document.createElement('div');
         card.className = 'playlist-card';
-
-        // Check Date Locking 
         const today = new Date();
         let isDateLocked = false;
-        let releaseDate = null;
-        if (ep.date) {
-            releaseDate = new Date(ep.date); 
-            if (releaseDate > today) isDateLocked = true;
-        }
+        if (ep.date && new Date(ep.date) > today) isDateLocked = true;
 
-        // --- DETERMINE STATUS ---
-        let badgeHtml = '';
-        let buttonClass = 'enter-btn';
-        let buttonText = 'LOCKED';
-        let buttonDisabled = true;
-
-        // CHECK 1: IS EVENT ENDED? (Priority Check)
+        let badgeHtml = '', buttonClass = 'enter-btn', buttonText = 'LOCKED', buttonDisabled = true;
         const isEnded = ep.status && (ep.status.toLowerCase() === 'ended' || ep.status.toLowerCase() === 'done');
 
         if (isEnded) {
-            // Status: ENDED (Overrides everything else)
-            badgeHtml = `
-                <div class="ticket-status ended-badge">
-                    EVENT ENDED
-                </div>`;
-            buttonText = 'ENDED';
-            buttonClass += ' ended'; // Adds dark style
-            buttonDisabled = true;
-
+            badgeHtml = `<div class="ticket-status ended-badge">EVENT ENDED</div>`;
+            buttonText = 'ENDED'; buttonClass += ' ended'; buttonDisabled = true;
         } else if (isUserVerified) {
-            // Status: VERIFIED & ACTIVE
-            badgeHtml = `
-                <div class="ticket-status verified">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-                    ACCOUNT VERIFIED
-                </div>`;
-            
-            if (!isDateLocked) {
-                buttonClass += ' active';
-                buttonText = 'ENTER';
-                buttonDisabled = false;
-            } else {
-                buttonClass += ' time-locked';
-                buttonText = 'WAITING'; // Verified but too early
-            }
-
+            badgeHtml = `<div class="ticket-status verified"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>ACCOUNT VERIFIED</div>`;
+            if (!isDateLocked) { buttonClass += ' active'; buttonText = 'ENTER'; buttonDisabled = false; } 
+            else { buttonClass += ' time-locked'; buttonText = 'WAITING'; }
         } else {
-            // Status: ACCESS DENIED
-            badgeHtml = `
-                <div class="ticket-status denied">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                    ACCOUNT NOT VERIFIED
-                </div>`;
+            badgeHtml = `<div class="ticket-status denied"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>ACCOUNT NOT VERIFIED</div>`;
             buttonText = 'NO ACCESS';
         }
 
-        // --- PARSE DATE FOR DISPLAY ---
-        let displayDate = "COMING SOON";
-        let displayTime = "";
-        
+        let displayDate = "COMING SOON", displayTime = "";
         if(ep.date) {
             const d = new Date(ep.date);
-            const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-            const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-            
+            const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'], months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
             displayDate = `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}`;
-            // Simple Time formatting
-            let hours = d.getHours();
-            let minutes = d.getMinutes();
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12; 
-            minutes = minutes < 10 ? '0'+minutes : minutes;
-            displayTime = hours + ':' + minutes + ' ' + ampm + " PHT";
+            let h = d.getHours(), m = d.getMinutes(), ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12; h = h ? h : 12; m = m < 10 ? '0'+m : m;
+            displayTime = h + ':' + m + ' ' + ampm + " PHT";
         }
 
-        // --- BUILD HTML ---
-        card.innerHTML = `
-            ${badgeHtml}
-            <div class="card-header">${ep.title}</div>
-            <div class="card-body">
-                <div class="date-info">
-                    <span class="date-main">${displayDate}</span>
-                    <span class="time-sub">${displayTime}</span>
-                </div>
-                <button 
-                    class="${buttonClass}" 
-                    data-unlock-time="${ep.date}"
-                    data-id="${ep.id}"
-                    data-verified="${isUserVerified}"
-                    data-ended="${isEnded}"
-                    ${buttonDisabled ? 'disabled' : ''} 
-                >${buttonText}</button>
-            </div>
-        `;
-
-        // Click Event
-        const btn = card.querySelector('button');
+        card.innerHTML = `${badgeHtml}<div class="card-header">${ep.title}</div><div class="card-body"><div class="date-info"><span class="date-main">${displayDate}</span><span class="time-sub">${displayTime}</span></div><button class="${buttonClass}" data-unlock-time="${ep.date}" data-id="${ep.id}" data-verified="${isUserVerified}" data-ended="${isEnded}" ${buttonDisabled ? 'disabled' : ''}>${buttonText}</button></div>`;
         
-        btn.addEventListener('click', (e) => {
+        card.querySelector('button').addEventListener('click', (e) => {
             const isVerified = e.target.getAttribute('data-verified') === 'true';
             const isEventEnded = e.target.getAttribute('data-ended') === 'true';
-            const unlockTimeStr = e.target.getAttribute('data-unlock-time');
-            const unlockTime = unlockTimeStr ? new Date(unlockTimeStr) : new Date();
-            const now = new Date();
-
-            if (isEventEnded) {
-                return; // Do nothing if ended
-            }
-
-            if (!isVerified) {
-                alert("Access Denied: Your account is not verified for this event.");
-                return;
-            }
-
-            if (now >= unlockTime) {
-                loadAndPlayEpisode(ep.id, true);
-                document.querySelector('.video-wrapper-left').scrollIntoView({ behavior: 'smooth' });
-            } else {
-                alert("Event has not started yet. Please wait.");
-            }
+            const unlockTime = e.target.getAttribute('data-unlock-time') ? new Date(e.target.getAttribute('data-unlock-time')) : new Date();
+            
+            if (isEventEnded) return;
+            if (!isVerified) { alert("Access Denied: Your account is not verified for this event."); return; }
+            if (new Date() >= unlockTime) { loadAndPlayEpisode(ep.id, true); document.querySelector('.video-wrapper-left').scrollIntoView({ behavior: 'smooth' }); } 
+            else { alert("Event has not started yet. Please wait."); }
         });
-
         playlistContainer.appendChild(card);
     });
 }
 
-// --- NEW FUNCTION: GLOBAL TIMER TO AUTO-UNLOCK BUTTONS ---
 function startGlobalTimer() {
     setInterval(() => {
         const now = new Date();
-
-        // 1. Update Buttons
-        const lockedButtons = document.querySelectorAll('.enter-btn.time-locked');
-        lockedButtons.forEach(btn => {
-            const unlockTimeStr = btn.getAttribute('data-unlock-time');
-            if (unlockTimeStr) {
-                const unlockTime = new Date(unlockTimeStr);
-                if (now >= unlockTime) {
-                    btn.textContent = 'ENTER';
-                    btn.classList.remove('time-locked');
-                    btn.classList.add('active');
-                    // Ensure it is visually clickable (removed disabled attribute if logic added it)
-                    btn.disabled = false; 
-                }
+        document.querySelectorAll('.enter-btn.time-locked').forEach(btn => {
+            if (btn.getAttribute('data-unlock-time') && now >= new Date(btn.getAttribute('data-unlock-time'))) {
+                btn.textContent = 'ENTER'; btn.classList.remove('time-locked'); btn.classList.add('active'); btn.disabled = false;
             }
         });
-
-        // 2. Update Date beside Viewers
-        if(currentDateDisplay) {
-            const options = { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
-            currentDateDisplay.textContent = " • " + now.toLocaleTimeString('en-US', options);
-        }
-
-    }, 1000); // Check every second
+        if(currentDateDisplay) currentDateDisplay.textContent = " • " + now.toLocaleTimeString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+    }, 1000);
 }
-
-// Start the timer
 startGlobalTimer();
-
-
-// --- 5. CHECK URL ON PAGE LOAD ---
-// (REMOVED OLD LISTENER TO PREVENT DOUBLE LOAD / SECURITY BYPASS)
-// Logic moved inside auth.onAuthStateChanged for security.
 
 const isMobileOrTablet = /Mobi|Android|iPad|Tablet/i.test(navigator.userAgent);
 
-function enterFullscreen(el) {
-  if (el.requestFullscreen) el.requestFullscreen();
-  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  else if (el.msRequestFullscreen) el.msRequestFullscreen();
-}
+// --- WRAPPED EVENTS FUNCTION ---
+function attachPlayerEvents() {
+    if(!player) return;
+    player.on('enterfullscreen', () => { if (isMobileOrTablet && screen.orientation) screen.orientation.lock('landscape').catch(()=>{}); });
+    player.on('exitfullscreen', () => { if (isMobileOrTablet && screen.orientation) screen.orientation.unlock(); });
+    player.on('waiting', () => { if (bufferingOverlay) bufferingOverlay.classList.add('visible'); });
+    player.on('playing', () => { if (bufferingOverlay) bufferingOverlay.classList.remove('visible'); });
+    player.on('pause', () => { if (bufferingOverlay) bufferingOverlay.classList.remove('visible'); });
+    player.on('canplay', () => { if (bufferingOverlay) bufferingOverlay.classList.remove('visible'); });
 
-player.on('enterfullscreen', () => {
-  if (isMobileOrTablet) {
-    if (screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('landscape').catch(err => {});
-    } else if (window.screen.lockOrientation) {
-      window.screen.lockOrientation('landscape');
-    }
-  }
-});
-
-player.on('exitfullscreen', () => {
-  if (isMobileOrTablet) {
-    if (screen.orientation && screen.orientation.unlock) {
-      screen.orientation.unlock();
-    }
-  }
-});
-
-// --- NEW: BUFFERING EVENTS & OVERLAY MANAGEMENT ---
-player.on('waiting', () => {
-    if (bufferingOverlay) bufferingOverlay.classList.add('visible');
-});
-
-player.on('playing', () => {
-    if (bufferingOverlay) bufferingOverlay.classList.remove('visible');
-});
-
-player.on('pause', () => {
-    if (bufferingOverlay) bufferingOverlay.classList.remove('visible');
-});
-
-player.on('canplay', () => {
-    if (bufferingOverlay) bufferingOverlay.classList.remove('visible');
-});
-
-player.on('ready', () => {
-    const videoContainer = player.elements.container;
-    const videoWrapper = videoContainer.querySelector('.plyr__video-wrapper');
-    if (!videoWrapper) return;
-    
-    // --- MOVE ELEMENTS INTO WRAPPER ---
-    const badge = document.getElementById('player-status-badge');
-    const overlayTitle = document.getElementById('player-overlay-title');
-    const buffer = document.getElementById('buffering-overlay');
-    
-    if(badge) videoWrapper.appendChild(badge);
-    if(overlayTitle) videoWrapper.appendChild(overlayTitle);
-    if(buffer) videoWrapper.appendChild(buffer);
-
-    player.on('controlsshown', () => {
+    player.on('ready', () => {
+        const videoWrapper = player.elements.container.querySelector('.plyr__video-wrapper');
+        if (!videoWrapper) return;
+        const badge = document.getElementById('player-status-badge'), overlayTitle = document.getElementById('player-overlay-title'), buffer = document.getElementById('buffering-overlay');
+        if(badge) videoWrapper.appendChild(badge); if(overlayTitle) videoWrapper.appendChild(overlayTitle); if(buffer) videoWrapper.appendChild(buffer);
+        player.on('controlsshown', () => { if(overlayTitle) overlayTitle.classList.add('visible'); });
+        player.on('controlshidden', () => { if(overlayTitle && !player.paused) overlayTitle.classList.remove('visible'); });
         if(overlayTitle) overlayTitle.classList.add('visible');
-    });
 
-    player.on('controlshidden', () => {
-        if(overlayTitle && !player.paused) { 
-            overlayTitle.classList.remove('visible');
-        }
-    });
-    
-    if(overlayTitle) overlayTitle.classList.add('visible');
+        const rewindIcon = document.getElementById('rewind-icon-overlay'), forwardIcon = document.getElementById('forward-icon-overlay'), playPauseIcon = document.getElementById('play-pause-icon-overlay');
+        if (rewindIcon) videoWrapper.appendChild(rewindIcon); if (forwardIcon) videoWrapper.appendChild(forwardIcon); if (playPauseIcon) videoWrapper.appendChild(playPauseIcon);
 
-    // --- DOUBLE TAP LOGIC ---
-    const rewindIcon = document.getElementById('rewind-icon-overlay');
-    const forwardIcon = document.getElementById('forward-icon-overlay');
-    const playPauseIcon = document.getElementById('play-pause-icon-overlay');
-    const playSvg = document.getElementById('svg-play') ? document.getElementById('svg-play').cloneNode(true) : null;
-    const pauseSvg = document.getElementById('svg-pause') ? document.getElementById('svg-pause').cloneNode(true) : null;
-    
-    if(playSvg) playSvg.style.display = 'block';
-    if(pauseSvg) pauseSvg.style.display = 'block';
+        let lastTapTime = 0, tapTimeout = null;
+        const playSvg = document.getElementById('svg-play') ? document.getElementById('svg-play').cloneNode(true) : null;
+        const pauseSvg = document.getElementById('svg-pause') ? document.getElementById('svg-pause').cloneNode(true) : null;
+        if(playSvg) playSvg.style.display = 'block'; if(pauseSvg) pauseSvg.style.display = 'block';
 
-    if (rewindIcon) videoWrapper.appendChild(rewindIcon);
-    if (forwardIcon) videoWrapper.appendChild(forwardIcon);
-    if (playPauseIcon) videoWrapper.appendChild(playPauseIcon);
-
-    let lastTapTime = 0, tapTimeout = null, iconHideTimeout = null;
-
-    function showSeekIcon(type) {
-        if (iconHideTimeout) clearTimeout(iconHideTimeout);
-        if(rewindIcon) rewindIcon.classList.remove('visible');
-        if(forwardIcon) forwardIcon.classList.remove('visible');
-        if(playPauseIcon) playPauseIcon.classList.remove('visible');
-
-        let iconToShow;
-        if (type === 'rewind') iconToShow = rewindIcon;
-        else if (type === 'forward') iconToShow = forwardIcon;
-        else if (type === 'play-pause') {
-            iconToShow = playPauseIcon;
-            if(playPauseIcon) {
+        function showSeekIcon(type) {
+            if(rewindIcon) rewindIcon.classList.remove('visible'); if(forwardIcon) forwardIcon.classList.remove('visible'); if(playPauseIcon) playPauseIcon.classList.remove('visible');
+            let iconToShow = (type === 'rewind') ? rewindIcon : (type === 'forward') ? forwardIcon : playPauseIcon;
+            if (type === 'play-pause' && playPauseIcon) {
                 playPauseIcon.innerHTML = '';
-                if (player.paused && pauseSvg) playPauseIcon.appendChild(pauseSvg); 
-                else if (!player.paused && playSvg) playPauseIcon.appendChild(playSvg);
+                if (player.paused && pauseSvg) playPauseIcon.appendChild(pauseSvg); else if (!player.paused && playSvg) playPauseIcon.appendChild(playSvg);
             }
+            if (iconToShow) { iconToShow.classList.add('visible'); setTimeout(() => iconToShow.classList.remove('visible'), 500); }
         }
-        if (iconToShow) {
-            iconToShow.classList.add('visible');
-            iconHideTimeout = setTimeout(() => { iconToShow.classList.remove('visible'); }, 500);
-        }
-    }
 
-    function handleDoubleTap(event) {
-        const rect = videoWrapper.getBoundingClientRect();
-        const tapX = event.clientX - rect.left;
-        const zoneWidth = rect.width;
-        if (tapX < zoneWidth * 0.35) { player.rewind(10); showSeekIcon('rewind'); }
-        else if (tapX > zoneWidth * 0.65) { player.forward(10); showSeekIcon('forward'); }
-        else { showSeekIcon('play-pause'); player.togglePlay(); }
-    }
-
-    videoWrapper.addEventListener('click', (event) => {
-        if (event.target.closest('.plyr__controls')) return;
-        event.stopPropagation();
-        const currentTime = new Date().getTime();
-        const timeSinceLastTap = currentTime - lastTapTime;
-        if (tapTimeout) { clearTimeout(tapTimeout); tapTimeout = null; }
-
-        if (timeSinceLastTap > 0 && timeSinceLastTap < 300) {
-            event.preventDefault(); handleDoubleTap(event); lastTapTime = 0;
-        } else {
-            event.preventDefault();
-            tapTimeout = setTimeout(() => { player.toggleControls(); }, 300);
-        }
-        lastTapTime = currentTime;
+        videoWrapper.addEventListener('click', (event) => {
+            if (event.target.closest('.plyr__controls')) return;
+            event.stopPropagation();
+            const currentTime = new Date().getTime();
+            if (currentTime - lastTapTime > 0 && currentTime - lastTapTime < 300) {
+                if (tapTimeout) clearTimeout(tapTimeout);
+                const tapX = event.clientX - videoWrapper.getBoundingClientRect().left;
+                if (tapX < videoWrapper.getBoundingClientRect().width * 0.35) { player.rewind(10); showSeekIcon('rewind'); }
+                else if (tapX > videoWrapper.getBoundingClientRect().width * 0.65) { player.forward(10); showSeekIcon('forward'); }
+                else { showSeekIcon('play-pause'); player.togglePlay(); }
+                lastTapTime = 0;
+            } else {
+                event.preventDefault(); tapTimeout = setTimeout(() => { player.toggleControls(); }, 300);
+            }
+            lastTapTime = currentTime;
+        });
+        videoWrapper.addEventListener('dblclick', (e) => { e.preventDefault(); e.stopPropagation(); });
     });
 
-    videoWrapper.addEventListener('dblclick', (e) => { e.preventDefault(); e.stopPropagation(); });
-});
-
-// --- CLOUD SAVING LOGIC ---
-let lastSaveTime = 0; 
-
-player.on("timeupdate", () => {
-    const user = auth.currentUser;
-    const now = Date.now();
-    if (user && window.currentEpData && !player.paused && player.currentTime > 5) {
-        if (now - lastSaveTime > 5000) { 
-            let path = window.location.pathname;
-            let pageName = path.substring(path.lastIndexOf('/') + 1);
-            if(!pageName) pageName = "videos.html"; 
-
-            const dataToSave = {
-                id: window.currentEpData.id,
-                title: window.currentEpData.title,
-                image: window.currentEpData.image,
-                currentTime: player.currentTime,
-                duration: player.duration || 0,
-                timestamp: now,
-                page: pageName 
-            };
-              
-            db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).update(dataToSave);
-            lastSaveTime = now;
+    let lastSaveTime = 0; 
+    player.on("timeupdate", () => {
+        const user = auth.currentUser;
+        if (user && window.currentEpData && !player.paused && player.currentTime > 5 && Date.now() - lastSaveTime > 5000) { 
+            let pageName = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1) || "videos.html"; 
+            db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).update({ id: window.currentEpData.id, title: window.currentEpData.title, image: window.currentEpData.image, currentTime: player.currentTime, duration: player.duration || 0, timestamp: Date.now(), page: pageName });
+            lastSaveTime = Date.now();
         }
-    }
-});
-
-// --- REMOVE VIEWER ON TAB CLOSE ---
-window.addEventListener('beforeunload', () => {
-    if (currentPresenceRef) {
-        currentPresenceRef.remove();
-    }
-});
+    });
+}
+window.addEventListener('beforeunload', () => { if (currentPresenceRef) currentPresenceRef.remove(); });
 </script>
 
 <script>
@@ -1504,11 +1239,7 @@ window.addEventListener('beforeunload', () => {
     navigator.serviceWorker.register('sw.js').then(reg => {
       reg.onupdatefound = () => {
         const newSW = reg.installing;
-        newSW.onstatechange = () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            window.location.reload();
-          }
-        };
+        newSW.onstatechange = () => { if (newSW.state === 'installed' && navigator.serviceWorker.controller) window.location.reload(); };
       };
     }).catch(err => {});
   }
