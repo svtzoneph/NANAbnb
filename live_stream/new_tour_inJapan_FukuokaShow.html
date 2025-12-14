@@ -161,7 +161,7 @@
     /* Keep padding in portrait so it doesn't touch edges */
     body { padding: 10px 0 !important; }
     .main-layout { padding: 0 15px !important; }
-     
+      
     h2 { font-size: 18px; }
     h3.playlist-header { 
         font-size: 16px; 
@@ -199,7 +199,7 @@
         width: 100% !important;
         height: 100% !important;
     }
-     
+      
     /* 3. Ensure the video element itself stretches */
     video {
         width: 100% !important;
@@ -217,7 +217,7 @@
     .video-wrapper-left {
         height: 100vh; /* Placeholder height */
     }
-     
+      
     #views-display, 
     #main-title, 
     #playlist {
@@ -235,7 +235,7 @@
     border-radius: 0px;
     overflow: hidden;
   }
-     
+      
   video { width: 100%; }
 
   /* --- GLASSMORPHISM BACK BUTTON (Hyper) --- */
@@ -381,7 +381,7 @@
     fill: white;
     display: block;
   }
-     
+      
   /* Scrollbar Styling */
   #playlist-items::-webkit-scrollbar { width: 8px; }
   #playlist-items::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }
@@ -551,20 +551,20 @@
     z-index: 1 !important;
     display: none;
     pointer-events: none;
-    
+     
     /* UPDATED STYLE: Transparent but Readable */
     font-size: 12px !important; 
     padding: 4px 10px !important;
-    
+     
     /* 1. Background: Almost invisible black tint for contrast */
     background: rgba(0, 0, 0, 0.2) !important; 
-    
+     
     /* 2. Color: White with 60% opacity (ghostly but visible) */
     color: rgba(255, 255, 255, 0.6) !important; 
-    
+     
     /* 3. Shadow: The secret to readability on any background */
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
-    
+     
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 6px;
     font-family: 'Roboto Mono', monospace;
@@ -707,14 +707,14 @@
       text-align: left;
     }
     .video-wrapper-left { width: 100%; max-width: 1100px; margin: 0 auto; }
-     
+      
     #playlist { 
         width: 100%; 
         max-width: 1100px; 
         margin: 20px auto !important; 
         text-align: left;
     }
-     
+      
     h3.playlist-header { margin-top: 0 !important; line-height: 1; }
     #playlist-items { 
         max-height: 500px !important; 
@@ -735,7 +735,7 @@
 <div class="main-layout">
 
   <div class="video-wrapper-left">
-     
+      
     <div id="poster-container">
       <div id="poster-overlay">Select the Live to Watch</div>
     </div>
@@ -776,7 +776,7 @@ const playlistData = [
     id: "1", 
     title: "DAY 1 - SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Fukuoka Show", 
     status: "Live", 
-    date: "December 20, 2025 5:00 PM", // Example: Future time to test auto-unlock
+    date: "December 20, 2025 5:00 PM", 
     image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png",
   },
   { 
@@ -839,7 +839,7 @@ function smartGoBack() {
 
 // Function to show the denial screen
 function showAccessDeniedModal(message) {
-    if(typeof player !== 'undefined') {
+    if(typeof player !== 'undefined' && player) {
         player.pause();
         if(player.fullscreen.active) player.fullscreen.exit();
     }
@@ -943,19 +943,26 @@ auth.onAuthStateChanged(user => {
 const video = document.getElementById("videoPlayer");
 let hls;
 
-// --- PLYR CONFIG UPDATED: Order adjusted for Layout ---
-const player = new Plyr(video, {
+// --- PLYR CONFIG UPDATED: CHANGED TO 'LET' AND MOVED INIT INSIDE HLS LOGIC ---
+let player = null;
+
+const defaultPlyrOptions = {
   captions: { active: true, update: true, language: "en" },
   controls: [
     'play-large',   
-    'play',           
+    'play',            
     'mute', // Will be pushed to right via CSS
+    'settings',
     'fullscreen'
   ],
   settings: ["captions","speed","quality"],
   clickToPlay: false, 
-  dblclickFullscreen: false
-});
+  dblclickFullscreen: false,
+  i18n: {
+    quality: 'Quality',
+    qualityBadge: { 2160: '4K', 1440: 'HD', 1080: 'HD', 720: 'HD', 576: 'SD', 480: 'SD' }
+  }
+};
 
 // --- HELPER: UPDATE LIVE BADGE IN PLAYER ---
 function updatePlayerLiveBadge(status) {
@@ -1033,7 +1040,8 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
         overlayTitle.textContent = ep.title;
     }
 
-    updatePlayerLiveBadge(ep.status);
+    // We do NOT call updatePlayerLiveBadge here yet because player might not be ready
+    // We will call it in attachPlayerEvents or after player creation
 
     posterContainer.style.display = "none";
     playerContainer.style.display = "block";
@@ -1078,11 +1086,12 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
       const data = snapshot.val();
       if(!data || !data.url) { alert("Live unavailable"); return; }
 
-      if(typeof hls !== 'undefined' && hls){ hls.destroy(); hls = null; }
-
       const resumePlayback = () => {
           player.volume = 1;    // Set volume to 100%
           player.muted = false; // Force Unmute
+          
+          // Re-apply badge
+          updatePlayerLiveBadge(ep.status);
 
           if (!window.currentEpData || !user) {
              var playPromise = player.play();
@@ -1108,15 +1117,66 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
           });
       };
 
+      // --- UPDATED HLS LOGIC WITH QUALITY CHANGER FIX ---
       if(typeof Hls !== 'undefined' && Hls.isSupported()){
+        if(hls) {
+            hls.destroy();
+        }
         hls = new Hls();
         hls.loadSource(data.url);
         hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => { 
-              setTimeout(resumePlayback, 100);
+        
+        hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+            
+            // 1. Get available qualities from the HLS stream
+            const availableQualities = hls.levels.map((l) => l.height);
+            
+            // 2. Add '0' to represent 'Auto' at the beginning
+            availableQualities.unshift(0);
+
+            // 3. Update Plyr config with these new options dynamically
+            const newOptions = Object.assign({}, defaultPlyrOptions);
+            newOptions.quality = {
+                default: 0, // Default to Auto
+                options: availableQualities,
+                forced: true,
+                onChange: (newQuality) => {
+                    if (newQuality === 0) {
+                        hls.currentLevel = -1; // -1 represents Auto in HLS.js
+                    } else {
+                        // Find the index of the selected height
+                        hls.levels.forEach((level, levelIndex) => {
+                            if (level.height === newQuality) {
+                                hls.currentLevel = levelIndex;
+                            }
+                        });
+                    }
+                }
+            };
+
+            // 4. Destroy old player if exists and create new one with OPTIONS
+            if(player) {
+                player.destroy();
+            }
+
+            player = new Plyr(video, newOptions);
+
+            // 5. Re-attach the custom events (Glassmorphism, Double tap, etc)
+            attachPlayerEvents();
+
+            // 6. Trigger playback
+            setTimeout(resumePlayback, 100);
         });
+        
       } else {
+        // Fallback for Safari (Native HLS)
         video.src = data.url;
+        
+        // Init player for Safari (without advanced quality controls as Safari handles it natively)
+        if(player) player.destroy();
+        player = new Plyr(video, defaultPlyrOptions);
+        attachPlayerEvents();
+
         video.addEventListener('loadedmetadata', resumePlayback, { once: true });
       }
 
@@ -1150,7 +1210,7 @@ window.addEventListener('popstate', (event) => {
     } else {
         posterContainer.style.display = "flex";
         playerContainer.style.display = "none";
-        player.pause();
+        if(player) player.pause();
     }
 });
 
@@ -1329,167 +1389,174 @@ startGlobalTimer();
 
 const isMobileOrTablet = /Mobi|Android|iPad|Tablet/i.test(navigator.userAgent);
 
-function enterFullscreen(el) {
-  if (el.requestFullscreen) el.requestFullscreen();
-  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  else if (el.msRequestFullscreen) el.msRequestFullscreen();
-}
+// --- WRAPPED EVENTS FUNCTION ---
+// We need this because we destroy and recreate the player to update quality settings
+function attachPlayerEvents() {
+    if(!player) return;
 
-player.on('enterfullscreen', () => {
-  if (isMobileOrTablet) {
-    if (screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('landscape').catch(err => {});
-    } else if (window.screen.lockOrientation) {
-      window.screen.lockOrientation('landscape');
+    function enterFullscreen(el) {
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      else if (el.msRequestFullscreen) el.msRequestFullscreen();
     }
-  }
-});
 
-player.on('exitfullscreen', () => {
-  if (isMobileOrTablet) {
-    if (screen.orientation && screen.orientation.unlock) {
-      screen.orientation.unlock();
-    }
-  }
-});
-
-// --- NEW: BUFFERING EVENTS & OVERLAY MANAGEMENT ---
-player.on('waiting', () => {
-    if (bufferingOverlay) bufferingOverlay.classList.add('visible');
-});
-
-player.on('playing', () => {
-    if (bufferingOverlay) bufferingOverlay.classList.remove('visible');
-});
-
-player.on('pause', () => {
-    if (bufferingOverlay) bufferingOverlay.classList.remove('visible');
-});
-
-player.on('canplay', () => {
-    if (bufferingOverlay) bufferingOverlay.classList.remove('visible');
-});
-
-player.on('ready', () => {
-    const videoContainer = player.elements.container;
-    const videoWrapper = videoContainer.querySelector('.plyr__video-wrapper');
-    if (!videoWrapper) return;
-    
-    // --- MOVE ELEMENTS INTO WRAPPER ---
-    const badge = document.getElementById('player-status-badge');
-    const overlayTitle = document.getElementById('player-overlay-title');
-    const buffer = document.getElementById('buffering-overlay');
-    
-    if(badge) videoWrapper.appendChild(badge);
-    if(overlayTitle) videoWrapper.appendChild(overlayTitle);
-    if(buffer) videoWrapper.appendChild(buffer);
-
-    player.on('controlsshown', () => {
-        if(overlayTitle) overlayTitle.classList.add('visible');
-    });
-
-    player.on('controlshidden', () => {
-        if(overlayTitle && !player.paused) { 
-            overlayTitle.classList.remove('visible');
+    player.on('enterfullscreen', () => {
+      if (isMobileOrTablet) {
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch(err => {});
+        } else if (window.screen.lockOrientation) {
+          window.screen.lockOrientation('landscape');
         }
+      }
     });
-    
-    if(overlayTitle) overlayTitle.classList.add('visible');
 
-    // --- DOUBLE TAP LOGIC ---
-    const rewindIcon = document.getElementById('rewind-icon-overlay');
-    const forwardIcon = document.getElementById('forward-icon-overlay');
-    const playPauseIcon = document.getElementById('play-pause-icon-overlay');
-    const playSvg = document.getElementById('svg-play') ? document.getElementById('svg-play').cloneNode(true) : null;
-    const pauseSvg = document.getElementById('svg-pause') ? document.getElementById('svg-pause').cloneNode(true) : null;
-    
-    if(playSvg) playSvg.style.display = 'block';
-    if(pauseSvg) pauseSvg.style.display = 'block';
+    player.on('exitfullscreen', () => {
+      if (isMobileOrTablet) {
+        if (screen.orientation && screen.orientation.unlock) {
+          screen.orientation.unlock();
+        }
+      }
+    });
 
-    if (rewindIcon) videoWrapper.appendChild(rewindIcon);
-    if (forwardIcon) videoWrapper.appendChild(forwardIcon);
-    if (playPauseIcon) videoWrapper.appendChild(playPauseIcon);
+    // --- NEW: BUFFERING EVENTS & OVERLAY MANAGEMENT ---
+    player.on('waiting', () => {
+        if (bufferingOverlay) bufferingOverlay.classList.add('visible');
+    });
 
-    let lastTapTime = 0, tapTimeout = null, iconHideTimeout = null;
+    player.on('playing', () => {
+        if (bufferingOverlay) bufferingOverlay.classList.remove('visible');
+    });
 
-    function showSeekIcon(type) {
-        if (iconHideTimeout) clearTimeout(iconHideTimeout);
-        if(rewindIcon) rewindIcon.classList.remove('visible');
-        if(forwardIcon) forwardIcon.classList.remove('visible');
-        if(playPauseIcon) playPauseIcon.classList.remove('visible');
+    player.on('pause', () => {
+        if (bufferingOverlay) bufferingOverlay.classList.remove('visible');
+    });
 
-        let iconToShow;
-        if (type === 'rewind') iconToShow = rewindIcon;
-        else if (type === 'forward') iconToShow = forwardIcon;
-        else if (type === 'play-pause') {
-            iconToShow = playPauseIcon;
-            if(playPauseIcon) {
-                playPauseIcon.innerHTML = '';
-                if (player.paused && pauseSvg) playPauseIcon.appendChild(pauseSvg); 
-                else if (!player.paused && playSvg) playPauseIcon.appendChild(playSvg);
+    player.on('canplay', () => {
+        if (bufferingOverlay) bufferingOverlay.classList.remove('visible');
+    });
+
+    player.on('ready', () => {
+        const videoContainer = player.elements.container;
+        const videoWrapper = videoContainer.querySelector('.plyr__video-wrapper');
+        if (!videoWrapper) return;
+        
+        // --- MOVE ELEMENTS INTO WRAPPER ---
+        const badge = document.getElementById('player-status-badge');
+        const overlayTitle = document.getElementById('player-overlay-title');
+        const buffer = document.getElementById('buffering-overlay');
+        
+        if(badge) videoWrapper.appendChild(badge);
+        if(overlayTitle) videoWrapper.appendChild(overlayTitle);
+        if(buffer) videoWrapper.appendChild(buffer);
+
+        player.on('controlsshown', () => {
+            if(overlayTitle) overlayTitle.classList.add('visible');
+        });
+
+        player.on('controlshidden', () => {
+            if(overlayTitle && !player.paused) { 
+                overlayTitle.classList.remove('visible');
+            }
+        });
+        
+        if(overlayTitle) overlayTitle.classList.add('visible');
+
+        // --- DOUBLE TAP LOGIC ---
+        const rewindIcon = document.getElementById('rewind-icon-overlay');
+        const forwardIcon = document.getElementById('forward-icon-overlay');
+        const playPauseIcon = document.getElementById('play-pause-icon-overlay');
+        const playSvg = document.getElementById('svg-play') ? document.getElementById('svg-play').cloneNode(true) : null;
+        const pauseSvg = document.getElementById('svg-pause') ? document.getElementById('svg-pause').cloneNode(true) : null;
+        
+        if(playSvg) playSvg.style.display = 'block';
+        if(pauseSvg) pauseSvg.style.display = 'block';
+
+        if (rewindIcon) videoWrapper.appendChild(rewindIcon);
+        if (forwardIcon) videoWrapper.appendChild(forwardIcon);
+        if (playPauseIcon) videoWrapper.appendChild(playPauseIcon);
+
+        let lastTapTime = 0, tapTimeout = null, iconHideTimeout = null;
+
+        function showSeekIcon(type) {
+            if (iconHideTimeout) clearTimeout(iconHideTimeout);
+            if(rewindIcon) rewindIcon.classList.remove('visible');
+            if(forwardIcon) forwardIcon.classList.remove('visible');
+            if(playPauseIcon) playPauseIcon.classList.remove('visible');
+
+            let iconToShow;
+            if (type === 'rewind') iconToShow = rewindIcon;
+            else if (type === 'forward') iconToShow = forwardIcon;
+            else if (type === 'play-pause') {
+                iconToShow = playPauseIcon;
+                if(playPauseIcon) {
+                    playPauseIcon.innerHTML = '';
+                    if (player.paused && pauseSvg) playPauseIcon.appendChild(pauseSvg); 
+                    else if (!player.paused && playSvg) playPauseIcon.appendChild(playSvg);
+                }
+            }
+            if (iconToShow) {
+                iconToShow.classList.add('visible');
+                iconHideTimeout = setTimeout(() => { iconToShow.classList.remove('visible'); }, 500);
             }
         }
-        if (iconToShow) {
-            iconToShow.classList.add('visible');
-            iconHideTimeout = setTimeout(() => { iconToShow.classList.remove('visible'); }, 500);
+
+        function handleDoubleTap(event) {
+            const rect = videoWrapper.getBoundingClientRect();
+            const tapX = event.clientX - rect.left;
+            const zoneWidth = rect.width;
+            if (tapX < zoneWidth * 0.35) { player.rewind(10); showSeekIcon('rewind'); }
+            else if (tapX > zoneWidth * 0.65) { player.forward(10); showSeekIcon('forward'); }
+            else { showSeekIcon('play-pause'); player.togglePlay(); }
         }
-    }
 
-    function handleDoubleTap(event) {
-        const rect = videoWrapper.getBoundingClientRect();
-        const tapX = event.clientX - rect.left;
-        const zoneWidth = rect.width;
-        if (tapX < zoneWidth * 0.35) { player.rewind(10); showSeekIcon('rewind'); }
-        else if (tapX > zoneWidth * 0.65) { player.forward(10); showSeekIcon('forward'); }
-        else { showSeekIcon('play-pause'); player.togglePlay(); }
-    }
+        videoWrapper.addEventListener('click', (event) => {
+            if (event.target.closest('.plyr__controls')) return;
+            event.stopPropagation();
+            const currentTime = new Date().getTime();
+            const timeSinceLastTap = currentTime - lastTapTime;
+            if (tapTimeout) { clearTimeout(tapTimeout); tapTimeout = null; }
 
-    videoWrapper.addEventListener('click', (event) => {
-        if (event.target.closest('.plyr__controls')) return;
-        event.stopPropagation();
-        const currentTime = new Date().getTime();
-        const timeSinceLastTap = currentTime - lastTapTime;
-        if (tapTimeout) { clearTimeout(tapTimeout); tapTimeout = null; }
+            if (timeSinceLastTap > 0 && timeSinceLastTap < 300) {
+                event.preventDefault(); handleDoubleTap(event); lastTapTime = 0;
+            } else {
+                event.preventDefault();
+                tapTimeout = setTimeout(() => { player.toggleControls(); }, 300);
+            }
+            lastTapTime = currentTime;
+        });
 
-        if (timeSinceLastTap > 0 && timeSinceLastTap < 300) {
-            event.preventDefault(); handleDoubleTap(event); lastTapTime = 0;
-        } else {
-            event.preventDefault();
-            tapTimeout = setTimeout(() => { player.toggleControls(); }, 300);
-        }
-        lastTapTime = currentTime;
+        videoWrapper.addEventListener('dblclick', (e) => { e.preventDefault(); e.stopPropagation(); });
     });
 
-    videoWrapper.addEventListener('dblclick', (e) => { e.preventDefault(); e.stopPropagation(); });
-});
+    // --- CLOUD SAVING LOGIC ---
+    let lastSaveTime = 0; 
 
-// --- CLOUD SAVING LOGIC ---
-let lastSaveTime = 0; 
+    player.on("timeupdate", () => {
+        const user = auth.currentUser;
+        const now = Date.now();
+        if (user && window.currentEpData && !player.paused && player.currentTime > 5) {
+            if (now - lastSaveTime > 5000) { 
+                let path = window.location.pathname;
+                let pageName = path.substring(path.lastIndexOf('/') + 1);
+                if(!pageName) pageName = "videos.html"; 
 
-player.on("timeupdate", () => {
-    const user = auth.currentUser;
-    const now = Date.now();
-    if (user && window.currentEpData && !player.paused && player.currentTime > 5) {
-        if (now - lastSaveTime > 5000) { 
-            let path = window.location.pathname;
-            let pageName = path.substring(path.lastIndexOf('/') + 1);
-            if(!pageName) pageName = "videos.html"; 
-
-            const dataToSave = {
-                id: window.currentEpData.id,
-                title: window.currentEpData.title,
-                image: window.currentEpData.image,
-                currentTime: player.currentTime,
-                duration: player.duration || 0,
-                timestamp: now,
-                page: pageName 
-            };
-              
-            db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).update(dataToSave);
-            lastSaveTime = now;
+                const dataToSave = {
+                    id: window.currentEpData.id,
+                    title: window.currentEpData.title,
+                    image: window.currentEpData.image,
+                    currentTime: player.currentTime,
+                    duration: player.duration || 0,
+                    timestamp: now,
+                    page: pageName 
+                };
+                  
+                db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).update(dataToSave);
+                lastSaveTime = now;
+            }
         }
-    }
-});
+    });
+}
+
 
 // --- REMOVE VIEWER ON TAB CLOSE ---
 window.addEventListener('beforeunload', () => {
