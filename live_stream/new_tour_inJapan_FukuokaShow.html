@@ -1173,12 +1173,6 @@ auth.onAuthStateChanged(user => {
         playerBadge.classList.add('status-uid');
     }
 
-    // --- NEW: SET FLOATING WATERMARK TEXT ---
-    const floatingWatermark = document.getElementById('floating-watermark');
-    if(floatingWatermark) {
-        floatingWatermark.textContent = "ID: " + user.uid;
-        floatingWatermark.style.display = "block";
-    }
 
     // --- REALTIME LISTENER (.on instead of .once) ---
     const accessRef = db.ref(`page_access/${PAGE_ID}/${user.uid}`);
