@@ -440,7 +440,7 @@
       color: #4db8ff; 
       border: 1px solid rgba(77, 184, 255, 0.3);
   }
-   
+    
   .ticket-status.denied { 
       background: rgba(255, 68, 68, 0.15);
       color: #ff4444; 
@@ -506,7 +506,7 @@
     -webkit-backdrop-filter: blur(4px);
     transition: all 0.3s ease;
   }
-   
+    
   #player-status-badge.status-uid {
     position: absolute;
     top: auto !important;
@@ -515,25 +515,50 @@
     z-index: 1 !important;
     display: none;
     pointer-events: none;
-     
+      
     /* UPDATED STYLE: Transparent but Readable */
     font-size: 12px !important; 
     padding: 4px 10px !important;
-     
+      
     /* 1. Background: Almost invisible black tint for contrast */
     background: rgba(0, 0, 0, 0.2) !important; 
-     
+      
     /* 2. Color: White with 60% opacity (ghostly but visible) */
     color: rgba(255, 255, 255, 0.6) !important; 
-     
+      
     /* 3. Shadow: The secret to readability on any background */
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
-     
+      
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 6px;
     font-family: 'Roboto Mono', monospace;
     text-transform: none;
     backdrop-filter: blur(2px); 
+  }
+
+  /* --- 🚀 NEW: RANDOM APPEAR/DISAPPEAR WATERMARK --- */
+  .floating-watermark {
+    position: absolute;
+    top: 10%; 
+    left: 10%;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 16px;
+    font-weight: 900;
+    
+    /* Initially Invisible */
+    opacity: 0;
+    
+    /* NEW: High visibility for "Can Read" request */
+    color: rgba(255, 255, 255, 0.5); 
+    text-shadow: 0 0 5px rgba(0,0,0,0.8); 
+    
+    pointer-events: none; 
+    z-index: 25; 
+    user-select: none;
+    white-space: nowrap;
+    
+    /* Fade Transition Only */
+    transition: opacity 1s ease-in-out; 
   }
 
   .live-control-badge {
@@ -647,6 +672,9 @@
         font-size: 8px !important;
         bottom: 13px !important;
         left: 10px !important;
+    }
+    .floating-watermark {
+        font-size: 12px; 
     }
     .player-overlay-title {
         font-size: 10px;
@@ -870,6 +898,9 @@
 
     <div id="player-container">
       <div id="player-status-badge" class="status-badge"></div>
+      
+      <div id="floating-watermark" class="floating-watermark"></div>
+
       <div id="player-overlay-title" class="player-overlay-title"></div>
       
       <div id="buffering-overlay" class="buffering-overlay">
@@ -948,12 +979,23 @@
                 </div>
             </div>
 
-            <div class="guide-item">
-                <div class="dot-icon"></div>
-                <div class="item-text">
-                    You can Screenshot or Screen Record, but please <span class="highlight">DO NOT POST</span> while the stream is ongoing. Always blur your ID to protect your info.
-                </div>
-            </div>
+           <div class="guide-item">
+    <div class="dot-icon"></div>
+    <div class="item-text">
+        <span class="highlight">SCREENSHOT AND SCREEN RECORDING ARE PROHIBITED.</span>
+        Do not capture, record, or redistribute any part of the stream.
+        Posting while the stream is ongoing is strictly not allowed.
+    </div>
+</div>
+
+<div class="guide-item">
+    <div class="dot-icon"></div>
+    <div class="item-text">
+        <span class="highlight" style="color:#ff4444;">DO NOT SHARE LINKS:</span>
+        Sharing, reposting, or distributing the website or stream link where you are watching is strictly prohibited. Violators may have their access revoked without notice.
+    </div>
+</div>
+
             
             <div class="guide-item">
                 <div class="dot-icon"></div>
@@ -1129,6 +1171,13 @@ auth.onAuthStateChanged(user => {
         playerBadge.textContent = "ID: " + user.uid;
         playerBadge.style.display = "block"; 
         playerBadge.classList.add('status-uid');
+    }
+
+    // --- NEW: SET FLOATING WATERMARK TEXT ---
+    const floatingWatermark = document.getElementById('floating-watermark');
+    if(floatingWatermark) {
+        floatingWatermark.textContent = "ID: " + user.uid;
+        floatingWatermark.style.display = "block";
     }
 
     // --- REALTIME LISTENER (.on instead of .once) ---
@@ -1709,12 +1758,62 @@ function attachPlayerEvents() {
         
         // --- MOVE ELEMENTS INTO WRAPPER ---
         const badge = document.getElementById('player-status-badge');
+        
+        // --- ADDED THIS LINE FOR FLOATING WATERMARK ---
+        const floater = document.getElementById('floating-watermark');
+
         const overlayTitle = document.getElementById('player-overlay-title');
         const buffer = document.getElementById('buffering-overlay');
         
         if(badge) videoWrapper.appendChild(badge);
+        
+        // --- ADDED THIS LINE FOR FLOATING WATERMARK ---
+        if(floater) videoWrapper.appendChild(floater);
+        
         if(overlayTitle) videoWrapper.appendChild(overlayTitle);
         if(buffer) videoWrapper.appendChild(buffer);
+
+        // --- 🚀 GHOST WATERMARK LOGIC (APPEAR/DISAPPEAR) ---
+        function watermarkLoop() {
+             if(!floater) return;
+
+             // 1. Move to random spot (Instant because opacity is 0)
+             // Widen ranges to hit edges more "Left, Right, Top, Bottom"
+             // Top: 5% to 85% (Covers top and bottom)
+             // Left: 5% to 70% (Covers left and center, avoids right overflow)
+             // To truly hit the "Right" side, we rely on the text width filling the gap, 
+             // but we can push it further if we assume mobile screens wrap? No, white-space: nowrap.
+             
+             const rTop = Math.floor(Math.random() * 85) + 5; 
+             const rLeft = Math.floor(Math.random() * 75) + 5; 
+             
+             floater.style.top = rTop + "%";
+             floater.style.left = rLeft + "%";
+
+             // 2. Fade In (small delay to ensure position updated)
+             setTimeout(() => {
+                 // --- CHANGE: INCREASED OPACITY TO 0.7 FOR BETTER READABILITY ---
+                 floater.style.opacity = "0.7"; 
+
+                 // 3. Stay visible for random time (e.g., 5000ms to 10000ms)
+                 const visibleTime = Math.floor(Math.random() * 5000) + 5000;
+
+                 setTimeout(() => {
+                     // 4. Fade Out
+                     floater.style.opacity = "0";
+
+                     // 5. Stay hidden for LONG random time (e.g., 10s to 60s)
+                     // This fixes the "every 2-3 sec" complaint
+                     const hiddenTime = Math.floor(Math.random() * 50000) + 10000;
+                     setTimeout(watermarkLoop, hiddenTime);
+
+                 }, visibleTime);
+             }, 100);
+        }
+
+        // Start the loop
+        watermarkLoop();
+
 
         player.on('controlsshown', () => {
             if(overlayTitle) overlayTitle.classList.add('visible');
