@@ -161,7 +161,7 @@
 
     /* Video Section */
     .video-wrapper-left { flex: 3; width: 100%; }
-    
+     
     #poster-container {
         width: 100%; aspect-ratio: 16/9;
         background-size: cover; background-position: center;
@@ -187,7 +187,7 @@
         overflow: hidden; 
         position: relative;
     }
-    
+     
     .art-video-player { width: 100%; height: 100%; }
 
     /* Titles */
@@ -320,7 +320,7 @@
         </div>
 
         <h2 id="main-title">Select Episode</h2>
-    
+     
     </div>
   </div>
 
@@ -349,7 +349,7 @@ const playlistData = [
   { id: "4", title: "[Multi-view] DAY 1 - SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Osaka Show", image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png" },
    { id: "5", title: "DAY 3 - SEVENTEEN [NEW_] WORLD TOUR IN OSAKA", image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png" },
   { id: "6", title: "[Multi-view] DAY 1 - SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Osaka Show", image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png" }
-];3
+];
 const playlistContainer = document.getElementById('playlist-items');
 const posterContainer = document.getElementById('poster-container');
 const playerContainer = document.getElementById('player-container');
@@ -402,8 +402,14 @@ function removeAccessDeniedModal() {
     if(modal) modal.remove();
 }
 
-// --- 3. ARTPLAYER & CUSTOM GESTURES ---
+// --- 3. ARTPLAYER & CUSTOM GESTURES (UPDATED WITH UNIQUE HISTORY) ---
 function loadAndPlayEpisode(epId, updateUrl = true) {
+    // 1. Destroy old player first
+    if (art) {
+        art.destroy(false);
+        art = null;
+    }
+
     const ep = playlistData.find(item => item.id === epId);
     if (!ep) return;
 
@@ -420,11 +426,16 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
     posterContainer.style.display = "none";
     playerContainer.style.display = "block";
 
+    // --- IDENTIFY PAGE NAME FOR UNIQUE HISTORY ---
+    let pageIdentifier = window.location.pathname.split("/").pop().replace(".html", "");
+    if (!pageIdentifier || pageIdentifier === "") pageIdentifier = "index";
+    
+    // Create Unique Key: VideoID + PageName
+    const uniqueHistoryKey = `${ep.id}_${pageIdentifier}`;
+
     db.ref(`newtourjpn/${ep.id}`).once('value').then(snapshot => {
       const data = snapshot.val();
       if(!data || !data.url) { alert("Video unavailable"); return; }
-
-      if (art) { art.destroy(); }
 
       art = new Artplayer({
           container: '#artplayer',
@@ -508,10 +519,10 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
           setTimeout(() => el.classList.remove('active'), 500);
       }
 
-      // Resume & History Saving (Same as before)
+      // Resume Logic (USING UNIQUE KEY)
       const user = auth.currentUser;
       if (user) {
-          db.ref('watchHistory/' + user.uid + '/' + ep.id).once('value').then(snap => {
+          db.ref('watchHistory/' + user.uid + '/' + uniqueHistoryKey).once('value').then(snap => {
               const saved = snap.val();
               if (saved && saved.currentTime > 0) {
                   art.on('ready', () => {
@@ -523,6 +534,7 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
           });
       }
 
+      // Save Logic (USING UNIQUE KEY)
       let lastSave = 0;
       art.on('video:timeupdate', () => {
           const now = Date.now();
@@ -534,9 +546,9 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
                   currentTime: art.currentTime,
                   duration: art.duration || 0,
                   timestamp: now,
-                  page: "watch.html"
+                  page: pageIdentifier
               };
-              db.ref('watchHistory/' + auth.currentUser.uid + '/' + window.currentEpData.id).update(historyData);
+              db.ref('watchHistory/' + auth.currentUser.uid + '/' + uniqueHistoryKey).update(historyData);
               lastSave = now;
           }
       });
