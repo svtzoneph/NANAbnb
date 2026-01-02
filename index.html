@@ -3,41 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Zone Vault</title>
-  <!-- Optional: Only keep if you actually have this file -->
-  <!-- <script src="main.js"></script> -->
-   
+  <title>Zone Vault | Exclusive VOD Experience</title>
+  
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="favicon-new.png" type="image/png">
-  <meta name="theme-color" content="#2196f3">
+  <meta name="theme-color" content="#0a0a0a">
 
   <meta name="title" content="Zone Vault">
-  <meta name="description" content="New Arrival! SEVENTEEN: OUR CHAPTER is finally here! Don’t wait—watch SEVENTEEN: OUR CHAPTER now and enjoy it all!">
+  <meta name="description" content="Watch, Enjoy, and Stay Private. The premier destination for exclusive SEVENTEEN content in a secure environment.">
 
-  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://zonevault.site/index">
   <meta property="og:title" content="Zone Vault">
-  <meta property="og:description" content="New Arrival! SEVENTEEN: OUR CHAPTER is finally here! Don’t wait—watch SEVENTEEN: OUR CHAPTER now and enjoy it all!">
+  <meta property="og:description" content="New Arrival! SEVENTEEN: OUR CHAPTER is finally here!">
   <meta property="og:image" content="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png">
-  <meta property="og:site_name" content="Zone Vault">
-  <meta property="og:locale" content="en_PH">
 
-  <!-- Twitter / X Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://zonevault.site/index">
-  <meta name="twitter:title" content="Zone Vault">
-  <meta name="twitter:description" content="New Arrival! SEVENTEEN: OUR CHAPTER is finally here! Don’t wait—watch SEVENTEEN: OUR CHAPTER now and enjoy it all!">
-  <meta name="twitter:image" content="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/Trailer -Cover.jpg">
-  <meta name="twitter:site" content="@101_livestream">
-
-  <meta name="apple-mobile-web-app-title" content="Zone Vault">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#1a1a1a">
-  <link rel="apple-touch-icon" sizes="192x192" href="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/Trailer -Cover.jpg">
-  <link rel="apple-touch-icon" sizes="512x512" href="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/Trailer -Cover.jpg">
-  <link rel="apple-touch-startup-image" href="splash.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
   <script>
@@ -46,198 +29,278 @@
     gtag('js', new Date());
     gtag('config', 'G-1B2RJ659GL');
   </script>
-   
+    
   <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+    :root {
+      --primary: #ffffff;
+      --secondary: #a1a1aa;
+      --accent: #3b82f6;
+      --bg-dark: #050505;
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-bg: rgba(20, 20, 20, 0.6);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     body {
-      background: radial-gradient(circle at top, #0a0a0a, #000);
-      color: #fff;
+      background-color: var(--bg-dark);
+      color: var(--primary);
+      font-family: "Inter", sans-serif;
       overflow-x: hidden;
       min-height: 100vh;
-      position: relative;
       display: flex;
       flex-direction: column;
-    }
-    main { flex: 1; }
-
-    /* === ANIMATED BACKGROUND GRADIENT === */
-    body::before {
-      content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(-45deg, #000, #111, #222, #000);
-      background-size: 400% 400%; animation: gradientFlow 10s ease infinite; z-index: 0;
-    }
-    @keyframes gradientFlow {
-      0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* === PARTICLES & GLOW === */
+    /* === PRO BACKGROUND === */
+    .bg-gradient {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+      background: 
+        radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08), transparent 25%), 
+        radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.08), transparent 25%);
+      pointer-events: none;
+    }
+    
+    .noise-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: -1;
+    }
+
+    /* === PARTICLES === */
+    #particle-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
     .particle {
-      position: fixed; background: rgba(255,255,255,0.1); border-radius: 50%;
-      animation: floatUp linear infinite; z-index: 0; pointer-events: none;
+      position: fixed; background: rgba(255,255,255,0.3); border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+      animation: floatUp linear infinite;
     }
     @keyframes floatUp {
-      0% { transform: translateY(0) scale(1); opacity: 0.2; }
-      50% { transform: translateY(-50vh) scale(1.3); opacity: 0.4; }
-      100% { transform: translateY(-100vh) scale(0.8); opacity: 0; }
+      0% { transform: translateY(0) scale(1); opacity: 0; }
+      20% { opacity: 0.5; }
+      100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
     }
-    .circle {
-      position: absolute; border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-      animation: float 15s infinite ease-in-out; z-index: 0;
-    }
-    .circle:nth-child(1) { width: 300px; height: 300px; top: 15%; left: 10%; }
-    .circle:nth-child(2) { width: 250px; height: 250px; bottom: 20%; right: 12%; animation-delay: 3s; }
-    .circle:nth-child(3) { width: 200px; height: 200px; top: 55%; right: 25%; animation-delay: 6s; }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-    
-    #particle-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
 
     /* === HEADER === */
     header {
       width: 100%; position: fixed; top: 0; left: 0; z-index: 100;
       display: flex; justify-content: space-between; align-items: center;
-      padding: 15px 35px; background: transparent; transition: background 0.4s ease;
+      padding: 20px 40px; transition: all 0.4s ease;
+      height: 80px; /* Fixed Height for alignment */
     }
-    header.scrolled { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); }
-    .logo img { height: 45px; width: auto; transition: transform 0.3s ease; z-index: 2; }
-    .logo img:hover { transform: scale(1.05); }
-    .header-buttons { display: flex; align-items: center; gap: 12px; z-index: 2; }
-    .header-btn {
-      padding: 10px 25px; border: 2px solid #fff; background: transparent; color: #fff;
-      border-radius: 30px; font-weight: 500; cursor: pointer; transition: all 0.3s ease;
-      z-index: 2; text-decoration: none;
+    header.scrolled {
+      padding: 10px 40px;
+      height: 70px;
+      background: rgba(5, 5, 5, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--glass-border);
     }
-    .header-btn:hover { background: #fff; color: #000; transform: scale(1.05); }
+    
+    .logo {
+        display: flex; align-items: center;
+    }
+    .logo img { height: 40px; width: auto; opacity: 0.9; transition: opacity 0.3s; display: block; }
+    .logo img:hover { opacity: 1; }
+
+    .header-buttons { display: flex; align-items: center; gap: 25px; height: 100%; }
+    
+    /* Clean Text Links (Button & Anchor normalized) */
+    .nav-link {
+      background: transparent; border: none; color: var(--secondary);
+      font-size: 14px; font-weight: 500; cursor: pointer; transition: color 0.3s;
+      text-decoration: none;
+      padding: 0; margin: 0;
+      font-family: inherit;
+      display: flex; align-items: center; /* Ensures text is centered */
+      height: 100%;
+    }
+    .nav-link:hover { color: #fff; }
+
+    /* Primary Action Button */
+    .btn-primary {
+      padding: 10px 24px; border-radius: 6px; 
+      background: #fff; color: #000;
+      font-size: 14px; font-weight: 600; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s; border: none; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,255,255,0.15); }
+
+    /* === MOBILE ADJUSTMENTS === */
+    @media (max-width: 600px) {
+      header { padding: 0 20px; height: 70px; }
+      header.scrolled { padding: 0 20px; height: 60px; }
+      
+      .logo img { height: 32px; }
+      
+      .header-buttons { gap: 12px; }
+      
+      /* Make nav links smaller and aligned */
+      .nav-link { font-size: 12px; }
+      
+      .btn-primary { 
+          padding: 8px 14px; 
+          font-size: 12px; 
+          height: 36px; /* Explicit height for alignment */
+      }
+    }
 
     /* === HERO === */
+    main { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; }
     .welcome {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      z-index: 2; height: 100vh; text-align: center; padding: 0 20px;
+      text-align: center; padding: 0 20px; max-width: 800px;
+      margin-top: -60px;
     }
-    .welcome h1 {
-      font-size: clamp(2rem, 5vw, 4rem); text-transform: uppercase; letter-spacing: 3px;
-      margin-bottom: 15px; background: linear-gradient(90deg, #fff, #999);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.4); animation: fadeIn 1s ease forwards;
+    
+    .badge {
+      display: inline-block; padding: 6px 12px; border-radius: 20px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+      font-size: 12px; letter-spacing: 1px; color: var(--secondary); text-transform: uppercase;
+      margin-bottom: 24px; animation: fadeIn 1s ease forwards;
     }
-    .welcome p {
-      max-width: 650px; color: #aaa; font-size: clamp(1rem, 3vw, 1.2rem);
-      line-height: 1.7; opacity: 0; animation: fadeIn 1.2s ease forwards 0.2s;
-    }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* === MODALS === */
+    .welcome h1 {
+      font-family: "Poppins", sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700; line-height: 1.1; letter-spacing: -1px;
+      margin-bottom: 20px;
+      background: linear-gradient(180deg, #fff 0%, #ccc 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: fadeIn 1s ease forwards 0.2s; opacity: 0;
+    }
+
+    .welcome p {
+      color: var(--secondary); font-size: clamp(1rem, 2vw, 1.15rem);
+      line-height: 1.6; max-width: 580px; margin: 0 auto 35px;
+      opacity: 0; animation: fadeIn 1s ease forwards 0.4s;
+    }
+
+    .cta-group {
+      display: flex; gap: 15px; justify-content: center;
+      opacity: 0; animation: fadeIn 1s ease forwards 0.6s;
+    }
+    
+    .btn-outline {
+      padding: 12px 28px; border-radius: 6px; 
+      background: transparent; color: #fff; border: 1px solid var(--glass-border);
+      font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s;
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); border-color: #fff; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* === MODALS (GLASSMORPHISM) === */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85); backdrop-filter: blur(0.5px);
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
       display: flex; justify-content: center; align-items: center;
-      z-index: 999; animation: fadeModal 0.3s ease;
+      z-index: 999; opacity: 0; animation: fadeModal 0.4s forwards;
     }
-    @keyframes fadeModal { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeModal { to { opacity: 1; } }
+
     .modal {
-      background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
-      width: 90%; max-width: 400px; position: relative; animation: popIn 0.3s ease;
+      background: #111;
+      background: rgba(15, 15, 15, 0.95);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border-radius: 16px; width: 90%; max-width: 420px;
+      position: relative; transform: scale(0.95); animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      overflow: hidden;
     }
-    @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes popIn { to { transform: scale(1); opacity: 1; } }
+
     .modal-header {
-      background: linear-gradient(90deg, #fff, #999); color: #000; padding: 15px;
-      font-weight: 700; display: flex; justify-content: space-between;
-      border-radius: 20px 20px 0 0;
+      padding: 20px 25px; border-bottom: 1px solid var(--glass-border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: "Poppins", sans-serif; font-weight: 600; font-size: 18px; color: #fff;
     }
-    .close-btn { font-size: 24px; cursor: pointer; color: #000; }
-    .modal-content { padding: 25px; text-align: center; }
-    .modal-content p { color: #bbb; margin-bottom: 20px; }
-    .modal button {
-      width: 100%; padding: 12px; border-radius: 25px; border: 2px solid #fff;
-      background: transparent; color: #fff; font-weight: 600; cursor: pointer; margin: 8px 0;
+    .close-btn { font-size: 20px; color: var(--secondary); cursor: pointer; transition: color 0.2s; }
+    .close-btn:hover { color: #fff; }
+
+    .modal-content { padding: 30px 25px; text-align: center; }
+    .modal-content p { color: var(--secondary); margin-bottom: 25px; font-size: 0.95rem; line-height: 1.5; }
+
+    .modal-actions { display: flex; flex-direction: column; gap: 10px; }
+    .modal-actions button {
+      width: 100%; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;
     }
-    .modal button:hover { background: #fff; color: #000; }
+    .btn-full-primary { background: #fff; border: none; color: #000; }
+    .btn-full-primary:hover { background: #e5e5e5; }
+    .btn-full-outline { background: transparent; border: 1px solid var(--glass-border); color: #fff; }
+    .btn-full-outline:hover { border-color: #fff; }
 
-    /* === ABOUT MODAL === */
-    #aboutModal .modal { max-width: 650px; max-height: 80vh; display: flex; flex-direction: column; }
-    #aboutModal .modal-content { overflow-y: auto; text-align: justify; color: #ccc; }
-    #aboutModal h3 { color: #fff; margin-top: 1.5rem; }
-    #aboutModal ul { padding-left: 20px; margin-bottom: 1.5rem; }
+    /* About Modal Specifics */
+    #aboutModal .modal { max-width: 650px; max-height: 85vh; display: flex; flex-direction: column; }
+    #aboutModal .modal-content { overflow-y: auto; text-align: left; padding-top: 10px; }
+    #aboutModal .modal-content::-webkit-scrollbar { width: 6px; }
+    #aboutModal .modal-content::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+    
+    #aboutModal h2 { color: #fff; font-size: 1.1rem; margin-top: 2rem; margin-bottom: 0.75rem; border-left: 3px solid #fff; padding-left: 10px; }
+    #aboutModal h2:first-child { margin-top: 0.5rem; }
+    #aboutModal p { font-size: 0.95rem; margin-bottom: 1rem; color: #a1a1aa; }
+    #aboutModal ul { padding-left: 20px; color: #a1a1aa; margin-bottom: 1rem; }
+    #aboutModal li { margin-bottom: 6px; }
+    #aboutModal strong { color: #fff; font-weight: 600; }
 
-    /* === RESPONSIVE === */
-    @media (max-width: 600px) {
-      header { flex-direction: row; padding: 10px 20px; }
-      .header-buttons { gap: 8px; }
-      .logo img { height: 35px; }
-      .header-btn { padding: 8px 14px; font-size: 0.85rem; }
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--glass-border);
+      padding: 30px; text-align: center; color: #444; font-size: 13px;
     }
   </style>
 </head>
 <body>
 
-  <div class="circle"></div>
-  <div class="circle"></div>
-  <div class="circle"></div>
+  <div class="bg-gradient"></div>
+  <div class="noise-overlay"></div>
   <div id="particle-container"></div>
-
-  <!-- PARTICLE SCRIPT -->
-  <script>
-    const container = document.getElementById("particle-container");
-    const colors = ["#fff", "#000", "#888", "#444"]; 
-    const particleCount = 200;
-    for(let i = 0; i < particleCount; i++){
-      const particle = document.createElement("div");
-      particle.classList.add("particle");
-      const size = Math.random() * 4 + 2;
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      particle.style.left = `${Math.random() * 100}%`;
-      particle.style.top = `${Math.random() * 100}%`;
-      particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-      particle.style.animationDuration = `${30 + Math.random() * 30}s`;
-      particle.style.animationDelay = `${Math.random() * 30}s`;
-      container.appendChild(particle);
-    }
-  </script>
 
   <header id="navbar">
     <div class="logo">
       <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault Logo">
     </div>
     <div class="header-buttons">
-      <button class="header-btn" onclick="openAbout()">About</button>
-      <button class="header-btn" onclick="openModal()">Sign up</button>
-      <a href="login.html" class="header-btn">Login</a>
+      <button class="nav-link" onclick="openAbout()">About</button>
+      <button class="btn-primary" onclick="openModal()">Get Access</button>
     </div>
   </header>
 
   <main>
     <div class="welcome">
-      <h1>Welcome to Zone Vault</h1>
-      <p>Watch, Enjoy, and Stay Private! Enjoy exclusive content in a private, full-featured layout.</p>
+      <div class="badge">Zone Vault 2.0</div>
+      <h1>Zone Vault</h1>
+      <p>A secure, permission-based sanctuary for exclusive content. Watch SEVENTEEN and more in high-fidelity private streams.</p>
+      
+      <div class="cta-group">
+        <a href="home" class="btn-primary" style="padding: 12px 30px;">Start Watching</a>
+      </div>
     </div>
   </main>
 
-  <!-- Welcome Modal -->
   <div class="modal-overlay" id="welcomeModal" style="display:none;">
     <div class="modal">
       <div class="modal-header">
-        Welcome
+        <span>Join Zone Vault</span>
         <span class="close-btn" onclick="closeModal()">&times;</span>
       </div>
       <div class="modal-content">
-        <p>Please login or register to continue your journey.</p>
-        <button onclick="window.location.href='login.html'">Login</button>
-        <button onclick="window.location.href='register.html'">Register</button>
+        <p>To maintain security and exclusivity, Zone Vault requires an account. Please log in or register to continue.</p>
+        <div class="modal-actions">
+          <button class="btn-full-primary" onclick="window.location.href='login'">Log In to Account</button>
+          <button class="btn-full-outline" onclick="window.location.href='register'">Create New Account</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- About Modal -->
-<div class="modal-overlay" id="aboutModal" style="display:none;">
-  <div class="modal">
-    <div class="modal-header">
-      About Zone Vault
-      <span class="close-btn" onclick="closeAbout()">&times;</span>
-    </div>
+  <div class="modal-overlay" id="aboutModal" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <span>Platform Overview</span>
+        <span class="close-btn" onclick="closeAbout()">&times;</span>
+      </div>
 
-    <div class="modal-content">
-
+      <div class="modal-content">
       <h2>How Zone Vault Works</h2>
       <p>
         Zone Vault is a private platform created for <strong>exclusive VODs.</strong>. 
@@ -265,10 +328,8 @@
         Zone Vault uses <strong>HLS (HTTP Live Streaming)</strong> with <strong>Plyr</strong>, providing smooth, adaptive 
         playback on all devices. Video sources are protected through database, preventing copying and sharing.
       </p>
-   
-<p> To improve performance and flexibility, we are now separating subtitles from the video files.</p>
- 
-  
+    
+      <p>To improve performance and flexibility, we are now separating subtitles from the video files.</p>
 
       <h3>Player Features</h3>
       <ul>
@@ -310,13 +371,39 @@
   </div>
 </div>
 
+  <script>
+    const container = document.getElementById("particle-container");
+    const particleCount = 60;
+    
+    for(let i = 0; i < particleCount; i++){
+      const particle = document.createElement("div");
+      particle.classList.add("particle");
+      const size = Math.random() * 3 + 1;
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.top = `${Math.random() * 100}%`;
+      particle.style.animationDuration = `${40 + Math.random() * 40}s`; 
+      particle.style.animationDelay = `${Math.random() * 20}s`;
+      container.appendChild(particle);
+    }
 
-  <!-- UI Logic Scripts -->
+    // Scroll Effect for Header
+    window.addEventListener('scroll', () => {
+      const header = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+  </script>
+
   <script>
     window.onload = function() {
       const modalShown = localStorage.getItem('welcomeModalShown');
       if (!modalShown) {
-        openModal();
+        // openModal(); 
       }
     };
     function closeModal() {
@@ -336,15 +423,20 @@
       document.getElementById("aboutModal").style.display = "flex";
       document.body.style.overflow = "hidden";
     }
+    
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal-overlay')) {
+        event.target.style.display = "none";
+        document.body.style.overflow = "auto";
+      }
+    }
   </script>
 
-  <!-- FIREBASE & NOTIFICATION LOGIC -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, push, set, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
     import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 
-    // 1. GENERATE USER ID FIRST
     let userId = localStorage.getItem("userId");
     if (!userId) {
       userId = "user_" + Math.random().toString(36).substring(2, 10);
@@ -368,43 +460,26 @@
     const messaging = getMessaging(app);
     const vapidKey = "BM9NB-Q0-KYbhwad-5lhztW0BMpRjKBs67IOtQ7uLBZUKgzmmSmPferlpJnyVbmjo4LlvX0cVF2G_zX1OOHldyE";
 
-    // 2. REGISTER SERVICE WORKER AND GET TOKEN
     async function initNotifications() {
       if ('serviceWorker' in navigator) {
-        
-        // GUARD: Check if running in Preview/Blob mode
         if (window.location.protocol === 'file:' || window.location.protocol === 'data:' || window.location.href.startsWith('blob:')) {
-            console.warn('⚠️ Service Worker Registration Skipped: Current environment (Preview/Blob) does not support Service Workers. This will work on your hosted site (zonevault.site).');
+            console.warn('⚠️ Service Worker skipped in preview.');
             return;
         }
-
         try {
-          // Register sw.js explicitly
           const registration = await navigator.serviceWorker.register('sw.js');
-          console.log('Service Worker registered with scope:', registration.scope);
-
-          // Request Permission
           const permission = await Notification.requestPermission();
           if (permission === 'granted') {
-            console.log('Notification permission granted.');
-
-            // Get Token using the SPECIFIC registration
             const currentToken = await getToken(messaging, { 
               vapidKey: vapidKey,
               serviceWorkerRegistration: registration 
             });
-
             if (currentToken) {
-              console.log('FCM Token:', currentToken);
               saveTokenToDatabase(currentToken);
-            } else {
-              console.log('No registration token available.');
             }
-          } else {
-            console.log('Permission denied for notifications.');
           }
         } catch (err) {
-          console.error('An error occurred while retrieving token:', err);
+          console.error('Notification Error:', err);
         }
       }
     }
@@ -417,54 +492,15 @@
       });
     }
 
-    // Start the process
     initNotifications();
 
-    // Handle foreground messages
     onMessage(messaging, (payload) => {
-      console.log('Message received. ', payload);
       const { title, body, icon } = payload.notification;
       new Notification(title, {
         body: body,
         icon: icon || 'https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png'
       });
     });
-
-    // 3. USER TRACKING LOGIC
-    const deviceInfo = navigator.userAgent;
-    function logActivity(action, details = "") {
-      const sessionRef = ref(db, "userSessions/" + userId);
-      update(sessionRef, {
-        lastAction: action,
-        lastDetails: details,
-        lastActive: new Date().toLocaleString(),
-        device: deviceInfo,
-        currentPage: window.location.pathname,
-      });
-      const activityRef = push(ref(db, "userSessions/" + userId + "/activityLog"));
-      set(activityRef, {
-        action,
-        details,
-        timestamp: serverTimestamp(),
-        page: window.location.pathname
-      });
-    }
-
-    logActivity("Page Visit", document.title);
-    document.addEventListener("click", (e) => {
-      const target = e.target.tagName;
-      logActivity("Click", `Clicked on ${target}`);
-    });
-    window.addEventListener("beforeunload", () => {
-      logActivity("Left Page", document.title);
-    });
   </script>
-
-  <footer style="width: 100%; color: #ccc; padding: 40px 10px 30px; font-size: 14px; line-height: 1.6; text-align: center;">
-    <div style="max-width: 1200px; margin: 0 auto; border-top: 1px solid #333; padding-top: 30px;">
-      <p>&copy; 2025 <strong>Zone Vault</strong>. All rights reserved.</p>
-    </div>
-  </footer>
-
 </body>
 </html>
