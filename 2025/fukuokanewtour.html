@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Watch | Zone Vault</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> 
@@ -36,20 +36,17 @@
 
   <style>
     /* =========================================
-       1. VARIABLES & THEME ENGINE (Synced with Profile)
+       1. VARIABLES & THEME ENGINE
        ========================================= */
     :root {
-        /* Default (Dark Mode) */
         --bg-color: #050505;
         --text-main: #ffffff;
         --text-muted: #a1a1aa;
         --card-bg: rgba(20, 20, 20, 0.6);
         --glass-border: 1px solid rgba(255, 255, 255, 0.08);
-        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         --accent: #ffffff;
     }
 
-    /* Light Mode Overrides */
     body.light-mode {
         --bg-color: #f0f2f5;
         --text-main: #1a1a1a;
@@ -66,9 +63,66 @@
         color: var(--text-main);
         font-family: 'Inter', sans-serif;
         margin: 0;
+        /* Standard padding for Portrait */
         padding: 20px;
         min-height: 100vh;
         transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* === LANDSCAPE FIX FOR MOBILE (YouTube Style) === */
+    @media (max-width: 900px) and (orientation: landscape) {
+        body {
+            padding: 0; /* Remove body padding to let video touch edges */
+            /* Safe Area Balancing: Adds equal black bars on notch devices */
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+            background: #000; /* Black background for cinematic feel */
+            display: flex;
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+        }
+        
+        .main-layout {
+            max-width: 100% !important;
+            width: 100% !important;
+            height: 100vh;
+            justify-content: center;
+        }
+
+        .video-wrapper-left {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .glass-card {
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            width: 100%;
+            border-radius: 0 !important;
+        }
+
+        /* Hide non-video elements in landscape */
+        #poster-container, h2, #playlist, .center-logo, .back-btn {
+            display: none !important;
+        }
+
+        #player-container {
+            display: block !important;
+            width: 100%;
+            height: 100%;
+            max-height: 100vh;
+            border-radius: 0 !important;
+        }
+        
+        /* Ensure player fills screen */
+        .art-video-player {
+            width: 100% !important;
+            height: 100% !important;
+        }
     }
 
     /* Noise Texture */
@@ -79,13 +133,14 @@
     }
 
     /* =========================================
-       2. LAYOUT & GLASS CARDS
+       2. LAYOUT
        ========================================= */
     .center-logo { display: flex; justify-content: center; margin-bottom: 20px; }
     .center-logo img { width: 50px; height: auto; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
 
     .main-layout {
         max-width: 1400px;
+        width: 100%;
         margin: 0 auto;
         display: flex;
         flex-direction: column;
@@ -105,7 +160,7 @@
     }
 
     /* Video Section */
-    .video-wrapper-left { flex: 3; }
+    .video-wrapper-left { flex: 3; width: 100%; }
     
     #poster-container {
         width: 100%; aspect-ratio: 16/9;
@@ -130,12 +185,13 @@
         aspect-ratio: 16/9;
         border-radius: 12px; 
         overflow: hidden; 
+        position: relative;
     }
     
     .art-video-player { width: 100%; height: 100%; }
 
     /* Titles */
-    h2 { font-size: 20px; font-weight: 600; margin: 20px 0 10px; color: var(--text-main); }
+    h2 { font-size: 20px; font-weight: 600; margin: 20px 10px 10px; color: var(--text-main); }
     h3.playlist-header { 
         font-size: 16px; font-weight: 600; color: var(--text-muted); 
         text-transform: uppercase; letter-spacing: 1px; padding: 20px; margin: 0;
@@ -143,7 +199,7 @@
     }
 
     /* Playlist Section */
-    #playlist { flex: 1; min-width: 300px; }
+    #playlist { flex: 1; min-width: 300px; width: 100%; }
     #playlist-items { padding: 15px; max-height: 500px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
 
     /* Playlist Items */
@@ -166,8 +222,6 @@
         .video-wrapper-left { margin-right: 0; }
         #playlist { margin-top: 0; height: auto; }
         .glass-card { height: auto; }
-        
-        /* Make playlist scrollable independently on desktop */
         #playlist .glass-card { max-height: calc(100vh - 100px); }
     }
 
@@ -198,6 +252,26 @@
     }
     .access-denied-modal button:hover { background: white; color: black; }
 
+    /* --- GESTURE ANIMATION OVERLAY --- */
+    .gesture-overlay {
+        position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+        pointer-events: none; overflow: hidden; z-index: 20;
+    }
+    .gesture-icon {
+        position: absolute; top: 50%; transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.6); border-radius: 50%; width: 60px; height: 60px;
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-weight: bold; font-size: 12px;
+        opacity: 0; transition: opacity 0.2s;
+    }
+    .gesture-icon svg { width: 24px; height: 24px; fill: white; display: block; margin: 0 auto; }
+    .gesture-icon.active { opacity: 1; animation: popFade 0.5s forwards; }
+    @keyframes popFade {
+        0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+        20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    }
+
   </style>
 </head>
 
@@ -212,7 +286,7 @@
 <div class="main-layout">
 
   <div class="video-wrapper-left">
-    <div class="glass-card" style="padding: 10px;">
+    <div class="glass-card video-card-container" style="padding: 0;">
         
         <div id="poster-container">
           <div id="poster-overlay">Select an Episode</div>
@@ -220,9 +294,32 @@
 
         <div id="player-container">
            <div id="artplayer" class="art-video-player"></div>
+           
+           <div id="click-catcher" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:10; cursor:pointer;"></div>
+
+           <div class="gesture-overlay">
+               <div id="icon-rewind" class="gesture-icon" style="left: 20%;">
+                   <div>
+                       <svg viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"></path></svg>
+                       <span>-10s</span>
+                   </div>
+               </div>
+               <div id="icon-forward" class="gesture-icon" style="left: 80%;">
+                   <div>
+                       <svg viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"></path></svg>
+                       <span>+10s</span>
+                   </div>
+               </div>
+               <div id="icon-play" class="gesture-icon" style="left: 50%;">
+                   <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+               </div>
+               <div id="icon-pause" class="gesture-icon" style="left: 50%;">
+                   <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+               </div>
+           </div>
         </div>
 
-        <h2 id="main-title" style="padding: 0 10px;">Select Episode</h2>
+        <h2 id="main-title">Select Episode</h2>
     
     </div>
   </div>
@@ -257,7 +354,7 @@ const posterContainer = document.getElementById('poster-container');
 const playerContainer = document.getElementById('player-container');
 const mainTitle = document.getElementById('main-title');
 window.currentEpData = null;
-let art = null; // Store Artplayer instance
+let art = null; 
 
 // --- 2. FIREBASE & ACCESS CONTROL ---
 const firebaseConfig = {
@@ -273,27 +370,18 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-// ACCESS CHECK
 const PAGE_ID = "fukuokashow"; 
 
 auth.onAuthStateChanged(user => {
     if (!user) { showAccessDeniedModal("You must be logged in to view this content."); return; }
-    
-    // Check Shared Theme (Read-Only)
     initTheme();
-
-    // Realtime Access Check
     db.ref(`page_access/${PAGE_ID}/${user.uid}`).on('value', (snapshot) => {
         const isAllowed = snapshot.val();
-        if (isAllowed === true) {
-            removeAccessDeniedModal();
-        } else {
-            showAccessDeniedModal("This content is restricted. Your account does not have permission.");
-        }
+        if (isAllowed === true) { removeAccessDeniedModal(); } 
+        else { showAccessDeniedModal("This content is restricted. Your account does not have permission."); }
     });
 });
 
-// --- THEME SYNC (Read-Only Logic) ---
 function initTheme() {
     const savedTheme = localStorage.getItem('zoneTheme') || 'dark';
     const isDark = savedTheme === 'dark';
@@ -305,11 +393,7 @@ function showAccessDeniedModal(msg) {
     if(document.querySelector('.access-denied-modal')) return;
     const modal = document.createElement('div');
     modal.className = 'access-denied-modal';
-    modal.innerHTML = `
-        <strong style="color:#FF4444; font-size:30px; margin-bottom:15px;">Access Denied</strong>
-        <div style="font-size:16px; margin-bottom:20px;">${msg}</div>
-        <button onclick="history.back()">GO BACK</button>
-    `;
+    modal.innerHTML = `<strong style="color:#FF4444; font-size:30px; margin-bottom:15px;">Access Denied</strong><div style="font-size:16px; margin-bottom:20px;">${msg}</div><button onclick="history.back()">GO BACK</button>`;
     document.body.appendChild(modal);
 }
 function removeAccessDeniedModal() {
@@ -317,7 +401,7 @@ function removeAccessDeniedModal() {
     if(modal) modal.remove();
 }
 
-// --- 3. ARTPLAYER SETUP & PLAY FUNCTION ---
+// --- 3. ARTPLAYER & CUSTOM GESTURES ---
 function loadAndPlayEpisode(epId, updateUrl = true) {
     const ep = playlistData.find(item => item.id === epId);
     if (!ep) return;
@@ -339,10 +423,8 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
       const data = snapshot.val();
       if(!data || !data.url) { alert("Video unavailable"); return; }
 
-      // Destroy previous instance if exists
       if (art) { art.destroy(); }
 
-      // Initialize Artplayer
       art = new Artplayer({
           container: '#artplayer',
           url: data.url,
@@ -357,16 +439,14 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
           miniProgressBar: true,
           mutex: true,
           airplay: true,
-          theme: '#ff0000', // Matches your theme red
-          
-          // --- MOBILE SETTINGS ---
-          // Enable fast forward/rewind on mobile (usually handled by native gestures or UI overlays)
-          // Artplayer has built-in mobile UI that supports this
-          autoOrientation: true, // Rotate screen on mobile
-          fastForward: true, // Enable long press to speed up
-          lock: true, // Enable lock screen control
-          
-          // HLS Config
+          theme: '#ff0000',
+          autoOrientation: true,
+          // Disable default gestures so our custom overlay works
+          isMobile: false, 
+          moreVideoAttr: {
+              playsInline: true,
+              'webkit-playsinline': true
+          },
           customType: {
               m3u8: function (video, url) {
                   if (Hls.isSupported()) {
@@ -380,7 +460,54 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
           },
       });
 
-      // --- RESUME PLAYBACK LOGIC ---
+      // --- CUSTOM DOUBLE TAP GESTURE LOGIC (DEBOUNCED) ---
+      const catcher = document.getElementById('click-catcher');
+      let clickTimer = null;
+      let lastTapTime = 0;
+
+      catcher.addEventListener('click', (e) => {
+          const now = new Date().getTime();
+          const timeSinceLastTap = now - lastTapTime;
+          
+          const rect = catcher.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const width = rect.width;
+
+          // Double Tap Threshold: 300ms
+          if (timeSinceLastTap < 300 && timeSinceLastTap > 0) {
+              // --- DOUBLE CLICK DETECTED ---
+              clearTimeout(clickTimer); // Cancel the single click action
+              
+              if (x < width * 0.35) {
+                  art.seek = art.currentTime - 10;
+                  showGestureFeedback('icon-rewind');
+              } else if (x > width * 0.65) {
+                  art.seek = art.currentTime + 10;
+                  showGestureFeedback('icon-forward');
+              } else {
+                  // Double tap center could toggle fullscreen or just play/pause
+                  art.toggle(); 
+              }
+          } else {
+              // --- SINGLE CLICK DETECTED (WAIT) ---
+              // Wait 300ms to see if user taps again
+              clickTimer = setTimeout(() => {
+                  // If timer finishes, it was just a single click -> Play/Pause
+                  art.toggle();
+                  if(art.playing) showGestureFeedback('icon-play');
+                  else showGestureFeedback('icon-pause');
+              }, 300);
+          }
+          lastTapTime = now;
+      });
+
+      function showGestureFeedback(id) {
+          const el = document.getElementById(id);
+          el.classList.add('active');
+          setTimeout(() => el.classList.remove('active'), 500);
+      }
+
+      // Resume & History Saving (Same as before)
       const user = auth.currentUser;
       if (user) {
           db.ref('watchHistory/' + user.uid + '/' + ep.id).once('value').then(snap => {
@@ -389,19 +516,16 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
                   art.on('ready', () => {
                       art.seek = saved.currentTime;
                       art.play();
-                      // Optional: Notification that video resumed
                       art.notice.show = 'Resumed from ' + formatTime(saved.currentTime);
                   });
               }
           });
       }
 
-      // --- SAVE HISTORY LOGIC ---
       let lastSave = 0;
       art.on('video:timeupdate', () => {
           const now = Date.now();
           if (auth.currentUser && window.currentEpData && !art.video.paused && now - lastSave > 5000) {
-              let pageName = window.location.pathname.split('/').pop() || "player.html";
               const historyData = {
                   id: window.currentEpData.id,
                   title: window.currentEpData.title,
@@ -409,7 +533,7 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
                   currentTime: art.currentTime,
                   duration: art.duration || 0,
                   timestamp: now,
-                  page: pageName
+                  page: "watch.html"
               };
               db.ref('watchHistory/' + auth.currentUser.uid + '/' + window.currentEpData.id).update(historyData);
               lastSave = now;
@@ -422,14 +546,12 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
 
 function formatTime(seconds) {
     const date = new Date(seconds * 1000);
-    const hh = date.getUTCHours();
     const mm = date.getUTCMinutes();
     const ss = date.getUTCSeconds();
-    if (hh) return `${hh}:${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
     return `${mm}:${String(ss).padStart(2, '0')}`;
 }
 
-// Browser Back Button
+// Browser Back
 window.addEventListener('popstate', (event) => {
     if (event.state && event.state.id) loadAndPlayEpisode(event.state.id, false);
     else { 
@@ -439,25 +561,14 @@ window.addEventListener('popstate', (event) => {
     }
 });
 
-// --- 4. RENDER PLAYLIST ---
+// Render Playlist
 playlistData.forEach(ep => {
   const epDiv = document.createElement('div');
   epDiv.className = 'playlist-item';
-  
-  const img = document.createElement('img');
-  img.src = ep.image; img.loading="lazy";
-  
-  const textDiv = document.createElement('div');
-  textDiv.className = "playlist-text";
-  
-  const title = document.createElement('span');
-  title.className = "playlist-title";
-  title.textContent = ep.title;
-  
-  textDiv.appendChild(title);
-  epDiv.appendChild(img);
-  epDiv.appendChild(textDiv);
-
+  const img = document.createElement('img'); img.src = ep.image; img.loading="lazy";
+  const textDiv = document.createElement('div'); textDiv.className = "playlist-text";
+  const title = document.createElement('span'); title.className = "playlist-title"; title.textContent = ep.title;
+  textDiv.appendChild(title); epDiv.appendChild(img); epDiv.appendChild(textDiv);
   epDiv.addEventListener('click', () => loadAndPlayEpisode(ep.id, true));
   playlistContainer.appendChild(epDiv);
 });
@@ -476,6 +587,5 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-
 </body>
 </html>
