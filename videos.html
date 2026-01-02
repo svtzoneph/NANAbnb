@@ -1,1081 +1,436 @@
-<!Doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>VIDEOS</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Videos | Zone Vault</title>
   
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  
-  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon-new.png" type="image/png" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#2196f3">
+  <meta name="theme-color" content="#1a1a1a">
+  
+  <meta name="apple-mobile-web-app-title" content="Zone Vault">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
+  <link rel="apple-touch-startup-image" href="splash.png">
 
-<meta name="apple-mobile-web-app-title" content="Zone Vault">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#1a1a1a">
-<link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
-<link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
-<link rel="apple-touch-startup-image" href="splash.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1B2RJ659GL');
+  </script>
 
-  gtag('config', 'G-1B2RJ659GL');
-</script>
-
-<script>
-  (function() {
-    const savedTheme = localStorage.getItem('zoneVaultTheme');
-    if(savedTheme) {
-      const style = document.createElement('style');
-      style.innerHTML = `
-        body { 
-          background: ${savedTheme} !important; 
-          background-size: cover !important;
-          background-attachment: fixed !important;
-          background-repeat: no-repeat !important;
-          min-height: 100vh;
-        }
-      `;
-      document.head.appendChild(style);
-    }
-  })();
-</script>
-
-<style>
-    /* --- CSS VARIABLES FOR GLASS --- */
+  <style>
+    /* =========================================
+       1. VARIABLES & THEME ENGINE
+       ========================================= */
     :root {
-        --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-        --glass-border: 1px solid rgba(255, 255, 255, 0.2);
-        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        --glass-blur: blur(20px);
-        --text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-        
-        --bg: black;
-        --muted: white;
-        --accent: white;
-        --radius: 12px;
+        --bg-color: #050505;
+        --text-main: #ffffff;
+        --text-muted: #a1a1aa;
+        --card-bg: rgba(20, 20, 20, 0.6);
+        --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+        --accent: #ffffff;
+        --input-bg: rgba(255, 255, 255, 0.05);
+        --banner-gradient: linear-gradient(to right, #000000, #434343);
+        --sidebar-bg: rgba(0, 0, 0, 0.95);
+        --status-pending: #ff9800;
+        --status-approved: #4caf50;
+        --status-rejected: #f44336;
+        --youtube-red: #ff0000;
     }
 
-    * {
-        box-sizing: border-box;
+    body.light-mode {
+        --bg-color: #f0f2f5;
+        --text-main: #1a1a1a;
+        --text-muted: #65676b;
+        --card-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: 1px solid rgba(0, 0, 0, 0.05);
+        --accent: #000000;
+        --input-bg: rgba(0, 0, 0, 0.05);
+        --banner-gradient: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+        --sidebar-bg: rgba(255, 255, 255, 0.98);
     }
 
-    body {
-        margin: 0;
-        font-family: Inter, system-ui;
-        background: black; /* Fallback */
-        color: #ffffff;
-        transition: background 0.5s ease;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { 
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        overflow-x: hidden;
     }
 
-    .container {
-        max-width: 1200px;
-        margin: 36px auto;
-        padding: 0 18px;
+    .noise-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        pointer-events: none; z-index: -1;
     }
 
-    .grid {
-        display: grid;
-        gap: 20px;
-        grid-template-columns: repeat(4, 1fr);
+    /* =========================================
+       2. HEADERS & NAVIGATION
+       ========================================= */
+    .switch {
+      display: block; --width-of-switch: 3.5em; --height-of-switch: 2em; --size-of-icon: 1.4em; --slider-offset: 0.3em;
+      position: relative; width: var(--width-of-switch); height: var(--height-of-switch);
     }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #f4f4f5; transition: .4s; border-radius: 30px; }
+    .slider:before { position: absolute; content: ""; height: var(--size-of-icon,1.4em); width: var(--size-of-icon,1.4em); border-radius: 20px; left: var(--slider-offset,0.3em); top: 50%; transform: translateY(-50%); background: linear-gradient(40deg,#ff0080,#ff8c00 70%); transition: .4s; }
+    input:checked + .slider { background-color: #303136; }
+    input:checked + .slider:before { left: calc(100% - (var(--size-of-icon,1.4em) + var(--slider-offset,0.3em))); background: #303136; box-shadow: inset -3px -2px 5px -2px #8983f7, inset -10px -4px 0 0 #a3dafb; }
 
-    @media (max-width: 1100px) {
-        .grid {
-            grid-template-columns: repeat(3, 1fr);
-        }
-    }
-
-    @media (max-width: 800px) {
-        .grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 500px) {
-        .grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    /* --- HEADER GLASSMORPHISM (UPDATED LAYOUT) --- */
     header {
-        padding: 15px 20px;
-        display: flex;
-        align-items: center;
-        /* UPDATED: Space between Nav/Logo (Left) and Profile (Right) */
-        justify-content: space-between;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        
-        /* Hyper Glass Effect */
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        
-        transition: transform 0.6s ease-out;
-        
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-        will-change: transform, backdrop-filter;
-    }
-
-    .header-links {
-        display: flex;
-        gap: 15px;
-        align-items: center;
-        justify-content: center;
-        overflow-x: auto;
-        white-space: nowrap;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    header.show {
-        transform: translateY(0);
-    }
-
-    header.hide {
-        transform: translateY(-100%);
-    }
-
-    .header-logo {
-        width: 40px;
-        height: auto;
-        flex: 0 0 auto;
-    }
-
-    .header-logo img {
-        width: 40px;
-        height: auto;
-        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
-    }
-
-    /* --- LINKS GLASSMORPHISM (UPDATED) --- */
-    .category-link {
-        padding: 8px 16px;
-        
-        /* Hyper Glass Button */
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-top: 1px solid rgba(255, 255, 255, 0.4);
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        
-        color: #fff;
-        border-radius: 12px;
-        font-size: 12px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
-        position: relative;
-        text-shadow: var(--text-shadow);
-
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-        will-change: transform, backdrop-filter;
-    }
-
-    .category-link::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.1);
-        opacity: 0;
-        transition: opacity 0.3s;
-        z-index: -1;
-    }
-
-    .category-link:hover {
-        color: #fff;
-        transform: scale(1.05);
-        background: rgba(255, 255, 255, 0.25);
-        border-color: rgba(255, 255, 255, 0.5);
-    }
-
-    .category-link:hover::before {
-        opacity: 1;
-    }
-
-    .category-link.active {
-        background: #fff;
-        color: #000;
-        backdrop-filter: none;
-        text-shadow: none;
-    }
-
-    .category-link.flash {
-        background: #fff;
-        color: #000;
-        transition: background 0.6s ease, color 0.6s ease;
-    }
-
-    /* --- PC HEADER PROFILE WIDGET STYLES --- */
-    .header-user-widget {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        text-decoration: none;
-        background: rgba(0,0,0,0.3);
-        padding: 5px 12px 5px 5px;
-        border-radius: 30px;
-        border: 1px solid rgba(255,255,255,0.1);
-        transition: all 0.2s ease;
-        margin-left: 20px;
-        flex-shrink: 0;
-    }
-    .header-user-widget:hover {
-        background: rgba(255,255,255,0.15);
-        border-color: rgba(255,255,255,0.3);
-    }
-    .header-user-img-small {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid rgba(255,255,255,0.2);
-    }
-    .header-user-name {
-        color: white;
-        font-size: 14px;
-        font-weight: 600;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-        white-space: nowrap;
-        max-width: 150px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    /* --- MOBILE HEADER PROFILE WIDGET STYLES --- */
-    .mobile-user-widget {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        background: rgba(0,0,0,0.3);
-        padding: 4px 10px 4px 4px;
-        border-radius: 20px;
-        border: 1px solid rgba(255,255,255,0.1);
-    }
-    .mobile-user-img-small {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 1px solid rgba(255,255,255,0.4);
-    }
-    .mobile-user-name {
-        color: white;
-        font-size: 12px;
-        font-weight: 600;
-        max-width: 100px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    /* --- CARD GLASSMORPHISM (UPDATED) --- */
-    .card {
-        /* Card Hyper Glass */
-        background: var(--glass-bg);
-        backdrop-filter: var(--glass-blur);
-        -webkit-backdrop-filter: var(--glass-blur);
-        border: var(--glass-border);
-        border-top: 1px solid rgba(255, 255, 255, 0.4);
-        box-shadow: var(--glass-shadow);
-        
-        border-radius: var(--radius);
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        transition: 0.3s ease;
-
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-        will-change: transform, backdrop-filter;
-    }
-
-    .card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 14px 38px rgba(0, 0, 0, 0.6);
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(255, 255, 255, 0.5);
-    }
-
-    .thumb img {
+        padding: 15px 30px; 
+        display: flex; align-items: center; justify-content: space-between;
+        position: sticky; top: 0; z-index: 100;
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border-bottom: var(--glass-border);
+        background: rgba(0,0,0,0.05);
         width: 100%;
-        height: 180px;
-        object-fit: cover;
-        display: block;
     }
-
-    .card-body {
-        padding: 18px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .meta {
-        color: #eee;
-        font-size: 10px;
-        font-weight: 500;
-        text-shadow: var(--text-shadow);
-    }
-
-    .title {
-        margin: 0;
-        font-size: 18px;
-        font-weight: 700;
-        color: white;
-        text-shadow: var(--text-shadow);
-    }
-
-    .hashtags {
-        color: #ddd;
-        font-size: 13px;
-        text-shadow: var(--text-shadow);
-    }
-
-    .bottom {
-        margin-top: auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    .btn {
-        position: relative;
-        overflow: hidden;
-        padding: 10px 20px;
-        font-weight: 700;
-        font-size: 14px;
-        color: #fff;
-        
-        /* Button Glass Style */
-        background: rgba(0,0,0,0.6);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        backdrop-filter: blur(5px);
-        
-        border-radius: 8px;
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-    }
-
-    .btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        background: rgba(255,255,255,0.2);
-    }
-
-    .btn:active {
-        transform: scale(0.95);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-
-    .btn::after {
-        content: "";
-        position: absolute;
-        width: 120px;
-        height: 120px;
-        background: rgba(255,255,255,0.3);
-        display: block;
-        border-radius: 50%;
-        transform: scale(0);
-        opacity: 0;
-        pointer-events: none;
-        transition: transform 0.6s, opacity 1s;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0);
-    }
-
-    .btn:active::after {
-        transform: translate(-50%, -50%) scale(4);
-        opacity: 1;
-        transition: 0s;
-    }
-
-    #pagination {
-        text-align: center;
-        margin: 20px 0;
-    }
-    #pagination button {
-        margin: 0 5px;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        background: rgba(255, 255, 255, 0.1);
-        color: #fff;
-        font-weight: 600;
-        backdrop-filter: blur(4px);
-        text-shadow: var(--text-shadow);
-    }
-    #pagination button.active {
-        border: 1px solid white;
-        background: white;
-        color: black;
-        text-shadow: none;
-    }
-
-    /* --- SIDEBAR GLASSMORPHISM (UPDATED) --- */
-    .sidebar {
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        top: 0;
-        left: -100%;
-        width: 80%;
-        max-width: 300px;
-        height: 100%;
-        
-        /* Deep Dark Glass */
-        background: rgba(0, 0, 0, 0.65);
-        backdrop-filter: blur(30px);
-        -webkit-backdrop-filter: blur(30px);
-        
-        z-index: 9999;
-        padding: 20px;
-        gap: 10px;
-        transition: left 0.3s ease;
-        justify-content: space-between;
-        border-right: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6);
-        overflow-y: auto;
-        overscroll-behavior: contain;
-
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-        will-change: transform, backdrop-filter;
-    }
-
-    .sidebar-nav {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        margin-top: 20px;
-        max-height: 450px;
-        overflow-y: auto;
-        padding-right: 5px;
-        
-        /* SMOOTH SCROLL */
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .sidebar-nav::-webkit-scrollbar {
-        width: 6px;
-    }
-    .sidebar-nav::-webkit-scrollbar-thumb {
-        background-color: rgba(255, 255, 255, 0.2);
-        border-radius: 4px;
-    }
-    .sidebar-nav:hover::-webkit-scrollbar-thumb {
-        background-color: rgba(255, 255, 255, 0.4);
-    }
-
-    .sidebar.open {
-        left: 0;
-    }
-
-    .sidebar .close-btn {
-        align-self: flex-end;
-        background: none;
-        border: none;
-        font-size: 26px;
-        color: #fff;
-        cursor: pointer;
-        transition: transform 0.2s ease;
-    }
-
-    .sidebar .close-btn:hover {
-        transform: rotate(90deg);
-    }
-
-    .sidebar-title {
-        font-size: 26px;
-        font-weight: 700;
-        text-align: center;
-        color: #f1f1f1;
-        margin-bottom: 20px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        padding-bottom: 10px;
-        text-shadow: var(--text-shadow);
-    }
-
-    .sidebar-nav a {
-        text-decoration: none;
-        color: #fff;
-        font-size: 15px;
-        font-weight: 500;
-        padding: 10px;
-        border-radius: 6px;
-        transition: all 0.3s ease;
-        /* Sidebar Item Glass */
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .sidebar-nav a:hover {
-        background: rgba(255, 255, 255, 0.15);
-        padding-left: 20px;
-        border-color: rgba(255, 255, 255, 0.3);
-    }
-
-    .sidebar-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: auto;
-        padding-top: 20px;
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .sidebar-logo img {
-        width: 50px;
-        height: auto;
-    }
-
-    .sidebar-email a {
-        color: white;
-        font-size: 18px;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-
-    .sidebar-email a:hover {
-        color: #00bfff;
-    }
-
-    .mobile-header {
-        display: none;
-    }
-
-    @media (max-width: 768px) {
-        #scrollHeader {
-            display: none;
-        }
-
-        .mobile-header {
-            display: flex;
-            padding: 10px 15px;
-            align-items: center;
-            justify-content: space-between;
-            z-index: 1000;
-            
-            /* Mobile Hyper Glass */
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            
-            position: sticky;
-            top: 0;
-
-            /* SMOOTHNESS BOOSTER */
-            transform: translateZ(0);
-            will-change: transform, backdrop-filter;
-        }
-
-        .hamburger {
-            font-size: 26px;
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-        }
-
-        .sidebar {
-            display: flex;
-        }
-
-        .sidebar-email img {
-            width: 30px;
-            height: 30px;
-        }
-
-        .sidebar-logo img {
-            width: 60px;
-            height: auto;
-        }
-
-        .sidebar-title {
-            font-size: 30px;
-            margin-bottom: 15px;
-        }
-    }
-
- .fav-btn {
-        background: none;
-        border: none;
-        color: gold;
-        font-size: 22px;
-        cursor: pointer;
-        transition: transform 0.2s ease;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-    }
-
-    .fav-btn:hover {
-        transform: scale(1.2);
-    }
-
-    .favorite-label {
-        color: gold;
-        font-size: 13px;
-        text-align: center;
-        margin-top: 8px;
-        font-weight: bold;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-    }
-
-    /* --- FIXED FAVORITE BUTTON WITH TEXT SHADOW --- */
-    .favorite-btn {
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.3);
-        backdrop-filter: blur(5px);
-        color: white;
-        font-weight: bold;
-        font-size: 13px;
-        padding: 8px 12px;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        /* Added Text Shadow Here */
-        text-shadow: 0 1px 2px rgba(0,0,0,0.8); 
-        
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-    }
-
-    .favorite-btn:hover {
-        background: rgba(255, 255, 255, 0.25);
-        border-color: white;
-    }
-
-    /* --- FAVORITE MODAL GLASSMORPHISM (UPDATED) --- */
-    .favorite-modal {
-        display: none;
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.7);
-        z-index: 99999;
-        align-items: center;
-        justify-content: center;
-        backdrop-filter: blur(15px); /* Overlay Blur */
-        -webkit-backdrop-filter: blur(15px);
-        
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-        will-change: opacity, backdrop-filter;
-    }
-
-    .favorite-modal.active {
-        display: flex;
-    }
-
-    .favorite-content {
-        /* Strong Glass Modal */
-        background: rgba(20, 20, 20, 0.75);
-        backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        
-        color: white;
-        padding: 20px;
-        border-radius: 16px;
-        max-width: 800px;
-        width: 90%;
-        max-height: 80vh;
-        overflow-y: auto;
-        position: relative;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-        scroll-behavior: smooth;
-    }
-
-    .favorite-content::-webkit-scrollbar {
-        width: 8px;
-    }
-    .favorite-content::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 8px;
-    }
-    .favorite-content::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        transition: background 0.3s ease;
-    }
-    .favorite-content::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.4);
-    }
-
-    .favorite-content h2 {
-        text-align: center;
-        margin-top: 0;
-        text-shadow: var(--text-shadow);
-    }
-
-    .close-fav {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        background: none;
-        border: none;
-        font-size: 24px;
-        color: white;
-        cursor: pointer;
-        padding: 5px 10px;
-        border-radius: 8px;
-        z-index: 20;
-        transition: transform 0.2s ease;
-    }
-
-    .close-fav:hover {
-        transform: scale(1.2);
-    }
-
-    .favorite-title {
-        text-align: center;
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 10px;
-        position: sticky;
-        top: 0;
-        padding: 15px 0;
-        z-index: 10;
-        text-shadow: var(--text-shadow);
-    }
-
-    .favorite-box {
-        max-height: 60vh;
-        overflow-y: auto;
-        padding: 10px;
-        border-radius: 12px;
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        
-        /* SMOOTH SCROLL */
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .favorite-box::-webkit-scrollbar {
-        width: 10px;
-    }
-    .favorite-box::-webkit-scrollbar-track {
-        background: rgba(255,255,255,0.05);
-        border-radius: 10px;
-    }
-    .favorite-box::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.3);
-        border-radius: 10px;
-        border: 2px solid rgba(255,255,255,0.1);
-        transition: background 0.3s ease;
-    }
-    .favorite-box::-webkit-scrollbar-thumb:hover {
-        background: rgba(255,255,255,0.6);
-    }
-
-    .favorite-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 15px;
-        margin-top: 20px;
-    }
-
-    .favorite-list .fav-item {
-        /* Glass Item Cards */
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(5px);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 10px;
-        padding: 10px;
-        text-align: center;
-        color: white;
-        transition: transform 0.2s ease, background 0.3s;
-        
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-    }
-
-    .favorite-list .fav-item:hover {
-        transform: translateY(-4px);
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(255, 255, 255, 0.3);
-    }
-    .favorite-list img {
-        width: 100%;
-        height: 120px;
-        border-radius: 8px;
-        object-fit: cover;
-    }
-
-    /* --- INFO MODAL GLASSMORPHISM (UPDATED) --- */
-    .info-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-        will-change: opacity, backdrop-filter;
-    }
-
-    .info-modal.active {
-        display: flex;
-    }
-
-    .info-content {
-        background: rgba(20, 20, 20, 0.8);
-        backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        
-        color: white;
-        border-radius: 14px;
-        max-width: 600px;
-        width: 100%;
-        max-height: 90vh;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-    }
-
-    .info-title {
-        font-size: 24px;
-        font-weight: bold;
-        margin: 0;
-        text-align: center;
-        border-bottom: 1px solid rgba(255,255,255,0.15);
-        padding-bottom: 10px;
-        width: 100%;
-        text-shadow: var(--text-shadow);
-    }
-
-    .spacer {
-        height: 15px;
-    }
-
-    .scroll-box {
-        background: rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        padding: 15px;
-        width: 100%;
-        flex: 1;
-        max-height: 45vh;
-        overflow-y: auto;
-        text-align: left;
-        scrollbar-width: thin;
-        scrollbar-color: rgba(255,255,255,0.3) transparent;
-        
-        /* SMOOTH SCROLL */
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch;
-    }
-    .scroll-box::-webkit-scrollbar {
-        width: 8px;
-    }
-    .scroll-box::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.3);
-        border-radius: 5px;
-    }
-    .scroll-box::-webkit-scrollbar-thumb:hover {
-        background: rgba(255,255,255,0.5);
-    }
+    .header-left-group { display: flex; align-items: center; gap: 30px; }
+    .header-logo { height: 35px; width: auto; display: block; }
+    .header-links { display: flex; gap: 10px; align-items: center; }
+    .nav-btn {
+        padding: 8px 16px; border-radius: 8px;
+        color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500;
+        transition: 0.2s;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .nav-btn:hover, .nav-btn.active { color: var(--text-main); background: rgba(255,255,255,0.05); }
     
-    .scroll-box p, .scroll-box b, .scroll-box strong {
-        text-shadow: 0 1px 1px rgba(0,0,0,0.8);
+    /* Header Right: Now only User Name */
+    .header-right { 
+        display: flex; align-items: center; gap: 15px; 
+        font-size: 14px; font-weight: 600; color: var(--text-main); 
+        cursor: default; /* Non-clickable cursor */
     }
 
-    .close-info {
-        margin-top: 15px;
-        padding: 10px 20px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: white;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background 0.3s;
-        backdrop-filter: blur(5px);
+    /* Mobile Header */
+    .mobile-header {
+        display: none; padding: 15px 20px;
+        align-items: center; justify-content: space-between;
+        position: sticky; top: 0; z-index: 100;
+        backdrop-filter: blur(20px); border-bottom: var(--glass-border);
+        background: var(--bg-color);
+        width: 100%;
     }
-    .close-info:hover {
-        background: rgba(255, 255, 255, 0.25);
+    .hamburger { background: none; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
+
+    /* Sidebar */
+    .sidebar {
+        position: fixed; top: 0; left: -100%; width: 280px; height: 100%;
+        background: var(--sidebar-bg); backdrop-filter: blur(30px);
+        z-index: 9999; padding: 20px; display: flex; flex-direction: column;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-right: var(--glass-border);
     }
-</style>
+    .sidebar.open { left: 0; }
+    .sidebar-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 30px; padding-bottom: 15px;
+        border-bottom: var(--glass-border);
+    }
+    .sidebar-logo { height: 35px; width: auto; }
+    .close-sidebar { font-size: 28px; color: var(--text-muted); background: none; border: none; cursor: pointer; line-height: 1; }
+    .sidebar-nav { flex: 1; }
+    .sidebar-nav a {
+        display: block; padding: 14px 15px; color: var(--text-main);
+        text-decoration: none; border-radius: 12px; margin-bottom: 8px; font-weight: 500;
+        transition: all 0.2s;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-nav a:hover, .sidebar-nav a.active-link { background: rgba(255,255,255,0.1); padding-left: 20px; }
+    .sidebar-footer { margin-top: auto; padding-top: 20px; border-top: var(--glass-border); display: flex; justify-content: space-between; align-items: center; }
+
+    @media (max-width: 900px) {
+        header { display: none !important; }
+        .mobile-header { display: flex !important; }
+    }
+
+    /* =========================================
+       3. SEARCH BAR (CENTERED & FIXED)
+       ========================================= */
+    .main-wrapper { max-width: 1200px; margin: 40px auto; width: 92%; }
+
+    .search-wrapper {
+        position: relative;
+        margin: 0 auto 30px auto; /* Centered */
+        width: 100%;
+        max-width: 600px; /* Constrained width on PC */
+        z-index: 50;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 14px 20px 14px 50px;
+        background: var(--card-bg);
+        border: var(--glass-border);
+        border-radius: 50px;
+        font-size: 15px;
+        color: var(--text-main);
+        outline: none;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .search-input::placeholder { color: var(--text-muted); opacity: 0.7; }
+    
+    .search-input:focus {
+        border-color: var(--text-main);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+        background: rgba(255,255,255,0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 16px;
+        pointer-events: none;
+        transition: color 0.3s;
+    }
+
+    .search-input:focus + .search-icon { color: var(--text-main); }
+
+    /* =========================================
+       4. GRID & CARDS
+       ========================================= */
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    /* Responsive Grid */
+    @media (max-width: 1100px) { .grid-container { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 800px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .grid-container { grid-template-columns: 1fr; } }
+
+    /* Glass Video Card */
+    .video-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border: var(--glass-border);
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex; flex-direction: column;
+        transition: transform 0.2s, box-shadow 0.2s;
+        position: relative;
+    }
+    .video-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+
+    .thumb-wrapper {
+        position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .thumb-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+    .video-card:hover .thumb-wrapper img { transform: scale(1.05); }
+
+    .card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; }
+    
+    .video-meta { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+    .video-title { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; line-height: 1.4; flex-grow: 1; }
+    .video-hashtags { font-size: 11px; color: var(--text-muted); margin-bottom: 15px; }
+
+    .card-actions { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+    
+    .btn-watch {
+        background: var(--text-main); color: var(--bg-color);
+        border: none; padding: 8px 16px; border-radius: 50px;
+        font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
+    }
+    .btn-watch:hover { opacity: 0.9; transform: scale(1.05); }
+
+    .btn-fav {
+        background: transparent; border: 1px solid var(--glass-border);
+        color: var(--text-muted); width: 32px; height: 32px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
+    }
+    .btn-fav:hover { color: gold; border-color: gold; background: rgba(255, 215, 0, 0.1); }
+    .btn-fav.active { color: gold; border-color: gold; }
+
+    /* Countdown Badge */
+    .countdown-badge {
+        position: absolute; top: 10px; right: 10px;
+        background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+        color: white; font-size: 10px; padding: 4px 8px; border-radius: 4px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Favorites Button in Header */
+    .fav-header-btn {
+        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+        color: var(--text-main); padding: 6px 12px; border-radius: 8px;
+        font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;
+    }
+    .fav-header-btn:hover { background: rgba(255,255,255,0.2); }
+
+    /* --- PAGINATION --- */
+    #pagination { text-align: center; margin-top: 30px; display: flex; justify-content: center; gap: 5px; }
+    #pagination button {
+        background: var(--card-bg); border: var(--glass-border); color: var(--text-muted);
+        width: 35px; height: 35px; border-radius: 8px; cursor: pointer; transition: 0.2s;
+    }
+    #pagination button.active { background: var(--text-main); color: var(--bg-color); border-color: var(--text-main); }
+    #pagination button:hover:not(.active) { background: rgba(255,255,255,0.1); }
+
+    /* --- MODALS --- */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+        z-index: 10000; display: none; align-items: center; justify-content: center;
+        opacity: 0; transition: opacity 0.3s;
+    }
+    .modal-overlay.active { opacity: 1; display: flex; }
+    
+    .modal-box {
+        background: #111; border: 1px solid #333; padding: 25px; border-radius: 16px; 
+        width: 90%; max-width: 500px; color: white; max-height: 80vh; overflow-y: auto;
+        position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333; }
+    .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+    
+    .fav-list-item {
+        display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid #333; align-items: center;
+    }
+    .fav-list-item img { width: 60px; height: 40px; object-fit: cover; border-radius: 4px; }
+    .fav-list-info { flex: 1; }
+    .fav-list-title { font-size: 13px; font-weight: 600; color: white; }
+    .fav-list-btn { font-size: 11px; background: white; color: black; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+
+    /* Info Modal Content Styling */
+    .info-text p { color: #aaa; font-size: 13px; line-height: 1.6; margin-bottom: 15px; }
+    .info-text b { color: white; }
+
+    /* Access Denied */
+    .access-denied-modal {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.85); color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        z-index: 11000; flex-direction: column; text-align: center;
+        backdrop-filter: blur(10px); animation: fadeIn 0.5s forwards;
+    }
+    .access-denied-modal button { 
+        margin-top: 20px; padding: 10px 25px; border-radius: 50px; 
+        background: transparent; border: 2px solid white; color: white; cursor: pointer;
+    }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+  </style>
 </head>
 <body>
-  
-<div id="infoModal" class="info-modal">
-  <div class="info-content">
-    <h2 class="info-title">Important Notice</h2>
 
-    <div class="spacer"></div>
-
-    <div class="scroll-box">
-
-<p><b>Player Update:</b></p>
-      <p>You can now <b>fast forward</b> the video by <b>double clicking or tapping on the right side</b> of your screen. To <b>rewind</b>, just <b>double click or tap on the left side</b>. If you want to <b>pause or stop</b> the video at any time, <b>double click or tap on the center</b> of the video.</p>
-<p>To <b>access the video controls</b>, simply <b>hold the screen for at least 2 seconds</b>. The controls will appear, allowing you to adjust playback, or navigate the video easily.</p>
-
-<p><b>Video Quality:</b> </p>
-      <p>The quality of your video will <b>depend on your internet connection speed</b>. Faster connections will provide smoother, higher-quality playback, while slower connections may reduce quality automatically to prevent interruptions.</p>
-
-<p>These updates aim to give you <b>better control</b> over your viewing experience, making it easier and more enjoyable to watch videos anytime, anywhere.</p>
-
-      
-      <p>PLEASE TAKE TIME TO READ</p>
-      <p>We kindly ask for your <strong>full cooperation and responsibility</strong> as a viewer of this site. Please ensure that you do not <strong>record, reupload, redistribute, or share</strong> any of the VODs available here on other platforms, social media, or websites.</p>
-      
-      <p>We acknowledge that the VODs and all content available on this site are <strong>not our property</strong> and belong to their respective <strong>creators and official platforms</strong>. We provide access solely for <strong>personal viewing purposes</strong> and do not claim ownership of any material.</p>
-      
-      <p><strong>Unauthorized recording, copying, distribution, or public posting</strong> of any content from this site is <strong>strictly prohibited</strong> and may result in a <strong>permanent ban and immediate removal of your access</strong>. This means you will no longer be allowed to <strong>join upcoming streams, watch any future VODs, or access your account</strong>. Such actions could also impact the <strong>availability of these VODs for everyone</strong> and affect <strong>future access for all users</strong>.</p>
-      
-      <p><p>We sincerely thank you for your <strong>understanding, respect, and cooperation</strong> in helping maintain a <strong>safe viewing environment</strong> for all.</p>  
-    </div>
-
-    <button class="close-info" onclick="closeInfoModal()">Close</button>
-  </div>
-</div>
-
-
-<script>
-function closeInfoModal() {
-  const modal = document.getElementById('infoModal');
-  modal.classList.remove('active');
-  document.body.style.overflow = '';
-  sessionStorage.setItem('infoModalShown', 'true');
-}
-
-// Show info modal once per session
-window.addEventListener('DOMContentLoaded', () => {
-  const modal = document.getElementById('infoModal');
-  const modalSeen = sessionStorage.getItem('infoModalShown');
-
-  if (!modalSeen) {
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-});
-</script>
-
-
+<div class="noise-overlay"></div>
 
 <div class="mobile-header">
-  <div style="display:flex;align-items:center;gap:12px;">
-    <button class="hamburger" onclick="toggleSidebar()">☰</button>
-    <button class="favorite-btn" onclick="openFavoriteModal()">Your Favorite</button>
-  </div>
-  
-  <a href="profile.html" class="mobile-user-widget">
-    <img id="mobile-header-img" src="https://via.placeholder.com/30" class="mobile-user-img-small" alt="User">
-    <span id="mobile-header-name" class="mobile-user-name">...</span>
-  </a>
-</div>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <button class="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <button class="fav-header-btn" onclick="openFavoriteModal()"><i class="fas fa-star"></i> Favorites</button>
+    </div>
+    </div>
 
-<header id="scrollHeader">
-  <div class="header-links">
-      <div class="header-logo">
-    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
-  </div>
-    <a class="category-link" href="index.html">LOGIN</a>
-    <a class="category-link" href="profile.html">PROFILE</a>
-    <a class="category-link" href="home.html">HOME</a>
-    <a class="category-link" href="live.html">LIVE</a>
-    <a class="category-link" href="gallery.html">GALLERY</a>
-    <a class="category-link" href="videos.html">VIDEOS</a>
-    <button class="favorite-btn" onclick="openFavoriteModal()">Your Favorite</button>
-  </div>
-
-  <a href="profile.html" class="header-user-widget">
-    <img id="header-profile-img" src="https://via.placeholder.com/35" class="header-user-img-small" alt="Profile">
-    <span id="header-display-name" class="header-user-name">Loading...</span>
-  </a>
+<header id="desktopHeader">
+    <div class="header-left-group">
+        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" class="header-logo">
+        <div class="header-links">
+            <a href="profile.html" class="nav-btn"><i class="fas fa-user"></i> Profile</a>
+            <a href="home.html" class="nav-btn"><i class="fas fa-home"></i> Home</a>
+            <a href="videos.html" class="nav-btn active"><i class="fas fa-play-circle"></i> Videos</a>
+            <a href="live.html" class="nav-btn"><i class="fas fa-broadcast-tower"></i> Live</a>
+        </div>
+    </div>
+    <div class="header-right">
+        <button class="fav-header-btn" onclick="openFavoriteModal()"><i class="fas fa-star"></i> Favorites</button>
+        <span id="header-user-name">Loading...</span>
+    </div>
 </header>
 
 <div id="mobileSidebar" class="sidebar">
-  <button class="close-btn" onclick="toggleSidebar()">✖</button>
-  
-  <div class="sidebar-title">Zone Vault</div>
-
-  <nav class="sidebar-nav">
-    <a href="index.html">LOGIN</a>
-    <a href="profile.html">PROFILE</a>
-    <a href="home.html">HOME</a>
-    <a href="live.html">LIVE</a>
-    <a href="gallery.html">GALLERY</a>
-    <a href="videos.html">VIDEOS</a>
-  </nav>
-
-  <div class="sidebar-footer">
-    <div class="sidebar-logo">
-      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
+    <div class="sidebar-header">
+        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault" class="sidebar-logo">
+        <button class="close-sidebar" onclick="toggleSidebar()">&times;</button>
     </div>
-    
-    <div class="sidebar-email">
-      <a href="zonevaultph@gmail.com" title="Send Email">
-        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" alt="Email" />
-      </a>
+    <div class="sidebar-nav">
+        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+        <a href="home.html"><i class="fas fa-home"></i> Home</a>
+        <a href="videos.html" class="active-link"><i class="fas fa-play-circle"></i> Videos</a>
+        <a href="live.html"><i class="fas fa-broadcast-tower"></i> Live Stream</a>
     </div>
-  </div>
+    <div class="sidebar-footer">
+        <div style="font-size:12px; color:var(--text-muted);">Theme</div>
+        <label class="switch">
+            <input type="checkbox" class="theme-checkbox-mobile" onchange="syncTheme(this)">
+            <span class="slider"></span>
+        </label>
+    </div>
 </div>
 
-
-<div id="favoriteModal" class="favorite-modal">
-  <div class="favorite-content">
-    <button class="close-fav" onclick="closeFavoriteModal()">✖</button>
-    <div class="favorite-title">⭐ Your Favorites</div>
-    <div class="favorite-box">
-      <div id="favoriteList" class="favorite-list"></div>
+<div class="main-wrapper">
+    <div class="search-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search videos, tags, categories..." oninput="handleSearch(this.value)">
     </div>
-  </div>
+
+    <div class="grid-container" id="grid">
+        </div>
+    <div id="pagination"></div>
 </div>
 
-
-<div class="container">
-  <div class="grid" id="grid"></div>
-  <div id="pagination" style="text-align:center;margin-top:20px;"></div>
+<div id="favoriteModal" class="modal-overlay">
+    <div class="modal-box">
+        <button class="close-modal" onclick="closeFavoriteModal()">&times;</button>
+        <div class="modal-title">⭐ Your Favorites</div>
+        <div id="favoriteList" class="info-text">
+            </div>
+    </div>
 </div>
 
+<div id="infoModal" class="modal-overlay">
+    <div class="modal-box">
+        <button class="close-modal" onclick="closeInfoModal()">&times;</button>
+        <div class="modal-title">Important Notice</div>
+        <div class="info-text">
+            <p><b>Player Update:</b><br>
+            Double tap right to <b>Fast Forward</b>. Double tap left to <b>Rewind</b>. Double tap center to <b>Pause/Play</b>.<br>
+            Hold screen for 2s to show controls.</p>
+            
+            <p><b>Video Quality:</b><br>
+            Quality auto-adjusts based on your internet speed.</p>
+            
+            <hr style="border-color:#333; margin:15px 0;">
+            
+            <p><b>PLEASE READ:</b><br>
+            Do not record, reupload, or share content. Unauthorized distribution will result in a <b>permanent ban</b>.</p>
+        </div>
+        <button onclick="closeInfoModal()" style="width:100%; padding:10px; background:white; color:black; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;">I Understand</button>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
 <script>
-/* ==================== Firebase Initialization ==================== */
+/* ==================== Firebase & Data Logic ==================== */
 const firebaseConfig = {
   apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
   authDomain: "tvnstream-b4497.firebaseapp.com",
@@ -1089,269 +444,182 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
-let favorites = []; // initially empty
+let favorites = [];
 let userId = null;
 
-// Firebase auth: anonymous login + Profile Fetch
+// Auth & Profile Fetch
 auth.onAuthStateChanged(user => {
   if (user) {
     userId = user.uid;
     loadFavoritesFromFirebase();
 
-    // NEW: Fetch Profile Data for Header Widget
     db.ref('users/' + userId).once('value').then(snapshot => {
         const data = snapshot.val() || {};
         const displayName = data.name || "Member";
-        const profilePic = data.profilePicture || "https://via.placeholder.com/35";
-
-        // Update PC Header
-        const pcImg = document.getElementById("header-profile-img");
-        const pcName = document.getElementById("header-display-name");
-        if(pcImg) pcImg.src = profilePic;
-        if(pcName) pcName.innerText = displayName;
-
-        // Update Mobile Header
-        const mobImg = document.getElementById("mobile-header-img");
-        const mobName = document.getElementById("mobile-header-name");
-        if(mobImg) mobImg.src = profilePic;
-        if(mobName) mobName.innerText = displayName;
         
-        // Update Theme
+        // Update Desktop Header Name
+        document.getElementById("header-user-name").innerText = displayName;
+        
+        // Sync Theme
         if(data.bannerColor) {
-            localStorage.setItem('zoneVaultTheme', data.bannerColor);
-            document.body.style.background = data.bannerColor;
+            localStorage.setItem('zoneTheme', data.bannerColor === 'white' ? 'light' : 'dark'); 
         }
     });
-
   } else {
     auth.signInAnonymously().catch(console.error);
   }
 });
 
-// Load favorites from Firebase
+/* ==================== Video Data ==================== */
+const data = [
+   {id:"v0.5", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Fukuoka Show", hashtags:"NEW ADDED", link:"2025/fukuokanewtour"},
+  {id:"v0.4", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Osaka Show", hashtags:"NEW ADDED", link:"2025/japannewtour"},
+  {id:"v0.3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/the-shadow's-edge.jpg", category:"MOVIE", title:"The Shadow's Edge", hashtags:"", link:"2025/the-shadows-edge"},
+  {id:"v0.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svt_ourchapter.jpg", category:"DOCU", title:"SEVENTEEN: OUR CHAPTER", hashtags:"", link:"2025/ourchapterS17N-111025-6B4"},
+  {id:"v1.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"SPECIAL", title:"[Let's SVTreaming Day]", hashtags:"", link:"2025/svtreaming1"},
+  {id:"v1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN WORLD TOUR [NEW_] IN INCHEON", hashtags:"", link:"2025/newtour"},
+  {id:"v2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_gwangju.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN GWANGJU", hashtags:"", link:"2025/hxwingwangju"},
+  {id:"v3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_seoul.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN SEOUL", hashtags:"", link:"2021/hxwfanconcert"},
+  {id:"v0.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png", category:"VARIETY", title:"IN THE SOOP SEVENTEEN ver. Season2", hashtags:"", link:"2025/inthesoop2-N12X5R25-74K2"},
+  {id:"v4", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/nana_bnb.png", category:"VIDEOS", title:"NANA bnb with SEVENTEEN", hashtags:"", link:"2025/nanabnb"},
+  {id:"v5", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/holiday.png", category:"VIDEOS", title:"SEVENTEEN 2025 JAPAN FAN MEETING 'HOLIDAY", hashtags:"", link:"/2025svtholiday"},
+  {id:"v6", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.png", category:"VIDEOS", title:"SEVENTEEN 'RIGHT HERE' WORLD TOUR IN GOYANG", hashtags:"", link:"2024/rightheregoyang"},
+  {id:"v7", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/arena-tour.png", category:"VIDEOS", title:"SEVENTEEN 2018 JAPAN ARENA TOUR 'SVT'", hashtags:"", link:"random/arenatour"},
+  {id:"v8", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/japan-concert.png", category:"VIDEOS", title:"17 JAPAN CONCERT Say the name #SEVENTEEN", hashtags:"", link:"random/svtjapanconcert"},
+  {id:"v9", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/disney.png", category:"VIDEOS", title:"SEVENTEEN TOUR AGAIN DISNEY+", hashtags:"", link:"random/touragain"}
+];
+
+let currentPaginationPage = 1;
+// DYNAMIC CARDS PER PAGE: 5 for Mobile (<=768px), 8 for Desktop/Tablet (>768px)
+let cardsPerPage = window.innerWidth <= 768 ? 5 : 8;
+const grid = document.getElementById("grid");
+
+// --- SEARCH LOGIC ---
+let filteredData = [...data]; // Initial state matches full data
+
+function handleSearch(query) {
+    const term = query.toLowerCase();
+    filteredData = data.filter(item => 
+        item.title.toLowerCase().includes(term) || 
+        item.category.toLowerCase().includes(term) ||
+        item.hashtags.toLowerCase().includes(term)
+    );
+    currentPaginationPage = 1; // Reset to page 1 on search
+    renderGrid(1);
+}
+
+/* ==================== Auto-Resize Logic ==================== */
+window.addEventListener('resize', () => {
+    const newLimit = window.innerWidth <= 768 ? 5 : 8;
+    if(newLimit !== cardsPerPage) {
+        cardsPerPage = newLimit;
+        currentPaginationPage = 1; 
+        renderGrid(1);
+    }
+});
+
+/* ==================== Grid Rendering ==================== */
+function renderGrid(page) {
+  grid.innerHTML = "";
+  
+  if (filteredData.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">No videos found matching your search.</div>';
+      document.getElementById("pagination").innerHTML = "";
+      return;
+  }
+
+  const start = (page-1)*cardsPerPage;
+  const end = start+cardsPerPage;
+  const pageData = filteredData.slice(start,end); // Use filteredData
+
+  pageData.forEach(item => {
+    const el = document.createElement("div");
+    el.className = "video-card";
+    const isFav = favorites.includes(item.id) ? 'active' : '';
+    const starIcon = favorites.includes(item.id) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+    
+    el.innerHTML = `
+      <div class="thumb-wrapper">
+        <img src="${item.thumb}" loading="lazy" alt="${item.title}">
+        <div class="countdown-badge" data-date="${item.releaseDate || ''}"></div>
+      </div>
+      <div class="card-body">
+        <div class="video-meta">${item.category}</div>
+        <div class="video-title">${item.title}</div>
+        <div class="video-hashtags">${item.hashtags}</div>
+        <div class="card-actions">
+            <button class="btn-watch" onclick="window.location.href='${item.link}'">WATCH NOW</button>
+            <button class="btn-fav ${isFav}" onclick="toggleFavorite('${item.id}')">${starIcon}</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(el);
+  });
+
+  renderPagination();
+  startCountdown();
+}
+
+/* ==================== Pagination ==================== */
+function renderPagination() {
+  const pagination = document.getElementById("pagination");
+  pagination.innerHTML = "";
+  const pageCount = Math.ceil(filteredData.length/cardsPerPage); // Use filteredData length
+  
+  if(pageCount <= 1) return; // Hide if only 1 page
+
+  for(let i=1; i<=pageCount; i++){
+    const btn = document.createElement("button");
+    btn.textContent = i;
+    if(i===currentPaginationPage) btn.classList.add("active");
+    btn.onclick = () => { currentPaginationPage=i; renderGrid(currentPaginationPage); window.scrollTo(0,0); };
+    pagination.appendChild(btn);
+  }
+}
+
+/* ==================== Countdown Logic ==================== */
+function startCountdown() {
+  document.querySelectorAll(".countdown-badge").forEach(elem => {
+    const dateStr = elem.dataset.date;
+    if (!dateStr) { elem.style.display='none'; return; }
+    const endDate = new Date(dateStr);
+    
+    const update = () => {
+      const now = new Date();
+      const diff = endDate - now;
+      if (diff <= 0) { elem.textContent = "Available Now"; return; }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      elem.textContent = `${days}d left`;
+    };
+    update();
+  });
+}
+
+/* ==================== Favorites Logic ==================== */
 function loadFavoritesFromFirebase() {
   if (!userId) return;
   db.ref('users/' + userId + '/favorites').on('value', snapshot => {
     favorites = snapshot.val() || [];
-    reorderFavorites();
+    renderGrid(currentPaginationPage); 
   });
 }
 
-// Save favorites to Firebase
 function saveFavoritesToFirebase() {
   if (!userId) return;
   db.ref('users/' + userId + '/favorites').set(favorites);
 }
 
-/* ==================== Video Data ==================== */
-const data = [
-   {id:"v0.5", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Fukuoka Show", hashtags:"NEW ADDED", link:"fukuokanewtour"},
-  {id:"v0.4", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Osaka Show", hashtags:"NEW ADDED", link:"japannewtour"},
-  {id:"v0.3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/the-shadow's-edge.jpg", category:"Macau Police brings the tracking expert police officer out of retirement to help catch a dangerous group of professional thieves.", title:"The Shadow's Edge", hashtags:"", link:"the-shadows-edge"},
-  {id:"v0.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svt_ourchapter.jpg", category:"After 10 years together, Seventeen look back at where they've been to uncover where they'll go next.", title:"SEVENTEEN: OUR CHAPTER", hashtags:"", link:"ourchapterS17N-111025-6B4"},
-  {id:"v1.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"Chuseok Holiday SEVENTEEN Concert Marathon [Let's SVTreaming Day]", title:"[Let's SVTreaming Day]", hashtags:"", link:"svtreaming1"},
-  {id:"v1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN WORLD TOUR [NEW_] IN INCHEON", hashtags:"", link:"newtour"},
-  {id:"v2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_gwangju.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN GWANGJU", hashtags:"", link:"hxwingwangju"},
-  {id:"v3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_seoul.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN SEOUL", hashtags:"", link:"hxwfanconcert"},
-  {id:"v0.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png", category:"Get ready to experience SEVENTEEN’s relaxing and heartwarming moments once again.", title:"IN THE SOOP SEVENTEEN ver. Season2", hashtags:"", link:"inthesoop2-N12X5R25-74K2"},
-  {id:"v4", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/nana_bnb.png", category:"VIDEOS", title:"NANA bnb with SEVENTEEN", hashtags:"", link:"nanabnb"},
-  {id:"v5", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/holiday.png", category:"VIDEOS", title:"SEVENTEEN 2025 JAPAN FAN MEETING 'HOLIDAY", hashtags:"", link:"svtholiday"},
-  {id:"v6", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.png", category:"VIDEOS", title:"SEVENTEEN 'RIGHT HERE' WORLD TOUR IN GOYANG", hashtags:"", link:"rightheregoyang"},
-  {id:"v7", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/arena-tour.png", category:"VIDEOS", title:"SEVENTEEN 2018 JAPAN ARENA TOUR 'SVT'", hashtags:"", link:"arenatour"},
-  {id:"v8", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/japan-concert.png", category:"VIDEOS", title:"17 JAPAN CONCERT Say the name #SEVENTEEN", hashtags:"", link:"svtjapanconcert"},
-  {id:"v9", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/disney.png", category:"VIDEOS", title:"SEVENTEEN TOUR AGAIN DISNEY+", hashtags:"", link:"touragain"}
-];
-
-let currentPaginationPage = 1;
-const cardsPerPage = 4;
-const grid = document.getElementById("grid");
-
-/* ==================== Grid Rendering ==================== */
-function renderGrid(page) {
-  grid.innerHTML = "";
-  const start = (page-1)*cardsPerPage;
-  const end = start+cardsPerPage;
-  const pageData = data.slice(start,end);
-
-  pageData.forEach(item => {
-    const el = document.createElement("div");
-    el.className = "card";
-    // SMOOTH LOADING: Added loading="lazy" and decoding="async"
-    el.innerHTML = `
-      <div class="thumb"><img src="${item.thumb}" loading="lazy" decoding="async" alt=""></div>
-      <div class="card-body">
-      <div class="countdown" data-date="${item.releaseDate || ''}"></div>
-        <div class="meta">${item.category}</div>
-        <h3 class="title">${item.title}</h3>
-           <div class="hashtags">${item.hashtags}</div>
-        <div class="bottom">
-          <button class="btn">WATCH NOW</button>
-          <button class="fav-btn" data-id="${item.id}">
-            <span class="star">☆</span>
-          </button>
-        </div>
-        <div class="favorite-label"></div>
-      </div>`;
-
-    el.querySelector(".btn").onclick = () => window.location.href = item.link;
-    grid.appendChild(el);
-
-    // Favorites
-    const favBtn = el.querySelector(".fav-btn");
-    const label = el.querySelector(".favorite-label");
-    if (favorites.includes(item.id)) {
-      favBtn.querySelector(".star").textContent = "★";
-      label.style.display = "block";
-    }
-    favBtn.onclick = () => toggleFavorite(item.id);
-  });
-
-  renderPagination();
-  startCountdown(); // Start countdown after grid is rendered
-}
-
-/* ==================== Countdown Timer ==================== */
-function startCountdown() {
-  const countdownElems = document.querySelectorAll(".countdown");
-
-  countdownElems.forEach(elem => {
-    const dateStr = elem.dataset.date;
-    if (!dateStr) return;
-
-    const endDate = new Date(dateStr);
-
-    function update() {
-      const now = new Date();
-      const diff = endDate - now;
-
-      if (diff <= 0) {
-        elem.textContent = "Available Now";
-        return;
-      }
-
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-
-      elem.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-    }
-
-    update();
-    setInterval(update, 1000);
-  });
-}
-
-function renderPagination() {
-  const pagination=document.getElementById("pagination");
-  pagination.innerHTML="";
-  const pageCount=Math.ceil(data.length/cardsPerPage);
-  for(let i=1;i<=pageCount;i++){
-    const btn=document.createElement("button");
-    btn.textContent=i;
-    if(i===currentPaginationPage) btn.classList.add("active");
-    btn.onclick=()=>{currentPaginationPage=i; renderGrid(currentPaginationPage);};
-    pagination.appendChild(btn);
-  }
-}
-
-/* ==================== Favorites Logic ==================== */
-function toggleFavorite(id) {
+window.toggleFavorite = function(id) {
   if (favorites.includes(id)) {
     favorites = favorites.filter(f => f !== id);
   } else {
     favorites.unshift(id);
   }
-  saveFavoritesToFirebase(); // <-- Firebase sync
-  reorderFavorites();
+  saveFavoritesToFirebase();
 }
 
-function reorderFavorites() {
-  const favSet = new Set(favorites);
-  const sorted = data.slice().sort((a,b)=>{
-    if (favSet.has(a.id) && !favSet.has(b.id)) return -1;
-    if (!favSet.has(a.id) && favSet.has(b.id)) return 1;
-    return 0;
-  });
-  if(window.innerWidth<=800){
-    renderGrid(currentPaginationPage);
-  } else {
-    grid.innerHTML="";
-    sorted.forEach(item=>{
-      const el=document.createElement("div");
-      el.className="card";
-      // SMOOTH LOADING: Added loading="lazy"
-      el.innerHTML=`<div class="thumb"><img src="${item.thumb}" loading="lazy" decoding="async" alt=""></div>
-      <div class="card-body">
-      <div class="countdown" data-date="${item.releaseDate || ''}"></div>
-        <div class="meta">${item.category}</div>
-        <h3 class="title">${item.title}</h3>
-        <div class="hashtags">${item.hashtags}</div>
-        <div class="bottom">
-          <button class="btn">WATCH NOW</button>
-          <button class="fav-btn" data-id="${item.id}">
-            <span class="star">☆</span>
-          </button>
-        </div>
-        <div class="favorite-label"></div>
-      </div>`;
-      el.querySelector(".btn").onclick=()=>window.location.href=item.link;
-      const favBtn = el.querySelector(".fav-btn");
-      const label = el.querySelector(".favorite-label");
-      if (favorites.includes(item.id)) {
-        favBtn.querySelector(".star").textContent = "★";
-        label.style.display = "block";
-      }
-      favBtn.onclick = ()=>toggleFavorite(item.id);
-      grid.appendChild(el);
-    });
-    document.getElementById("pagination").innerHTML="";
-  }
-}
-
-/* ==================== Responsive Check ==================== */
-function checkResponsive() {
-  if(window.innerWidth<=800){
-    renderGrid(currentPaginationPage);
-  } else {
-    grid.innerHTML="";
-    data.forEach(item=>{
-      const el=document.createElement("div");
-      el.className="card";
-      // SMOOTH LOADING: Added loading="lazy"
-      el.innerHTML = `<div class="thumb"><img src="${item.thumb}" loading="lazy" decoding="async" alt=""></div>
-      <div class="card-body">
-      <div class="countdown" data-date="${item.releaseDate || ''}"></div>
-        <div class="meta">${item.category}</div>
-        <h3 class="title">${item.title}</h3>
-        <div class="hashtags">${item.hashtags}</div>
-        <div class="bottom">
-          <button class="btn">WATCH NOW</button>
-          <button class="fav-btn" data-id="${item.id}">
-            <span class="star">☆</span>
-          </button>
-        </div>
-        <div class="favorite-label" style="display:none;"></div>
-      </div>`;
-      el.querySelector(".btn").onclick=()=>window.location.href=item.link;
-      grid.appendChild(el);
-      const favBtn = el.querySelector(".fav-btn");
-      const label = el.querySelector(".favorite-label");
-      if (favorites.includes(item.id)) {
-        favBtn.querySelector(".star").textContent = "★";
-        label.style.display = "block";
-      }
-      favBtn.onclick = () => toggleFavorite(item.id);
-    });
-    document.getElementById("pagination").innerHTML="";
-  }
-}
-checkResponsive();
-window.addEventListener("resize", checkResponsive);
-
-/* ==================== Favorite Modal ==================== */
-function openFavoriteModal() {
-  const modal = document.getElementById('favoriteModal');
+/* ==================== Modals & UI ==================== */
+window.openFavoriteModal = function() {
   const list = document.getElementById('favoriteList');
   list.innerHTML = '';
   if (favorites.length === 0) {
@@ -1360,187 +628,75 @@ function openFavoriteModal() {
     favorites.forEach(favId => {
       const item = data.find(d => d.id === favId);
       if (item) {
-        const el = document.createElement('div');
-        el.className = 'fav-item';
-        // SMOOTH LOADING: Added loading="lazy"
-        el.innerHTML = `<img src="${item.thumb}" loading="lazy" decoding="async" alt="${item.title}">
-          <div style="margin-top:8px;font-weight:bold;">${item.title}</div>
-          <div class="countdown" data-date="${item.releaseDate || ''}"></div>
-          <button class="btn" style="margin-top:8px;" onclick="window.location.href='${item.link}'">WATCH</button>`;
-        list.appendChild(el);
+        list.innerHTML += `
+          <div class="fav-list-item">
+             <img src="${item.thumb}">
+             <div class="fav-list-info">
+                <div class="fav-list-title">${item.title}</div>
+             </div>
+             <button class="fav-list-btn" onclick="window.location.href='${item.link}'">WATCH</button>
+          </div>
+        `;
       }
     });
   }
-  modal.classList.add('active');
-  document.body.style.overflow = 'hidden'; // Prevent background scroll
+  document.getElementById('favoriteModal').classList.add('active');
 }
 
-function closeFavoriteModal() {
-  const modal = document.getElementById('favoriteModal');
-  modal.classList.remove('active');
-  document.body.style.overflow = ''; // Restore background scroll
+window.closeFavoriteModal = function() { document.getElementById('favoriteModal').classList.remove('active'); }
+window.closeInfoModal = function() { document.getElementById('infoModal').classList.remove('active'); sessionStorage.setItem('infoModalShown', 'true'); }
+
+// Show info modal on load if not seen
+window.addEventListener('DOMContentLoaded', () => {
+  if (!sessionStorage.getItem('infoModalShown')) {
+    document.getElementById('infoModal').classList.add('active');
+  }
+  renderGrid(1); // Initial Render
+});
+
+// UI Toggles
+window.toggleSidebar = function() { document.getElementById('mobileSidebar').classList.toggle('open'); }
+
+// Theme Logic
+function initTheme() {
+    const savedTheme = localStorage.getItem('zoneTheme') || 'dark';
+    const isDark = savedTheme === 'dark';
+    if (!isDark) { document.body.classList.add('light-mode'); }
+    document.querySelectorAll('.theme-checkbox-mobile').forEach(cb => { cb.checked = isDark; });
 }
+window.syncTheme = function(el) {
+    const isDark = el.checked;
+    if(isDark) {
+        document.body.classList.remove('light-mode');
+        localStorage.setItem('zoneTheme', 'dark');
+    } else {
+        document.body.classList.add('light-mode');
+        localStorage.setItem('zoneTheme', 'light');
+    }
+}
+initTheme();
 </script>
 
-
-
 <script>
-// Scrollable header
-document.querySelector('.header-links').addEventListener('wheel', e=>{
-  if(e.deltaY===0) return;
-  e.preventDefault();
-  e.currentTarget.scrollBy({ left: e.deltaY<0?-100:100 });
-});
-
-// Toggle sidebar
-function toggleSidebar(){ document.getElementById('mobileSidebar').classList.toggle('open'); }
-
-// Hide/show header on scroll
-let lastScrollY = window.scrollY;
-const scrollHeader = document.getElementById('scrollHeader');
-window.addEventListener('scroll', ()=>{
-  const currentScrollY = window.scrollY;
-  if(currentScrollY>lastScrollY && currentScrollY>50){ scrollHeader.classList.add('hide'); }
-  else { scrollHeader.classList.remove('hide'); }
-  lastScrollY=currentScrollY;
-});
-
-// Flash effect for category links
-document.querySelectorAll('.category-link').forEach(link=>{
-  link.addEventListener('click', e=>{
-    e.preventDefault();
-    document.querySelectorAll('.category-link').forEach(l=>l.classList.remove('flash'));
-    link.classList.add('flash');
-    setTimeout(()=>{ link.classList.remove('flash'); window.location.href=link.href; },800);
-  });
-});
-
-// Sidebar scroll lock
-document.querySelector('.sidebar-nav').addEventListener('wheel', e=>{
-  const sidebarNav=document.querySelector('.sidebar-nav');
-  const isAtTop = sidebarNav.scrollTop === 0;
-  const isAtBottom = sidebarNav.scrollHeight - sidebarNav.scrollTop === sidebarNav.clientHeight;
-  if((e.deltaY<0 && isAtTop) || (e.deltaY>0 && isAtBottom)){ e.preventDefault(); }
-},{passive:false});
-</script>
-
- <style>
-  /* Access Denied Modal */
-  .access-denied-modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 11000;
-    text-align: center;
-    padding: 20px;
-    opacity: 0;
-    animation: fadeIn 0.5s forwards;
-    flex-direction: column;
-    
-    /* SMOOTHNESS BOOSTER */
-    transform: translateZ(0);
-    will-change: opacity;
-  }
-
-  .access-denied-modal strong {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-
-  .access-denied-modal button {
-    margin-top: 15px;
-    padding: 10px 25px;
-    background: transparent;
-    color: white;
-    border: 2px solid white;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-  }
-
-  .access-denied-modal button:hover {
-    background: white;
-    color: black;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-</style>
-
-<script>
-  const allowedPaths = [
-    '/index.html',
-    '/home.html',
-    '/nanabnb.html',
-    '/newtour.html',
-    '/hxwfanconcert.html',
-    '/svtholiday.html',
-    '/arenatour.html',
-    '/svtjapanconcert.html',
-    '/touragain.html',
-    '/gallery.html',
-    '/profile.html',
-    '/soon.html'
-  ];
-
+  // --- PROTECTION LOGIC ---
+  const allowedPaths = ['/index.html','/home.html','/nanabnb.html','/newtour.html','/hxwfanconcert.html','/svtholiday.html','/arenatour.html','/svtjapanconcert.html','/touragain.html','/gallery.html','/profile.html','/soon.html','/videos.html'];
   const currentPage = window.location.pathname;
-
-  // Check if user already has internalAccess flag
   let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
-
-  // Check if user came from an allowed page
   const referrer = document.referrer;
   const refPath = referrer ? new URL(referrer).pathname : null;
-  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
-
-  // Grant internalAccess if coming from allowed page
-  if (cameFromAllowedPage) {
-    sessionStorage.setItem('internalAccess', 'true');
-    hasInternalAccess = true;
+  if (refPath && allowedPaths.includes(refPath)) {
+      sessionStorage.setItem('internalAccess', 'true');
+      hasInternalAccess = true;
   }
-
-  // Allow access if user already has internalAccess or is on index page
   const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
-  if (!hasInternalAccess && !isIndexPage) {
-    showAccessDeniedModal();
-  }
-
-  function showAccessDeniedModal() {
-    const modal = document.createElement('div');
-    modal.className = 'access-denied-modal';
-    modal.innerHTML = `
-      <strong>🚫 Access Denied</strong>
-      <div>You cannot access this page directly.<br>
-      Please go through the homepage or allowed sections.</div>
-      <div id="redirectTimer">Redirecting in 3 seconds...</div>
-      <button onclick="goBack()">Go Back</button>
-    `;
-    document.body.appendChild(modal);
-
-    let countdown = 3;
-    const timer = document.getElementById('redirectTimer');
-    const interval = setInterval(() => {
-      countdown--;
-      timer.textContent = `Redirecting in ${countdown} seconds...`;
-      if (countdown <= 0) {
-        clearInterval(interval);
-        window.location.href = "index.html";
-      }
-    }, 1000);
-  }
-
-  function goBack() {
-    window.history.back();
+  if (!hasInternalAccess && !isIndexPage) { 
+      const modal = document.createElement('div');
+      modal.className = 'access-denied-modal';
+      modal.innerHTML = `<strong>🚫 Access Denied</strong><div>You cannot access this page directly.</div><div id="redirectTimer">Redirecting...</div><button onclick="window.history.back()">Go Back</button>`;
+      document.body.appendChild(modal);
+      setTimeout(() => { window.location.href = "index.html"; }, 3000);
   }
 </script>
 
- 
 </body>
 </html>
