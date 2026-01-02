@@ -69,7 +69,7 @@
     })();
   </script>
 
-  <style>
+<style>
     /* =========================================
        1. VARIABLES & THEME DEFINITIONS
        ========================================= */
@@ -109,7 +109,7 @@
         transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    /* === LANDSCAPE FIX FOR MOBILE === */
+    /* === LANDSCAPE FIX FOR MOBILE (Cinematic Mode) === */
     @media (max-width: 900px) and (orientation: landscape) {
         body {
             padding: 0;
@@ -121,12 +121,13 @@
         .main-layout { max-width: 100% !important; width: 100% !important; height: 100vh; justify-content: center; }
         .video-wrapper-left { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
         .glass-card { border: none !important; background: transparent !important; box-shadow: none !important; width: 100%; border-radius: 0 !important; }
+        /* Hide UI elements in landscape */
         #poster-container, h2, #playlist, .center-logo, .back-btn { display: none !important; }
         #player-container { display: block !important; width: 100%; height: 100%; max-height: 100vh; border-radius: 0 !important; }
         .art-video-player { width: 100% !important; height: 100% !important; }
     }
 
-    /* Noise Texture Overlay */
+    /* Noise Texture Overlay (Optional aesthetic) */
     .noise-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
@@ -185,9 +186,13 @@
         overflow: hidden; 
         position: relative;
         box-shadow: 0 10px 30px -5px rgba(0,0,0,0.5);
+        touch-action: none; /* Prevents scrolling while swiping on video */
     }
     
     .art-video-player { width: 100%; height: 100%; }
+
+    /* Fix for mobile touch */
+    .art-layer-mobile { pointer-events: auto !important; }
 
     /* Titles */
     h2 { font-size: 20px; font-weight: 600; margin: 20px 10px 10px; color: var(--text-main); }
@@ -208,6 +213,7 @@
         gap: 10px; 
     }
     
+    /* Scrollbar for playlist */
     #playlist-items::-webkit-scrollbar { width: 6px; }
     #playlist-items::-webkit-scrollbar-track { background: transparent; }
     #playlist-items::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 10px; opacity: 0.2; }
@@ -233,8 +239,8 @@
     @media (min-width: 1000px) {
         .main-layout { flex-direction: row; align-items: flex-start; }
         .video-wrapper-left { margin-right: 0; }
-        .glass-card { height: auto; }
         #playlist { margin-top: 0; height: auto; }
+        .glass-card { height: auto; }
         #playlist .glass-card { max-height: calc(100vh - 100px); }
     }
 
@@ -268,26 +274,7 @@
         font-weight: bold; transition: 0.3s;
     }
     .access-denied-modal button:hover { background: white; color: black; }
-
-    /* --- GESTURE ANIMATION OVERLAY --- */
-    .gesture-overlay {
-        position: absolute; top: 0; left: 0; bottom: 0; right: 0;
-        pointer-events: none; overflow: hidden; z-index: 20;
-    }
-    .gesture-icon {
-        position: absolute; top: 50%; transform: translate(-50%, -50%);
-        background: rgba(0,0,0,0.6); border-radius: 50%; width: 60px; height: 60px;
-        display: flex; align-items: center; justify-content: center;
-        color: white; font-weight: bold; font-size: 12px;
-        opacity: 0; transition: opacity 0.2s;
-    }
-    .gesture-icon svg { width: 24px; height: 24px; fill: white; display: block; margin: 0 auto; }
-    .gesture-icon.active { opacity: 1; animation: popFade 0.5s forwards; }
-    @keyframes popFade {
-        0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-        20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
-        100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
-    }
+    
   </style>
 </head>
 
@@ -310,29 +297,6 @@
 
         <div id="player-container">
            <div id="artplayer" class="art-video-player"></div>
-           
-           <div id="click-catcher" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:10; cursor:pointer;"></div>
-
-           <div class="gesture-overlay">
-               <div id="icon-rewind" class="gesture-icon" style="left: 20%;">
-                   <div>
-                       <svg viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"></path></svg>
-                       <span>-10s</span>
-                   </div>
-               </div>
-               <div id="icon-forward" class="gesture-icon" style="left: 80%;">
-                   <div>
-                       <svg viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"></path></svg>
-                       <span>+10s</span>
-                   </div>
-               </div>
-               <div id="icon-play" class="gesture-icon" style="left: 50%;">
-                   <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
-               </div>
-               <div id="icon-pause" class="gesture-icon" style="left: 50%;">
-                   <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
-               </div>
-           </div>
         </div>
 
         <h2 id="main-title">Select Episode</h2>
@@ -416,8 +380,24 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
       const data = snapshot.val();
       if(!data || !data.url) { alert("Video unavailable"); return; }
 
+      // --- SUBTITLE PROCESSING ---
+      let artSubtitles = [];
+      if (data.subtitles) {
+          Object.entries(data.subtitles).forEach(([lang, url]) => {
+              artSubtitles.push({
+                  html: lang.toUpperCase(),
+                  url: url,
+                  default: lang === 'en'
+              });
+          });
+      }
+
       if (art) { art.destroy(); }
 
+      // --- MOBILE DETECTION ---
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+      // --- INIT ARTPLAYER WITH SMART MOBILE SETTINGS ---
       art = new Artplayer({
           container: '#artplayer',
           url: data.url,
@@ -428,45 +408,45 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
           muted: false,
           autoplay: true,
           
-          // --- ALL CONTROLS + SUBTITLES ---
+          // --- MOBILE SPECIFIC ---
+          isMobile: isMobile, // Use Native Mobile UI
+          autoOrientation: true, // Rotate on fullscreen
+          lock: true, // Screen lock
+          fastForward: true, // Press and hold to speed up
+          
+          // --- COMMON SETTINGS ---
           setting: true,
           fullscreen: true,
           fullscreenWeb: true,
+          subtitleOffset: true,
           miniProgressBar: true,
           mutex: true,
           backdrop: true,
           playsInline: true,
           autoPlayback: true,
           airplay: true,
-          hotkey: true,
-          lock: true,
-          fastForward: true,
-          theme: '#ff0000', 
-          lang: navigator.language.toLowerCase(),
+          theme: '#ff0057', 
           
-          // === NEW SUBTITLE CONFIGURATION ===
+          // Subtitle Config
           subtitle: {
-              url: data.subtitle || '', // Needs 'subtitle' key in Firebase
+              url: artSubtitles.find(s => s.default)?.url || '',
               type: 'vtt',
-              style: {
-                  color: '#ffffff',
-                  fontSize: '24px',
-                  fontFamily: 'Inter',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.8)',
-                  background: 'transparent',
-              },
               encoding: 'utf-8',
+              style: {
+                  color: '#fff',
+                  fontSize: isMobile ? '16px' : '20px',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+                  background: 'none',
+                  marginBottom: isMobile ? '20px' : '0'
+              }
           },
-          subtitleOffset: true, // Enables subtitle sync adjustment in settings
-          // ==================================
 
-          autoOrientation: true,
-          isMobile: false, 
-          
           moreVideoAttr: {
-              crossOrigin: 'anonymous',
               playsInline: true,
-              'webkit-playsinline': true
+              'webkit-playsinline': true,
+              'x5-video-player-type': 'h5',
+              'x5-video-player-fullscreen': 'true',
+              'x5-video-orientation': 'landscape'
           },
           
           customType: {
@@ -482,48 +462,19 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
           },
       });
 
-      // --- CUSTOM DOUBLE TAP GESTURE LOGIC ---
-      const catcher = document.getElementById('click-catcher');
-      let clickTimer = null;
-      let lastTapTime = 0;
-
-      catcher.addEventListener('click', (e) => {
-          const now = new Date().getTime();
-          const timeSinceLastTap = now - lastTapTime;
-          
-          const rect = catcher.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const width = rect.width;
-
-          // Double Tap Threshold
-          if (timeSinceLastTap < 300 && timeSinceLastTap > 0) {
-              clearTimeout(clickTimer);
-              
-              if (x < width * 0.35) {
-                  art.seek = art.currentTime - 10;
-                  showGestureFeedback('icon-rewind');
-              } else if (x > width * 0.65) {
-                  art.seek = art.currentTime + 10;
-                  showGestureFeedback('icon-forward');
-              } else {
-                  art.toggle(); 
-              }
-          } else {
-              // Single Click Wait
-              clickTimer = setTimeout(() => {
-                  art.toggle();
-                  if(art.playing) showGestureFeedback('icon-play');
-                  else showGestureFeedback('icon-pause');
-              }, 300);
-          }
-          lastTapTime = now;
-      });
-
-      function showGestureFeedback(id) {
-          const el = document.getElementById(id);
-          if(!el) return;
-          el.classList.add('active');
-          setTimeout(() => el.classList.remove('active'), 500);
+      // --- ADD SUBTITLE SWITCHING MENU ---
+      if(artSubtitles.length > 0) {
+          art.setting.add({
+              html: 'Subtitles',
+              width: 200,
+              selector: artSubtitles.map(s => {
+                  return { html: s.html, url: s.url, default: s.default };
+              }),
+              onSelect: function (item) {
+                  art.subtitle.switch(item.url, { name: item.html });
+                  return item.html;
+              },
+          });
       }
 
       // Resume Logic
@@ -546,6 +497,7 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
       art.on('video:timeupdate', () => {
           const now = Date.now();
           if (auth.currentUser && window.currentEpData && !art.video.paused && now - lastSave > 5000) {
+              // Get Page Name logic
               let pageName = window.location.pathname;
               if(pageName.startsWith('/')) pageName = pageName.substring(1); 
               if(!pageName) pageName = "videos.html"; 
@@ -642,17 +594,21 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const currentPage = window.location.pathname;
 
+  // Check if user already has internalAccess flag
   let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
 
+  // Check if user came from an allowed page
   const referrer = document.referrer;
   const refPath = referrer ? new URL(referrer).pathname : null;
   const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
 
+  // Grant internalAccess if coming from allowed page
   if (cameFromAllowedPage) {
     sessionStorage.setItem('internalAccess', 'true');
     hasInternalAccess = true;
   }
 
+  // Allow access if user already has internalAccess or is on index page
   const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
   if (!hasInternalAccess && !isIndexPage) {
     showAccessDeniedModal();
