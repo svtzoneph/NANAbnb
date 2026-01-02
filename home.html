@@ -1,1116 +1,449 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
- <link rel="icon" href="favicon-new.png" type="image/png" />
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2196f3">
-<meta name="description" content="Private SEVENTEEN streaming vault with lifetime access for approved members.">
-<meta name="keywords" content="SEVENTEEN, concert, vault, fanclub, exclusive, stream, archive">
-<meta property="og:title" content="Zone Vault - SEVENTEEN Exclusive Archive">
-<meta property="og:description" content="Private vault for SEVENTEEN concerts and shows. Members-only. No leaks allowed.">
-<meta property="og:image" content="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png">
-<meta property="og:type" content="website">
-
-<meta name="apple-mobile-web-app-title" content="Zone Vault">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#1a1a1a">
-<link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
-<link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
-<link rel="apple-touch-startup-image" href="splash.png">
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-1B2RJ659GL');
-</script>
-
-<script>
-  (function() {
-    const savedTheme = localStorage.getItem('zoneVaultTheme');
-    if(savedTheme) {
-      const style = document.createElement('style');
-      style.innerHTML = `
-        body { 
-          background: ${savedTheme} !important; 
-          background-size: cover !important;
-          background-attachment: fixed !important;
-          background-repeat: no-repeat !important;
-          min-height: 100vh;
-        }
-      `;
-      document.head.appendChild(style);
-    }
-  })();
-</script>
-
   <title>Home | Zone Vault</title>
+  
+  <link rel="icon" href="favicon-new.png" type="image/png" />
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
-    /* --- CSS VARIABLES FOR GLASS --- */
+    /* =========================================
+       1. VARIABLES & THEME ENGINE
+       ========================================= */
     :root {
-        --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-        --glass-border: 1px solid rgba(255, 255, 255, 0.2);
-        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        --glass-blur: blur(20px);
-        --text-shadow: 0 1px 2px rgba(0,0,0,0.8); /* Readability on any bg */
+        --bg-color: #050505;
+        --text-main: #ffffff;
+        --text-muted: #a1a1aa;
+        --card-bg: rgba(20, 20, 20, 0.6);
+        --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+        --accent: #ffffff;
+        --input-bg: rgba(255, 255, 255, 0.05);
+        --banner-gradient: linear-gradient(to right, #000000, #434343);
+        --sidebar-bg: rgba(0, 0, 0, 0.9);
+        --status-pending: #ff9800;
+        --status-approved: #4caf50;
+        --status-rejected: #f44336;
+        --youtube-red: #ff0000;
     }
 
-    * {
-        box-sizing: border-box;
+    body.light-mode {
+        --bg-color: #f0f2f5;
+        --text-main: #1a1a1a;
+        --text-muted: #65676b;
+        --card-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: 1px solid rgba(0, 0, 0, 0.05);
+        --accent: #000000;
+        --input-bg: rgba(0, 0, 0, 0.05);
+        --banner-gradient: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+        --sidebar-bg: rgba(255, 255, 255, 0.98);
     }
 
-    html, body {
-        height: 100%;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-        margin: 0;
-        font-family: 'Segoe UI', Arial, sans-serif;
-        background: black; /* Fallback */
-        color: white;
+    body { 
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        transition: background-color 0.3s ease, color 0.3s ease;
         overflow-x: hidden;
-        font-size: 16px;
-        transition: background 0.5s ease; /* Smooth transition if theme changes */
     }
 
-    /* --- HEADER GLASSMORPHISM (LEFT ALIGNED LAYOUT) --- */
+    .noise-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        pointer-events: none; z-index: -1;
+    }
+
+    /* =========================================
+       2. HEADERS & NAVIGATION
+       ========================================= */
+    .switch {
+      display: block; --width-of-switch: 3.5em; --height-of-switch: 2em; --size-of-icon: 1.4em; --slider-offset: 0.3em;
+      position: relative; width: var(--width-of-switch); height: var(--height-of-switch);
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #f4f4f5; transition: .4s; border-radius: 30px; }
+    .slider:before { position: absolute; content: ""; height: var(--size-of-icon,1.4em); width: var(--size-of-icon,1.4em); border-radius: 20px; left: var(--slider-offset,0.3em); top: 50%; transform: translateY(-50%); background: linear-gradient(40deg,#ff0080,#ff8c00 70%); transition: .4s; }
+    input:checked + .slider { background-color: #303136; }
+    input:checked + .slider:before { left: calc(100% - (var(--size-of-icon,1.4em) + var(--slider-offset,0.3em))); background: #303136; box-shadow: inset -3px -2px 5px -2px #8983f7, inset -10px -4px 0 0 #a3dafb; }
+
     header {
-        padding: 15px 20px;
-        display: flex;
-        align-items: center;
-        /* REVERTED: Space-between puts Links Left and Profile Right */
-        justify-content: space-between;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        
-        /* Hyper Glass Effect */
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-        will-change: transform, backdrop-filter;
-    }
-
-    .header-links {
-        display: flex;
-        gap: 15px;
-        align-items: center;
-        justify-content: center; /* Internal centering */
-        overflow-x: auto;
-        white-space: nowrap;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    header.show {
-        transform: translateY(0);
-        transition: transform 0.6s ease-out;
-    }
-
-    header.hide {
-        transform: translateY(-100%);
-    }
-
-    .header-logo {
-        width: 40px;
-        height: auto;
-        flex: 0 0 auto;
-    }
-
-    .header-logo img {
-        width: 40px;
-        height: auto;
-        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
-    }
-
-    /* --- LINKS GLASSMORPHISM (UPDATED) --- */
-    .category-link {
-        padding: 8px 16px;
-        
-        /* Button Glass - Hyper */
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-top: 1px solid rgba(255, 255, 255, 0.4); /* Highlight */
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        
-        color: #fff;
-        border-radius: 12px;
-        font-size: 14px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: all 0.3s ease;
-        position: relative;
-        text-shadow: var(--text-shadow);
-
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-        will-change: transform, backdrop-filter;
-    }
-
-    .category-link::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.1);
-        opacity: 0;
-        transition: opacity 0.3s;
-        z-index: -1;
-    }
-
-    .category-link:hover {
-        color: #fff;
-        transform: scale(1.05);
-        background: rgba(255, 255, 255, 0.25);
-        border-color: rgba(255, 255, 255, 0.5);
-    }
-
-    .category-link:hover::before {
-        opacity: 1;
-    }
-
-    .category-link.active {
-        background: #fff;
-        color: #000;
-        backdrop-filter: none;
-        text-shadow: none;
-    }
-
-    .category-link.flash {
-        background: #fff;
-        color: #000;
-        transition: background 0.6s ease, color 0.6s ease;
-    }
-
-    /* --- PC HEADER PROFILE WIDGET STYLES (REVERTED) --- */
-    .header-user-widget {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        text-decoration: none;
-        background: rgba(0,0,0,0.3);
-        padding: 5px 12px 5px 5px;
-        border-radius: 30px;
-        border: 1px solid rgba(255,255,255,0.1);
-        transition: all 0.2s ease;
-        margin-left: 20px;
-        flex-shrink: 0; 
-        /* No absolute positioning needed for Left/Right split */
-    }
-    .header-user-widget:hover {
-        background: rgba(255,255,255,0.15);
-        border-color: rgba(255,255,255,0.3);
-    }
-    .header-user-img-small {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid rgba(255,255,255,0.2);
-    }
-    .header-user-name {
-        color: white;
-        font-size: 14px;
-        font-weight: 600;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-        white-space: nowrap;
-        max-width: 150px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    /* --- ADDED: MOBILE HEADER PROFILE WIDGET STYLES --- */
-    .mobile-user-widget {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        background: rgba(0,0,0,0.3);
-        padding: 4px 10px 4px 4px;
-        border-radius: 20px;
-        border: 1px solid rgba(255,255,255,0.1);
-    }
-    .mobile-user-img-small {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 1px solid rgba(255,255,255,0.4);
-    }
-    .mobile-user-name {
-        color: white;
-        font-size: 12px;
-        font-weight: 600;
-        max-width: 100px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .hero-section {
-        display: flex;
-        flex-wrap: wrap;
+        padding: 15px 30px; 
+        display: flex; align-items: center; justify-content: space-between;
+        position: sticky; top: 0; z-index: 100;
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border-bottom: var(--glass-border);
+        background: rgba(0,0,0,0.05);
         width: 100%;
-        padding: 20px;
-        gap: 20px;
     }
-
-    /* --- HERO GLASSMORPHISM (UPDATED) --- */
-    .hero-left, .hero-right {
-        flex: 1 1 calc(50% - 20px);
-        min-width: 300px;
-        padding: 40px 30px;
-        
-        /* Hyper Glass Styles */
-        background: var(--glass-bg);
-        backdrop-filter: var(--glass-blur);
-        -webkit-backdrop-filter: var(--glass-blur);
-        border: var(--glass-border);
-        border-top: 1px solid rgba(255, 255, 255, 0.5); /* Top Highlight */
-        border-left: 1px solid rgba(255, 255, 255, 0.5); /* Left Highlight */
-        border-radius: 24px;
-        box-shadow: var(--glass-shadow);
-
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-        will-change: transform, backdrop-filter;
+    .header-left-group { display: flex; align-items: center; gap: 30px; }
+    .header-logo { height: 35px; width: auto; display: block; }
+    .header-links { display: flex; gap: 10px; align-items: center; }
+    .nav-btn {
+        padding: 8px 16px; border-radius: 8px;
+        color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500;
+        transition: 0.2s;
+        display: flex; align-items: center; gap: 8px;
     }
-
-    .hero-left {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    .hero-left h1 {
-        font-size: clamp(40px, 9vw, 34px);
-        margin-bottom: 50px;
-        align-items: center;
-        color: #fff;
-        text-shadow: var(--text-shadow);
-    }
-
-    .hero-left p {
-        font-size: clamp(14px, 6vw, 18px);
-        color: #f1f1f1;
-        margin-bottom: 100px;
-        text-shadow: var(--text-shadow);
-    }
-
-    .hero-right {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .main-image {
-        width: 100%;
-        height: 400px;
-        margin-bottom: 20px;
-        border-radius: 16px;
-        overflow: hidden;
-        /* Image Glass Border */
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-    }
-
-    .main-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        opacity: 1;
-        transition: opacity 0.4s ease-in-out;
-    }
-
-    .main-image img.fade-out {
-        opacity: 0;
-    }
-
-    /* --- UPDATED: THUMBNAIL ROW SCROLL --- */
-    .thumbnail-row {
-        display: flex;
-        gap: 10px;
-        overflow-x: auto;
-        padding-bottom: 5px;
-        scroll-behavior: smooth;
-        width: 100%;
-        
-        /* CHANGED: Align start to allow proper scrolling without cropping */
-        justify-content: flex-start; 
-        
-        /* SMOOTH SCROLL */
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .thumbnail-row::-webkit-scrollbar {
-        height: 6px;
-    }
-
-    .thumbnail-row::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-    }
-
-    /* --- UPDATED: THUMB BOX NO SHRINK --- */
-    .thumb-box {
-        width: 60px;
-        height: 60px;
-        aspect-ratio: 1 / 1; /* square */
-        border-radius: 12px;
-        overflow: hidden;
-        
-        /* ADDED: Prevent shrinking so they don't squeeze */
-        flex-shrink: 0; 
-        
-        /* Glassy Thumbnails */
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(5px);
-        
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-        will-change: transform;
-    }
-
-    .thumb-box.active,
-    .thumb-box:hover {
-        border-color: #fff;
-        background: rgba(255, 255, 255, 0.3);
-        transform: scale(1.05);
-    }
-
-    .thumb {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        opacity: 0.7;
-        transition: opacity 0.3s ease;
-    }
-    .thumb-box.active .thumb,
-    .thumb-box:hover .thumb {
-        opacity: 1;
-    }
-
-    .container {
-        width: 100%;
-        padding: 0 15px 60px;
-    }
-
-    .grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-    }
-
-    /* --- ACCORDION GLASSMORPHISM (UPDATED) --- */
-    .accordion {
-        border-radius: 20px;
-        overflow: hidden;
-        
-        /* Accordion Hyper Glass */
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-top: 1px solid rgba(255, 255, 255, 0.4);
-        box-shadow: var(--glass-shadow);
-        
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-        will-change: transform, backdrop-filter;
-    }
-
-    .accordion-header {
-        padding: 16px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-        background: rgba(255, 255, 255, 0.05);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        transition: background 0.2s;
-    }
-    
-    .accordion-header:hover {
-        background: rgba(255, 255, 255, 0.1);
-    }
-
-    .accordion-header h3 {
-        margin: 0;
-        font-size: clamp(14px, 4vw, 18px);
-        color: #fff;
-        text-shadow: var(--text-shadow);
-    }
-
-    .arrow {
-        transition: transform 0.3s ease;
-        font-size: 16px;
-        text-shadow: var(--text-shadow);
-    }
-
-    .accordion.open .arrow {
-        transform: rotate(90deg);
-    }
-
-    .accordion-content {
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        transform: scaleY(0.95);
-        padding: 0 20px;
-        transition: max-height 0.5s ease, opacity 0.4s ease, transform 0.4s ease, padding 0.3s ease;
-        background: transparent;
-    }
-
-    .accordion.open .accordion-content {
-        padding: 16px 20px;
-        max-height: 400px;
-        opacity: 1;
-        transform: scaleY(1);
-    }
-
-    .accordion-content p, .accordion-content li {
-        margin: 0;
-        line-height: 1.6;
-        font-size: clamp(12px, 2.5vw, 14px);
-        color: #f1f1f1;
-        text-shadow: 0 1px 1px rgba(0,0,0,0.8);
-    }
-
-    .accordion-content.scrollable {
-        overflow-y: auto;
-        scroll-behavior: smooth;
-        padding-right: 10px;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .accordion-content.scrollable::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .accordion-content.scrollable::-webkit-scrollbar-thumb {
-        background-color: rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-    }
-
-    /* --- SIDEBAR GLASSMORPHISM (UPDATED) --- */
-    .sidebar {
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        top: 0;
-        left: -100%;
-        width: 80%;
-        max-width: 300px;
-        height: 100%;
-        
-        /* Deep Dark Glass */
-        background: rgba(0, 0, 0, 0.65);
-        backdrop-filter: blur(30px);
-        -webkit-backdrop-filter: blur(30px);
-        
-        z-index: 9999;
-        padding: 20px;
-        gap: 10px;
-        transition: left 0.3s ease;
-        justify-content: space-between;
-        border-right: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.6);
-        overflow-y: auto;
-        overscroll-behavior: contain;
-
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-        will-change: transform, backdrop-filter;
-    }
-
-    .sidebar-nav {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        margin-top: 20px;
-        max-height: 450px;
-        overflow-y: auto;
-        padding-right: 5px;
-        /* SMOOTH SCROLL */
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .sidebar-nav::-webkit-scrollbar {
-        width: 6px;
-    }
-    .sidebar-nav::-webkit-scrollbar-thumb {
-        background-color: rgba(255, 255, 255, 0.2);
-        border-radius: 4px;
-    }
-    .sidebar-nav:hover::-webkit-scrollbar-thumb {
-        background-color: rgba(255, 255, 255, 0.4);
-    }
-
-    .sidebar.open {
-        left: 0;
-    }
-
-    .sidebar .close-btn {
-        align-self: flex-end;
-        background: none;
-        border: none;
-        font-size: 26px;
-        color: #fff;
-        cursor: pointer;
-        transition: transform 0.2s ease;
-    }
-
-    .sidebar .close-btn:hover {
-        transform: rotate(90deg);
-    }
-
-    .sidebar-title {
-        font-size: 26px;
-        font-weight: 700;
-        text-align: center;
-        color: #f1f1f1;
-        margin-bottom: 20px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        padding-bottom: 10px;
-    }
-
-    .sidebar-nav a {
-        text-decoration: none;
-        color: #fff;
-        font-size: 15px;
-        font-weight: 500;
-        padding: 10px;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        /* Sidebar Item Glass */
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .sidebar-nav a:hover {
-        background: rgba(255, 255, 255, 0.15);
-        padding-left: 20px;
-        border-color: rgba(255, 255, 255, 0.3);
-    }
-
-    .sidebar-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: auto;
-        padding-top: 20px;
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .sidebar-logo img {
-        width: 50px;
-        height: auto;
-    }
-
-    .sidebar-email a {
-        color: white;
-        font-size: 18px;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-
-    .sidebar-email a:hover {
-        color: #00bfff;
-    }
+    .nav-btn:hover, .nav-btn.active { color: var(--text-main); background: rgba(255,255,255,0.05); }
+    .header-right { font-size: 14px; font-weight: 600; color: var(--text-main); }
 
     .mobile-header {
-        display: none;
+        display: none; padding: 15px 20px;
+        align-items: center; justify-content: space-between;
+        position: sticky; top: 0; z-index: 100;
+        backdrop-filter: blur(20px); border-bottom: var(--glass-border);
+        background: var(--bg-color);
+        width: 100%;
+    }
+    .hamburger { background: none; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
+
+    .sidebar {
+        position: fixed; top: 0; left: -100%; width: 280px; height: 100%;
+        background: var(--sidebar-bg); backdrop-filter: blur(30px);
+        z-index: 9999; padding: 20px; display: flex; flex-direction: column;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-right: var(--glass-border);
+    }
+    .sidebar.open { left: 0; }
+    .sidebar-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 30px; padding-bottom: 15px;
+        border-bottom: var(--glass-border);
+    }
+    .sidebar-logo { height: 35px; width: auto; }
+    .close-sidebar { font-size: 28px; color: var(--text-muted); background: none; border: none; cursor: pointer; line-height: 1; }
+    .sidebar-nav { flex: 1; }
+    .sidebar-nav a {
+        display: block; padding: 14px 15px; color: var(--text-main);
+        text-decoration: none; border-radius: 12px; margin-bottom: 8px; font-weight: 500;
+        transition: all 0.2s;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-nav a:hover, .sidebar-nav a.active-link { background: rgba(255,255,255,0.1); padding-left: 20px; }
+    .sidebar-footer { margin-top: auto; padding-top: 20px; border-top: var(--glass-border); display: flex; justify-content: space-between; align-items: center; }
+
+    @media (max-width: 900px) {
+        header { display: none !important; }
+        .mobile-header { display: flex !important; }
+    }
+
+    /* =========================================
+       3. HOME CONTENT LAYOUT
+       ========================================= */
+    .main-wrapper { max-width: 1000px; margin: 40px auto; width: 92%; }
+
+    .glass-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border: var(--glass-border);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+        display: flex; flex-direction: column;
+    }
+
+    /* HERO SECTION - 50/50 Split */
+    .hero-section {
+        display: flex;
+        flex-direction: row; 
+        padding: 40px;
+        gap: 30px; 
+        align-items: center;
     }
     
-    .header-left {
+    .hero-left, .hero-right {
+        flex: 1; 
+        width: 50%; /* Force equal width */
+        min-width: 0; 
         display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .header-search {
-        display: flex;
-        align-items: center;
-    }
-
-    .header-search input {
-        padding: 6px 10px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        background: rgba(0, 0, 0, 0.3);
-        color: white;
-        border-radius: 20px;
-        outline: none;
-        backdrop-filter: blur(4px);
-    }
-
-    .header-search button {
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        padding: 6px 12px;
-        margin-left: 5px;
-        cursor: pointer;
-        backdrop-filter: blur(4px);
-    }
-    .header-search button:hover {
-        background: rgba(255, 255, 255, 0.2);
-    }
-
-    #noticeModal,
-    #secondModal {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.8); /* Darker overlay */
-        display: none;
-        align-items: center;
+        flex-direction: column;
         justify-content: center;
-        z-index: 9999;
-        padding: 10px;
-        box-sizing: border-box;
-        font-family: Arial, sans-serif;
-        opacity: 0;
-        transition: opacity 0.6s ease;
-        backdrop-filter: blur(15px); /* Strong Blur on overlay */
-        -webkit-backdrop-filter: blur(15px);
-        
-        /* SMOOTHNESS BOOSTER */
-        transform: translateZ(0);
-        will-change: opacity, backdrop-filter;
     }
 
-    #noticeBox,
-    #secondBox {
-        position: relative;
-        z-index: 10;
-        
-        /* Modal Glass */
-        background: rgba(30, 30, 30, 0.7);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        
-        padding: 18px;
-        border-radius: 12px;
+    .hero-left h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 15px; line-height: 1.1; }
+    .hero-left p { color: var(--text-muted); font-size: 1rem; line-height: 1.5; }
+
+    /* Carousel Styling */
+    .main-image-wrapper {
         width: 100%;
-        max-width: 500px;
-        text-align: center;
-        overflow-y: auto;
-        max-height: 90vh;
-        color: white;
-    }
-
-    #noticeBox::before,
-    #secondBox::before {
-        content: none;
-    }
-
-    #noticeBox button,
-    #noticeBox .btn-link,
-    #secondBox button,
-    #secondBox .btn-link {
-        background: rgba(255,255,255,0.1);
-        color: white;
-        padding: 10px 18px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        text-decoration: none;
-        display: inline-block;
-        transition: background 0.3s;
-        margin: 6px;
+        aspect-ratio: 16/9;
+        border-radius: 12px;
+        overflow: hidden;
+        border: var(--glass-border);
         position: relative;
-        z-index: 20;
-        backdrop-filter: blur(5px);
     }
-    #noticeBox button:hover,
-    #noticeBox .btn-link:hover,
-    #secondBox button:hover,
-    #secondBox .btn-link:hover{
-        background: rgba(255, 255, 255, 0.25);
-        border-color: white;
-    }
+    .main-image-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s ease; }
+    .main-image-wrapper img.fade-out { opacity: 0; }
 
-    /* Responsive */
+    .thumbnail-row {
+        display: flex; gap: 10px; width: 100%; overflow-x: auto; padding-bottom: 5px; margin-top: 15px;
+        scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    }
+    .thumb-box {
+        width: 60px; height: 60px; min-width: 60px; border-radius: 10px;
+        border: var(--glass-border); cursor: pointer; overflow: hidden; 
+        transition: 0.2s; opacity: 0.6;
+    }
+    .thumb-box.active, .thumb-box:hover { opacity: 1; border-color: var(--text-main); transform: scale(1.05); }
+    .thumb-box img { width: 100%; height: 100%; object-fit: cover; }
+
     @media (max-width: 768px) {
         .hero-section {
-            flex-direction: column;
-            gap: 20px;
+            flex-direction: column; 
+            padding: 30px 20px;
+            gap: 30px;
         }
-
         .hero-left, .hero-right {
-            padding: 25px 20px;
-            width: 100%;
-            margin: 0;
+            width: 100%; 
         }
-
-        .hero-left h1 {
-            font-size: clamp(30px, 5vw, 28px);
-            margin-bottom: 20px;
-        }
-
-        .hero-left p {
-            font-size: clamp(15px, 4vw, 16px);
-            margin-bottom: 12px;
-        }
-
-        .main-image {
-            height: auto;
-            max-height: 250px;
-        }
-
-        .thumb-box {
-            width: 60px;
-            height: 60px;
-        }
-
-        .grid {
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .container {
-            padding: 0 10px 40px;
-        }
-
-        #scrollHeader {
-            display: none;
-        }
-
-        .mobile-header {
-            display: flex;
-            padding: 10px 15px; /* Adjusted padding */
-            align-items: center;
-            justify-content: space-between;
-            /* Mobile Header Hyper Glass */
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            position: sticky;
-            top: 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-
-            /* SMOOTHNESS BOOSTER */
-            transform: translateZ(0);
-            will-change: transform, backdrop-filter;
-        }
-
-        .hamburger {
-            font-size: 26px;
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-        }
-
-        .sidebar {
-            display: flex;
-        }
-
-        .sidebar-email img {
-            width: 30px;
-            height: 30px;
-        }
-
-        .sidebar-logo img {
-            width: 60px;
-            height: auto;
-        }
-
-        .sidebar-title {
-            font-size: 30px;
-            margin-bottom: 15px;
-        }
+        .hero-left { text-align: center; }
+        .hero-left h1 { font-size: 2rem; }
     }
 
-    @media (max-width: 420px) {
-        .grid {
-            grid-template-columns: 1fr;
-            gap: 10px;
-        }
-
-        .accordion-header h3 {
-            font-size: 12.5px;
-        }
-
-        .hero-left p {
-            font-size: 14px;
-        }
-
-        .thumb-box {
-            width: 50px;
-            height: 40px;
-        }
-        
-        #noticeBox h3, #secondBox h3 { font-size: 18px; }
-        #noticeBox p, #secondBox p { font-size: 12px; line-height: 1.4; }
-        #noticeBox button, #noticeBox .btn-link, #secondBox button, #secondBox .btn-link {
-            font-size: 10px; padding: 8px;
-        }
-        #noticeBox, #secondBox { background-size: 500px 450px; }
+    /* GRID FOR ACCORDIONS */
+    .grid-container {
+        display: grid; 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 15px; /* Tighter gap */
+        margin-top: 24px;
     }
-</style>
+    
+    @media (max-width: 768px) {
+        .grid-container { grid-template-columns: 1fr; } 
+    }
+
+    /* --- FIXED ACCORDION CARDS SIZE (SMALLER) --- */
+    .accordion-card { 
+        cursor: pointer; 
+        transition: 0.2s; 
+        position: relative;
+        background-color: var(--card-bg); 
+    }
+    
+    .accordion-card:hover { 
+        filter: brightness(0.95);
+    }
+    
+    .card-header {
+        /* Reduced padding for smaller size */
+        padding: 15px 20px;
+        border-bottom: 1px solid transparent;
+        display: flex; justify-content: space-between; align-items: center;
+        font-weight: 600; 
+        height: auto;
+    }
+    
+    /* Smaller Font Size to match Profile */
+    .card-header h3 { 
+        font-size: 14px; 
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0; 
+        color: var(--text-muted); /* Muted initially like profile */
+        font-weight: 600; 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+    }
+    
+    .accordion-card.open .card-header h3 {
+        color: var(--text-main); /* White when open */
+    }
+    
+    .card-content {
+        max-height: 0; overflow: hidden; opacity: 0; padding: 0 20px;
+        transition: all 0.4s ease; color: var(--text-muted); font-size: 14px; line-height: 1.5;
+    }
+    
+    .accordion-card.open .card-header { border-bottom: var(--glass-border); }
+    .accordion-card.open .card-content { max-height: 500px; opacity: 1; padding: 20px; padding-bottom: 25px; overflow-y: auto; }
+    
+    .arrow { transition: transform 0.3s; font-size: 14px; color: var(--text-muted); }
+    .accordion-card.open .arrow { transform: rotate(90deg); color: var(--text-main); }
+    
+    .card-content li { margin-bottom: 8px; }
+    .card-content strong { color: var(--text-main); }
+    .card-content a { color: #fff; text-decoration: underline; }
+
+    /* Access Denied */
+    .access-denied-modal {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.85); color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        z-index: 99999; text-align: center; padding: 20px;
+        backdrop-filter: blur(10px); flex-direction: column;
+    }
+    .access-denied-modal button { 
+        margin-top: 15px; padding: 10px 25px; background: transparent; 
+        border: 2px solid white; color: white; border-radius: 50px; cursor: pointer; 
+    }
+  </style>
 </head>
 <body>
-  
-<div id="noticeModal">
-  <div id="noticeBox">
-    <h3 class="modal-title">⚠️ Notice</h3>
-    <div class="modal-content scrollable">
-      <p>
-  ✨ We’re excited to introduce <b>new profile features</b> on our site! You can now <b>view your watch history 📺</b>, stay updated with <b>announcements 📰</b>, and fully <b>customize your profile 🎨</b>.
-  <br><br>
-  Edit your <b>name 🖊️</b> and <b>bio 📝</b>, change your <b>banner 🖼️</b>, and even update your <b>background 🌈</b>. The background will automatically adjust based on the <b>color of your banner 🎨</b> for a seamless, personalized look.
-  <br><br>
-  🎉 Enjoy a more personalized experience and make your profile truly yours!
-</p>
-      <div class="btn-group">
-        <button onclick="showSecondModal()">I Understand</button>
-        <a href="bdaymessage.html" target="_blank" class="btn-link">Bday Message</a>
-      </div>
-    </div>
-  </div>
-</div>
 
-
-<div id="secondModal">
-  <div id="secondBox">
-    <p style="line-height: 1.5; font-size: 14px;">
-    <h3>  🚨 <strong>OUT NOW</strong> 🚨 <br></h3>
-      에스쿱스 X 민규 (SEVENTEEN) – <strong>‘5, 4, 3 (Pretty Woman)’</strong> (feat. Lay Bankz) OFFICIAL MV 💎 <br>
-      Let’s show our love and support. STREAM the full MV on 
-      <a href="https://www.youtube.com/@HYBELABELS" target="_blank" style="color: white; text-decoration:underline;">
-        <b>HYBE LABELS’ Official YouTube Channel</b>
-      </a> NOW! <br>
-      Every view counts, CARATs 💖✨ <br>
-      #SEVENTEEN #에스쿱스 X 민규규 #PrettyWoman
-    </p>
-    <div class="btn-group">
-      <button onclick="closeSecondModal()">Close </button>
-       <a href="https://www.youtube.com/results?search_query=%EC%97%90%EC%8A%A4%EC%BF%B1%EC%8A%A4X%EB%AF%BC%EA%B7%9C+(SEVENTEEN)+%275%2C+4%2C+3+(Pretty+woman)+(feat.+Lay+Bankz)%27+Official+MV" target="_blank" class="btn-link">STREAM NOW</a>
-    </div>
-  </div>
-</div>
+<div class="noise-overlay"></div>
 
 <div class="mobile-header">
-  <button class="hamburger" onclick="toggleSidebar()">☰</button>
-  
-  <a href="profile.html" class="mobile-user-widget">
-    <img id="mobile-header-img" src="https://via.placeholder.com/30" class="mobile-user-img-small" alt="User">
-    <span id="mobile-header-name" class="mobile-user-name">...</span>
-  </a>
+    <button class="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <div style="font-weight:700; letter-spacing:-0.5px;">ZONE VAULT</div>
+    <div style="width: 24px;"></div>
 </div>
 
-<header id="scrollHeader">
-  <div class="header-links">
-      <div class="header-logo">
-    <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" />
-  </div>
-    <a class="category-link" href="index.html">LOGIN</a>
-    <a class="category-link" href="profile.html">PROFILE</a>
-    <a class="category-link" href="home.html">HOME</a>
-    <a class="category-link" href="live.html">LIVE</a>
-    <a class="category-link" href="gallery.html">GALLERY</a>
-    <a class="category-link" href="videos.html">VIDEOS</a>
-  </div>
-
-  <a href="profile.html" class="header-user-widget">
-    <img id="header-profile-img" src="https://via.placeholder.com/35" class="header-user-img-small" alt="Profile">
-    <span id="header-display-name" class="header-user-name">Loading...</span>
-  </a>
+<header id="desktopHeader">
+    <div class="header-left-group">
+        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" class="header-logo">
+        <div class="header-links">
+            <a href="profile.html" class="nav-btn"><i class="fas fa-user"></i> Profile</a>
+            <a href="home.html" class="nav-btn active"><i class="fas fa-home"></i> Home</a>
+            <a href="videos.html" class="nav-btn"><i class="fas fa-play-circle"></i> Videos</a>
+            <a href="live.html" class="nav-btn"><i class="fas fa-broadcast-tower"></i> Live</a>
+        </div>
+    </div>
+    <div class="header-right">
+        <span id="header-user-name">Loading...</span>
+    </div>
 </header>
 
 <div id="mobileSidebar" class="sidebar">
-  <button class="close-btn" onclick="toggleSidebar()">✖</button>
-  
-  <div class="sidebar-title">Zone Vault</div>
-
-  <nav class="sidebar-nav">
-    <a href="index.html">LOGIN</a>
-    <a href="profile.html">PROFILE</a>
-    <a href="home.html">HOME</a>
-    <a href="live.html">LIVE</a>
-    <a href="gallery.html">GALLERY</a>
-    <a href="videos.html">VIDEOS</a>
-  </nav>
-
-  <div class="sidebar-footer">
-    <div class="sidebar-logo">
-      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" loading="lazy" alt="Logo" />
+    <div class="sidebar-header">
+        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault" class="sidebar-logo">
+        <button class="close-sidebar" onclick="toggleSidebar()">&times;</button>
     </div>
-    
-    <div class="sidebar-email">
-      <a href="zonevaultph@gmail.com" title="Send Email">
-        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/letter.png" loading="lazy" alt="Email" />
-      </a>
+    <div class="sidebar-nav">
+        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+        <a href="home.html" class="active-link"><i class="fas fa-home"></i> Home</a>
+        <a href="videos.html"><i class="fas fa-play-circle"></i> Videos</a>
+        <a href="live.html"><i class="fas fa-broadcast-tower"></i> Live Stream</a>
     </div>
-  </div>
+    <div class="sidebar-footer">
+        <div style="font-size:12px; color:var(--text-muted);">Theme</div>
+        <label class="switch">
+            <input type="checkbox" class="theme-checkbox-mobile" onchange="syncTheme(this)">
+            <span class="slider"></span>
+        </label>
+    </div>
 </div>
 
-  <div class="hero-section">
-    <div class="hero-left">
-      <h1>Welcome to Zone Vault</h1>
-      <p>Watch, Enjoy, and Stay Private! Enjoy exclusive content in a private, full-featured layout. Don’t forget to read the rules.</p>
-    </div>
-   
-    <div class="hero-right">
-      <div class="main-image">
-        <img id="mainDisplay" src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/1.png" alt="Main">
-      </div>
-      <div class="thumbnail-row" id="thumbScroll">
-        <div class="thumb-box active" onclick="switchImage(this)">
-          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/1.png" loading="lazy" class="thumb">
+<div class="main-wrapper">
+
+    <div class="glass-card hero-section">
+        <div class="hero-left">
+            <h1>Welcome to Zone Vault</h1>
+            <p>Watch, Enjoy, and Stay Private! Enjoy exclusive content in a private, full-featured layout. Don’t forget to read the rules.</p>
         </div>
-        <div class="thumb-box" onclick="switchImage(this)">
-          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/2.png" loading="lazy" class="thumb">
+        
+        <div class="hero-right">
+             <div class="main-image-wrapper">
+                <img id="mainDisplay" src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/1.png" alt="Main">
+             </div>
+             <div class="thumbnail-row" id="thumbScroll">
+                <div class="thumb-box active" onclick="switchImage(this)"><img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/1.png"></div>
+                <div class="thumb-box" onclick="switchImage(this)"><img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/2.png"></div>
+                <div class="thumb-box" onclick="switchImage(this)"><img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/3.png"></div>
+                <div class="thumb-box" onclick="switchImage(this)"><img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/4.png"></div>
+                <div class="thumb-box" onclick="switchImage(this)"><img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/5.png"></div>
+                <div class="thumb-box" onclick="switchImage(this)"><img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/6.png"></div>
+                <div class="thumb-box" onclick="switchImage(this)"><img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/Trailer -Cover.jpg"></div>
+                <div class="thumb-box" onclick="switchImage(this)"><img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png"></div>
+                <div class="thumb-box" onclick="switchImage(this)"><img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.png"></div>
+                <div class="thumb-box" onclick="switchImage(this)"><img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_gwangju.png"></div>
+             </div>
         </div>
-        <div class="thumb-box" onclick="switchImage(this)">
-          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/3.png" loading="lazy" class="thumb">
+    </div>
+
+    <div class="grid-container">
+        
+        <div class="glass-card accordion-card" onclick="toggleAccordion(this)">
+            <div class="card-header">
+                <h3>Rules</h3>
+                <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+            </div>
+            <div class="card-content">
+                <ul>
+                  <li>Do not share or repost any content or links outside this site.</li>
+                  <li>No screenshots, screen recording, or reuploads of any content.</li>
+                  <li>Leaking content will lead to a permanent ban without warning.</li>
+                  <li>Access is for approved users only — do not share your login info or account.</li>
+                </ul>
+                <p><strong>Violation of any rule will result in immediate removal and permanent ban.</strong></p>
+            </div>
         </div>
-        <div class="thumb-box" onclick="switchImage(this)">
-          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/4.png" loading="lazy" class="thumb">
+
+        <div class="glass-card accordion-card" onclick="toggleAccordion(this)">
+            <div class="card-header">
+                <h3>Announcements</h3>
+                <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+            </div>
+            <div class="card-content">
+                <h4 style="color:var(--text-main); margin-bottom:10px;">📲 Want to Install the Zone Vault Website as an App?</h4>
+                <p>Here's the Step-by-Step:</p>
+                <ol style="margin-left:20px;">
+                  <li>Open <strong>zonevault.site</strong> using <strong>Google Chrome</strong> on your phone</li>
+                  <li>Wait for the website to fully load, then tap the <strong>three dots (⋮)</strong> in the upper-right corner of your browser</li>
+                  <li>Select <strong>“Add to Home screen”</strong> then tap <strong>“Install”</strong></li>
+                  <li>✅ Once installation is complete, Zone Vault will appear on your phone just like a regular app — no need to search in your browser again!</li>
+                </ol>
+                <p>🔐 <strong>Stay connected anytime, anywhere</strong> — access exclusive content in just one tap.</p>
+                <p>💬 <strong>Need help?</strong> Just visit the Vault Help section or email us if you have any other questions.</p>
+            </div>
         </div>
-        <div class="thumb-box" onclick="switchImage(this)">
-          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/5.png" loading="lazy" class="thumb">
+
+        <div class="glass-card accordion-card" onclick="toggleAccordion(this)">
+            <div class="card-header">
+                <h3>Notes</h3>
+                <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+            </div>
+            <div class="card-content">
+                <ul>
+                  <li>This platform is for private viewing only.</li>
+                  <li>Sharing links outside may lead to takedown or bans.</li>
+                  <li>All content is <strong>lifetime access</strong> — this means you can watch the content anytime, forever, with no expiration, as long as your account and this website stays active.</li>
+                </ul>
+            </div>
         </div>
-        <div class="thumb-box" onclick="switchImage(this)">
-          <img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/6.png" loading="lazy" class="thumb">
-      </div>
-              <div class="thumb-box" onclick="switchImage(this)">
-          <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/Trailer -Cover.jpg" loading="lazy" class="thumb">
-      </div>
-              <div class="thumb-box" onclick="switchImage(this)">
-          <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png" loading="lazy" class="thumb">
-      </div>
-              <div class="thumb-box" onclick="switchImage(this)">
-          <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.png" loading="lazy" class="thumb">
-      </div>
-              <div class="thumb-box" onclick="switchImage(this)">
-          <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_gwangju.png" loading="lazy" class="thumb">
-      </div>
+
+        <div class="glass-card accordion-card" onclick="toggleAccordion(this)">
+            <div class="card-header">
+                <h3>Vault Help</h3>
+                <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+            </div>
+            <div class="card-content">
+                <p><strong>Q: Who can access the content?</strong><br>
+                A: Only paid members or approved joiners can view the exclusive content inside the site.</p>
+
+                <p><strong>Q: Can I share my account with someone else?</strong><br>
+                A: No. Account sharing is strictly prohibited and will result in a permanent ban.</p>
+
+                <p><strong>Q: Is it okay to repost or reupload the videos?</strong><br>
+                A: Absolutely not. All content is private. No screenshots, screen recordings, or reposts are allowed.</p>
+
+                <p><strong>Q: What happens if someone breaks the rules?</strong><br>
+                A: Any violation will lead to immediate removal and a permanent ban, with no warnings.</p>
+
+                <p><strong>Q: Can I request specific SEVENTEEN content?</strong><br>
+                A: You may send a request, but approval depends on the admin and content availability.</p>
+
+                <p><strong>Q: Where can I get the access code?</strong><br>
+                A: The access code is shared by the admin through email, DM, or after payment confirmation.</p>
+            </div>
+        </div>
+
     </div>
-  </div>
-
- <div class="container">
-  <div class="grid">
-    <div class="accordion">
-      <div class="accordion-header">
-        <h3>Rules</h3>
-        <span class="arrow">▶</span>
-      </div>
-      <div class="accordion-content scrollable">
-        <p>
-          • Do not share or repost any content or links outside this site.<br>
-          • No screenshots, screen recording, or reuploads of any content.<br>
-          • Leaking content will lead to a permanent ban without warning.<br>
-          • Access is for approved users only — do not share your login info or account.<br>
-        </p>
-        <p><strong>Violation of any rule will result in immediate removal and permanent ban.</strong><br></p>
-      </div>
-    </div>
-
-    <div class="accordion">
-      <div class="accordion-header">
-        <h3>Announcements</h3>
-        <span class="arrow">▶</span>
-      </div>
-      <div class="accordion-content scrollable">
-        <h2 style="margin-top: 0;">📲 Want to Install the Zone Vault Website as an App?</h2>
-        <p>Here's the Step-by-Step:</p>
-        <ol>
-          <li>Open <strong>zonevault.site</strong> using <strong>Google Chrome</strong> on your phone</li>
-          <li>Wait for the website to fully load, then tap the <strong>three dots (⋮)</strong> in the upper-right corner of your browser</li>
-          <li>Select <strong>“Add to Home screen”</strong> then tap <strong>“Install”</strong></li>
-          <li>✅ Once installation is complete, Zone Vault will appear on your phone just like a regular app — no need to search in your browser again!</li>
-        </ol>
-        <p>🔐 <strong>Stay connected anytime, anywhere</strong> — access exclusive content in just one tap.</p>
-        <p>💬 <strong>Need help?</strong> Just visit the <a href="#vault-help" style="color:#4a6cff; text-decoration:underline;">Vault Help</a> section or <a href="mailto:zonevaultph@gmail.com" style="color:#4a6cff; text-decoration:underline;">email us</a> if you have any other questions.</p>
-      </div>
-    </div>
-
-    <div class="accordion">
-      <div class="accordion-header">
-        <h3>Notes</h3>
-        <span class="arrow">▶</span>
-      </div>
-      <div class="accordion-content scrollable">
-        <p>
-          • This platform is for private viewing only.<br>
-          • Sharing links outside may lead to takedown or bans.<br>
-          • All content is <strong>lifetime access</strong> — this means you can watch the content anytime, forever, with no expiration, as long as your account and this website stays active.
-        </p>
-      </div>
-    </div>
-    
-    <div class="accordion">
-      <div class="accordion-header">
-        <h3>Vault Help</h3>
-        <span class="arrow">▶</span>
-      </div>
-      <div class="accordion-content scrollable">
-        <p><strong>Q: Who can access the content?</strong><br>
-        A: Only paid members or approved joiners can view the exclusive content inside the site.</p>
-
-        <p><strong>Q: Can I share my account with someone else?</strong><br>
-        A: No. Account sharing is strictly prohibited and will result in a permanent ban.</p>
-
-        <p><strong>Q: Is it okay to repost or reupload the videos?</strong><br>
-        A: Absolutely not. All content is private. No screenshots, screen recordings, or reposts are allowed.</p>
-
-        <p><strong>Q: What happens if someone breaks the rules?</strong><br>
-        A: Any violation will lead to immediate removal and a permanent ban, with no warnings.</p>
-
-        <p><strong>Q: Can I request specific SEVENTEEN content?</strong><br>
-        A: You may send a request, but approval depends on the admin and content availability.</p>
-
-        <p><strong>Q: Where can I get the access code?</strong><br>
-        A: The access code is shared by the admin through email, DM, or after payment confirmation.</p>
-      </div>
-    </div>
-
-  </div>
 </div>
+
 <script type="module">
 import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getDatabase,
-  ref,
-  get,
-  child
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// ---------- FIREBASE CONFIG ----------
 const firebaseConfig = {
   apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
   authDomain: "tvnstream-b4497.firebaseapp.com",
@@ -1118,270 +451,117 @@ const firebaseConfig = {
   projectId: "tvnstream-b4497",
   storageBucket: "tvnstream-b4497.firebasestorage.app",
   messagingSenderId: "308384754214",
-  appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-  measurementId: "G-VFNH70R4D9"
+  appId: "1:308384754214:web:2938e76cd29b288f75d4e7"
 };
 
-// ---------- INITIALIZE ----------
 let app;
-try {
-  app = getApp();
-} catch {
-  app = initializeApp(firebaseConfig);
-}
+try { app = getApp(); } catch { app = initializeApp(firebaseConfig); }
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-// ---------- NEW: FETCH & DISPLAY USER PROFILE ----------
 onAuthStateChanged(auth, (user) => {
     if (user) {
         const uid = user.uid;
-        // Fetch user data from Realtime Database
         get(child(ref(db), `users/${uid}`)).then((snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 const displayName = data.name || "Member";
-                const profilePic = data.profilePicture || "https://via.placeholder.com/35";
-
-                // Update PC Header
-                const pcImg = document.getElementById("header-profile-img");
-                const pcName = document.getElementById("header-display-name");
-                if(pcImg) pcImg.src = profilePic;
-                if(pcName) pcName.innerText = displayName;
-
-                // Update Mobile Header
-                const mobImg = document.getElementById("mobile-header-img");
-                const mobName = document.getElementById("mobile-header-name");
-                if(mobImg) mobImg.src = profilePic;
-                if(mobName) mobName.innerText = displayName;
-                
-                // Update Theme (Redundant check to ensure sync)
-                if(data.bannerColor) {
-                    localStorage.setItem('zoneVaultTheme', data.bannerColor);
-                    document.body.style.background = data.bannerColor;
-                }
+                document.getElementById("header-user-name").innerText = displayName;
             }
-        }).catch((error) => {
-            console.error(error);
         });
     }
 });
 </script>
 
-
 <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').then(reg => {
-    console.log('Service Worker registered');
-
-    reg.onupdatefound = () => {
-      const newSW = reg.installing;
-      newSW.onstatechange = () => {
-        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-          console.log('New content available, reloading...');
-          window.location.reload();
-        }
-      };
-    };
-  }).catch(err => console.error('Service Worker registration failed:', err));
-}
-</script>
-<script>
-  function toggleSidebar() {
-    const sidebar = document.getElementById('mobileSidebar');
-    sidebar.classList.toggle('open');
-  }
-
-  // Also adding the scroll header logic just in case, as they usually go together
-  let lastScrollY = window.scrollY;
-  const scrollHeader = document.getElementById('scrollHeader');
-  window.addEventListener('scroll', () => {
-    const currentScrollY = window.scrollY;
-    if (currentScrollY > lastScrollY && currentScrollY > 50) {
-      scrollHeader.classList.add('hide');
-    } else {
-      scrollHeader.classList.remove('hide');
+    // --- THEME LOGIC ---
+    function initTheme() {
+        const savedTheme = localStorage.getItem('zoneTheme') || 'dark';
+        const isDark = savedTheme === 'dark';
+        if (!isDark) { document.body.classList.add('light-mode'); }
+        document.querySelectorAll('.theme-checkbox-mobile').forEach(cb => { cb.checked = isDark; });
     }
-    lastScrollY = currentScrollY;
-  });
+    window.syncTheme = function(el) {
+        const isDark = el.checked;
+        if(isDark) {
+            document.body.classList.remove('light-mode');
+            localStorage.setItem('zoneTheme', 'dark');
+        } else {
+            document.body.classList.add('light-mode');
+            localStorage.setItem('zoneTheme', 'light');
+        }
+    }
+    initTheme();
+
+    // --- SIDEBAR TOGGLE ---
+    window.toggleSidebar = function() {
+        document.getElementById('mobileSidebar').classList.toggle('open');
+    }
+
+    // --- ACCORDION TOGGLE ---
+    window.toggleAccordion = function(element) {
+        const wasOpen = element.classList.contains('open');
+        document.querySelectorAll('.accordion-card').forEach(c => c.classList.remove('open'));
+        if(!wasOpen) element.classList.add('open');
+    }
+
+    // --- CAROUSEL LOGIC ---
+    const thumbnailBoxes = document.querySelectorAll('.thumb-box');
+    const mainImage = document.getElementById('mainDisplay');
+    const slideshowSources = Array.from(thumbnailBoxes).map(box => box.querySelector('img').src);
+    let current = 0;
+
+    function switchImageByIndex(index) {
+        const newSrc = slideshowSources[index];
+        mainImage.classList.add('fade-out');
+        setTimeout(() => {
+            mainImage.src = newSrc;
+            mainImage.classList.remove('fade-out');
+        }, 300);
+        thumbnailBoxes.forEach(b => b.classList.remove('active'));
+        if (index < thumbnailBoxes.length) thumbnailBoxes[index].classList.add('active');
+    }
+
+    setInterval(() => {
+        current = (current + 1) % slideshowSources.length;
+        switchImageByIndex(current);
+    }, 3000);
+
+    window.switchImage = function(box) {
+        const img = box.querySelector('img');
+        mainImage.classList.add('fade-out');
+        setTimeout(() => {
+            mainImage.src = img.src;
+            mainImage.classList.remove('fade-out');
+        }, 300);
+        thumbnailBoxes.forEach(b => b.classList.remove('active'));
+        box.classList.add('active');
+        current = slideshowSources.indexOf(img.src);
+    }
 </script>
-    
-  <script>
-    // Accordion toggle
-    document.querySelectorAll('.accordion-header').forEach(header => {
-      header.addEventListener('click', () => {
-        const acc = header.parentElement;
-        const open = acc.classList.contains('open');
-        document.querySelectorAll('.accordion').forEach(a => a.classList.remove('open'));
-        if (!open) acc.classList.add('open');
-      });
-    });
-    
-const thumbnailBoxes = document.querySelectorAll('.thumb-box');
-const mainImage = document.getElementById('mainDisplay');
-let current = 0;
-
-// Extra hidden slides (these won't appear in thumbnail row)
-const extraSlides = [
-];
-
-// Only use the combined array for cycling images, thumbnails stay separate
-const slideshowSources = [
-  ...Array.from(thumbnailBoxes).map(box => box.querySelector('img').src),
-  ...extraSlides
-];
-
-function switchImageByIndex(index) {
-  const newSrc = slideshowSources[index];
-  mainImage.classList.add('fade-out');
-  setTimeout(() => {
-    mainImage.src = newSrc;
-    mainImage.classList.remove('fade-out');
-  }, 300);
-
-  // Only highlight thumbnails if it's one of the visible thumbs
-  thumbnailBoxes.forEach(b => b.classList.remove('active'));
-  if (index < thumbnailBoxes.length) {
-    thumbnailBoxes[index].classList.add('active');
-  }
-}
-
-setInterval(() => {
-  current = (current + 1) % slideshowSources.length;
-  switchImageByIndex(current);
-}, 2000);
-
-// Manual switch from visible thumbnail
-function switchImage(box) {
-  const img = box.querySelector('img');
-  mainImage.classList.add('fade-out');
-  setTimeout(() => {
-    mainImage.src = img.src;
-    mainImage.classList.remove('fade-out');
-  }, 300);
-
-  thumbnailBoxes.forEach(b => b.classList.remove('active'));
-  box.classList.add('active');
-  current = slideshowSources.indexOf(img.src); // will keep cycling after this
-}
-
-</script>
-
-<style>
-  /* Access Denied Modal */
-  .access-denied-modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 11000;
-    text-align: center;
-    padding: 20px;
-    opacity: 0;
-    animation: fadeIn 0.5s forwards;
-    flex-direction: column;
-    /* SMOOTHNESS BOOSTER */
-    transform: translateZ(0);
-    will-change: opacity;
-  }
-
-  .access-denied-modal strong {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-
-  .access-denied-modal button {
-    margin-top: 15px;
-    padding: 10px 25px;
-    background: transparent;
-    color: white;
-    border: 2px solid white;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-  }
-
-  .access-denied-modal button:hover {
-    background: white;
-    color: black;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-</style>
 
 <script>
-  const allowedPaths = [
-    '/index.html',
-    '/home.html',
-    '/nanabnb.html',
-    '/newtour.html',
-    '/hxwfanconcert.html',
-    '/svtholiday.html',
-    '/arenatour.html',
-    '/svtjapanconcert.html',
-    '/touragain.html',
-    '/gallery.html',
-    '/profile.html',
-    '/soon.html'
-  ];
-
+  // --- PROTECTION LOGIC ---
+  const allowedPaths = ['/index.html','/home.html','/nanabnb.html','/newtour.html','/hxwfanconcert.html','/svtholiday.html','/arenatour.html','/svtjapanconcert.html','/touragain.html','/gallery.html','/profile.html','/soon.html','/videos.html'];
   const currentPage = window.location.pathname;
-
-  // Check if user already has internalAccess flag
   let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
-
-  // Check if user came from an allowed page
   const referrer = document.referrer;
   const refPath = referrer ? new URL(referrer).pathname : null;
-  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
-
-  // Grant internalAccess if coming from allowed page
-  if (cameFromAllowedPage) {
-    sessionStorage.setItem('internalAccess', 'true');
-    hasInternalAccess = true;
+  if (refPath && allowedPaths.includes(refPath)) {
+      sessionStorage.setItem('internalAccess', 'true');
+      hasInternalAccess = true;
   }
-
-  // Allow access if user already has internalAccess or is on index page
   const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
-  if (!hasInternalAccess && !isIndexPage) {
-    showAccessDeniedModal();
-  }
+  if (!hasInternalAccess && !isIndexPage) { showAccessDeniedModal(); }
 
   function showAccessDeniedModal() {
     const modal = document.createElement('div');
     modal.className = 'access-denied-modal';
-    modal.innerHTML = `
-      <strong>🚫 Access Denied</strong>
-      <div>You cannot access this page directly.<br>
-      Please go through the homepage or allowed sections.</div>
-      <div id="redirectTimer">Redirecting in 3 seconds...</div>
-      <button onclick="goBack()">Go Back</button>
-    `;
+    modal.innerHTML = `<strong>🚫 Access Denied</strong><div>You cannot access this page directly.</div><div id="redirectTimer">Redirecting...</div><button onclick="window.history.back()">Go Back</button>`;
     document.body.appendChild(modal);
-
-    let countdown = 3;
-    const timer = document.getElementById('redirectTimer');
-    const interval = setInterval(() => {
-      countdown--;
-      timer.textContent = `Redirecting in ${countdown} seconds...`;
-      if (countdown <= 0) {
-        clearInterval(interval);
-        window.location.href = "index.html";
-      }
-    }, 1000);
-  }
-
-  function goBack() {
-    window.history.back();
+    setTimeout(() => { window.location.href = "index.html"; }, 3000);
   }
 </script>
-    
+
 </body>
 </html>
