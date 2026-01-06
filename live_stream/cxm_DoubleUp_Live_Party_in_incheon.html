@@ -3,15 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>Live | Zone Vault</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1.0, user-scalable=0" />
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js"></script>
 
 <link rel="icon" href="favicon-new.png" type="image/png" />
 <link rel="manifest" href="manifest.json">
@@ -97,50 +93,42 @@
     text-shadow: var(--text-shadow);
   }
 
-  /* --- ARTPLAYER CONTAINER --- */
+  /* --- IFRAME PLAYER CONTAINER --- */
   #player-container {
     display: none; 
     width: 100%;
     aspect-ratio: 16/9;
     box-shadow: var(--glass-shadow);
     position: relative; 
-    background: transparent; 
+    background: black; 
+    overflow: hidden; /* Ensures watermark doesn't spill out */
   }
     
-  /* The actual div artplayer attaches to */
-  .artplayer-app {
+  /* The Iframe styling */
+  #muvi-iframe {
       width: 100%;
       height: 100%;
-  }
-
-  /* --- CUSTOM LIVE BADGE STYLE --- */
-  .custom-live-badge {
-      font-family: 'Segoe UI', sans-serif;
-      font-weight: 900;
-      font-size: 14px;
-      color: #ffffff;
-      margin-left: 10px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      display: none; /* Hidden by default */
-      align-items: center;
-      justify-content: center;
-      cursor: default;
-  }
-
-  /* --- UID WATERMARK (Artplayer Layer) --- */
-  .uid-watermark {
+      border: 0;
       position: absolute;
-      bottom: 15px;
-      left: 15px;
+      top: 0;
+      left: 0;
+      z-index: 1;
+  }
+
+  /* --- UID WATERMARK (OVERLAY ON IFRAME) --- */
+  .uid-watermark-overlay {
+      position: absolute;
+      bottom: 25px; /* Positioned over the iframe */
+      left: 20px;
       font-family: 'Roboto Mono', monospace;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.5); /* Slightly transparent */
-      text-shadow: 0 1px 2px black; /* Shadow for visibility */
-      pointer-events: none; /* Click through */
-      z-index: 20;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6); /* Transparent white */
+      text-shadow: 0 2px 4px black; /* Heavy shadow for readability */
+      pointer-events: none; /* CRITICAL: Allows clicks to pass through to the video controls */
+      z-index: 50; /* Above the iframe */
       white-space: nowrap;
-      font-weight: bold;
+      font-weight: 900;
+      display: none; /* Hidden until loaded */
   }
 
   h2 {
@@ -392,7 +380,9 @@
     </div>
 
     <div id="player-container">
-       <div class="artplayer-app"></div>
+       <iframe id="muvi-iframe" src="" frameborder="0" allowfullscreen allow="encrypted-media"></iframe>
+       
+       <div id="watermark-overlay" class="uid-watermark-overlay">ID: Loading...</div>
     </div>
 
     <div id="views-display" class="views-container">
@@ -415,78 +405,25 @@
 
 <div id="guidelines-modal" class="guidelines-modal-overlay">
     <div class="guidelines-content">
-        <div class="guide-header">
-            Stream Guidelines
-        </div>
-        
+        <div class="guide-header">Stream Guidelines</div>
         <div class="guide-list">
             <div class="guide-item">
                 <div class="dot-icon"></div>
-                <div class="item-text">
-                    <span class="highlight">One Device Policy:</span> Only 1 device can access the stream. If you try to login again on another device, the first connected device will be automatically logged out.
-                </div>
+                <div class="item-text"><span class="highlight">One Device Policy:</span> Only 1 device can access the stream.</div>
             </div>
-
             <div class="guide-item">
                 <div class="dot-icon"></div>
-                <div class="item-text">
-                    You can change the <span class="highlight">Video Resolution</span> (1080p, 720p, 540p, 480p, 360p, 240p) or set it to 0p via the settings gear icon.
-                </div>
+                <div class="item-text">The ID displayed on the screen is your <span class="highlight">User ID</span>. Do not share your screen.</div>
             </div>
-
             <div class="guide-item">
                 <div class="dot-icon"></div>
-                <div class="item-text">
-                    Only <span class="highlight">allowed/verified users</span> can access or view the live stream. Unverified accounts will be blocked.
-                </div>
+                <div class="item-text"><span class="highlight" style="color:#ff4444;">NO RESTREAMING:</span> Prohibited.</div>
             </div>
-
-            <div class="guide-item">
-                <div class="dot-icon"></div>
-                <div class="item-text">
-                    The ID displayed on the bottom left is your <span class="highlight">User ID</span>. This is recorded in our database and used to grant your access.
-                </div>
-            </div>
-
-            <div class="guide-item">
-                <div class="dot-icon"></div>
-                <div class="item-text">
-                    <span class="highlight" style="color:#ff4444;">NO RESTREAMING:</span> Restreaming on any platform is strictly prohibited. If caught, you will immediately lose access to the stream and be permanently blacklisted.
-                </div>
-            </div>
-
-            <div class="guide-item">
-                <div class="dot-icon"></div>
-                <div class="item-text">
-                    <span class="highlight" style="color:#ff4444;">SCREENSHOT AND SCREEN RECORDING ARE PROHIBITED.</span>
-                    Do not capture, record, or redistribute any part of the stream.
-                    Posting while the stream is ongoing is strictly not allowed.
-                </div>
-            </div>
-
-            <div class="guide-item">
-                <div class="dot-icon"></div>
-                <div class="item-text">
-                    <span class="highlight" style="color:#ff4444;">DO NOT SHARE LINKS:</span>
-                    Sharing, reposting, or distributing the website or stream link where you are watching is strictly prohibited. Violators may have their access revoked without notice.
-                </div>
-            </div>
-            
-            <div class="guide-item">
-                <div class="dot-icon"></div>
-                <div class="item-text">
-                    If you experience buffering or black screen, please refresh the page or lower the video quality.
-                </div>
-            </div>
-
              <div class="guide-item">
                 <div class="dot-icon"></div>
-                <div class="item-text">
-                    No sound? Tap the audio icon to unmute. iOS users should check if the physical silent switch is on.
-                </div>
+                <div class="item-text">If you experience buffering, please refresh the page.</div>
             </div>
         </div>
-        
         <button class="close-guide-btn" onclick="closeGuidelines()">I UNDERSTAND</button>
     </div>
 </div>
@@ -520,11 +457,12 @@ const playlistData = [
 const playlistContainer = document.getElementById('playlist-items');
 const posterContainer = document.getElementById('poster-container');
 const playerContainer = document.getElementById('player-container');
+const iframePlayer = document.getElementById('muvi-iframe');
+const watermarkOverlay = document.getElementById('watermark-overlay');
 const mainTitle = document.getElementById('main-title');
 const currentDateDisplay = document.getElementById('current-date-display');
 
 window.currentEpData = null;
-let art = null; // Artplayer Instance
 let localSessionToken = null; // Stores this browser's session ID
 </script>
 
@@ -553,7 +491,6 @@ function closeGuidelines() {
     document.getElementById('guidelines-modal').style.display = 'none';
     document.body.style.overflow = 'auto';
 }
-// Close if clicked outside
 document.getElementById('guidelines-modal').addEventListener('click', function(e) {
     if (e.target === this) closeGuidelines();
 });
@@ -568,15 +505,12 @@ function smartGoBack() {
 }
 
 function showAccessDeniedModal(message) {
-    if(art) {
-        art.pause();
-        art.destroy(false);
-        playerContainer.style.display = "none";
-        posterContainer.style.display = "flex";
-    }
+    iframePlayer.src = ""; // Stop the iframe
+    playerContainer.style.display = "none";
+    posterContainer.style.display = "flex";
+    
     document.body.style.overflow = 'hidden';
     if(document.querySelector('.access-denied-modal')) {
-        // If modal already exists, just update text (prevents stacking)
         document.querySelector('.access-denied-modal').innerHTML = `
         <strong style="color: #FF4444; font-size: 32px; margin-bottom: 20px;">Access Restricted</strong>
         <div style="margin-top: 15px; font-size: 16px; max-width: 90%; line-height: 1.4;">${message}</div>
@@ -607,20 +541,13 @@ function removeAccessDeniedModal() {
 
 // --- ONE DEVICE POLICY LOGIC ---
 function registerAndMonitorSession(uid) {
-    // 1. Generate a new session token for THIS specific instance
     localSessionToken = Date.now().toString() + Math.random().toString(36).substr(2, 5);
-    
-    // 2. Save this token to Firebase. This overwrites any previous token (kicking out other devices)
     db.ref(`active_sessions/${uid}`).set(localSessionToken);
 
-    // 3. Listen for changes to the token
     const sessionRef = db.ref(`active_sessions/${uid}`);
     sessionRef.on('value', (snapshot) => {
         const serverSession = snapshot.val();
-        
-        // If there is a session on server, and it DOES NOT match my local token
         if (serverSession && serverSession !== localSessionToken) {
-            // Someone else logged in!
             showAccessDeniedModal("You have been disconnected because your account was used on another device.<br><br>Only one device is allowed at a time.");
         }
     });
@@ -636,8 +563,6 @@ auth.onAuthStateChanged(user => {
     const urlParams = new URLSearchParams(window.location.search);
     const linkUid = urlParams.get('uid');
 
-    // --- UNIQUE LINK PROTECTION LOGIC ---
-    // If a UID is present in the link, it MUST match the logged in user
     if (linkUid && linkUid !== user.uid) {
         showAccessDeniedModal("<b>SECURITY ALERT</b><br>This link does not belong to you.<br><br>Link ID: " + linkUid + "<br>Your ID: " + user.uid);
         return;
@@ -660,7 +585,7 @@ auth.onAuthStateChanged(user => {
     });
 });
 
-// --- CORE FUNCTION: PLAY EPISODE (ARTPLAYER) ---
+// --- CORE FUNCTION: PLAY EPISODE (IFRAME) ---
 function loadAndPlayEpisode(epId, updateUrl = true) {
     const ep = playlistData.find(item => item.id === epId);
     if (!ep) return;
@@ -674,11 +599,13 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
     // --- ACTIVATE ONE DEVICE POLICY ---
     if(auth.currentUser) {
         registerAndMonitorSession(auth.currentUser.uid);
+        // Show UID on watermark
+        watermarkOverlay.innerText = "ID:" + auth.currentUser.uid;
+        watermarkOverlay.style.display = "block";
     }
 
     if (updateUrl && auth.currentUser) {
         const titleSlug = ep.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        // GENERATE UNIQUE URL: Adds UID + Random Token to make it look unique/scary to share
         const uniqueToken = Math.random().toString(36).substr(2, 9);
         const newUrl = window.location.pathname + `?v=${ep.id}&uid=${auth.currentUser.uid}&token=${uniqueToken}&title=${titleSlug}`;
         history.pushState({id: ep.id, uid: auth.currentUser.uid}, '', newUrl);
@@ -687,152 +614,23 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
     window.currentEpData = ep;
     posterContainer.style.display = "none";
     playerContainer.style.display = "block";
+    mainTitle.textContent = ep.title;
 
+    // --- EMBED LOGIC ---
+    // This checks Firebase for a specific URL, otherwise uses the fallback Muvi URL provided
     db.ref(`live/${ep.id}`).once('value').then(snapshot => {
       const data = snapshot.val();
-      if(!data || !data.url) { alert("Live unavailable"); return; }
       
-      mainTitle.textContent = data.title || ep.title;
-      setupStream(data.url, ep.status); // Initialize Artplayer
-    });
-}
-
-// --- ARTPLAYER SETUP ---
-function setupStream(streamUrl, status) {
-    if(art) { art.destroy(false); } // Destroy old instance
-
-    const isLive = status && status.toUpperCase() === 'LIVE';
-
-    art = new Artplayer({
-        container: '.artplayer-app',
-        url: streamUrl,
-        type: 'm3u8',
-        customType: {
-            m3u8: function (video, url, art) {
-                if (Hls.isSupported()) {
-                    if (art.hls) art.hls.destroy();
-                    const hls = new Hls();
-                    hls.loadSource(url);
-                    hls.attachMedia(video);
-                    art.hls = hls;
-                    
-                    // --- QUALITY SELECTOR LOGIC ---
-                    art.on('destroy', () => hls.destroy());
-                    hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-                        const levels = hls.levels.map((level, index) => {
-                            return {
-                                default: index === hls.currentLevel,
-                                html: level.height + 'p', // e.g. "1080p"
-                                url: level.url || url, // If level doesn't have explicit URL, reuse main
-                                index: index, // store index to switch
-                            };
-                        });
-                        
-                        // Add "Auto" option
-                        levels.unshift({
-                            default: true,
-                            html: 'Auto',
-                            index: -1,
-                        });
-                        
-                        // Update Artplayer Quality Control
-                        art.controls.update({
-                            name: 'quality',
-                            index: 10,
-                            position: 'right',
-                            style: { marginRight: '10px' },
-                            html: 'Quality', // Or an icon
-                            selector: levels,
-                            onSelect: function (item) {
-                                hls.currentLevel = item.index;
-                                return item.html;
-                            },
-                        });
-                    });
-                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = url;
-                }
-            },
-        },
-        volume: 0.7,
-        isLive: isLive,
-        muted: false,
-        autoplay: true,
-        autoSize: true,
-        autoMini: true,
-        fullscreen: true,
-        subtitleOffset: true,
-        mutex: true,
-        backdrop: false, /* UPDATED: REMOVED BLACK LAYER OVERLAY */
-        playsInline: true,
-        autoPlayback: true,
-        airplay: true,
-        theme: '#ff0033', // Red Theme
-        
-        // --- LAYERS (UID WATERMARK - NO SPACES) ---
-        layers: [
-            {
-                name: 'uid-watermark',
-                html: `<div class="uid-watermark">ID:${auth.currentUser ? auth.currentUser.uid : 'Loading...'}</div>`,
-                style: {
-                    position: 'absolute',
-                    bottom: '15px',
-                    left: '15px',
-                    zIndex: '20'
-                }
-            }
-        ],
-
-        // --- CONTROLS (THE LIVE INDICATOR) ---
-        controls: [
-            {
-                name: 'live-badge',
-                position: 'left', // Puts it next to play/volume usually
-                index: 30, // Adjust index to place it correctly
-                html: `<div class="custom-live-badge">LIVE</div>`,
-                tooltip: 'Live Stream',
-                style: {
-                    marginLeft: '5px',
-                    marginRight: '25px', /* UPDATED: INCREASED MARGIN TO FIX SPACING */
-                }
-            }
-        ],
-    });
-
-    // Update Live Badge Visibility
-    art.on('ready', () => {
-        const badge = document.querySelector('.custom-live-badge');
-        if(badge) {
-            badge.style.display = isLive ? 'flex' : 'none';
-        }
-        
-        // Auto Fullscreen on mobile landscape
-        const isMobile = /Mobi|Android|iPad|Tablet/i.test(navigator.userAgent);
-        if(isMobile) {
-            art.on('fullscreen', (state) => {
-                 if(state && screen.orientation) screen.orientation.lock('landscape').catch(()=>{});
-                 else if(!state && screen.orientation) screen.orientation.unlock();
-            });
-        }
-    });
-
-    // Watch History
-    let lastSaveTime = 0;
-    art.on('video:timeupdate', () => {
-        const user = auth.currentUser;
-        if (user && window.currentEpData && !art.video.paused && art.video.currentTime > 5 && Date.now() - lastSaveTime > 5000) { 
-            let pageName = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1) || "videos.html"; 
-            db.ref('watchHistory/' + user.uid + '/' + window.currentEpData.id).update({ 
-                id: window.currentEpData.id, 
-                title: window.currentEpData.title, 
-                image: window.currentEpData.image, 
-                currentTime: art.video.currentTime, 
-                duration: art.video.duration || 0, 
-                timestamp: Date.now(), 
-                page: pageName 
-            });
-            lastSaveTime = Date.now();
-        }
+      let finalUrl = "https://live.muvi.com/v2/play/680ade47C2ku"; // Default Muvi Link
+      
+      // If Firebase has a specific URL for this episode, use it.
+      if(data && data.url) { 
+         finalUrl = data.url; 
+         if(data.title) mainTitle.textContent = data.title;
+      }
+      
+      // Set the Iframe Source
+      iframePlayer.src = finalUrl;
     });
 }
 
@@ -843,7 +641,7 @@ window.addEventListener('popstate', (event) => {
     } else {
         posterContainer.style.display = "flex";
         playerContainer.style.display = "none";
-        if(art) art.pause();
+        iframePlayer.src = ""; // Stop playback
     }
 });
 
