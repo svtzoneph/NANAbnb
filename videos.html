@@ -507,6 +507,11 @@
                 </label>
             </div>
 
+            <div class="nav-link" style="cursor:default; margin-top:5px; margin-bottom:5px; border:1px solid var(--glass-border);">
+                 <i class="fas fa-shield-alt" id="status-icon-mobile"></i>
+                 <span class="nav-text" id="status-text-mobile" style="margin-left:10px; font-weight:700;">Checking...</span>
+            </div>
+
             <div class="nav-item">
                 <a href="#" onclick="logout()" class="nav-link" style="color:var(--admin-color);">
                     <i class="fas fa-sign-out-alt"></i> <span>Log Out</span>
@@ -573,6 +578,11 @@
                 </label>
             </div>
 
+            <div class="nav-link" style="cursor:default; margin-top:5px; margin-bottom:5px; border:1px solid var(--glass-border);">
+                 <i class="fas fa-shield-alt" id="status-icon-pc"></i>
+                 <span class="nav-text nav-text" id="status-text-pc" style="margin-left:10px; font-weight:700;">Checking...</span>
+            </div>
+
             <div class="nav-item">
                 <a href="#" onclick="logout()" class="nav-link" style="color:var(--admin-color);">
                     <i class="fas fa-sign-out-alt"></i> <span class="nav-text">Log Out</span>
@@ -597,7 +607,7 @@
     </div>
 
     <div class="grid-container" id="grid"></div>
-    
+     
     <div id="pagination"></div>
 </div>
 
@@ -666,11 +676,12 @@ auth.onAuthStateChanged(user => {
     userId = user.uid;
     loadFavoritesFromFirebase();
 
-    db.ref('users/' + userId).once('value').then(snapshot => {
+    db.ref('users/' + userId).on('value', snapshot => {
         const data = snapshot.val() || {};
         const displayName = data.name || "Member";
         const displayEmail = user.email;
         const displayPic = data.profilePicture || "https://via.placeholder.com/150";
+        const role = (data.role || "member").toLowerCase();
 
         // Update Desktop Sidebar
         const sbName = document.getElementById("sidebar-name");
@@ -687,6 +698,34 @@ auth.onAuthStateChanged(user => {
         if(mbName) mbName.innerText = displayName;
         if(mbEmail) mbEmail.innerText = displayEmail;
         if(mbPic) mbPic.src = displayPic;
+
+        // --- ROLE INDICATORS ---
+        const isAdm = role === 'admin';
+        const statusTextIds = ['status-text-pc', 'status-text-mobile'];
+        const statusIconIds = ['status-icon-pc', 'status-icon-mobile'];
+
+        statusTextIds.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.innerText = isAdm ? "ADMIN" : "MEMBER";
+                el.style.color = isAdm ? "var(--admin-color)" : "var(--text-muted)";
+            }
+        });
+
+        statusIconIds.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.style.color = isAdm ? "var(--admin-color)" : "var(--text-muted)";
+            }
+        });
+
+        if (isAdm) {
+            // Keep Bypass for Admin
+            sessionStorage.setItem('isAdmin', 'true');
+            sessionStorage.setItem('internalAccess', 'true');
+        } else {
+            sessionStorage.removeItem('isAdmin');
+        }
     });
   } else {
     // If no user, redirect or handle anonymously
@@ -940,22 +979,28 @@ initTheme();
 </script>
 
 <script>
-  // --- PROTECTION LOGIC ---
-  const allowedPaths = ['/index.html','/home.html','/nanabnb.html','/newtour.html','/hxwfanconcert.html','/svtholiday.html','/arenatour.html','/svtjapanconcert.html','/touragain.html','/gallery.html','/profile.html','/soon.html','/videos.html'];
+  // --- PROTECTION LOGIC (Includes Admin Bypass) ---
+  const allowedPaths = ['/index.html','/home.html','/nanabnb.html','/newtour.html','/hxwfanconcert.html','/svtholiday.html','/arenatour.html','/svtjapanconcert.html','/touragain.html','/gallery.html','/profile.html','/soon.html','/videos.html', '/admin.html'];
+  
+  // Check Admin Status from Session
+  const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+
   const currentPage = window.location.pathname;
   let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
   const referrer = document.referrer;
   const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
+  
+  // If coming from allowed page OR is Admin, grant access
   const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
-   
-  if (cameFromAllowedPage) { 
+  if (cameFromAllowedPage || isAdmin) { 
       sessionStorage.setItem('internalAccess', 'true'); 
       hasInternalAccess = true; 
   }
-   
+  
   const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
-   
-  if (!hasInternalAccess && !isIndexPage) { 
+  
+  // If NOT internal access AND NOT index page AND NOT admin -> Block
+  if (!hasInternalAccess && !isIndexPage && !isAdmin) { 
       showAccessDeniedModal(); 
   }
 
