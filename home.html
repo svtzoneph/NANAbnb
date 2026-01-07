@@ -17,31 +17,42 @@
        1. VARIABLES & THEME ENGINE
        ========================================= */
     :root {
-        --bg-color: #050505;
-        --text-main: #ffffff;
-        --text-muted: #a1a1aa;
-        --card-bg: rgba(20, 20, 20, 0.6);
-        --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+        --bg-color: #121212;
+        --text-main: #e0e0e0;
+        --text-muted: #a0a0a0;
+        
+        --sidebar-bg: #18181b; 
+        --sidebar-hover-bg: #27272a;
+        
+        --card-bg: #1e1e1e;
+        --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+        
         --accent: #ffffff;
         --input-bg: rgba(255, 255, 255, 0.05);
-        --banner-gradient: linear-gradient(to right, #000000, #434343);
-        --sidebar-bg: rgba(0, 0, 0, 0.9);
-        --status-pending: #ff9800;
-        --status-approved: #4caf50;
-        --status-rejected: #f44336;
+        --banner-gradient: linear-gradient(to right, #18181b, #27272a);
+        
+        --status-pending: #fbbf24;
+        --status-approved: #4ade80;
+        --status-rejected: #f87171;
         --youtube-red: #ff0000;
+        --admin-color: #ef4444;
+        
+        /* Sidebar Dimensions */
+        --sidebar-width-collapsed: 72px;
+        --sidebar-width-expanded: 260px;
     }
 
     body.light-mode {
-        --bg-color: #f0f2f5;
-        --text-main: #1a1a1a;
-        --text-muted: #65676b;
-        --card-bg: rgba(255, 255, 255, 0.7);
-        --glass-border: 1px solid rgba(0, 0, 0, 0.05);
+        --bg-color: #f3f4f6;
+        --text-main: #111827;
+        --text-muted: #6b7280;
+        --card-bg: #ffffff;
+        --sidebar-bg: #ffffff;
+        --sidebar-hover-bg: #f9fafb;
+        --glass-border: 1px solid rgba(0, 0, 0, 0.06);
         --accent: #000000;
-        --input-bg: rgba(0, 0, 0, 0.05);
+        --input-bg: #f3f4f6;
         --banner-gradient: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
-        --sidebar-bg: rgba(255, 255, 255, 0.98);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -53,87 +64,153 @@
         min-height: 100vh;
         transition: background-color 0.3s ease, color 0.3s ease;
         overflow-x: hidden;
+        /* Padding for Fixed Sidebar */
+        padding-left: var(--sidebar-width-collapsed); 
     }
 
+    /* Noise Texture */
     .noise-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
         pointer-events: none; z-index: -1;
     }
 
     /* =========================================
-       2. HEADERS & NAVIGATION
+       2. SIDEBAR STYLES (MATCHING PROFILE.HTML)
        ========================================= */
-    .switch {
-      display: block; --width-of-switch: 3.5em; --height-of-switch: 2em; --size-of-icon: 1.4em; --slider-offset: 0.3em;
-      position: relative; width: var(--width-of-switch); height: var(--height-of-switch);
+    /* Layout containers */
+    .sidebar-container {
+        display: flex; flex-direction: column; justify-content: space-between;
+        height: 100%; padding-top: 20px;
     }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #f4f4f5; transition: .4s; border-radius: 30px; }
-    .slider:before { position: absolute; content: ""; height: var(--size-of-icon,1.4em); width: var(--size-of-icon,1.4em); border-radius: 20px; left: var(--slider-offset,0.3em); top: 50%; transform: translateY(-50%); background: linear-gradient(40deg,#ff0080,#ff8c00 70%); transition: .4s; }
-    input:checked + .slider { background-color: #303136; }
-    input:checked + .slider:before { left: calc(100% - (var(--size-of-icon,1.4em) + var(--slider-offset,0.3em))); background: #303136; box-shadow: inset -3px -2px 5px -2px #8983f7, inset -10px -4px 0 0 #a3dafb; }
 
-    header {
-        padding: 15px 30px; 
-        display: flex; align-items: center; justify-content: space-between;
-        position: sticky; top: 0; z-index: 100;
-        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-        border-bottom: var(--glass-border);
-        background: rgba(0,0,0,0.05);
+    .sidebar-brand {
+        display: flex; align-items: center; padding: 0 20px;
+        height: 50px; margin-bottom: 30px; white-space: nowrap;
+    }
+    .sidebar-brand img { width: 32px; height: auto; min-width: 32px; }
+    .sidebar-brand span {
+        margin-left: 15px; font-weight: 700; font-size: 18px; letter-spacing: -0.5px;
+        color: var(--text-main);
+    }
+
+    /* Navigation */
+    .nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; padding: 0 10px; width: 100%; }
+    
+    .nav-link {
+        display: flex; align-items: center;
+        padding: 12px 14px;
+        color: var(--text-muted);
+        text-decoration: none;
+        border-radius: 12px;
+        transition: all 0.2s;
+        white-space: nowrap;
+        font-size: 14px;
+        font-weight: 500;
+        height: 48px; 
+    }
+    
+    .nav-link i {
+        font-size: 18px; min-width: 24px; text-align: center;
+        margin-right: 15px; 
+        transition: margin-right 0.3s;
+    }
+    
+    .nav-link:hover { background: var(--sidebar-hover-bg); color: var(--text-main); }
+    .nav-link.active { background: var(--input-bg); color: var(--text-main); border: 1px solid var(--glass-border); }
+
+    /* Bottom Section */
+    .sidebar-bottom {
+        padding: 15px 10px;
+        border-top: var(--glass-border);
+        display: flex; flex-direction: column; gap: 5px;
         width: 100%;
+        margin-top: auto; 
     }
-    .header-left-group { display: flex; align-items: center; gap: 30px; }
-    .header-logo { height: 35px; width: auto; display: block; }
-    .header-links { display: flex; gap: 10px; align-items: center; }
-    .nav-btn {
-        padding: 8px 16px; border-radius: 8px;
-        color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500;
-        transition: 0.2s;
-        display: flex; align-items: center; gap: 8px;
-    }
-    .nav-btn:hover, .nav-btn.active { color: var(--text-main); background: rgba(255,255,255,0.05); }
-    .header-right { font-size: 14px; font-weight: 600; color: var(--text-main); }
 
+    /* User Profile Widget */
+    .sidebar-user {
+        display: flex; align-items: center;
+        padding: 10px; border-radius: 12px;
+        cursor: pointer; transition: 0.2s;
+        overflow: hidden; margin-top: 5px;
+    }
+    .sidebar-user:hover { background: var(--sidebar-hover-bg); }
+
+    .sidebar-user img {
+        width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
+        min-width: 32px; border: 2px solid var(--accent);
+    }
+    
+    .sidebar-user-info {
+        margin-left: 12px; display: flex; flex-direction: column;
+        white-space: nowrap;
+    }
+    .sidebar-username { font-size: 13px; font-weight: 600; color: var(--text-main); }
+    .sidebar-useremail { font-size: 11px; color: var(--text-muted); }
+
+    /* DESKTOP SIDEBAR */
+    .sidebar-desktop {
+        position: fixed; top: 0; left: 0; height: 100vh;
+        width: var(--sidebar-width-collapsed);
+        background: var(--sidebar-bg);
+        border-right: var(--glass-border);
+        z-index: 1000;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden; 
+    }
+    .sidebar-desktop:hover {
+        width: var(--sidebar-width-expanded);
+        box-shadow: 10px 0 40px rgba(0,0,0,0.1);
+    }
+    /* Animations for Desktop Collapse */
+    .sidebar-desktop .sidebar-brand span, 
+    .sidebar-desktop .nav-text, 
+    .sidebar-desktop .sidebar-user-info,
+    .sidebar-desktop .theme-text {
+        opacity: 0; transition: opacity 0.2s; pointer-events: none;
+    }
+    .sidebar-desktop .nav-link i { margin-right: 0; }
+    
+    .sidebar-desktop:hover .sidebar-brand span, 
+    .sidebar-desktop:hover .nav-text, 
+    .sidebar-desktop:hover .sidebar-user-info,
+    .sidebar-desktop:hover .theme-text {
+        opacity: 1; transition-delay: 0.1s;
+    }
+    .sidebar-desktop:hover .nav-link i { margin-right: 15px; }
+
+    /* MOBILE SIDEBAR & HEADER */
     .mobile-header {
         display: none; padding: 15px 20px;
-        align-items: center; justify-content: space-between;
-        position: sticky; top: 0; z-index: 100;
+        align-items: center; justify-content: space-between; 
+        position: sticky; top: 0; z-index: 90;
         backdrop-filter: blur(20px); border-bottom: var(--glass-border);
-        background: var(--bg-color);
-        width: 100%;
+        background: var(--bg-color); width: 100%;
     }
-    .hamburger { background: none; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
+    .mobile-logo-container { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.5px; }
+    .mobile-logo-img { height: 30px; width: auto; }
+    .hamburger { background: transparent; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
 
-    .sidebar {
+    .mobile-sidebar-menu {
         position: fixed; top: 0; left: -100%; width: 280px; height: 100%;
-        background: var(--sidebar-bg); backdrop-filter: blur(30px);
-        z-index: 9999; padding: 20px; display: flex; flex-direction: column;
-        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border-right: var(--glass-border);
+        background: var(--sidebar-bg);
+        z-index: 9999; transition: left 0.3s ease; border-right: var(--glass-border);
     }
-    .sidebar.open { left: 0; }
-    .sidebar-header {
-        display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 30px; padding-bottom: 15px;
-        border-bottom: var(--glass-border);
+    .mobile-sidebar-menu.open { left: 0; }
+    .mobile-close-btn { 
+        position: absolute; top: 25px; right: 20px; 
+        background: none; border: none; color: var(--text-main); 
+        font-size: 24px; cursor: pointer; z-index: 10;
     }
-    .sidebar-logo { height: 35px; width: auto; }
-    .close-sidebar { font-size: 28px; color: var(--text-muted); background: none; border: none; cursor: pointer; line-height: 1; }
-    .sidebar-nav { flex: 1; }
-    .sidebar-nav a {
-        display: block; padding: 14px 15px; color: var(--text-main);
-        text-decoration: none; border-radius: 12px; margin-bottom: 8px; font-weight: 500;
-        transition: all 0.2s;
-        display: flex; align-items: center; gap: 10px;
-    }
-    .sidebar-nav a:hover, .sidebar-nav a.active-link { background: rgba(255,255,255,0.1); padding-left: 20px; }
-    .sidebar-footer { margin-top: auto; padding-top: 20px; border-top: var(--glass-border); display: flex; justify-content: space-between; align-items: center; }
 
-    @media (max-width: 900px) {
-        header { display: none !important; }
-        .mobile-header { display: flex !important; }
-    }
+    /* Switch */
+    .switch { display: block; --width-of-switch: 3.5em; --height-of-switch: 2em; --size-of-icon: 1.4em; --slider-offset: 0.3em; position: relative; width: var(--width-of-switch); height: var(--height-of-switch); }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .4s; border-radius: 30px; }
+    .slider:before { position: absolute; content: ""; height: var(--size-of-icon,1.4em); width: var(--size-of-icon,1.4em); border-radius: 20px; left: var(--slider-offset,0.3em); top: 50%; transform: translateY(-50%); background: linear-gradient(40deg,#ff0080,#ff8c00 70%); transition: .4s; }
+    input:checked + .slider { background-color: #3f3f46; }
+    input:checked + .slider:before { left: calc(100% - (var(--size-of-icon,1.4em) + var(--slider-offset,0.3em))); background: #ffffff; }
 
     /* =========================================
        3. HOME CONTENT LAYOUT
@@ -142,148 +219,72 @@
 
     .glass-card {
         background: var(--card-bg);
-        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-        border: var(--glass-border);
+        border: var(--glass-border); /* Updated to new variable */
         border-radius: 20px;
         overflow: hidden;
-        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         display: flex; flex-direction: column;
     }
 
     /* HERO SECTION - 50/50 Split */
     .hero-section {
-        display: flex;
-        flex-direction: row; 
-        padding: 40px;
-        gap: 30px; 
-        align-items: center;
+        display: flex; flex-direction: row; padding: 40px; gap: 30px; align-items: center;
     }
-    
-    .hero-left, .hero-right {
-        flex: 1; 
-        width: 50%; /* Force equal width */
-        min-width: 0; 
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
+    .hero-left, .hero-right { flex: 1; width: 50%; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
     .hero-left h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 15px; line-height: 1.1; }
     .hero-left p { color: var(--text-muted); font-size: 1rem; line-height: 1.5; }
 
     /* Carousel Styling */
-    .main-image-wrapper {
-        width: 100%;
-        aspect-ratio: 16/9;
-        border-radius: 12px;
-        overflow: hidden;
-        border: var(--glass-border);
-        position: relative;
-    }
+    .main-image-wrapper { width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; border: var(--glass-border); position: relative; }
     .main-image-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s ease; }
     .main-image-wrapper img.fade-out { opacity: 0; }
 
-    .thumbnail-row {
-        display: flex; gap: 10px; width: 100%; overflow-x: auto; padding-bottom: 5px; margin-top: 15px;
-        scrollbar-width: none; -webkit-overflow-scrolling: touch;
-    }
-    .thumb-box {
-        width: 60px; height: 60px; min-width: 60px; border-radius: 10px;
-        border: var(--glass-border); cursor: pointer; overflow: hidden; 
-        transition: 0.2s; opacity: 0.6;
-    }
+    .thumbnail-row { display: flex; gap: 10px; width: 100%; overflow-x: auto; padding-bottom: 5px; margin-top: 15px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .thumb-box { width: 60px; height: 60px; min-width: 60px; border-radius: 10px; border: var(--glass-border); cursor: pointer; overflow: hidden; transition: 0.2s; opacity: 0.6; }
     .thumb-box.active, .thumb-box:hover { opacity: 1; border-color: var(--text-main); transform: scale(1.05); }
     .thumb-box img { width: 100%; height: 100%; object-fit: cover; }
 
-    @media (max-width: 768px) {
-        .hero-section {
-            flex-direction: column; 
-            padding: 30px 20px;
-            gap: 30px;
-        }
-        .hero-left, .hero-right {
-            width: 100%; 
-        }
-        .hero-left { text-align: center; }
-        .hero-left h1 { font-size: 2rem; }
-    }
-
     /* GRID FOR ACCORDIONS */
-    .grid-container {
-        display: grid; 
-        grid-template-columns: repeat(2, 1fr); 
-        gap: 15px; /* Tighter gap */
-        margin-top: 24px;
-    }
+    .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 24px; }
     
-    @media (max-width: 768px) {
-        .grid-container { grid-template-columns: 1fr; } 
-    }
-
-    /* --- FIXED ACCORDION CARDS SIZE (SMALLER) --- */
-    .accordion-card { 
-        cursor: pointer; 
-        transition: 0.2s; 
-        position: relative;
-        background-color: var(--card-bg); 
-    }
-    
-    .accordion-card:hover { 
-        filter: brightness(0.95);
-    }
-    
-    .card-header {
-        /* Reduced padding for smaller size */
-        padding: 15px 20px;
-        border-bottom: 1px solid transparent;
-        display: flex; justify-content: space-between; align-items: center;
-        font-weight: 600; 
-        height: auto;
-    }
-    
-    /* Smaller Font Size to match Profile */
-    .card-header h3 { 
-        font-size: 14px; 
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin: 0; 
-        color: var(--text-muted); /* Muted initially like profile */
-        font-weight: 600; 
-        display: flex; 
-        align-items: center; 
-        gap: 10px; 
-    }
-    
-    .accordion-card.open .card-header h3 {
-        color: var(--text-main); /* White when open */
-    }
-    
-    .card-content {
-        max-height: 0; overflow: hidden; opacity: 0; padding: 0 20px;
-        transition: all 0.4s ease; color: var(--text-muted); font-size: 14px; line-height: 1.5;
-    }
-    
+    /* ACCORDION CARDS */
+    .accordion-card { cursor: pointer; transition: 0.2s; position: relative; background-color: var(--card-bg); }
+    .accordion-card:hover { filter: brightness(0.95); }
+    .card-header { padding: 15px 20px; border-bottom: 1px solid transparent; display: flex; justify-content: space-between; align-items: center; font-weight: 600; height: auto; }
+    .card-header h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    .accordion-card.open .card-header h3 { color: var(--text-main); }
+    .card-content { max-height: 0; overflow: hidden; opacity: 0; padding: 0 20px; transition: all 0.4s ease; color: var(--text-muted); font-size: 14px; line-height: 1.5; }
     .accordion-card.open .card-header { border-bottom: var(--glass-border); }
     .accordion-card.open .card-content { max-height: 500px; opacity: 1; padding: 20px; padding-bottom: 25px; overflow-y: auto; }
-    
     .arrow { transition: transform 0.3s; font-size: 14px; color: var(--text-muted); }
     .accordion-card.open .arrow { transform: rotate(90deg); color: var(--text-main); }
-    
     .card-content li { margin-bottom: 8px; }
     .card-content strong { color: var(--text-main); }
     .card-content a { color: #fff; text-decoration: underline; }
 
-    /* Access Denied */
-    .access-denied-modal {
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0, 0, 0, 0.85); color: #fff;
-        display: flex; align-items: center; justify-content: center;
-        z-index: 99999; text-align: center; padding: 20px;
-        backdrop-filter: blur(10px); flex-direction: column;
-    }
-    .access-denied-modal button { 
-        margin-top: 15px; padding: 10px 25px; background: transparent; 
-        border: 2px solid white; color: white; border-radius: 50px; cursor: pointer; 
+    /* =========================================
+       4. PROFESSIONAL ACCESS DENIED MODAL
+       ========================================= */
+    .access-denied-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 10, 10, 0.95); color: #fff; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; z-index: 99999; opacity: 0; animation: fadeIn 0.4s forwards; backdrop-filter: blur(15px); }
+    .access-card { background: #18181b; border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); transform: translateY(20px); animation: slideUp 0.4s forwards 0.1s; }
+    .access-icon-box { width: 60px; height: 60px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 24px; }
+    .access-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; color: #fff; }
+    .access-desc { font-size: 14px; color: #a1a1aa; line-height: 1.5; margin-bottom: 25px; }
+    .access-btn { background: #fff; color: #000; padding: 12px 24px; border-radius: 12px; font-weight: 600; font-size: 14px; border: none; cursor: pointer; transition: all 0.2s; width: 100%; }
+    .access-btn:hover { background: #e5e5e5; transform: translateY(-1px); }
+
+    @keyframes fadeIn { to { opacity: 1; } }
+    @keyframes slideUp { to { transform: translateY(0); } }
+
+    @media (max-width: 900px) {
+        .sidebar-desktop { display: none; }
+        .mobile-header { display: flex; }
+        body { padding-left: 0; }
+        .hero-section { flex-direction: column; padding: 30px 20px; gap: 30px; }
+        .hero-left, .hero-right { width: 100%; }
+        .hero-left { text-align: center; }
+        .hero-left h1 { font-size: 2rem; }
+        .grid-container { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -292,45 +293,138 @@
 <div class="noise-overlay"></div>
 
 <div class="mobile-header">
-    <button class="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-    <div style="font-weight:700; letter-spacing:-0.5px;">ZONE VAULT</div>
-    <div style="width: 24px;"></div>
+    <div class="mobile-logo-container">
+         <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault" class="mobile-logo-img">
+         <span>ZONE VAULT</span>
+    </div>
+    <button class="hamburger" onclick="toggleMobileSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
 </div>
 
-<header id="desktopHeader">
-    <div class="header-left-group">
-        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" class="header-logo">
-        <div class="header-links">
-            <a href="profile.html" class="nav-btn"><i class="fas fa-user"></i> Profile</a>
-            <a href="home.html" class="nav-btn active"><i class="fas fa-home"></i> Home</a>
-            <a href="videos.html" class="nav-btn"><i class="fas fa-play-circle"></i> Videos</a>
-            <a href="live.html" class="nav-btn"><i class="fas fa-broadcast-tower"></i> Live</a>
+<div id="mobileSidebar" class="mobile-sidebar-menu">
+    <div class="sidebar-container">
+        <button class="mobile-close-btn" onclick="toggleMobileSidebar()">&times;</button>
+
+        <div class="sidebar-top">
+            <div class="sidebar-brand">
+                <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault">
+                <span>ZONE VAULT</span>
+            </div>
+
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="profile.html" class="nav-link">
+                        <i class="fas fa-user"></i> <span>Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="home.html" class="nav-link active">
+                        <i class="fas fa-home"></i> <span>Home</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="videos.html" class="nav-link">
+                        <i class="fas fa-play-circle"></i> <span>Videos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="live.html" class="nav-link">
+                        <i class="fas fa-broadcast-tower"></i> <span>Live</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-bottom">
+            <div class="nav-link" style="justify-content:space-between; cursor:default; padding: 10px;">
+                <div style="display:flex; align-items:center;">
+                    <i class="fas fa-moon"></i> 
+                    <span id="theme-text-mobile" class="nav-text" style="font-size:13px; margin-left:10px;">Dark Mode</span>
+                </div>
+                <label class="switch" style="transform:scale(0.65);">
+                    <input type="checkbox" class="theme-checkbox-mobile" onchange="syncTheme(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="nav-item">
+                <a href="#" onclick="logout()" class="nav-link" style="color:var(--admin-color);">
+                    <i class="fas fa-sign-out-alt"></i> <span>Log Out</span>
+                </a>
+            </div>
+
+            <div class="sidebar-user" onclick="window.location.href='profile.html'">
+                <img id="mobile-sidebar-pic" src="https://via.placeholder.com/150" alt="Profile">
+                <div class="sidebar-user-info">
+                    <div id="mobile-sidebar-name" class="sidebar-username">Loading...</div>
+                    <div id="mobile-sidebar-email" class="sidebar-useremail">...</div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="header-right">
-        <span id="header-user-name">Loading...</span>
-    </div>
-</header>
-
-<div id="mobileSidebar" class="sidebar">
-    <div class="sidebar-header">
-        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault" class="sidebar-logo">
-        <button class="close-sidebar" onclick="toggleSidebar()">&times;</button>
-    </div>
-    <div class="sidebar-nav">
-        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
-        <a href="home.html" class="active-link"><i class="fas fa-home"></i> Home</a>
-        <a href="videos.html"><i class="fas fa-play-circle"></i> Videos</a>
-        <a href="live.html"><i class="fas fa-broadcast-tower"></i> Live Stream</a>
-    </div>
-    <div class="sidebar-footer">
-        <div style="font-size:12px; color:var(--text-muted);">Theme</div>
-        <label class="switch">
-            <input type="checkbox" class="theme-checkbox-mobile" onchange="syncTheme(this)">
-            <span class="slider"></span>
-        </label>
-    </div>
 </div>
+
+<aside class="sidebar-desktop">
+    <div class="sidebar-container">
+        <div class="sidebar-top">
+            <div class="sidebar-brand">
+                <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo">
+                <span>ZONE VAULT</span>
+            </div>
+
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="profile.html" class="nav-link">
+                        <i class="fas fa-user"></i> <span class="nav-text">Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="home.html" class="nav-link active">
+                        <i class="fas fa-home"></i> <span class="nav-text">Home</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="videos.html" class="nav-link">
+                        <i class="fas fa-play-circle"></i> <span class="nav-text">Videos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="live.html" class="nav-link">
+                        <i class="fas fa-broadcast-tower"></i> <span class="nav-text">Live</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-bottom">
+            <div class="nav-link" style="justify-content:space-between; cursor:default; padding: 10px;">
+                <div style="display:flex; align-items:center;">
+                    <i class="fas fa-moon"></i> 
+                    <span id="theme-text-pc" class="theme-text nav-text" style="font-size:13px; margin-left:10px;">Dark Mode</span>
+                </div>
+                <label class="switch" style="transform:scale(0.65);">
+                    <input type="checkbox" class="theme-checkbox-pc" onchange="syncTheme(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="nav-item">
+                <a href="#" onclick="logout()" class="nav-link" style="color:var(--admin-color);">
+                    <i class="fas fa-sign-out-alt"></i> <span class="nav-text">Log Out</span>
+                </a>
+            </div>
+
+            <div class="sidebar-user" onclick="window.location.href='profile.html'">
+                <img id="sidebar-pic" src="https://via.placeholder.com/150" alt="Profile">
+                <div class="sidebar-user-info">
+                    <div id="sidebar-name" class="sidebar-username">Loading...</div>
+                    <div id="sidebar-email" class="sidebar-useremail">...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
 
 <div class="main-wrapper">
 
@@ -442,7 +536,7 @@
 <script type="module">
 import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
@@ -466,21 +560,47 @@ onAuthStateChanged(auth, (user) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 const displayName = data.name || "Member";
-                document.getElementById("header-user-name").innerText = displayName;
+                const displayEmail = user.email;
+                const displayPic = data.profilePicture || "https://via.placeholder.com/150";
+
+                // Update Desktop Sidebar
+                const sbName = document.getElementById("sidebar-name");
+                const sbEmail = document.getElementById("sidebar-email");
+                const sbPic = document.getElementById("sidebar-pic");
+                if(sbName) sbName.innerText = displayName;
+                if(sbEmail) sbEmail.innerText = displayEmail;
+                if(sbPic) sbPic.src = displayPic;
+
+                // Update Mobile Sidebar
+                const mbName = document.getElementById("mobile-sidebar-name");
+                const mbEmail = document.getElementById("mobile-sidebar-email");
+                const mbPic = document.getElementById("mobile-sidebar-pic");
+                if(mbName) mbName.innerText = displayName;
+                if(mbEmail) mbEmail.innerText = displayEmail;
+                if(mbPic) mbPic.src = displayPic;
             }
         });
     }
 });
+
+// Expose logout function to window
+window.logout = function() {
+    if(confirm("Are you sure you want to log out?")) {
+        signOut(auth).then(() => window.location.href = "index.html");
+    }
+}
 </script>
 
 <script>
-    // --- THEME LOGIC ---
+    // --- THEME LOGIC (UPDATED WITH TEXT TOGGLE) ---
     function initTheme() {
         const savedTheme = localStorage.getItem('zoneTheme') || 'dark';
         const isDark = savedTheme === 'dark';
         if (!isDark) { document.body.classList.add('light-mode'); }
-        document.querySelectorAll('.theme-checkbox-mobile').forEach(cb => { cb.checked = isDark; });
+        document.querySelectorAll('.theme-checkbox-pc, .theme-checkbox-mobile').forEach(cb => { cb.checked = isDark; });
+        updateThemeText(isDark);
     }
+    
     window.syncTheme = function(el) {
         const isDark = el.checked;
         if(isDark) {
@@ -490,11 +610,21 @@ onAuthStateChanged(auth, (user) => {
             document.body.classList.add('light-mode');
             localStorage.setItem('zoneTheme', 'light');
         }
+        document.querySelectorAll('.theme-checkbox-pc, .theme-checkbox-mobile').forEach(cb => { cb.checked = isDark; });
+        updateThemeText(isDark);
+    }
+    
+    function updateThemeText(isDark) {
+        const text = isDark ? "Dark Mode" : "Light Mode";
+        const pcText = document.getElementById('theme-text-pc');
+        const mobileText = document.getElementById('theme-text-mobile');
+        if(pcText) pcText.innerText = text;
+        if(mobileText) mobileText.innerText = text;
     }
     initTheme();
 
     // --- SIDEBAR TOGGLE ---
-    window.toggleSidebar = function() {
+    window.toggleMobileSidebar = function() {
         document.getElementById('mobileSidebar').classList.toggle('open');
     }
 
@@ -541,23 +671,32 @@ onAuthStateChanged(auth, (user) => {
 </script>
 
 <script>
-  // --- PROTECTION LOGIC ---
+  // --- PROTECTION LOGIC (UPDATED WITH PROFESSIONAL MODAL) ---
   const allowedPaths = ['/index.html','/home.html','/nanabnb.html','/newtour.html','/hxwfanconcert.html','/svtholiday.html','/arenatour.html','/svtjapanconcert.html','/touragain.html','/gallery.html','/profile.html','/soon.html','/videos.html'];
   const currentPage = window.location.pathname;
   let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
   const referrer = document.referrer;
-  const refPath = referrer ? new URL(referrer).pathname : null;
-  if (refPath && allowedPaths.includes(refPath)) {
-      sessionStorage.setItem('internalAccess', 'true');
-      hasInternalAccess = true;
+  const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+  
+  if (cameFromAllowedPage) { 
+      sessionStorage.setItem('internalAccess', 'true'); 
+      hasInternalAccess = true; 
   }
+  
   const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
-  if (!hasInternalAccess && !isIndexPage) { showAccessDeniedModal(); }
+  
+  if (!hasInternalAccess && !isIndexPage) { 
+      showAccessDeniedModal(); 
+  }
 
   function showAccessDeniedModal() {
     const modal = document.createElement('div');
     modal.className = 'access-denied-modal';
-    modal.innerHTML = `<strong>🚫 Access Denied</strong><div>You cannot access this page directly.</div><div id="redirectTimer">Redirecting...</div><button onclick="window.history.back()">Go Back</button>`;
+    const card = document.createElement('div');
+    card.className = 'access-card';
+    card.innerHTML = `<div class="access-icon-box"><i class="fas fa-lock"></i></div><div class="access-title">Access Restricted</div><div class="access-desc">You are not authorized to view this page directly. Please log in or return home.</div><button class="access-btn" onclick="window.location.href='index.html'">Return to Safety</button><div style="margin-top:15px; font-size:12px; color:#555;">Redirecting automatically...</div>`;
+    modal.appendChild(card);
     document.body.appendChild(modal);
     setTimeout(() => { window.location.href = "index.html"; }, 3000);
   }
