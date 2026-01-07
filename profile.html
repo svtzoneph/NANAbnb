@@ -353,6 +353,7 @@
         </div>
 
         <div class="sidebar-bottom">
+
             <div class="nav-link" style="justify-content:space-between; cursor:default; padding: 10px;">
                 <div style="display:flex; align-items:center;">
                     <i class="fas fa-moon"></i> 
@@ -363,7 +364,12 @@
                     <span class="slider"></span>
                 </label>
             </div>
-
+  
+              <div class="nav-link" style="cursor:default; margin-bottom:5px; border:1px solid var(--glass-border);">
+                 <i class="fas fa-shield-alt" id="status-icon-mobile"></i>
+                 <span class="nav-text" id="status-text-mobile" style="margin-left:10px; font-weight:700;">Checking...</span>
+            </div>
+  
             <div class="nav-item">
                 <a href="#" onclick="logout()" class="nav-link" style="color:var(--admin-color);">
                     <i class="fas fa-sign-out-alt"></i> <span>Log Out</span>
@@ -414,6 +420,11 @@
         </div>
 
         <div class="sidebar-bottom">
+            <div class="nav-link" style="cursor:default; margin-bottom:5px; border:1px solid var(--glass-border);">
+                 <i class="fas fa-shield-alt" id="status-icon-pc"></i>
+                 <span class="nav-text nav-text" id="status-text-pc" style="margin-left:10px; font-weight:700;">Checking...</span>
+            </div>
+
             <div class="nav-link" style="justify-content:space-between; cursor:default; padding: 10px;">
                 <div style="display:flex; align-items:center;">
                     <i class="fas fa-moon"></i> 
@@ -535,11 +546,13 @@
       messagingSenderId: "308384754214",
       appId: "1:308384754214:web:2938e76cd29b288f75d4e7"
     };
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // --- THEME LOGIC (Updated to switch text) ---
+    // --- THEME LOGIC ---
     function initTheme() {
         const savedTheme = localStorage.getItem('zoneTheme') || 'dark';
         const isDark = savedTheme === 'dark';
@@ -600,6 +613,7 @@
                 const name = data.name || "Member";
                 const bio = data.bio || "No bio set.";
                 const pic = data.profilePicture || "https://via.placeholder.com/150";
+                const role = (data.role || "member").toLowerCase();
                 
                 // Update Main Profile Card
                 document.getElementById('display-name').innerText = name;
@@ -607,33 +621,54 @@
                 document.getElementById('display-bio').innerText = bio;
                 document.getElementById('profile-pic').src = pic;
 
-                // Update Sidebar (Desktop)
-                const sbName = document.getElementById('sidebar-name');
-                const sbEmail = document.getElementById('sidebar-email');
-                const sbPic = document.getElementById('sidebar-pic');
-                if(sbName) sbName.innerText = name;
-                if(sbEmail) sbEmail.innerText = user.email;
-                if(sbPic) sbPic.src = pic;
+                // Update Sidebars
+                const ids = ['sidebar-name', 'mobile-sidebar-name'];
+                ids.forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerText = name; });
+                
+                // Sidebar pics
+                const picIds = ['sidebar-pic', 'mobile-sidebar-pic'];
+                picIds.forEach(id => { if(document.getElementById(id)) document.getElementById(id).src = pic; });
 
-                // Update Sidebar (Mobile)
-                const mbName = document.getElementById('mobile-sidebar-name');
-                const mbEmail = document.getElementById('mobile-sidebar-email');
-                const mbPic = document.getElementById('mobile-sidebar-pic');
-                if(mbName) mbName.innerText = name;
-                if(mbEmail) mbEmail.innerText = user.email;
-                if(mbPic) mbPic.src = pic;
-
-                // Handle Role
-                const role = data.role || "Member"; 
+                // --- ROLE & ADMIN LOGIC ---
+                // Update the Card in Main Content
                 const roleEl = document.getElementById('user-role');
                 roleEl.innerText = role.toUpperCase();
                 
-                if(role.toLowerCase() === 'admin') {
+                const isAdm = role === 'admin';
+
+                // Update SIDEBAR INDICATORS (New Logic)
+                const statusTextIds = ['status-text-pc', 'status-text-mobile'];
+                const statusIconIds = ['status-icon-pc', 'status-icon-mobile'];
+
+                statusTextIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) {
+                        el.innerText = isAdm ? "ADMIN" : "MEMBER";
+                        el.style.color = isAdm ? "var(--admin-color)" : "var(--text-muted)";
+                    }
+                });
+
+                statusIconIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) {
+                        el.style.color = isAdm ? "var(--admin-color)" : "var(--text-muted)";
+                    }
+                });
+                
+                if(isAdm) {
+                    // Profile Card Style
                     roleEl.style.color = 'var(--admin-color)';
                     roleEl.style.textShadow = '0 0 10px rgba(239, 68, 68, 0.4)';
+                    
+                    // ENABLE ADMIN PERMISSIONS (Bypass)
+                    sessionStorage.setItem('isAdmin', 'true');
+                    sessionStorage.setItem('internalAccess', 'true');
+                    // Note: No longer injecting button link
                 } else {
+                    // Not admin? Reset styles and permissions
                     roleEl.style.color = 'var(--text-main)';
                     roleEl.style.textShadow = 'none';
+                    sessionStorage.removeItem('isAdmin');
                 }
             });
 
@@ -769,20 +804,35 @@
 </script>
 
 <script>
+  // --- UPDATED SECURITY LOGIC ---
   const allowedPaths = [
     '/index.html', '/home.html', '/nanabnb.html', '/newtour.html',
     'hxwfanconcert.html', '/svtholiday.html', '/arenatour.html',
     '/svtjapanconcert.html', '/touragain.html', '/gallery.html',
-    '/profile.html', '/soon.html', '/videos.html'
+    '/profile.html', '/soon.html', '/videos.html', '/admin.html' 
   ];
+  
+  // Check Admin Status from Session (set in previous script)
+  const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+
   const currentPage = window.location.pathname;
   let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
   const referrer = document.referrer;
   const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
+  
+  // If coming from allowed page OR is Admin, grant access
   const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
-  if (cameFromAllowedPage) { sessionStorage.setItem('internalAccess', 'true'); hasInternalAccess = true; }
+  if (cameFromAllowedPage || isAdmin) { 
+      sessionStorage.setItem('internalAccess', 'true'); 
+      hasInternalAccess = true; 
+  }
+
   const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
-  if (!hasInternalAccess && !isIndexPage) { showAccessDeniedModal(); }
+
+  // If NOT internal access AND NOT index page AND NOT admin -> Block
+  if (!hasInternalAccess && !isIndexPage && !isAdmin) { 
+      showAccessDeniedModal(); 
+  }
 
   function showAccessDeniedModal() {
     const modal = document.createElement('div');
