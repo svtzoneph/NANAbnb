@@ -7,15 +7,8 @@
   
   <link rel="icon" href="favicon-new.png" type="image/png" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1a1a1a">
+  <meta name="theme-color" content="#121212">
   
-  <meta name="apple-mobile-web-app-title" content="Zone Vault">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
-  <link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
-  <link rel="apple-touch-startup-image" href="splash.png">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -31,34 +24,45 @@
 
   <style>
     /* =========================================
-       1. VARIABLES & THEME ENGINE
+       1. VARIABLES & THEME ENGINE (UPDATED)
        ========================================= */
     :root {
-        --bg-color: #050505;
-        --text-main: #ffffff;
-        --text-muted: #a1a1aa;
-        --card-bg: rgba(20, 20, 20, 0.6);
-        --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+        --bg-color: #121212;
+        --text-main: #e0e0e0;
+        --text-muted: #a0a0a0;
+        
+        --sidebar-bg: #18181b; 
+        --sidebar-hover-bg: #27272a;
+        
+        --card-bg: #1e1e1e;
+        --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+        
         --accent: #ffffff;
         --input-bg: rgba(255, 255, 255, 0.05);
-        --banner-gradient: linear-gradient(to right, #000000, #434343);
-        --sidebar-bg: rgba(0, 0, 0, 0.9);
-        --status-pending: #ff9800;
-        --status-approved: #4caf50;
-        --status-rejected: #f44336;
+        --banner-gradient: linear-gradient(to right, #18181b, #27272a);
+        
+        --status-pending: #fbbf24;
+        --status-approved: #4ade80;
+        --status-rejected: #f87171;
         --youtube-red: #ff0000;
+        --admin-color: #ef4444;
+        
+        /* Sidebar Dimensions */
+        --sidebar-width-collapsed: 72px;
+        --sidebar-width-expanded: 260px;
     }
 
     body.light-mode {
-        --bg-color: #f0f2f5;
-        --text-main: #1a1a1a;
-        --text-muted: #65676b;
-        --card-bg: rgba(255, 255, 255, 0.7);
-        --glass-border: 1px solid rgba(0, 0, 0, 0.05);
+        --bg-color: #f3f4f6;
+        --text-main: #111827;
+        --text-muted: #6b7280;
+        --card-bg: #ffffff;
+        --sidebar-bg: #ffffff;
+        --sidebar-hover-bg: #f9fafb;
+        --glass-border: 1px solid rgba(0, 0, 0, 0.06);
         --accent: #000000;
-        --input-bg: rgba(0, 0, 0, 0.05);
+        --input-bg: #f3f4f6;
         --banner-gradient: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
-        --sidebar-bg: rgba(255, 255, 255, 0.98);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -70,99 +74,155 @@
         min-height: 100vh;
         transition: background-color 0.3s ease, color 0.3s ease;
         overflow-x: hidden;
+        /* Padding for Fixed Sidebar */
+        padding-left: var(--sidebar-width-collapsed); 
     }
 
+    /* Noise Texture */
     .noise-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
         pointer-events: none; z-index: -1;
     }
 
     /* =========================================
-       2. HEADERS & NAVIGATION
+       2. SIDEBAR STYLES (MATCHING PROFILE/HOME)
        ========================================= */
-    .switch {
-      display: block; --width-of-switch: 3.5em; --height-of-switch: 2em; --size-of-icon: 1.4em; --slider-offset: 0.3em;
-      position: relative; width: var(--width-of-switch); height: var(--height-of-switch);
+    .sidebar-container {
+        display: flex; flex-direction: column; justify-content: space-between;
+        height: 100%; padding-top: 20px;
     }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #f4f4f5; transition: .4s; border-radius: 30px; }
-    .slider:before { position: absolute; content: ""; height: var(--size-of-icon,1.4em); width: var(--size-of-icon,1.4em); border-radius: 20px; left: var(--slider-offset,0.3em); top: 50%; transform: translateY(-50%); background: linear-gradient(40deg,#ff0080,#ff8c00 70%); transition: .4s; }
-    input:checked + .slider { background-color: #303136; }
-    input:checked + .slider:before { left: calc(100% - (var(--size-of-icon,1.4em) + var(--slider-offset,0.3em))); background: #303136; box-shadow: inset -3px -2px 5px -2px #8983f7, inset -10px -4px 0 0 #a3dafb; }
 
-    header {
-        padding: 15px 30px; 
-        display: flex; align-items: center; justify-content: space-between;
-        position: sticky; top: 0; z-index: 100;
-        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-        border-bottom: var(--glass-border);
-        background: rgba(0,0,0,0.05);
-        width: 100%;
+    .sidebar-brand {
+        display: flex; align-items: center; padding: 0 20px;
+        height: 50px; margin-bottom: 30px; white-space: nowrap;
     }
-    .header-left-group { display: flex; align-items: center; gap: 30px; }
-    .header-logo { height: 35px; width: auto; display: block; }
-    .header-links { display: flex; gap: 10px; align-items: center; }
-    .nav-btn {
-        padding: 8px 16px; border-radius: 8px;
-        color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500;
-        transition: 0.2s;
-        display: flex; align-items: center; gap: 8px;
+    .sidebar-brand img { width: 32px; height: auto; min-width: 32px; }
+    .sidebar-brand span {
+        margin-left: 15px; font-weight: 700; font-size: 18px; letter-spacing: -0.5px;
+        color: var(--text-main);
     }
-    .nav-btn:hover, .nav-btn.active { color: var(--text-main); background: rgba(255,255,255,0.05); }
+
+    /* Navigation */
+    .nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; padding: 0 10px; width: 100%; }
     
-    .header-right { display: flex; align-items: center; }
-    .profile-name-link {
-        font-size: 14px; font-weight: 600; color: var(--text-main);
-        text-decoration: none; padding: 5px 10px; border-radius: 6px;
-        transition: background 0.2s;
+    .nav-link {
+        display: flex; align-items: center;
+        padding: 12px 14px;
+        color: var(--text-muted);
+        text-decoration: none;
+        border-radius: 12px;
+        transition: all 0.2s;
+        white-space: nowrap;
+        font-size: 14px;
+        font-weight: 500;
+        height: 48px; 
     }
-    .profile-name-link:hover { background: rgba(255,255,255,0.1); }
+    
+    .nav-link i {
+        font-size: 18px; min-width: 24px; text-align: center;
+        margin-right: 15px; 
+        transition: margin-right 0.3s;
+    }
+    
+    .nav-link:hover { background: var(--sidebar-hover-bg); color: var(--text-main); }
+    .nav-link.active { background: var(--input-bg); color: var(--text-main); border: 1px solid var(--glass-border); }
 
-    /* Mobile Header */
+    /* Bottom Section */
+    .sidebar-bottom {
+        padding: 15px 10px;
+        border-top: var(--glass-border);
+        display: flex; flex-direction: column; gap: 5px;
+        width: 100%;
+        margin-top: auto; 
+    }
+
+    /* User Profile Widget */
+    .sidebar-user {
+        display: flex; align-items: center;
+        padding: 10px; border-radius: 12px;
+        cursor: pointer; transition: 0.2s;
+        overflow: hidden; margin-top: 5px;
+    }
+    .sidebar-user:hover { background: var(--sidebar-hover-bg); }
+
+    .sidebar-user img {
+        width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
+        min-width: 32px; border: 2px solid var(--accent);
+    }
+    
+    .sidebar-user-info {
+        margin-left: 12px; display: flex; flex-direction: column;
+        white-space: nowrap;
+    }
+    .sidebar-username { font-size: 13px; font-weight: 600; color: var(--text-main); }
+    .sidebar-useremail { font-size: 11px; color: var(--text-muted); }
+
+    /* DESKTOP SIDEBAR */
+    .sidebar-desktop {
+        position: fixed; top: 0; left: 0; height: 100vh;
+        width: var(--sidebar-width-collapsed);
+        background: var(--sidebar-bg);
+        border-right: var(--glass-border);
+        z-index: 1000;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden; 
+    }
+    .sidebar-desktop:hover {
+        width: var(--sidebar-width-expanded);
+        box-shadow: 10px 0 40px rgba(0,0,0,0.1);
+    }
+    /* Animations for Desktop Collapse */
+    .sidebar-desktop .sidebar-brand span, 
+    .sidebar-desktop .nav-text, 
+    .sidebar-desktop .sidebar-user-info,
+    .sidebar-desktop .theme-text {
+        opacity: 0; transition: opacity 0.2s; pointer-events: none;
+    }
+    .sidebar-desktop .nav-link i { margin-right: 0; }
+    
+    .sidebar-desktop:hover .sidebar-brand span, 
+    .sidebar-desktop:hover .nav-text, 
+    .sidebar-desktop:hover .sidebar-user-info,
+    .sidebar-desktop:hover .theme-text {
+        opacity: 1; transition-delay: 0.1s;
+    }
+    .sidebar-desktop:hover .nav-link i { margin-right: 15px; }
+
+    /* MOBILE SIDEBAR & HEADER */
     .mobile-header {
         display: none; padding: 15px 20px;
-        align-items: center; justify-content: space-between;
-        position: sticky; top: 0; z-index: 100;
+        align-items: center; justify-content: space-between; 
+        position: sticky; top: 0; z-index: 90;
         backdrop-filter: blur(20px); border-bottom: var(--glass-border);
-        background: var(--bg-color);
-        width: 100%;
+        background: var(--bg-color); width: 100%;
     }
-    .hamburger { background: none; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
+    .mobile-logo-container { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.5px; }
+    .mobile-logo-img { height: 30px; width: auto; }
+    .hamburger { background: transparent; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
 
-    /* Sidebar */
-    .sidebar {
+    .mobile-sidebar-menu {
         position: fixed; top: 0; left: -100%; width: 280px; height: 100%;
-        background: var(--sidebar-bg); backdrop-filter: blur(30px);
-        z-index: 9999; padding: 20px; display: flex; flex-direction: column;
-        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border-right: var(--glass-border);
+        background: var(--sidebar-bg);
+        z-index: 9999; transition: left 0.3s ease; border-right: var(--glass-border);
     }
-    .sidebar.open { left: 0; }
-    .sidebar-header {
-        display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 30px; padding-bottom: 15px;
-        border-bottom: var(--glass-border);
+    .mobile-sidebar-menu.open { left: 0; }
+    .mobile-close-btn { 
+        position: absolute; top: 25px; right: 20px; 
+        background: none; border: none; color: var(--text-main); 
+        font-size: 24px; cursor: pointer; z-index: 10;
     }
-    .sidebar-logo { height: 35px; width: auto; }
-    .close-sidebar { font-size: 28px; color: var(--text-muted); background: none; border: none; cursor: pointer; line-height: 1; }
-    .sidebar-nav { flex: 1; }
-    .sidebar-nav a {
-        display: block; padding: 14px 15px; color: var(--text-main);
-        text-decoration: none; border-radius: 12px; margin-bottom: 8px; font-weight: 500;
-        transition: all 0.2s;
-        display: flex; align-items: center; gap: 10px;
-    }
-    .sidebar-nav a:hover, .sidebar-nav a.active-link { background: rgba(255,255,255,0.1); padding-left: 20px; }
-    .sidebar-footer { margin-top: auto; padding-top: 20px; border-top: var(--glass-border); display: flex; justify-content: space-between; align-items: center; }
 
-    @media (max-width: 900px) {
-        header { display: none !important; }
-        .mobile-header { display: flex !important; }
-    }
+    /* Switch */
+    .switch { display: block; --width-of-switch: 3.5em; --height-of-switch: 2em; --size-of-icon: 1.4em; --slider-offset: 0.3em; position: relative; width: var(--width-of-switch); height: var(--height-of-switch); }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .4s; border-radius: 30px; }
+    .slider:before { position: absolute; content: ""; height: var(--size-of-icon,1.4em); width: var(--size-of-icon,1.4em); border-radius: 20px; left: var(--slider-offset,0.3em); top: 50%; transform: translateY(-50%); background: linear-gradient(40deg,#ff0080,#ff8c00 70%); transition: .4s; }
+    input:checked + .slider { background-color: #3f3f46; }
+    input:checked + .slider:before { left: calc(100% - (var(--size-of-icon,1.4em) + var(--slider-offset,0.3em))); background: #ffffff; }
 
     /* =========================================
-       3. LIVE VIDEO CARD & GRID
+       3. LIVE VIDEO CARD
        ========================================= */
     .main-wrapper { max-width: 1200px; margin: 40px auto; width: 92%; }
 
@@ -171,46 +231,44 @@
         flex-wrap: wrap;
         justify-content: center;
         gap: 20px;
+        margin-top: 40px;
     }
 
-    /* Glass Video Card */
     .video-card {
         background: var(--card-bg);
-        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
         border: var(--glass-border);
         border-radius: 16px;
         overflow: hidden;
         display: flex; flex-direction: column;
         transition: transform 0.2s, box-shadow 0.2s;
         position: relative;
-        width: 300px; /* Fixed width for nice centering */
+        width: 350px; 
         max-width: 100%;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    .video-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+  
 
     .thumb-wrapper {
         position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden;
         border-bottom: 1px solid rgba(255,255,255,0.05);
     }
     .thumb-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
-    .video-card:hover .thumb-wrapper img { transform: scale(1.05); }
 
-    .card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; }
+    .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
     
     .video-meta { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-    .video-title { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; line-height: 1.4; flex-grow: 1; }
-    .video-hashtags { font-size: 11px; color: var(--text-muted); margin-bottom: 15px; }
+    .video-title { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; line-height: 1.4; flex-grow: 1; }
+    .video-hashtags { font-size: 11px; color: var(--text-muted); margin-bottom: 20px; }
 
-    .card-actions { display: flex; align-items: center; justify-content: center; margin-top: auto; }
+    .card-actions { margin-top: auto; }
     
     .btn-watch {
         background: var(--text-main); color: var(--bg-color);
-        border: none; padding: 10px 30px; border-radius: 50px;
+        border: none; padding: 12px; border-radius: 12px;
         font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s; width: 100%;
     }
-    .btn-watch:hover { opacity: 0.9; transform: scale(1.02); }
+    .btn-watch:hover { opacity: 0.9; transform: translateY(-3px); }
 
-    /* Countdown Badge */
     .countdown-badge {
         position: absolute; top: 10px; right: 10px;
         background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
@@ -218,40 +276,23 @@
         border: 1px solid rgba(255,255,255,0.1);
     }
 
-    /* --- INFO MODAL --- */
-    .modal-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-        z-index: 10000; display: none; align-items: center; justify-content: center;
-        opacity: 0; transition: opacity 0.3s;
-    }
-    .modal-overlay.active { opacity: 1; display: flex; }
-    
-    .modal-box {
-        background: #111; border: 1px solid #333; padding: 25px; border-radius: 16px; 
-        width: 90%; max-width: 500px; color: white; max-height: 80vh; overflow-y: auto;
-        position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    }
-    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333; }
-    .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
-    
-    .info-text p { color: #aaa; font-size: 13px; line-height: 1.6; margin-bottom: 15px; }
-    .info-text b, .info-text strong { color: white; font-weight: 700; }
+    /* Access Denied Modal */
+    .access-denied-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 10, 10, 0.95); color: #fff; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; z-index: 11000; opacity: 0; animation: fadeIn 0.4s forwards; backdrop-filter: blur(15px); }
+    .access-card { background: #18181b; border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); transform: translateY(20px); animation: slideUp 0.4s forwards 0.1s; }
+    .access-icon-box { width: 60px; height: 60px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 24px; }
+    .access-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; color: #fff; }
+    .access-desc { font-size: 14px; color: #a1a1aa; line-height: 1.5; margin-bottom: 25px; }
+    .access-btn { background: #fff; color: #000; padding: 12px 24px; border-radius: 12px; font-weight: 600; font-size: 14px; border: none; cursor: pointer; transition: all 0.2s; width: 100%; }
+    .access-btn:hover { background: #e5e5e5; transform: translateY(-1px); }
 
-    /* Access Denied */
-    .access-denied-modal {
-        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0, 0, 0, 0.85); color: #fff;
-        display: flex; align-items: center; justify-content: center;
-        z-index: 11000; flex-direction: column; text-align: center;
-        backdrop-filter: blur(10px); animation: fadeIn 0.5s forwards;
-    }
-    .access-denied-modal button { 
-        margin-top: 20px; padding: 10px 25px; border-radius: 50px; 
-        background: transparent; border: 2px solid white; color: white; cursor: pointer;
-    }
     @keyframes fadeIn { to { opacity: 1; } }
+    @keyframes slideUp { to { transform: translateY(0); } }
 
+    @media (max-width: 900px) {
+        .sidebar-desktop { display: none; }
+        .mobile-header { display: flex; }
+        body { padding-left: 0; }
+    }
   </style>
 </head>
 <body>
@@ -259,72 +300,142 @@
 <div class="noise-overlay"></div>
 
 <div class="mobile-header">
-    <button class="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-    <div style="font-weight:700; letter-spacing:-0.5px;">ZONE VAULT</div>
-    <div style="width: 24px;"></div>
+    <div class="mobile-logo-container">
+         <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault" class="mobile-logo-img">
+         <span>ZONE VAULT</span>
+    </div>
+    <button class="hamburger" onclick="toggleMobileSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
 </div>
 
-<header id="desktopHeader">
-    <div class="header-left-group">
-        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" class="header-logo">
-        <div class="header-links">
-            <a href="profile.html" class="nav-btn"><i class="fas fa-user"></i> Profile</a>
-            <a href="home.html" class="nav-btn"><i class="fas fa-home"></i> Home</a>
-            <a href="videos.html" class="nav-btn"><i class="fas fa-play-circle"></i> Videos</a>
-            <a href="live.html" class="nav-btn active"><i class="fas fa-broadcast-tower"></i> Live</a>
+<div id="mobileSidebar" class="mobile-sidebar-menu">
+    <div class="sidebar-container">
+        <button class="mobile-close-btn" onclick="toggleMobileSidebar()">&times;</button>
+
+        <div class="sidebar-top">
+            <div class="sidebar-brand">
+                <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault">
+                <span>ZONE VAULT</span>
+            </div>
+
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="profile.html" class="nav-link">
+                        <i class="fas fa-user"></i> <span>Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="home.html" class="nav-link">
+                        <i class="fas fa-home"></i> <span>Home</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="videos.html" class="nav-link">
+                        <i class="fas fa-play-circle"></i> <span>Videos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="live.html" class="nav-link active">
+                        <i class="fas fa-broadcast-tower"></i> <span>Live</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-bottom">
+            <div class="nav-link" style="justify-content:space-between; cursor:default; padding: 10px;">
+                <div style="display:flex; align-items:center;">
+                    <i class="fas fa-moon"></i> 
+                    <span id="theme-text-mobile" class="nav-text" style="font-size:13px; margin-left:10px;">Dark Mode</span>
+                </div>
+                <label class="switch" style="transform:scale(0.65);">
+                    <input type="checkbox" class="theme-checkbox-mobile" onchange="syncTheme(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="nav-item">
+                <a href="#" onclick="logout()" class="nav-link" style="color:var(--admin-color);">
+                    <i class="fas fa-sign-out-alt"></i> <span>Log Out</span>
+                </a>
+            </div>
+
+            <div class="sidebar-user" onclick="window.location.href='profile.html'">
+                <img id="mobile-sidebar-pic" src="https://via.placeholder.com/150" alt="Profile">
+                <div class="sidebar-user-info">
+                    <div id="mobile-sidebar-name" class="sidebar-username">Loading...</div>
+                    <div id="mobile-sidebar-email" class="sidebar-useremail">...</div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="header-right">
-        <a href="profile.html" class="profile-name-link">
-            <span id="header-user-name">Loading...</span>
-        </a>
-    </div>
-</header>
-
-<div id="mobileSidebar" class="sidebar">
-    <div class="sidebar-header">
-        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault" class="sidebar-logo">
-        <button class="close-sidebar" onclick="toggleSidebar()">&times;</button>
-    </div>
-    <div class="sidebar-nav">
-        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
-        <a href="home.html"><i class="fas fa-home"></i> Home</a>
-        <a href="videos.html"><i class="fas fa-play-circle"></i> Videos</a>
-        <a href="live.html" class="active-link"><i class="fas fa-broadcast-tower"></i> Live Stream</a>
-    </div>
-    <div class="sidebar-footer">
-        <div style="font-size:12px; color:var(--text-muted);">Theme</div>
-        <label class="switch">
-            <input type="checkbox" class="theme-checkbox-mobile" onchange="syncTheme(this)">
-            <span class="slider"></span>
-        </label>
-    </div>
 </div>
+
+<aside class="sidebar-desktop">
+    <div class="sidebar-container">
+        <div class="sidebar-top">
+            <div class="sidebar-brand">
+                <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo">
+                <span>ZONE VAULT</span>
+            </div>
+
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="profile.html" class="nav-link">
+                        <i class="fas fa-user"></i> <span class="nav-text">Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="home.html" class="nav-link">
+                        <i class="fas fa-home"></i> <span class="nav-text">Home</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="videos.html" class="nav-link">
+                        <i class="fas fa-play-circle"></i> <span class="nav-text">Videos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="live.html" class="nav-link active">
+                        <i class="fas fa-broadcast-tower"></i> <span class="nav-text">Live</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-bottom">
+            <div class="nav-link" style="justify-content:space-between; cursor:default; padding: 10px;">
+                <div style="display:flex; align-items:center;">
+                    <i class="fas fa-moon"></i> 
+                    <span id="theme-text-pc" class="theme-text nav-text" style="font-size:13px; margin-left:10px;">Dark Mode</span>
+                </div>
+                <label class="switch" style="transform:scale(0.65);">
+                    <input type="checkbox" class="theme-checkbox-pc" onchange="syncTheme(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="nav-item">
+                <a href="#" onclick="logout()" class="nav-link" style="color:var(--admin-color);">
+                    <i class="fas fa-sign-out-alt"></i> <span class="nav-text">Log Out</span>
+                </a>
+            </div>
+
+            <div class="sidebar-user" onclick="window.location.href='profile.html'">
+                <img id="sidebar-pic" src="https://via.placeholder.com/150" alt="Profile">
+                <div class="sidebar-user-info">
+                    <div id="sidebar-name" class="sidebar-username">Loading...</div>
+                    <div id="sidebar-email" class="sidebar-useremail">...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
 
 <div class="main-wrapper">
     <div id="grid">
         </div>
-</div>
-
-<div id="infoModal" class="modal-overlay">
-    <div class="modal-box">
-        <button class="close-modal" onclick="closeInfoModal()">&times;</button>
-        <div class="modal-title">Important Notice</div>
-        <div class="info-text">
-            <p><b>Player Update:</b><br>
-            You can now <b>fast forward</b> by double clicking right, <b>rewind</b> by double clicking left, and <b>pause/stop</b> by double clicking center.</p>
-            <p>To access <b>video controls</b>, hold the screen for 2 seconds.</p>
-            <p><b>Video Quality:</b><br>
-            Auto-adjusts based on your internet speed.</p>
-            
-            <hr style="border-color:#333; margin:15px 0;">
-            
-            <p><b>PLEASE TAKE TIME TO READ</b><br>
-            We kindly ask for your <strong>full cooperation</strong>. Do not <strong>record, reupload, redistribute, or share</strong> any content on other platforms.</p>
-            <p><strong>Unauthorized recording or distribution</strong> is strictly prohibited and will result in a <strong>permanent ban</strong>.</p>
-        </div>
-        <button onclick="closeInfoModal()" style="width:100%; padding:10px; background:white; color:black; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;">I Understand</button>
-    </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -353,19 +464,36 @@ auth.onAuthStateChanged(user => {
     db.ref('users/' + user.uid).once('value').then(snapshot => {
         const data = snapshot.val() || {};
         const displayName = data.name || "Member";
-        
-        // Desktop: Name Only
-        document.getElementById("header-user-name").innerText = displayName;
-        
-        // Sync Theme
-        if(data.bannerColor) {
-            localStorage.setItem('zoneTheme', data.bannerColor === 'white' ? 'light' : 'dark'); 
-        }
+        const displayEmail = user.email;
+        const displayPic = data.profilePicture || "https://via.placeholder.com/150";
+
+        // Update Desktop Sidebar
+        const sbName = document.getElementById("sidebar-name");
+        const sbEmail = document.getElementById("sidebar-email");
+        const sbPic = document.getElementById("sidebar-pic");
+        if(sbName) sbName.innerText = displayName;
+        if(sbEmail) sbEmail.innerText = displayEmail;
+        if(sbPic) sbPic.src = displayPic;
+
+        // Update Mobile Sidebar
+        const mbName = document.getElementById("mobile-sidebar-name");
+        const mbEmail = document.getElementById("mobile-sidebar-email");
+        const mbPic = document.getElementById("mobile-sidebar-pic");
+        if(mbName) mbName.innerText = displayName;
+        if(mbEmail) mbEmail.innerText = displayEmail;
+        if(mbPic) mbPic.src = displayPic;
     });
   } else {
+    // If no user, redirect or handle anonymously
     auth.signInAnonymously().catch(console.error);
   }
 });
+
+window.logout = function() {
+    if(confirm("Are you sure you want to log out?")) {
+        auth.signOut().then(() => window.location.href = "index.html");
+    }
+}
 
 /* ==================== Live Video Data ==================== */
 const data = [
@@ -427,26 +555,16 @@ function startCountdown() {
   });
 }
 
-/* ==================== Modals & UI ==================== */
-window.closeInfoModal = function() { document.getElementById('infoModal').classList.remove('active'); sessionStorage.setItem('infoModalShown', 'true'); }
-
-// Show info modal on load if not seen
-window.addEventListener('DOMContentLoaded', () => {
-  if (!sessionStorage.getItem('infoModalShown')) {
-    document.getElementById('infoModal').classList.add('active');
-  }
-  renderGrid(); 
-});
-
-// UI Toggles
-window.toggleSidebar = function() { document.getElementById('mobileSidebar').classList.toggle('open'); }
+// Sidebar Toggle
+window.toggleMobileSidebar = function() { document.getElementById('mobileSidebar').classList.toggle('open'); }
 
 // Theme Logic
 function initTheme() {
     const savedTheme = localStorage.getItem('zoneTheme') || 'dark';
     const isDark = savedTheme === 'dark';
     if (!isDark) { document.body.classList.add('light-mode'); }
-    document.querySelectorAll('.theme-checkbox-mobile').forEach(cb => { cb.checked = isDark; });
+    document.querySelectorAll('.theme-checkbox-pc, .theme-checkbox-mobile').forEach(cb => { cb.checked = isDark; });
+    updateThemeText(isDark);
 }
 window.syncTheme = function(el) {
     const isDark = el.checked;
@@ -457,8 +575,20 @@ window.syncTheme = function(el) {
         document.body.classList.add('light-mode');
         localStorage.setItem('zoneTheme', 'light');
     }
+    document.querySelectorAll('.theme-checkbox-pc, .theme-checkbox-mobile').forEach(cb => { cb.checked = isDark; });
+    updateThemeText(isDark);
+}
+function updateThemeText(isDark) {
+    const text = isDark ? "Dark Mode" : "Light Mode";
+    const pcText = document.getElementById('theme-text-pc');
+    const mobileText = document.getElementById('theme-text-mobile');
+    if(pcText) pcText.innerText = text;
+    if(mobileText) mobileText.innerText = text;
 }
 initTheme();
+
+// Initial Render
+renderGrid();
 </script>
 
 <script>
@@ -467,18 +597,29 @@ initTheme();
   const currentPage = window.location.pathname;
   let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
   const referrer = document.referrer;
-  const refPath = referrer ? new URL(referrer).pathname : null;
-  if (refPath && allowedPaths.includes(refPath)) {
-      sessionStorage.setItem('internalAccess', 'true');
-      hasInternalAccess = true;
+  const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+  
+  if (cameFromAllowedPage) { 
+      sessionStorage.setItem('internalAccess', 'true'); 
+      hasInternalAccess = true; 
   }
+  
   const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
+  
   if (!hasInternalAccess && !isIndexPage) { 
-      const modal = document.createElement('div');
-      modal.className = 'access-denied-modal';
-      modal.innerHTML = `<strong>🚫 Access Denied</strong><div>You cannot access this page directly.</div><div id="redirectTimer">Redirecting...</div><button onclick="window.history.back()">Go Back</button>`;
-      document.body.appendChild(modal);
-      setTimeout(() => { window.location.href = "index.html"; }, 3000);
+      showAccessDeniedModal(); 
+  }
+
+  function showAccessDeniedModal() {
+    const modal = document.createElement('div');
+    modal.className = 'access-denied-modal';
+    const card = document.createElement('div');
+    card.className = 'access-card';
+    card.innerHTML = `<div class="access-icon-box"><i class="fas fa-lock"></i></div><div class="access-title">Access Restricted</div><div class="access-desc">You are not authorized to view this page directly. Please log in or return home.</div><button class="access-btn" onclick="window.location.href='index.html'">Return to Safety</button><div style="margin-top:15px; font-size:12px; color:#555;">Redirecting automatically...</div>`;
+    modal.appendChild(card);
+    document.body.appendChild(modal);
+    setTimeout(() => { window.location.href = "index.html"; }, 3000);
   }
 </script>
 
