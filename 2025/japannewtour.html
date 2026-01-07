@@ -18,6 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <meta name="apple-mobile-web-app-title" content="Zone Vault">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -161,7 +162,7 @@
 
     /* Video Section */
     .video-wrapper-left { flex: 3; width: 100%; }
-     
+      
     #poster-container {
         width: 100%; aspect-ratio: 16/9;
         background-size: cover; background-position: center;
@@ -187,7 +188,7 @@
         overflow: hidden; 
         position: relative;
     }
-     
+      
     .art-video-player { width: 100%; height: 100%; }
 
     /* Titles */
@@ -272,12 +273,34 @@
         100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
     }
 
+    /* --- ADMIN NOTIFICATION TOAST --- */
+    .admin-toast {
+        position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+        background: rgba(220, 38, 38, 0.95); /* Intense Red */
+        color: white; padding: 12px 30px; border-radius: 50px;
+        font-weight: 700; font-size: 14px; z-index: 20000;
+        box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4);
+        border: 1px solid rgba(255,255,255,0.2);
+        backdrop-filter: blur(10px);
+        display: flex; align-items: center; gap: 12px;
+        transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        pointer-events: none;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+    .admin-toast.show { top: 30px; }
+    .admin-toast i { font-size: 16px; }
+
   </style>
 </head>
 
 <body>
 
 <div class="noise-overlay"></div>
+
+<div id="adminToast" class="admin-toast">
+    <i class="fas fa-shield-alt"></i> You are using ADMIN ACCOUNT
+</div>
 
 <div class="center-logo">
   <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" loading="lazy" alt="Zone Vault Logo">
@@ -373,13 +396,38 @@ const db = firebase.database();
 
 const PAGE_ID = "jpnnewtour"; 
 
+// --- UPDATED AUTH LOGIC WITH ADMIN TOAST ---
 auth.onAuthStateChanged(user => {
     if (!user) { showAccessDeniedModal("You must be logged in to view this content."); return; }
     initTheme();
-    db.ref(`page_access/${PAGE_ID}/${user.uid}`).on('value', (snapshot) => {
-        const isAllowed = snapshot.val();
-        if (isAllowed === true) { removeAccessDeniedModal(); } 
-        else { showAccessDeniedModal("This content is restricted. Your account does not have permission."); }
+
+    // 1. Fetch User Role
+    db.ref('users/' + user.uid).once('value').then(snapshot => {
+        const userData = snapshot.val() || {};
+        const role = (userData.role || 'member').toLowerCase();
+
+        if (role === 'admin') {
+            // --- ADMIN BYPASS ---
+            removeAccessDeniedModal();
+            console.log("Admin access granted");
+            
+            // SHOW ADMIN TOAST
+            const toast = document.getElementById('adminToast');
+            if(toast) {
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 4000); // Hide after 4s
+            }
+        } else {
+            // --- MEMBER CHECK ---
+            db.ref(`page_access/${PAGE_ID}/${user.uid}`).on('value', (accessSnapshot) => {
+                const isAllowed = accessSnapshot.val();
+                if (isAllowed === true) { 
+                    removeAccessDeniedModal(); 
+                } else { 
+                    showAccessDeniedModal("This content is restricted. Your account does not have permission."); 
+                }
+            });
+        }
     });
 });
 
@@ -429,7 +477,7 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
     // --- IDENTIFY PAGE NAME FOR UNIQUE HISTORY ---
     let pageIdentifier = window.location.pathname.split("/").pop().replace(".html", "");
     if (!pageIdentifier || pageIdentifier === "") pageIdentifier = "index";
-    
+     
     // Create Unique Key: VideoID + PageName
     const uniqueHistoryKey = `${ep.id}_${pageIdentifier}`;
 
@@ -546,7 +594,7 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
                   currentTime: art.currentTime,
                   duration: art.duration || 0,
                   timestamp: now,
-                  page: pageIdentifier
+                  page: pageIdentifier // Use current filename instead of hardcoded value
               };
               db.ref('watchHistory/' + auth.currentUser.uid + '/' + uniqueHistoryKey).update(historyData);
               lastSave = now;
