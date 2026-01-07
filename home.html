@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Home | Zone Vault</title>
+  <title>Profile | Zone Vault</title>
   
   <link rel="icon" href="favicon-new.png" type="image/png" />
   <link rel="manifest" href="manifest.json">
@@ -52,7 +52,6 @@
         --glass-border: 1px solid rgba(0, 0, 0, 0.06);
         --accent: #000000;
         --input-bg: #f3f4f6;
-        --banner-gradient: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -64,7 +63,6 @@
         min-height: 100vh;
         transition: background-color 0.3s ease, color 0.3s ease;
         overflow-x: hidden;
-        /* Padding for Fixed Sidebar */
         padding-left: var(--sidebar-width-collapsed); 
     }
 
@@ -76,8 +74,9 @@
     }
 
     /* =========================================
-       2. SIDEBAR STYLES (MATCHING PROFILE.HTML)
+       2. SHARED SIDEBAR STYLES (Mobile & Desktop)
        ========================================= */
+    
     /* Layout containers */
     .sidebar-container {
         display: flex; flex-direction: column; justify-content: space-between;
@@ -112,7 +111,7 @@
     
     .nav-link i {
         font-size: 18px; min-width: 24px; text-align: center;
-        margin-right: 15px; 
+        margin-right: 15px; /* Default margin for expanded view/mobile */
         transition: margin-right 0.3s;
     }
     
@@ -125,7 +124,7 @@
         border-top: var(--glass-border);
         display: flex; flex-direction: column; gap: 5px;
         width: 100%;
-        margin-top: auto; 
+        margin-top: auto; /* Pushes to bottom */
     }
 
     /* User Profile Widget */
@@ -149,7 +148,9 @@
     .sidebar-username { font-size: 13px; font-weight: 600; color: var(--text-main); }
     .sidebar-useremail { font-size: 11px; color: var(--text-muted); }
 
-    /* DESKTOP SIDEBAR */
+    /* =========================================
+       3. DESKTOP SPECIFIC OVERRIDES
+       ========================================= */
     .sidebar-desktop {
         position: fixed; top: 0; left: 0; height: 100vh;
         width: var(--sidebar-width-collapsed);
@@ -159,10 +160,12 @@
         transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden; 
     }
+
     .sidebar-desktop:hover {
         width: var(--sidebar-width-expanded);
         box-shadow: 10px 0 40px rgba(0,0,0,0.1);
     }
+    
     /* Animations for Desktop Collapse */
     .sidebar-desktop .sidebar-brand span, 
     .sidebar-desktop .nav-text, 
@@ -170,7 +173,8 @@
     .sidebar-desktop .theme-text {
         opacity: 0; transition: opacity 0.2s; pointer-events: none;
     }
-    .sidebar-desktop .nav-link i { margin-right: 0; }
+    
+    .sidebar-desktop .nav-link i { margin-right: 0; } /* Collapse margin */
     
     .sidebar-desktop:hover .sidebar-brand span, 
     .sidebar-desktop:hover .nav-text, 
@@ -178,9 +182,12 @@
     .sidebar-desktop:hover .theme-text {
         opacity: 1; transition-delay: 0.1s;
     }
-    .sidebar-desktop:hover .nav-link i { margin-right: 15px; }
+    
+    .sidebar-desktop:hover .nav-link i { margin-right: 15px; } /* Expand margin */
 
-    /* MOBILE SIDEBAR & HEADER */
+    /* =========================================
+       4. MOBILE SPECIFIC OVERRIDES
+       ========================================= */
     .mobile-header {
         display: none; padding: 15px 20px;
         align-items: center; justify-content: space-between; 
@@ -195,16 +202,75 @@
     .mobile-sidebar-menu {
         position: fixed; top: 0; left: -100%; width: 280px; height: 100%;
         background: var(--sidebar-bg);
-        z-index: 9999; transition: left 0.3s ease; border-right: var(--glass-border);
+        z-index: 9999; 
+        transition: left 0.3s ease; border-right: var(--glass-border);
+        /* Mobile doesn't need padding-top here because sidebar-container has it */
     }
     .mobile-sidebar-menu.open { left: 0; }
+    
+    /* Close button in mobile sidebar */
     .mobile-close-btn { 
         position: absolute; top: 25px; right: 20px; 
         background: none; border: none; color: var(--text-main); 
         font-size: 24px; cursor: pointer; z-index: 10;
     }
 
-    /* Switch */
+    /* =========================================
+       5. MAIN CONTENT & CARDS
+       ========================================= */
+    .main-wrapper { max-width: 1000px; margin: 40px auto; width: 92%; }
+    .glass-card {
+        background: var(--card-bg); border: var(--glass-border);
+        border-radius: 16px; overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        display: flex; flex-direction: column;
+    }
+    .banner { height: 180px; width: 100%; background: var(--banner-gradient); position: relative; }
+    .profile-body { padding: 0 30px 30px; position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .avatar-wrapper { margin-top: -60px; position: relative; cursor: pointer; display: inline-block; }
+    .profile-img {
+        width: 120px; height: 120px; border-radius: 50%;
+        border: 4px solid var(--card-bg); object-fit: cover; background: #000;
+        transition: transform 0.2s;
+    }
+    .avatar-wrapper:hover .profile-img { transform: scale(1.02); filter: brightness(0.8); }
+    .avatar-icon {
+        position: absolute; bottom: 5px; right: 5px;
+        background: var(--accent); color: var(--bg-color);
+        width: 30px; height: 30px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; border: 2px solid var(--card-bg);
+    }
+    .user-info h1 { font-size: 24px; font-weight: 700; margin-top: 15px; }
+    .user-info p.email { color: var(--text-muted); font-size: 13px; margin-bottom: 8px; }
+    .user-info p.bio { color: var(--text-main); font-size: 15px; max-width: 500px; margin: 0 auto 20px; line-height: 1.5; }
+    
+    .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary { background: var(--accent); color: var(--bg-color); }
+    .btn-secondary { background: transparent; border: 1px solid var(--text-muted); color: var(--text-main); }
+    
+    .input-group { margin-bottom: 15px; text-align: left; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto;}
+    .input-group label { display: block; font-size: 12px; margin-bottom: 5px; color: var(--text-muted); font-weight: 600; }
+    .styled-input {
+        width: 100%; padding: 12px; border-radius: 8px;
+        background: var(--input-bg); border: var(--glass-border);
+        color: var(--text-main); outline: none; font-family: 'Inter', sans-serif;
+    }
+
+    .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 24px; }
+    .card-header { padding: 20px; border-bottom: var(--glass-border); font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px; }
+    .card-content { padding: 20px; font-size: 14px; color: var(--text-main); min-height: 100px; flex: 1;}
+
+    .history-item { display: flex; gap: 12px; margin-bottom: 15px; cursor: pointer; padding: 8px; border-radius: 8px; transition: 0.2s; border: 1px solid transparent; }
+    .history-item:hover { background: var(--input-bg); border-color: var(--glass-border); }
+    .history-thumb-wrapper { width: 120px; min-width: 120px; aspect-ratio: 16/9; background: #000; border-radius: 6px; overflow: hidden; position: relative; }
+    .history-thumb-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+    .progress-bar-bg { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: rgba(255,255,255,0.3); }
+    .progress-bar-fill { height: 100%; background: var(--youtube-red); }
+    .time-badge { position: absolute; bottom: 4px; right: 4px; background: rgba(0,0,0,0.8); color: white; font-size: 10px; padding: 1px 4px; border-radius: 2px; }
+    .history-info { display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+    .history-title { font-weight: 600; font-size: 13px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .history-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
     .switch { display: block; --width-of-switch: 3.5em; --height-of-switch: 2em; --size-of-icon: 1.4em; --slider-offset: 0.3em; position: relative; width: var(--width-of-switch); height: var(--height-of-switch); }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .4s; border-radius: 30px; }
@@ -212,59 +278,13 @@
     input:checked + .slider { background-color: #3f3f46; }
     input:checked + .slider:before { left: calc(100% - (var(--size-of-icon,1.4em) + var(--slider-offset,0.3em))); background: #ffffff; }
 
-    /* =========================================
-       3. HOME CONTENT LAYOUT
-       ========================================= */
-    .main-wrapper { max-width: 1000px; margin: 40px auto; width: 92%; }
+    #edit-mode { display: none; width: 100%; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 10000; display: none; align-items: center; justify-content: center; }
+    .modal-box { background: var(--card-bg); border: 1px solid var(--glass-border); padding: 25px; border-radius: 16px; width: 90%; max-width: 450px; color: var(--text-main); max-height: 80vh; overflow-y: auto; }
+    .avatar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
+    .avatar-option { width: 100%; aspect-ratio: 1/1; border-radius: 50%; cursor: pointer; transition: 0.2s; border: 2px solid transparent;}
+    .avatar-option:hover { transform: scale(1.1); border-color: var(--text-main); }
 
-    .glass-card {
-        background: var(--card-bg);
-        border: var(--glass-border); /* Updated to new variable */
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        display: flex; flex-direction: column;
-    }
-
-    /* HERO SECTION - 50/50 Split */
-    .hero-section {
-        display: flex; flex-direction: row; padding: 40px; gap: 30px; align-items: center;
-    }
-    .hero-left, .hero-right { flex: 1; width: 50%; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
-    .hero-left h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 15px; line-height: 1.1; }
-    .hero-left p { color: var(--text-muted); font-size: 1rem; line-height: 1.5; }
-
-    /* Carousel Styling */
-    .main-image-wrapper { width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; border: var(--glass-border); position: relative; }
-    .main-image-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s ease; }
-    .main-image-wrapper img.fade-out { opacity: 0; }
-
-    .thumbnail-row { display: flex; gap: 10px; width: 100%; overflow-x: auto; padding-bottom: 5px; margin-top: 15px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-    .thumb-box { width: 60px; height: 60px; min-width: 60px; border-radius: 10px; border: var(--glass-border); cursor: pointer; overflow: hidden; transition: 0.2s; opacity: 0.6; }
-    .thumb-box.active, .thumb-box:hover { opacity: 1; border-color: var(--text-main); transform: scale(1.05); }
-    .thumb-box img { width: 100%; height: 100%; object-fit: cover; }
-
-    /* GRID FOR ACCORDIONS */
-    .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 24px; }
-    
-    /* ACCORDION CARDS */
-    .accordion-card { cursor: pointer; transition: 0.2s; position: relative; background-color: var(--card-bg); }
-    .accordion-card:hover { filter: brightness(0.95); }
-    .card-header { padding: 15px 20px; border-bottom: 1px solid transparent; display: flex; justify-content: space-between; align-items: center; font-weight: 600; height: auto; }
-    .card-header h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 10px; }
-    .accordion-card.open .card-header h3 { color: var(--text-main); }
-    .card-content { max-height: 0; overflow: hidden; opacity: 0; padding: 0 20px; transition: all 0.4s ease; color: var(--text-muted); font-size: 14px; line-height: 1.5; }
-    .accordion-card.open .card-header { border-bottom: var(--glass-border); }
-    .accordion-card.open .card-content { max-height: 500px; opacity: 1; padding: 20px; padding-bottom: 25px; overflow-y: auto; }
-    .arrow { transition: transform 0.3s; font-size: 14px; color: var(--text-muted); }
-    .accordion-card.open .arrow { transform: rotate(90deg); color: var(--text-main); }
-    .card-content li { margin-bottom: 8px; }
-    .card-content strong { color: var(--text-main); }
-    .card-content a { color: #fff; text-decoration: underline; }
-
-    /* =========================================
-       4. PROFESSIONAL ACCESS DENIED MODAL
-       ========================================= */
     .access-denied-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 10, 10, 0.95); color: #fff; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; z-index: 99999; opacity: 0; animation: fadeIn 0.4s forwards; backdrop-filter: blur(15px); }
     .access-card { background: #18181b; border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); transform: translateY(20px); animation: slideUp 0.4s forwards 0.1s; }
     .access-icon-box { width: 60px; height: 60px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 24px; }
@@ -280,11 +300,7 @@
         .sidebar-desktop { display: none; }
         .mobile-header { display: flex; }
         body { padding-left: 0; }
-        .hero-section { flex-direction: column; padding: 30px 20px; gap: 30px; }
-        .hero-left, .hero-right { width: 100%; }
-        .hero-left { text-align: center; }
-        .hero-left h1 { font-size: 2rem; }
-        .grid-container { grid-template-columns: 1fr; }
+        .grid-container { grid-template-columns: 1fr; gap: 20px; }
     }
   </style>
 </head>
@@ -314,12 +330,12 @@
 
             <ul class="nav-list">
                 <li class="nav-item">
-                    <a href="profile.html" class="nav-link">
+                    <a href="profile.html" class="nav-link active">
                         <i class="fas fa-user"></i> <span>Profile</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="home.html" class="nav-link active">
+                    <a href="home.html" class="nav-link">
                         <i class="fas fa-home"></i> <span>Home</span>
                     </a>
                 </li>
@@ -337,6 +353,7 @@
         </div>
 
         <div class="sidebar-bottom">
+
             <div class="nav-link" style="justify-content:space-between; cursor:default; padding: 10px;">
                 <div style="display:flex; align-items:center;">
                     <i class="fas fa-moon"></i> 
@@ -347,7 +364,12 @@
                     <span class="slider"></span>
                 </label>
             </div>
-
+  
+              <div class="nav-link" style="cursor:default; margin-bottom:5px; border:1px solid var(--glass-border);">
+                 <i class="fas fa-shield-alt" id="status-icon-mobile"></i>
+                 <span class="nav-text" id="status-text-mobile" style="margin-left:10px; font-weight:700;">Checking...</span>
+            </div>
+  
             <div class="nav-item">
                 <a href="#" onclick="logout()" class="nav-link" style="color:var(--admin-color);">
                     <i class="fas fa-sign-out-alt"></i> <span>Log Out</span>
@@ -375,12 +397,12 @@
 
             <ul class="nav-list">
                 <li class="nav-item">
-                    <a href="profile.html" class="nav-link">
+                    <a href="profile.html" class="nav-link active">
                         <i class="fas fa-user"></i> <span class="nav-text">Profile</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="home.html" class="nav-link active">
+                    <a href="home.html" class="nav-link">
                         <i class="fas fa-home"></i> <span class="nav-text">Home</span>
                     </a>
                 </li>
@@ -398,6 +420,11 @@
         </div>
 
         <div class="sidebar-bottom">
+            <div class="nav-link" style="cursor:default; margin-bottom:5px; border:1px solid var(--glass-border);">
+                 <i class="fas fa-shield-alt" id="status-icon-pc"></i>
+                 <span class="nav-text nav-text" id="status-text-pc" style="margin-left:10px; font-weight:700;">Checking...</span>
+            </div>
+
             <div class="nav-link" style="justify-content:space-between; cursor:default; padding: 10px;">
                 <div style="display:flex; align-items:center;">
                     <i class="fas fa-moon"></i> 
@@ -427,172 +454,105 @@
 </aside>
 
 <div class="main-wrapper">
+    <div class="glass-card">
+        <div class="banner"></div>
+        <div class="profile-body">
+            <div class="avatar-wrapper" onclick="openAvatarModal()">
+                <img id="profile-pic" src="https://via.placeholder.com/150" class="profile-img">
+                <div class="avatar-icon"><i class="fas fa-camera" style="font-size:12px;"></i></div>
+            </div>
 
-    <div class="glass-card hero-section">
-        <div class="hero-left">
-            <h1>Welcome to Zone Vault</h1>
-            <p>Watch, Enjoy, and Stay Private! Enjoy exclusive content in a private, full-featured layout. Don’t forget to read the rules.</p>
-        </div>
-        
-        <div class="hero-right">
-             <div class="main-image-wrapper">
-                <img id="mainDisplay" src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/1.png" alt="Main">
-             </div>
-             <div class="thumbnail-row" id="thumbScroll">
-                <div class="thumb-box active" onclick="switchImage(this)"><img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/1.png"></div>
-                <div class="thumb-box" onclick="switchImage(this)"><img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/2.png"></div>
-                <div class="thumb-box" onclick="switchImage(this)"><img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/3.png"></div>
-                <div class="thumb-box" onclick="switchImage(this)"><img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/4.png"></div>
-                <div class="thumb-box" onclick="switchImage(this)"><img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/5.png"></div>
-                <div class="thumb-box" onclick="switchImage(this)"><img src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/6.png"></div>
-                <div class="thumb-box" onclick="switchImage(this)"><img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/Trailer -Cover.jpg"></div>
-                <div class="thumb-box" onclick="switchImage(this)"><img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png"></div>
-                <div class="thumb-box" onclick="switchImage(this)"><img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.png"></div>
-                <div class="thumb-box" onclick="switchImage(this)"><img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_gwangju.png"></div>
-             </div>
+            <div class="user-info">
+                <div id="display-mode">
+                    <h1 id="display-name">Loading User...</h1>
+                    <p class="email" id="display-email">...</p>
+                    <p class="bio" id="display-bio">Loading bio...</p>
+                    <button class="btn btn-secondary" onclick="toggleEditMode()">
+                        <i class="fas fa-pencil-alt"></i> Edit Profile
+                    </button>
+                </div>
+
+                <div id="edit-mode">
+                    <div class="input-group">
+                        <label>Display Name</label>
+                        <input type="text" id="nameInput" class="styled-input" placeholder="Name">
+                    </div>
+                    <div class="input-group">
+                        <label>Bio</label>
+                        <textarea id="bioInput" class="styled-input" rows="3" placeholder="Tell us about yourself"></textarea>
+                    </div>
+                    <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+                        <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+                        <button class="btn btn-secondary" onclick="toggleEditMode()">Cancel</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="grid-container">
+        <div class="glass-card">
+            <div class="card-header"><i class="fas fa-id-card"></i> Account Status</div>
+            <div class="card-content">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span style="color:var(--text-muted)">Access Level</span>
+                    <span id="user-role" style="font-weight:bold;">Member</span>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <span style="color:var(--text-muted)">Request Status</span>
+                    <span id="req-status" style="font-weight:bold;">Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <div class="card-header"><i class="fas fa-bell"></i> Updates</div>
+            <div class="card-content" id="notice-container">
+                <div style="color:var(--text-muted); font-style:italic;">Checking for updates...</div>
+            </div>
+        </div>
         
-        <div class="glass-card accordion-card" onclick="toggleAccordion(this)">
-            <div class="card-header">
-                <h3>Rules</h3>
-                <span class="arrow"><i class="fas fa-chevron-right"></i></span>
-            </div>
-            <div class="card-content">
-                <ul>
-                  <li>Do not share or repost any content or links outside this site.</li>
-                  <li>No screenshots, screen recording, or reuploads of any content.</li>
-                  <li>Leaking content will lead to a permanent ban without warning.</li>
-                  <li>Access is for approved users only — do not share your login info or account.</li>
-                </ul>
-                <p><strong>Violation of any rule will result in immediate removal and permanent ban.</strong></p>
+        <div class="glass-card" style="grid-column: 1 / -1;">
+            <div class="card-header"><i class="fas fa-history"></i> Continue Watching</div>
+            <div class="card-content" id="watched-list">
+                <div style="color:var(--text-muted); font-style:italic;">Loading history...</div>
             </div>
         </div>
-
-        <div class="glass-card accordion-card" onclick="toggleAccordion(this)">
-            <div class="card-header">
-                <h3>Announcements</h3>
-                <span class="arrow"><i class="fas fa-chevron-right"></i></span>
-            </div>
-            <div class="card-content">
-                <h4 style="color:var(--text-main); margin-bottom:10px;">📲 Want to Install the Zone Vault Website as an App?</h4>
-                <p>Here's the Step-by-Step:</p>
-                <ol style="margin-left:20px;">
-                  <li>Open <strong>zonevault.site</strong> using <strong>Google Chrome</strong> on your phone</li>
-                  <li>Wait for the website to fully load, then tap the <strong>three dots (⋮)</strong> in the upper-right corner of your browser</li>
-                  <li>Select <strong>“Add to Home screen”</strong> then tap <strong>“Install”</strong></li>
-                  <li>✅ Once installation is complete, Zone Vault will appear on your phone just like a regular app — no need to search in your browser again!</li>
-                </ol>
-                <p>🔐 <strong>Stay connected anytime, anywhere</strong> — access exclusive content in just one tap.</p>
-                <p>💬 <strong>Need help?</strong> Just visit the Vault Help section or email us if you have any other questions.</p>
-            </div>
-        </div>
-
-        <div class="glass-card accordion-card" onclick="toggleAccordion(this)">
-            <div class="card-header">
-                <h3>Notes</h3>
-                <span class="arrow"><i class="fas fa-chevron-right"></i></span>
-            </div>
-            <div class="card-content">
-                <ul>
-                  <li>This platform is for private viewing only.</li>
-                  <li>Sharing links outside may lead to takedown or bans.</li>
-                  <li>All content is <strong>lifetime access</strong> — this means you can watch the content anytime, forever, with no expiration, as long as your account and this website stays active.</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="glass-card accordion-card" onclick="toggleAccordion(this)">
-            <div class="card-header">
-                <h3>Vault Help</h3>
-                <span class="arrow"><i class="fas fa-chevron-right"></i></span>
-            </div>
-            <div class="card-content">
-                <p><strong>Q: Who can access the content?</strong><br>
-                A: Only paid members or approved joiners can view the exclusive content inside the site.</p>
-
-                <p><strong>Q: Can I share my account with someone else?</strong><br>
-                A: No. Account sharing is strictly prohibited and will result in a permanent ban.</p>
-
-                <p><strong>Q: Is it okay to repost or reupload the videos?</strong><br>
-                A: Absolutely not. All content is private. No screenshots, screen recordings, or reposts are allowed.</p>
-
-                <p><strong>Q: What happens if someone breaks the rules?</strong><br>
-                A: Any violation will lead to immediate removal and a permanent ban, with no warnings.</p>
-
-                <p><strong>Q: Can I request specific SEVENTEEN content?</strong><br>
-                A: You may send a request, but approval depends on the admin and content availability.</p>
-
-                <p><strong>Q: Where can I get the access code?</strong><br>
-                A: The access code is shared by the admin through email, DM, or after payment confirmation.</p>
-            </div>
-        </div>
-
     </div>
 </div>
 
-<script type="module">
-import { initializeApp, getApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+<div id="avatarModal" class="modal-overlay">
+    <div class="modal-box">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>Select Avatar</h3>
+            <button onclick="document.getElementById('avatarModal').style.display='none'" style="background:none; border:none; color:var(--text-main); font-size:20px; cursor:pointer;">&times;</button>
+        </div>
+        <div class="avatar-grid" id="avatarGrid"></div>
+    </div>
+</div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-  authDomain: "tvnstream-b4497.firebaseapp.com",
-  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-  projectId: "tvnstream-b4497",
-  storageBucket: "tvnstream-b4497.firebasestorage.app",
-  messagingSenderId: "308384754214",
-  appId: "1:308384754214:web:2938e76cd29b288f75d4e7"
-};
-
-let app;
-try { app = getApp(); } catch { app = initializeApp(firebaseConfig); }
-const db = getDatabase(app);
-const auth = getAuth(app);
-
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        const uid = user.uid;
-        get(child(ref(db), `users/${uid}`)).then((snapshot) => {
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                const displayName = data.name || "Member";
-                const displayEmail = user.email;
-                const displayPic = data.profilePicture || "https://via.placeholder.com/150";
-
-                // Update Desktop Sidebar
-                const sbName = document.getElementById("sidebar-name");
-                const sbEmail = document.getElementById("sidebar-email");
-                const sbPic = document.getElementById("sidebar-pic");
-                if(sbName) sbName.innerText = displayName;
-                if(sbEmail) sbEmail.innerText = displayEmail;
-                if(sbPic) sbPic.src = displayPic;
-
-                // Update Mobile Sidebar
-                const mbName = document.getElementById("mobile-sidebar-name");
-                const mbEmail = document.getElementById("mobile-sidebar-email");
-                const mbPic = document.getElementById("mobile-sidebar-pic");
-                if(mbName) mbName.innerText = displayName;
-                if(mbEmail) mbEmail.innerText = displayEmail;
-                if(mbPic) mbPic.src = displayPic;
-            }
-        });
-    }
-});
-
-// Expose logout function to window
-window.logout = function() {
-    if(confirm("Are you sure you want to log out?")) {
-        signOut(auth).then(() => window.location.href = "index.html");
-    }
-}
-</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
-    // --- THEME LOGIC (UPDATED WITH TEXT TOGGLE) ---
+    // --- FIREBASE INIT ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+      authDomain: "tvnstream-b4497.firebaseapp.com",
+      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+      projectId: "tvnstream-b4497",
+      storageBucket: "tvnstream-b4497.appspot.com",
+      messagingSenderId: "308384754214",
+      appId: "1:308384754214:web:2938e76cd29b288f75d4e7"
+    };
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    // --- THEME LOGIC ---
     function initTheme() {
         const savedTheme = localStorage.getItem('zoneTheme') || 'dark';
         const isDark = savedTheme === 'dark';
@@ -600,7 +560,7 @@ window.logout = function() {
         document.querySelectorAll('.theme-checkbox-pc, .theme-checkbox-mobile').forEach(cb => { cb.checked = isDark; });
         updateThemeText(isDark);
     }
-    
+
     window.syncTheme = function(el) {
         const isDark = el.checked;
         if(isDark) {
@@ -621,72 +581,256 @@ window.logout = function() {
         if(pcText) pcText.innerText = text;
         if(mobileText) mobileText.innerText = text;
     }
+    
     initTheme();
 
-    // --- SIDEBAR TOGGLE ---
+    // --- UI LOGIC ---
     window.toggleMobileSidebar = function() {
         document.getElementById('mobileSidebar').classList.toggle('open');
     }
-
-    // --- ACCORDION TOGGLE ---
-    window.toggleAccordion = function(element) {
-        const wasOpen = element.classList.contains('open');
-        document.querySelectorAll('.accordion-card').forEach(c => c.classList.remove('open'));
-        if(!wasOpen) element.classList.add('open');
+    window.toggleEditMode = function() {
+        const display = document.getElementById('display-mode');
+        const edit = document.getElementById('edit-mode');
+        if(display.style.display === 'none') {
+            display.style.display = 'block'; edit.style.display = 'none';
+        } else {
+            const currentName = document.getElementById('display-name').innerText;
+            const currentBio = document.getElementById('display-bio').innerText;
+            document.getElementById('nameInput').value = currentName;
+            document.getElementById('bioInput').value = (currentBio === "No bio set.") ? "" : currentBio;
+            display.style.display = 'none'; edit.style.display = 'block';
+        }
     }
 
-    // --- CAROUSEL LOGIC ---
-    const thumbnailBoxes = document.querySelectorAll('.thumb-box');
-    const mainImage = document.getElementById('mainDisplay');
-    const slideshowSources = Array.from(thumbnailBoxes).map(box => box.querySelector('img').src);
-    let current = 0;
+    // --- DATA LOGIC ---
+    auth.onAuthStateChanged(user => {
+        if(user) {
+            const uid = user.uid;
+            
+            // 1. Fetch Profile
+            db.ref('users/' + uid).on('value', snap => {
+                const data = snap.val() || {};
+                const name = data.name || "Member";
+                const bio = data.bio || "No bio set.";
+                const pic = data.profilePicture || "https://via.placeholder.com/150";
+                const role = (data.role || "member").toLowerCase();
+                
+                // Update Main Profile Card
+                document.getElementById('display-name').innerText = name;
+                document.getElementById('display-email').innerText = user.email;
+                document.getElementById('display-bio').innerText = bio;
+                document.getElementById('profile-pic').src = pic;
 
-    function switchImageByIndex(index) {
-        const newSrc = slideshowSources[index];
-        mainImage.classList.add('fade-out');
-        setTimeout(() => {
-            mainImage.src = newSrc;
-            mainImage.classList.remove('fade-out');
-        }, 300);
-        thumbnailBoxes.forEach(b => b.classList.remove('active'));
-        if (index < thumbnailBoxes.length) thumbnailBoxes[index].classList.add('active');
+                // Update Sidebars
+                const ids = ['sidebar-name', 'mobile-sidebar-name'];
+                ids.forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerText = name; });
+                
+                // Sidebar pics
+                const picIds = ['sidebar-pic', 'mobile-sidebar-pic'];
+                picIds.forEach(id => { if(document.getElementById(id)) document.getElementById(id).src = pic; });
+
+                // --- ROLE & ADMIN LOGIC ---
+                // Update the Card in Main Content
+                const roleEl = document.getElementById('user-role');
+                roleEl.innerText = role.toUpperCase();
+                
+                const isAdm = role === 'admin';
+
+                // Update SIDEBAR INDICATORS (New Logic)
+                const statusTextIds = ['status-text-pc', 'status-text-mobile'];
+                const statusIconIds = ['status-icon-pc', 'status-icon-mobile'];
+
+                statusTextIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) {
+                        el.innerText = isAdm ? "ADMIN" : "MEMBER";
+                        el.style.color = isAdm ? "var(--admin-color)" : "var(--text-muted)";
+                    }
+                });
+
+                statusIconIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) {
+                        el.style.color = isAdm ? "var(--admin-color)" : "var(--text-muted)";
+                    }
+                });
+                
+                if(isAdm) {
+                    // Profile Card Style
+                    roleEl.style.color = 'var(--admin-color)';
+                    roleEl.style.textShadow = '0 0 10px rgba(239, 68, 68, 0.4)';
+                    
+                    // ENABLE ADMIN PERMISSIONS (Bypass)
+                    sessionStorage.setItem('isAdmin', 'true');
+                    sessionStorage.setItem('internalAccess', 'true');
+                    // Note: No longer injecting button link
+                } else {
+                    // Not admin? Reset styles and permissions
+                    roleEl.style.color = 'var(--text-main)';
+                    roleEl.style.textShadow = 'none';
+                    sessionStorage.removeItem('isAdmin');
+                }
+            });
+
+            // 2. Fetch Request Status
+            db.ref('joinRequests/' + uid + '/status').once('value', snap => {
+                const status = snap.val();
+                const el = document.getElementById('req-status');
+                if(status) {
+                    const fmt = status.charAt(0).toUpperCase() + status.slice(1);
+                    el.innerText = fmt;
+                    if(status === 'pending') el.style.color = 'var(--status-pending)';
+                    else if(status === 'approved') el.style.color = 'var(--status-approved)';
+                    else if(status === 'rejected') el.style.color = 'var(--status-rejected)';
+                } else {
+                    el.innerText = "None"; el.style.color = "var(--text-muted)";
+                }
+            });
+
+            // 3. Fetch Notices
+            db.ref('notices').limitToLast(3).once('value', snap => {
+                const data = snap.val();
+                const container = document.getElementById('notice-container');
+                if(!data) {
+                    container.innerHTML = `<div style="color:var(--text-muted)">No new updates.</div>`;
+                    return;
+                }
+                let html = '';
+                Object.values(data).reverse().forEach(n => {
+                    html += `<div style="padding:10px 0; border-bottom:1px solid var(--glass-border);">
+                        <div style="font-weight:bold; font-size:13px;">${n.title || 'Update'}</div>
+                        <div style="font-size:12px; color:var(--text-muted)">${n.message || ''}</div>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            });
+
+            // 4. WATCH HISTORY
+            db.ref('watchHistory/' + uid).on('value', (snapshot) => {
+                const historyContainer = document.getElementById("watched-list");
+                const data = snapshot.val();
+                if (data) {
+                    const historyItems = Object.values(data);
+                    historyItems.sort((a, b) => b.timestamp - a.timestamp);
+                    let historyHTML = "";
+                    historyItems.slice(0, 5).forEach(item => { 
+                        if (item.title && item.currentTime > 0) {
+                            const minutes = Math.floor(item.currentTime / 60);
+                            const seconds = Math.floor(item.currentTime % 60);
+                            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                            let percent = 0;
+                            if(item.duration > 0) percent = (item.currentTime / item.duration) * 100;
+                            const targetPage = item.page || 'videos.html';
+                            const targetLink = `${targetPage}?v=${item.id}`;
+
+                            historyHTML += `
+                            <div class="history-item" onclick="window.location.href='${targetLink}'">
+                                <div class="history-thumb-wrapper">
+                                    <img src="${item.image || 'https://via.placeholder.com/160x90'}" class="history-thumb-img">
+                                    <div class="progress-bar-bg">
+                                        <div class="progress-bar-fill" style="width: ${percent}%"></div>
+                                    </div>
+                                    <div class="time-badge">${timeString}</div>
+                                </div>
+                                <div class="history-info">
+                                    <div class="history-title">${item.title}</div>
+                                    <div class="history-meta"><i class="fas fa-play" style="font-size:10px; margin-right:4px;"></i> Resume</div>
+                                </div>
+                            </div>`;
+                        }
+                    });
+                    historyContainer.innerHTML = historyHTML || "<div style='color:var(--text-muted)'>No recent history.</div>";
+                } else {
+                    historyContainer.innerHTML = "<div style='color:var(--text-muted)'>No watch history found.</div>";
+                }
+            });
+        }
+    });
+
+    // --- BUTTON ACTIONS ---
+    window.saveProfile = function() {
+        const user = auth.currentUser;
+        if(!user) return;
+        const btn = document.querySelector('#edit-mode .btn-primary');
+        const originalText = btn.innerText;
+        btn.innerText = "Saving...";
+        const updates = {
+            name: document.getElementById('nameInput').value,
+            bio: document.getElementById('bioInput').value
+        };
+        db.ref('users/' + user.uid).update(updates).then(() => {
+             btn.innerText = "Saved!";
+             setTimeout(() => { btn.innerText = originalText; toggleEditMode(); }, 800);
+        });
     }
 
-    setInterval(() => {
-        current = (current + 1) % slideshowSources.length;
-        switchImageByIndex(current);
-    }, 3000);
+    window.logout = function() {
+        if(confirm("Are you sure you want to log out?")) {
+            auth.signOut().then(() => window.location.href = "index.html");
+        }
+    }
 
-    window.switchImage = function(box) {
-        const img = box.querySelector('img');
-        mainImage.classList.add('fade-out');
-        setTimeout(() => {
-            mainImage.src = img.src;
-            mainImage.classList.remove('fade-out');
-        }, 300);
-        thumbnailBoxes.forEach(b => b.classList.remove('active'));
-        box.classList.add('active');
-        current = slideshowSources.indexOf(img.src);
+    // --- AVATAR LOGIC ---
+    const avatars = [
+       "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/profile/scoups.png", 
+       "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/profile/jeonghan.png", 
+       "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/profile/joshua.png", 
+       "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/profile/jun.png", 
+       "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/profile/hoshi.png", 
+       "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/profile/wonwoo.png", 
+       "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/profile/woozi.png", 
+       "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/profile/dk.png", 
+       "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/profile/mingyu.png", 
+       "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/profile/the8.png", 
+       "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/profile/seungkwan.png", 
+       "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/profile/vernon.png", 
+       "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/profile/dino.png"
+    ];
+    window.openAvatarModal = function() {
+        const grid = document.getElementById('avatarGrid');
+        grid.innerHTML = '';
+        avatars.forEach(url => {
+            const img = document.createElement('img');
+            img.src = url;
+            img.className = 'avatar-option';
+            img.onclick = () => {
+                db.ref('users/' + auth.currentUser.uid).update({profilePicture: url});
+                document.getElementById('avatarModal').style.display='none';
+            };
+            grid.appendChild(img);
+        });
+        document.getElementById('avatarModal').style.display = 'flex';
     }
 </script>
 
 <script>
-  // --- PROTECTION LOGIC (UPDATED WITH PROFESSIONAL MODAL) ---
-  const allowedPaths = ['/index.html','/home.html','/nanabnb.html','/newtour.html','/hxwfanconcert.html','/svtholiday.html','/arenatour.html','/svtjapanconcert.html','/touragain.html','/gallery.html','/profile.html','/soon.html','/videos.html'];
+  // --- UPDATED SECURITY LOGIC ---
+  const allowedPaths = [
+    '/index.html', '/home.html', '/nanabnb.html', '/newtour.html',
+    'hxwfanconcert.html', '/svtholiday.html', '/arenatour.html',
+    '/svtjapanconcert.html', '/touragain.html', '/gallery.html',
+    '/profile.html', '/soon.html', '/videos.html', '/admin.html' 
+  ];
+  
+  // Check Admin Status from Session (set in previous script)
+  const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+
   const currentPage = window.location.pathname;
   let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
   const referrer = document.referrer;
   const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
-  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
   
-  if (cameFromAllowedPage) { 
+  // If coming from allowed page OR is Admin, grant access
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+  if (cameFromAllowedPage || isAdmin) { 
       sessionStorage.setItem('internalAccess', 'true'); 
       hasInternalAccess = true; 
   }
-  
+
   const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
-  
-  if (!hasInternalAccess && !isIndexPage) { 
+
+  // If NOT internal access AND NOT index page AND NOT admin -> Block
+  if (!hasInternalAccess && !isIndexPage && !isAdmin) { 
       showAccessDeniedModal(); 
   }
 
