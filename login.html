@@ -153,6 +153,16 @@
     #verify-section h3, #waiting h3, #approved h3 { font-size: 1.2rem; margin-bottom: 10px; }
     #verify-section p, #waiting p { color: var(--secondary); font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px; }
 
+    /* === LOADING SPINNER === */
+    #loader-section { text-align: center; py: 20px; }
+    .spinner {
+      width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1);
+      border-radius: 50%; border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin: 0 auto 15px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     @media (max-width: 480px) {
       .container { padding: 30px 20px; border: none; background: transparent; box-shadow: none; }
       h2 { font-size: 1.5rem; }
@@ -170,7 +180,12 @@
 
 <div class="container">
   
-  <div id="auth-section">
+  <div id="loader-section">
+    <div class="spinner"></div>
+    <p class="subtitle">Securely authenticating...</p>
+  </div>
+
+  <div id="auth-section" class="hidden">
     <h2>Zone Vault</h2>
     <p class="subtitle">Welcome back. Please login.</p>
     
@@ -238,7 +253,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
     getAuth, signInWithEmailAndPassword, onAuthStateChanged,
-    reload, signInWithPopup, GoogleAuthProvider, signOut
+    reload, signInWithPopup, GoogleAuthProvider, signOut, setPersistence, browserLocalPersistence
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   import {
     getDatabase, ref, onValue, get, set, update, push, serverTimestamp
@@ -266,6 +281,11 @@
   const provider = new GoogleAuthProvider();
   const messaging = getMessaging(app);
 
+  // Ensure persistence is set to LOCAL (Standard behavior, but good to be explicit)
+  setPersistence(auth, browserLocalPersistence).catch(error => {
+    console.error("Persistence error:", error);
+  });
+
   let currentUid = null;
   let localUserId = localStorage.getItem("userId");
   if (!localUserId) {
@@ -285,26 +305,27 @@
     const password = document.getElementById("password").value;
     if (!email || !password) return alert("Please enter email and password.");
     
+    // UI Feedback: Show loader while logging in
+    show("loader-section");
+
     signInWithEmailAndPassword(auth, email, password)
       .then(userCred => {
-        reload(userCred.user).then(() => {
-             if(userCred.user.emailVerified) {
-                 checkJoinRequest(userCred.user);
-             } else {
-                 show("verify-section");
-             }
-        });
+        // Successful login, onAuthStateChanged will handle the rest
       })
-      .catch(e => alert("Login error: " + e.message));
+      .catch(e => {
+        show("auth-section"); // Go back to login on error
+        alert("Login error: " + e.message);
+      });
   };
 
   window.googleLogin = async function() {
     try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      currentUid = user.uid;
-      checkJoinRequest(user);
+      // UI Feedback
+      show("loader-section");
+      await signInWithPopup(auth, provider);
+      // onAuthStateChanged will handle the redirect
     } catch (e) {
+      show("auth-section");
       alert("Google login error: " + e.message);
     }
   };
@@ -348,7 +369,7 @@
         sessionStorage.setItem("internalAccess", "true");
         sessionStorage.setItem("fromIndex", "true");
         show("approved");
-        setTimeout(() => window.location.href = "home", 1500);
+        setTimeout(() => window.location.href = "home", 1000); // Faster redirect
       } else if (data.status === "pending") {
         show("waiting");
       } else {
@@ -404,14 +425,17 @@
     });
   }
 
-  // 7. Event Listeners
+  // 7. Event Listeners & Auth State
   window.addEventListener("load", () => logActivity("Page Visit", document.title));
   document.addEventListener("click", e => logActivity("Click", `Clicked ${e.target.tagName}`)); 
   window.addEventListener("beforeunload", () => logActivity("Left Page", document.title));
 
+  // === CRITICAL CHANGE FOR AUTO LOGIN ===
   onAuthStateChanged(auth, user => {
     if (user) {
+      // User is already logged in (Persistent Session)
       currentUid = user.uid;
+      // Do not show auth-section. Go straight to checking status.
       reload(user).then(() => {
         if (user.emailVerified || user.providerData.some(p => p.providerId === "google.com")) {
           checkJoinRequest(user);
@@ -422,6 +446,7 @@
         }
       });
     } else {
+      // No user found, NOW we show the login form
       show("auth-section");
     }
   });
