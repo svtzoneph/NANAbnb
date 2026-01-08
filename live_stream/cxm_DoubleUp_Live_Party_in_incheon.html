@@ -374,10 +374,32 @@
   }
   .close-guide-btn:hover { background: #444; }
 
+  /* --- ADMIN NOTIFICATION TOAST --- */
+  .admin-toast {
+      position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+      background: rgba(220, 38, 38, 0.95); /* Intense Red */
+      color: white; padding: 12px 30px; border-radius: 50px;
+      font-weight: 700; font-size: 14px; z-index: 20000;
+      box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4);
+      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      display: flex; align-items: center; gap: 12px;
+      transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+  }
+  .admin-toast.show { top: 30px; }
+
 </style>
 </head>
 
 <body>
+
+<div id="adminToast" class="admin-toast">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    You are using ADMIN ACCOUNT
+</div>
 
 <div class="center-logo">
   <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" loading="lazy" alt="Zone Vault Logo">
@@ -542,7 +564,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth(); 
 const db = firebase.database();
 
-const PAGE_ID = "jpnnewtour"; 
+const PAGE_ID = "cxmdoubleup"; 
 
 // --- GUIDELINES MODAL LOGIC ---
 function openGuidelines() {
@@ -626,6 +648,7 @@ function registerAndMonitorSession(uid) {
     });
 }
 
+// --- UPDATED AUTH & SECURITY LOGIC (ADMIN/MEMBER SPLIT) ---
 auth.onAuthStateChanged(user => {
     if (!user) {
         showAccessDeniedModal("You must be logged in to view this content.");
@@ -633,30 +656,61 @@ auth.onAuthStateChanged(user => {
         return;
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const linkUid = urlParams.get('uid');
+    // 1. Check User Role from Database
+    db.ref('users/' + user.uid).once('value').then(snapshot => {
+        const userData = snapshot.val() || {};
+        const role = (userData.role || 'member').toLowerCase();
 
-    // --- UNIQUE LINK PROTECTION LOGIC ---
-    // If a UID is present in the link, it MUST match the logged in user
-    if (linkUid && linkUid !== user.uid) {
-        showAccessDeniedModal("<b>SECURITY ALERT</b><br>This link does not belong to you.<br><br>Link ID: " + linkUid + "<br>Your ID: " + user.uid);
-        return;
-    }
+        // --- SCENARIO A: ADMIN (Bypass Everything) ---
+        if (role === 'admin') {
+            console.log("Admin access granted");
+            
+            // Show Admin Toast
+            const toast = document.getElementById('adminToast');
+            if(toast) {
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 4000);
+            }
 
-    const accessRef = db.ref(`page_access/${PAGE_ID}/${user.uid}`);
-    accessRef.on('value', (snapshot) => {
-        const isAllowed = snapshot.val();
-        renderPlaylist(isAllowed === true);
-        
-        if (isAllowed === true) {
-            removeAccessDeniedModal(); 
-            const videoId = urlParams.get('v'); 
+            // Bypass Restrictions & Render as Verified
+            removeAccessDeniedModal();
+            renderPlaylist(true); 
+            
+            // Auto-load video if in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const videoId = urlParams.get('v');
             if (videoId && !window.currentEpData) {
                  setTimeout(() => { loadAndPlayEpisode(videoId, false); }, 500);
             }
-        } else {
-            showAccessDeniedModal("Your access to this stream has been revoked.<br>UID: " + user.uid);
+            return; // STOP HERE (Do not run member checks)
         }
+
+        // --- SCENARIO B: MEMBER (Strict Checks) ---
+        
+        // 1. Unique Link Protection (Member Only)
+        const urlParams = new URLSearchParams(window.location.search);
+        const linkUid = urlParams.get('uid');
+        if (linkUid && linkUid !== user.uid) {
+            showAccessDeniedModal("<b>SECURITY ALERT</b><br>This link does not belong to you.<br><br>Link ID: " + linkUid + "<br>Your ID: " + user.uid);
+            return;
+        }
+
+        // 2. Permission Check (Member Only)
+        const accessRef = db.ref(`page_access/${PAGE_ID}/${user.uid}`);
+        accessRef.on('value', (accessSnap) => {
+            const isAllowed = accessSnap.val();
+            renderPlaylist(isAllowed === true);
+            
+            if (isAllowed === true) {
+                removeAccessDeniedModal(); 
+                const videoId = urlParams.get('v'); 
+                if (videoId && !window.currentEpData) {
+                     setTimeout(() => { loadAndPlayEpisode(videoId, false); }, 500);
+                }
+            } else {
+                showAccessDeniedModal("Your access to this stream has been revoked.<br>UID: " + user.uid);
+            }
+        });
     });
 });
 
