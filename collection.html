@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Collection | Zone Vault</title>
+  
+  <link rel="icon" href="favicon-new.png" type="image/png" />
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* =========================================
+       1. VARIABLES & THEME ENGINE
+       ========================================= */
+    :root {
+        --bg-color: #121212;
+        --text-main: #e0e0e0;
+        --text-muted: #a0a0a0;
+        
+        --sidebar-bg: #18181b; 
+        --sidebar-hover-bg: #27272a;
+        
+        --card-bg: #1e1e1e;
+        --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+        
+        --accent: #ffffff;
+        --input-bg: rgba(255, 255, 255, 0.05);
+        --banner-gradient: linear-gradient(to right, #18181b, #27272a);
+        
+        --status-pending: #fbbf24;
+        --status-approved: #4ade80;
+        --status-rejected: #f87171;
+        --youtube-red: #ff0000;
+        --admin-color: #ef4444;
+        
+        /* Sidebar Dimensions */
+        --sidebar-width-collapsed: 72px;
+        --sidebar-width-expanded: 260px;
+    }
+
+    body.light-mode {
+        --bg-color: #f3f4f6;
+        --text-main: #111827;
+        --text-muted: #6b7280;
+        --card-bg: #ffffff;
+        --sidebar-bg: #ffffff;
+        --sidebar-hover-bg: #f9fafb;
+        --glass-border: 1px solid rgba(0, 0, 0, 0.06);
+        --accent: #000000;
+        --input-bg: #f3f4f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { 
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        overflow-x: hidden;
+        padding-left: var(--sidebar-width-collapsed); 
+    }
+
+    /* Noise Texture */
+    .noise-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none; z-index: -1;
+    }
+
+    /* =========================================
+       2. SIDEBAR STYLES
+       ========================================= */
+    .sidebar-container { display: flex; flex-direction: column; justify-content: space-between; height: 100%; padding-top: 20px; }
+    .sidebar-brand { display: flex; align-items: center; padding: 0 20px; height: 50px; margin-bottom: 30px; white-space: nowrap; }
+    .sidebar-brand img { width: 32px; height: auto; min-width: 32px; }
+    .sidebar-brand span { margin-left: 15px; font-weight: 700; font-size: 18px; letter-spacing: -0.5px; color: var(--text-main); }
+    
+    .nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; padding: 0 10px; width: 100%; }
+    .nav-link { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; border-radius: 12px; transition: all 0.2s; white-space: nowrap; font-size: 14px; font-weight: 500; height: 48px; }
+    .nav-link i { font-size: 18px; min-width: 24px; text-align: center; margin-right: 15px; transition: margin-right 0.3s; }
+    .nav-link:hover { background: var(--sidebar-hover-bg); color: var(--text-main); }
+    .nav-link.active { background: var(--input-bg); color: var(--text-main); border: 1px solid var(--glass-border); }
+    
+    .sidebar-bottom { padding: 15px 10px; border-top: var(--glass-border); display: flex; flex-direction: column; gap: 5px; width: 100%; margin-top: auto; }
+    .sidebar-user { display: flex; align-items: center; padding: 10px; border-radius: 12px; cursor: pointer; transition: 0.2s; overflow: hidden; margin-top: 5px; }
+    .sidebar-user:hover { background: var(--sidebar-hover-bg); }
+    .sidebar-user img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; min-width: 32px; border: 2px solid var(--accent); }
+    .sidebar-user-info { margin-left: 12px; display: flex; flex-direction: column; white-space: nowrap; }
+    .sidebar-username { font-size: 13px; font-weight: 600; color: var(--text-main); }
+    .sidebar-useremail { font-size: 11px; color: var(--text-muted); }
+
+    /* Desktop Sidebar */
+    .sidebar-desktop { position: fixed; top: 0; left: 0; height: 100vh; width: var(--sidebar-width-collapsed); background: var(--sidebar-bg); border-right: var(--glass-border); z-index: 1000; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+    .sidebar-desktop:hover { width: var(--sidebar-width-expanded); box-shadow: 10px 0 40px rgba(0,0,0,0.1); }
+    .sidebar-desktop .sidebar-brand span, .sidebar-desktop .nav-text, .sidebar-desktop .sidebar-user-info, .sidebar-desktop .theme-text { opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+    .sidebar-desktop .nav-link i { margin-right: 0; }
+    .sidebar-desktop:hover .sidebar-brand span, .sidebar-desktop:hover .nav-text, .sidebar-desktop:hover .sidebar-user-info, .sidebar-desktop:hover .theme-text { opacity: 1; transition-delay: 0.1s; }
+    .sidebar-desktop:hover .nav-link i { margin-right: 15px; }
+
+    /* Mobile Sidebar */
+    .mobile-header { display: none; padding: 15px 20px; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 90; backdrop-filter: blur(20px); border-bottom: var(--glass-border); background: var(--bg-color); width: 100%; }
+    .mobile-logo-container { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.5px; }
+    .mobile-logo-img { height: 30px; width: auto; }
+    .hamburger { background: transparent; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
+    .mobile-sidebar-menu { position: fixed; top: 0; left: -100%; width: 280px; height: 100%; background: var(--sidebar-bg); z-index: 9999; transition: left 0.3s ease; border-right: var(--glass-border); }
+    .mobile-sidebar-menu.open { left: 0; }
+    .mobile-close-btn { position: absolute; top: 25px; right: 20px; background: none; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; z-index: 10; }
+
+    /* Switch */
+    .switch { display: block; --width-of-switch: 3.5em; --height-of-switch: 2em; --size-of-icon: 1.4em; --slider-offset: 0.3em; position: relative; width: var(--width-of-switch); height: var(--height-of-switch); }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .4s; border-radius: 30px; }
+    .slider:before { position: absolute; content: ""; height: var(--size-of-icon,1.4em); width: var(--size-of-icon,1.4em); border-radius: 20px; left: var(--slider-offset,0.3em); top: 50%; transform: translateY(-50%); background: linear-gradient(40deg,#ff0080,#ff8c00 70%); transition: .4s; }
+    input:checked + .slider { background-color: #3f3f46; }
+    input:checked + .slider:before { left: calc(100% - (var(--size-of-icon,1.4em) + var(--slider-offset,0.3em))); background: #ffffff; }
+
+    /* =========================================
+       3. COLLECTION LAYOUT (CATEGORY CARDS & GRIDS)
+       ========================================= */
+    .main-wrapper { max-width: 1200px; margin: 40px auto; width: 92%; }
+    
+    .page-title {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* --- Back Button Style --- */
+    .back-to-cat-btn {
+        display: none; /* Hidden by default */
+        align-items: center;
+        gap: 8px;
+        background: transparent;
+        color: var(--text-muted);
+        border: none;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 20px;
+        transition: color 0.2s;
+    }
+    .back-to-cat-btn:hover { color: var(--text-main); }
+
+    /* --- CATEGORY CARD GRID (MENU) --- */
+    .category-menu-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        animation: fadeIn 0.4s ease;
+    }
+
+    .cat-card {
+        background: var(--card-bg);
+        border: var(--glass-border);
+        border-radius: 16px;
+        overflow: hidden;
+        cursor: pointer;
+        position: relative;
+        aspect-ratio: 16/9;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .cat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border-color: var(--text-main);
+    }
+    .cat-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s;
+        filter: brightness(0.6);
+    }
+    .cat-card:hover img {
+        transform: scale(1.05);
+        filter: brightness(0.4);
+    }
+    .cat-title-overlay {
+        position: absolute;
+        bottom: 0; left: 0; width: 100%;
+        padding: 20px;
+        background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    }
+    .cat-title-overlay h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* --- IMAGE GALLERIES (HIDDEN BY DEFAULT) --- */
+    .collection-section {
+        display: none; /* Hidden until category clicked */
+        animation: fadeIn 0.4s ease;
+    }
+    
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 15px;
+    }
+
+    .gallery-item {
+        position: relative;
+        aspect-ratio: 1/1;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        border: var(--glass-border);
+        background: var(--card-bg);
+        transition: transform 0.2s, border-color 0.2s;
+    }
+    
+    .gallery-item:hover {
+        transform: scale(1.03);
+        border-color: var(--text-main);
+        z-index: 2;
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: opacity 0.3s;
+    }
+
+    /* =========================================
+       4. LIGHTBOX & THUMBNAILS
+       ========================================= */
+    .lightbox-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.85); 
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        z-index: 20000;
+        display: none;
+        flex-direction: column; 
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        touch-action: none; 
+    }
+    
+    .lightbox-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .lightbox-content-wrapper {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        overflow: hidden;
+        padding-bottom: 80px; 
+    }
+
+    .lightbox-content {
+        max-width: 95vw;
+        max-height: 80vh;
+        object-fit: contain;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6); 
+        border-radius: 4px;
+        animation: zoomIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes zoomIn {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    /* THUMBNAIL STRIP */
+    .lightbox-thumbs {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        max-width: 90%;
+        overflow-x: auto;
+        padding: 10px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+        z-index: 20005;
+        scrollbar-width: none; 
+    }
+    .lightbox-thumbs::-webkit-scrollbar { display: none; }
+
+    .lb-thumb {
+        width: 50px; height: 50px;
+        object-fit: cover;
+        border-radius: 8px;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: 0.2s;
+        border: 2px solid transparent;
+        flex-shrink: 0;
+    }
+    .lb-thumb:hover { opacity: 0.8; }
+    .lb-thumb.active {
+        opacity: 1;
+        border-color: white;
+        transform: scale(1.1);
+    }
+
+    /* Controls Top Right */
+    .lightbox-controls {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 15px;
+        z-index: 20003; 
+    }
+
+    .lightbox-btn {
+        background: rgba(255, 255, 255, 0.15); 
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+        backdrop-filter: blur(5px);
+        font-size: 16px;
+    }
+
+    .lightbox-btn:hover {
+        background: white;
+        color: black;
+        transform: scale(1.1);
+    }
+
+    /* Access Denied Modal */
+    .access-denied-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 10, 10, 0.95); color: #fff; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; z-index: 99999; opacity: 0; animation: fadeIn 0.4s forwards; backdrop-filter: blur(15px); }
+    .access-card { background: #18181b; border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); transform: translateY(20px); animation: slideUp 0.4s forwards 0.1s; }
+    .access-icon-box { width: 60px; height: 60px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 24px; }
+    .access-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; color: #fff; }
+    .access-desc { font-size: 14px; color: #a1a1aa; line-height: 1.5; margin-bottom: 25px; }
+    .access-btn { background: #fff; color: #000; padding: 12px 24px; border-radius: 12px; font-weight: 600; font-size: 14px; border: none; cursor: pointer; transition: all 0.2s; width: 100%; }
+    .access-btn:hover { background: #e5e5e5; transform: translateY(-1px); }
+
+    @keyframes fadeIn { to { opacity: 1; } }
+    @keyframes slideUp { to { transform: translateY(0); } }
+
+    /* =========================================
+       5. MEDIA QUERIES (MOBILE RESPONSIVENESS)
+       ========================================= */
+    @media (max-width: 900px) {
+        .sidebar-desktop { display: none; }
+        .mobile-header { display: flex; }
+        body { padding-left: 0; }
+    }
+
+    /* --- NEW: Mobile-specific styles for 2-column grid --- */
+    @media (max-width: 600px) {
+        .gallery-grid {
+            /* 2 images per row on mobile */
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 15px;
+        }
+        
+        .category-menu-grid {
+            /* 2 cards per row on mobile */
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .main-wrapper {
+            width: 92%;
+            margin: 20px auto;
+        }
+        .page-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .collection-section {
+            margin-bottom: 30px;
+        }
+        
+        /* Adjust card height slightly for 2-column look on mobile */
+        .cat-card {
+            aspect-ratio: 4/3; /* Slightly taller for smaller cards */
+        }
+        .cat-title-overlay h3 {
+            font-size: 13px; /* Smaller font */
+            padding: 10px;
+        }
+        .cat-title-overlay {
+            padding: 0;
+        }
+    }
+  </style>
+</head>
+<body>
+
+<div class="noise-overlay"></div>
+
+<div class="mobile-header">
+    <div class="mobile-logo-container">
+         <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault" class="mobile-logo-img">
+         <span>ZONE VAULT</span>
+    </div>
+    <button class="hamburger" onclick="toggleMobileSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+</div>
+
+<div id="mobileSidebar" class="mobile-sidebar-menu">
+    <div class="sidebar-container">
+        <button class="mobile-close-btn" onclick="toggleMobileSidebar()">&times;</button>
+
+        <div class="sidebar-top">
+            <div class="sidebar-brand">
+                <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault">
+                <span>ZONE VAULT</span>
+            </div>
+
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="profile" class="nav-link">
+                        <i class="fas fa-user"></i> <span>Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="home" class="nav-link">
+                        <i class="fas fa-home"></i> <span>Home</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="videos" class="nav-link">
+                        <i class="fas fa-play-circle"></i> <span>Videos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="collection" class="nav-link active">
+                        <i class="fas fa-images"></i> <span>Collection</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="live" class="nav-link">
+                        <i class="fas fa-broadcast-tower"></i> <span>Live</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-bottom">
+            <div class="nav-link" style="justify-content:space-between; cursor:default; padding: 10px;">
+                <div style="display:flex; align-items:center;">
+                    <i class="fas fa-moon"></i> 
+                    <span id="theme-text-mobile" class="nav-text" style="font-size:13px; margin-left:10px;">Dark Mode</span>
+                </div>
+                <label class="switch" style="transform:scale(0.65);">
+                    <input type="checkbox" class="theme-checkbox-mobile" onchange="syncTheme(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+  
+            <div class="nav-link" style="cursor:default; margin-bottom:5px; border:1px solid var(--glass-border);">
+                 <i class="fas fa-shield-alt" id="status-icon-mobile"></i>
+                 <span class="nav-text" id="status-text-mobile" style="margin-left:10px; font-weight:700;">Checking...</span>
+            </div>
+  
+            <div class="nav-item">
+                <a href="#" onclick="logout()" class="nav-link" style="color:var(--admin-color);">
+                    <i class="fas fa-sign-out-alt"></i> <span>Log Out</span>
+                </a>
+            </div>
+
+            <div class="sidebar-user" onclick="window.location.href='profile.html'">
+                <img id="mobile-sidebar-pic" src="https://via.placeholder.com/150" alt="Profile">
+                <div class="sidebar-user-info">
+                    <div id="mobile-sidebar-name" class="sidebar-username">Loading...</div>
+                    <div id="mobile-sidebar-email" class="sidebar-useremail">...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<aside class="sidebar-desktop">
+    <div class="sidebar-container">
+        <div class="sidebar-top">
+            <div class="sidebar-brand">
+                <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo">
+                <span>ZONE VAULT</span>
+            </div>
+
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="profile" class="nav-link">
+                        <i class="fas fa-user"></i> <span class="nav-text">Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="home" class="nav-link">
+                        <i class="fas fa-home"></i> <span class="nav-text">Home</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="videos" class="nav-link">
+                        <i class="fas fa-play-circle"></i> <span class="nav-text">Videos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="collection" class="nav-link active">
+                        <i class="fas fa-images"></i> <span class="nav-text">Collection</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="live" class="nav-link">
+                        <i class="fas fa-broadcast-tower"></i> <span class="nav-text">Live</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-bottom">
+            <div class="nav-link" style="justify-content:space-between; cursor:default; padding: 10px;">
+                <div style="display:flex; align-items:center;">
+                    <i class="fas fa-moon"></i> 
+                    <span id="theme-text-pc" class="theme-text nav-text" style="font-size:13px; margin-left:10px;">Dark Mode</span>
+                </div>
+                <label class="switch" style="transform:scale(0.65);">
+                    <input type="checkbox" class="theme-checkbox-pc" onchange="syncTheme(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="nav-link" style="cursor:default; margin-bottom:5px; border:1px solid var(--glass-border);">
+                 <i class="fas fa-shield-alt" id="status-icon-pc"></i>
+                 <span class="nav-text nav-text" id="status-text-pc" style="margin-left:10px; font-weight:700;">Checking...</span>
+            </div>
+
+            <div class="nav-item">
+                <a href="#" onclick="logout()" class="nav-link" style="color:var(--admin-color);">
+                    <i class="fas fa-sign-out-alt"></i> <span class="nav-text">Log Out</span>
+                </a>
+            </div>
+
+            <div class="sidebar-user" onclick="window.location.href='profile.html'">
+                <img id="sidebar-pic" src="https://via.placeholder.com/150" alt="Profile">
+                <div class="sidebar-user-info">
+                    <div id="sidebar-name" class="sidebar-username">Loading...</div>
+                    <div id="sidebar-email" class="sidebar-useremail">...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 class="page-title" id="page-heading">My Collection</h1>
+        <button id="backToCatBtn" class="back-to-cat-btn" onclick="showMenu()">
+            <i class="fas fa-arrow-left"></i> Back to Collections
+        </button>
+    </div>
+
+    <div id="category-menu" class="category-menu-grid">
+        </div>
+
+    <div id="galleries-container">
+        
+        <div class="collection-section" id="section-5">
+            <div class="gallery-grid" id="grid-category-5"></div>
+        </div>
+    
+        <div class="collection-section" id="section-4">
+            <div class="gallery-grid" id="grid-category-4"></div>
+        </div>
+    
+        <div class="collection-section" id="section-3">
+            <div class="gallery-grid" id="grid-category-3"></div>
+        </div>
+    
+        <div class="collection-section" id="section-2">
+            <div class="gallery-grid" id="grid-category-2"></div>
+        </div>
+    
+        <div class="collection-section" id="section-1">
+            <div class="gallery-grid" id="grid-category-1"></div>
+        </div>
+
+    </div>
+</div>
+
+<div id="lightbox" class="lightbox-overlay">
+    <div class="lightbox-controls">
+        <div class="lightbox-btn" onclick="downloadImage()">
+            <i class="fas fa-download"></i>
+        </div>
+        <div class="lightbox-btn" onclick="closeLightbox()">
+            <i class="fas fa-times"></i>
+        </div>
+    </div>
+    
+    <div class="lightbox-content-wrapper">
+        <img id="lightbox-img" src="" class="lightbox-content">
+    </div>
+
+    <div id="lightbox-thumbs" class="lightbox-thumbs">
+        </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+    // --- FIREBASE INIT ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+      authDomain: "tvnstream-b4497.firebaseapp.com",
+      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+      projectId: "tvnstream-b4497",
+      storageBucket: "tvnstream-b4497.appspot.com",
+      messagingSenderId: "308384754214",
+      appId: "1:308384754214:web:2938e76cd29b288f75d4e7"
+    };
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    // --- THEME LOGIC ---
+    function initTheme() {
+        const savedTheme = localStorage.getItem('zoneTheme') || 'dark';
+        const isDark = savedTheme === 'dark';
+        if (!isDark) { document.body.classList.add('light-mode'); }
+        document.querySelectorAll('.theme-checkbox-pc, .theme-checkbox-mobile').forEach(cb => { cb.checked = isDark; });
+        updateThemeText(isDark);
+    }
+
+    window.syncTheme = function(el) {
+        const isDark = el.checked;
+        if(isDark) {
+            document.body.classList.remove('light-mode');
+            localStorage.setItem('zoneTheme', 'dark');
+        } else {
+            document.body.classList.add('light-mode');
+            localStorage.setItem('zoneTheme', 'light');
+        }
+        document.querySelectorAll('.theme-checkbox-pc, .theme-checkbox-mobile').forEach(cb => { cb.checked = isDark; });
+        updateThemeText(isDark);
+    }
+    
+    function updateThemeText(isDark) {
+        const text = isDark ? "Dark Mode" : "Light Mode";
+        const pcText = document.getElementById('theme-text-pc');
+        const mobileText = document.getElementById('theme-text-mobile');
+        if(pcText) pcText.innerText = text;
+        if(mobileText) mobileText.innerText = text;
+    }
+    initTheme();
+
+    // --- UI LOGIC ---
+    window.toggleMobileSidebar = function() {
+        document.getElementById('mobileSidebar').classList.toggle('open');
+    }
+
+    // --- DATA LOGIC ---
+    auth.onAuthStateChanged(user => {
+        if(user) {
+            const uid = user.uid;
+            
+            // --- URL EXPANSION LOGIC ---
+            if (!window.location.search.includes('token')) {
+                const uniqueToken = Math.random().toString(36).substr(2, 12);
+                const newUrl = window.location.pathname + `?uid=${user.uid}&token=${uniqueToken}&verified=true`;
+                history.replaceState(null, '', newUrl);
+            }
+
+            db.ref('users/' + uid).on('value', snap => {
+                const data = snap.val() || {};
+                const name = data.name || "Member";
+                const pic = data.profilePicture || "https://via.placeholder.com/150";
+                const role = (data.role || "member").toLowerCase();
+                const isAdm = role === 'admin';
+
+                // Sidebar names
+                const ids = ['mobile-sidebar-name', 'sidebar-name'];
+                ids.forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerText = name; });
+                const picIds = ['mobile-sidebar-pic', 'sidebar-pic'];
+                picIds.forEach(id => { if(document.getElementById(id)) document.getElementById(id).src = pic; });
+                const emailIds = ['mobile-sidebar-email', 'sidebar-email'];
+                emailIds.forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerText = user.email; });
+
+                // Admin Indicators
+                const statusTextIds = ['status-text-pc', 'status-text-mobile'];
+                const statusIconIds = ['status-icon-pc', 'status-icon-mobile'];
+
+                statusTextIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) {
+                        el.innerText = isAdm ? "ADMIN" : "MEMBER";
+                        el.style.color = isAdm ? "var(--admin-color)" : "var(--text-muted)";
+                    }
+                });
+
+                statusIconIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) {
+                        el.style.color = isAdm ? "var(--admin-color)" : "var(--text-muted)";
+                    }
+                });
+                
+                if(isAdm) {
+                    sessionStorage.setItem('isAdmin', 'true');
+                    sessionStorage.setItem('internalAccess', 'true');
+                } else {
+                    sessionStorage.removeItem('isAdmin');
+                }
+            });
+        }
+    });
+
+    window.logout = function() {
+        if(confirm("Are you sure you want to log out?")) {
+            auth.signOut().then(() => window.location.href = "index.html");
+        }
+    }
+
+    // --- COLLECTION DATA & LOGIC ---
+    const collectionData = [
+        {
+            category: "SEVENTEEN WORLD TOUR [NEW_] IN INCHEON SPECIAL GIFTS",
+            targetId: "grid-category-5",
+            sectionId: "section-5",
+            images: [
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20SeungcheoL.png", link: "https://drive.usercontent.google.com/download?id=1OG3WFMM3_wVHYgwAKs8g-vD6JOMjePv4&export=download&authuser=0&confirm=t&uuid=dc89feac-1ef2-4343-87b7-0e27f2036341&at=ANTm3czNLcDJmIgv5k61XycCyQz0:1767970217853" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Joshua.png", link: "https://drive.usercontent.google.com/download?id=1uRA1BOzoyWB0HuUB0vY53YtNALAF2RuE&export=download&authuser=0&confirm=t&uuid=b64e117e-e3dd-4d83-b82d-cd3d75f7e951&at=ANTm3cyntlyrAHU6NPUDGRoJb5kY:1767970209018" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Jun.png", link: "https://drive.usercontent.google.com/download?id=12w_pB2MSM6b_hr9WkxLv0QkqUZyJgz0E&export=download&authuser=0&confirm=t&uuid=b33b41d1-959a-4f67-82ef-55ea34b07361&at=ANTm3czkvYnaYBvdFmO0teHOgAMi:1767970211967" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Dk.png", link: "https://drive.usercontent.google.com/download?id=1alWIYhSIWVyLjZacZToQ9gC2GlX9S1q3&export=download&authuser=0&confirm=t&uuid=0e9d902f-896a-408d-a4a0-f4b94befc776&at=ANTm3cwLwhQpQ7enjduRrCK0kINT:1767970205350" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Mingyu.png", link: "https://drive.usercontent.google.com/download?id=1Cwix_pCLX0WQZhYageQFiUPkCrt1UQFs&export=download&authuser=0&confirm=t&uuid=78c5528d-8639-486d-bcc0-722dc258d22d&at=ANTm3cxtaroDqjVOUU0br5OvRRzT:1767970214673" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20The8.png", link: "https://drive.usercontent.google.com/download?id=1vJpEknyO9qW6LgNJ2_JB3oX3QYtXD0jF&export=download&authuser=0&confirm=t&uuid=be9cfcbf-cb75-44d5-8e1a-7d7b463ef028&at=ANTm3cxXtQYytylv1m4PsTVg1axQ:1767970223797" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Seungkwan.png", link: "https://drive.usercontent.google.com/download?id=15ERl4v3WbiAZNM_GCOVzakIZOkTcxSRR&export=download&authuser=0&confirm=t&uuid=c637a438-12c3-4a40-be14-f590e7bd7bb0&at=ANTm3cwMX5OAGgu8QGcUWot8hT5w:1767970220868" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Vernon.png", link: "https://drive.usercontent.google.com/download?id=1o_UJBprWKYfPj8m0J3Sm6Sy0jFH4MsR6&export=download&authuser=0&confirm=t&uuid=a178234d-dcd4-4cd7-beab-c92efca8c31f&at=ANTm3cxC8eXGcXT_FqN4V27NJrcl:1767970226159" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Dino.png", link: "https://drive.usercontent.google.com/download?id=19y3lzbjIkZ0BaacQIyLmwl3cvleMAKvc&export=download&authuser=0&confirm=t&uuid=a90063c7-6cdf-47e1-89ab-029544640e0b&at=ANTm3cxqM2fvcRxhZ_BqCGy5RGMz:1767970202844" },
+            ]
+        },
+        {
+            category: "SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Osaka Show SPECIAL GIFTS",
+            targetId: "grid-category-4",
+            sectionId: "section-4",
+            images: [
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_osakanewtour/%5BOSAKA%20TOUR%5D%20Group.jpg", link: "https://drive.usercontent.google.com/download?id=1UbcDnJLiL8e-cIwTxGAE_-SIZ5zFIfF-&export=download&authuser=0&confirm=t&uuid=53524a0b-5b67-46ed-a324-979952146cf3&at=ANTm3cytZsntc4VWCCXqhcxzTfrJ:1767971765844" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_osakanewtour/%5BOSAKA%20TOUR%5D%20Seungcheol.jpg", link: "https://drive.usercontent.google.com/download?id=1kxZselcw1GSKO1iEpGlxo6eP_ttXkXEX&export=download&authuser=0&confirm=t&uuid=48fcd21a-6448-423b-8541-a9420a5b08a7&at=ANTm3czJvhLBvkorZs-kewpWvMVD:1767971775455" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_osakanewtour/%5BOSAKA%20TOUR%5D%20Joshua.jpg", link: "https://drive.usercontent.google.com/download?id=1yWBVW6SfSS2GKZauK2BVofqvehPvbJiA&export=download&authuser=0&confirm=t&uuid=a9eabbac-e861-4e3d-8f4a-6d6ef7fa86d6&at=ANTm3czyrkprWirUsb-Thf5OJNIt:1767971768047" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_osakanewtour/%5BOSAKA%20TOUR%5D%20Jun.jpg", link: "https://drive.usercontent.google.com/download?id=1uLXPH1WaU1D3yt1aOvYPjnU--hT7xsTC&export=download&authuser=0&confirm=t&uuid=1438abe2-8e58-49d2-b715-bb09d97c4e3e&at=ANTm3cwypqZQIEBGshuCnIjbJ8Zv:1767971770570" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_osakanewtour/%5BOSAKA%20TOUR%5D%20Dk.jpg", link: "https://drive.usercontent.google.com/download?id=1Be4t58tClizM4ZaWzKHpzTJHNzMlPlQM&export=download&authuser=0&confirm=t&uuid=e68855b7-0691-4a7c-be84-5095f6944b8d&at=ANTm3cxtO3gGvjzVXKQRAc0Sz1JN:1767971762247" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_osakanewtour/%5BOSAKA%20TOUR%5D%20Mingyu.jpg", link: "https://drive.usercontent.google.com/download?id=1hI1y21a7Ddi0i7qEUEUfYp4zcL_SLLnv&export=download&authuser=0&confirm=t&uuid=c29b1ff1-7992-455f-98f4-74d043bbc565&at=ANTm3cwJFolO2-1e_JSSCiPHhxML:1767971772969" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_osakanewtour/%5BOSAKA%20TOUR%5D%20The%208.jpg", link: "https://drive.usercontent.google.com/download?id=1wmWvboi1NTOT2-rnuU4BJ3xJm-s-bLkF&export=download&authuser=0&confirm=t&uuid=e7219b0c-bf96-4a7e-9c1d-b21bf78db17a&at=ANTm3cyBvcuO6zTMfoV-UCTVaxrN:1767971780935" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_osakanewtour/%5BOSAKA%20TOUR%5D%20Seungkwan.jpg", link: "https://drive.usercontent.google.com/download?id=1QmHVfdQqX-JkkEB3jXdTQObX_buhpdHX&export=download&authuser=0&confirm=t&uuid=7dd85f00-76a4-4e32-af1b-dd4f4c4325a9&at=ANTm3czK-DFb9TJvCSNsksDKlIyN:1767971777805" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_osakanewtour/%5BOSAKA%20TOUR%5D%20Vernon.jpg", link: "https://drive.usercontent.google.com/download?id=1aquFXS5KxwP722xfxJnIOCU47pDjpIne&export=download&authuser=0&confirm=t&uuid=4b0ebd93-2840-4605-97c3-2f8591501a67&at=ANTm3cyCbgIymrOthAtMZfo8lERz:1767971783863" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_osakanewtour/%5BOSAKA%20TOUR%5D%20Dino.jpg", link: "https://drive.usercontent.google.com/download?id=1Pa6qk_NTvbT3ssSR--vqCcvKyuHkMmOD&export=download&authuser=0&confirm=t&uuid=04d75216-8394-4ce3-a605-9e857bfa1f4d&at=ANTm3cyNGz0lT2zamj7GLYVcTT0a:1767971761060" }
+            ]
+        },
+        {
+            category: "HOSHI X WOOZI FAN CONCERT [WARNING] SEOUL SPECIAL GIFTS",
+            targetId: "grid-category-3",
+            sectionId: "section-3",
+            images: [
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_warninginseoul/%5BWARNING%5D%20Spacial%20Gifts%20Hoshi.png", link: "https://drive.usercontent.google.com/download?id=1dcb0l3cFl5d0tTQgP-oZn7hKE1jfPKON&export=download&authuser=0&confirm=t&uuid=75145aa6-d9ca-4f66-9570-1308cbdf9a21&at=ANTm3cyprTA8Ce71_NvpYu--hvk3:1767969455908" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_warninginseoul/%5BWARNING%5D%20Spacial%20Gifts%20Woozi.png", link: "https://drive.usercontent.google.com/download?id=186cwfeQx_WonPPm6yEujEJ16ZYWtuBUl&export=download&authuser=0&confirm=t&uuid=22904790-e7b4-4137-8db8-b04b93660b78&at=ANTm3czrXnS5A6O920n2bkZHyILd:1767969458563" },
+            ]
+        },
+        {
+            category: "SEVENTEEN 2025 JAPAN FANMEETING 'HOLIDAY' SPECIAL GIFTS",
+            targetId: "grid-category-2",
+            sectionId: "section-2",
+            images: [
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20%20Groups.jpg", link: "https://drive.usercontent.google.com/download?id=1kWlj5laH-rDTlFs1UTAnV2Duu02EMjj3&export=download&authuser=0&confirm=t&uuid=6170db2a-d9a8-4508-81ce-60592fad7ed7&at=ANTm3czsQm0fMyueHrT0C8yzSNd7:1767965912563" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Seungcheol.jpg", link: "https://drive.usercontent.google.com/download?id=1g6CTFYc55mm3Q4LXEAn-1MNLTmVfjVZQ&export=download&authuser=0&confirm=t&uuid=05d957b1-3b7a-4a22-9bbd-1bab25f23760&at=ANTm3cya4vFWtk-34e6DWVmPY5zf:1767965891156" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Joshua.jpg", link: "https://drive.usercontent.google.com/download?id=1Z8CTHozvvovBwQFeOFsm0eYbRsQumU2a&export=download&authuser=0&confirm=t&uuid=17e6594d-e170-4bfb-aae8-b32455bfbc2b&at=ANTm3cz1lnResG_pVq_vIW_wxd98:1767965899601" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Jun.jpg", link: "https://drive.usercontent.google.com/download?id=1fsv1u1RJi2Vi8Q_cBgf9wtfdWfl-l4Ue&export=download&authuser=0&confirm=t&uuid=148ba2fa-0faf-4014-ac53-aade1e46a3bb&at=ANTm3cytVyrSuVTXF38XdZcK5jBD:1767965897623" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Hoshi.jpg", link: "https://drive.usercontent.google.com/download?id=15Hy6AI1_cy4gTCIBGdtlV8fIaEkHz0kj&export=download&authuser=0&confirm=t&uuid=49d04a7e-1494-42d7-bf13-7073142b3158&at=ANTm3cxixcdU6Ysh-hk2F7lw3hmD:1767965902141" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Woozi.jpg", link: "https://drive.usercontent.google.com/download?id=1HBPtCB5RHqXHBjuJj2Q-NlEjjx2i2bdQ&export=download&authuser=0&confirm=t&uuid=464a5731-7f35-4afe-bc68-9bf5e0acc2cb&at=ANTm3cwgd_XaxPI2t4pOKJ57wcfQ:1767965880980" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Dk.jpg", link: "https://drive.usercontent.google.com/download?id=1MrA7jvdbqJngJoB0vKHE2J79skLU2ze8&export=download&authuser=0&confirm=t&uuid=21a76af9-6420-4a1d-ba3e-fc7c8078e048&at=ANTm3czVE1C9hPRs96HEDXSwApyX:1767965906068" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Mingyu.jpg", link: "https://drive.usercontent.google.com/download?id=1vt76WL85I-Ugebuwrap2V4Hp_E29Fa0d&export=download&authuser=0&confirm=t&uuid=e5565d46-2791-4c58-be92-92c1284b0bf8&at=ANTm3czXPy2cpZ-kiNuotgJc_Qcq:1767965893374" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20The8.jpg", link: "https://drive.usercontent.google.com/download?id=1MGu26ixI2dA8qq7q6NmgU3FrhGQmtza4&export=download&authuser=0&confirm=t&uuid=cb45a56a-176f-47da-956c-4da8e66f767c&at=ANTm3cyuq1QeI9mBBOahw0SmGJpH:1767965885745" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Seungkwan.jpg", link: "https://drive.usercontent.google.com/download?id=1qZvY6dvZIEaC6tB7Crnag20j0wgMhuZ2&export=download&authuser=0&confirm=t&uuid=3ebf127e-6a58-41bb-b197-1e108d0b9380&at=ANTm3cyr2SWYl6sO-BihqiCOQ9Cm:1767965888067" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Vernon.jpg", link: "https://drive.usercontent.google.com/download?id=1qZvY6dvZIEaC6tB7Crnag20j0wgMhuZ2&export=download&authuser=0&confirm=t&uuid=3ebf127e-6a58-41bb-b197-1e108d0b9380&at=ANTm3cyr2SWYl6sO-BihqiCOQ9Cm:1767965888067" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Dino.jpg", link: "https://drive.usercontent.google.com/download?id=1zEsO9LymkEY7j8XEJs-ELQ73up8e_B9U&export=download&authuser=0&confirm=t&uuid=b86359b7-83fc-4b80-87a8-6b1abd642652&at=ANTm3cyuGPTEC4BrznFcLHlFrlDS:1767965911829" },
+            ]
+        },
+        {
+            category: "SEVENTEEN 'RIGHT HERE' WORLD TOUR SPECIAL GIFTS",
+            targetId: "grid-category-1",
+            sectionId: "section-1",
+            images: [
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Seungcheol.jpg", link: "https://drive.usercontent.google.com/download?id=1cafIg2xS5BTxe-X-RpCMjmGN7rWDfle4&export=download&authuser=0&confirm=t&uuid=3cdd8686-5c3d-48bc-9bab-9351633887df&at=ANTm3cxbXPxcqsHdp-AtlBjDOCId:1767967583447" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Jeonghan.jpg", link: "https://drive.usercontent.google.com/download?id=12Q2HbMeoePOw8fBFKcFBbU3erUwcTSzS&export=download&authuser=0&confirm=t&uuid=b54ad855-e3be-42c6-a8cc-99bfb8947dac&at=ANTm3cyyLAd0ewebS6VKkdsev734:1767967576796" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Joshua.jpg", link: "https://drive.usercontent.google.com/download?id=12Q2HbMeoePOw8fBFKcFBbU3erUwcTSzS&export=download&authuser=0&confirm=t&uuid=b54ad855-e3be-42c6-a8cc-99bfb8947dac&at=ANTm3cyyLAd0ewebS6VKkdsev734:1767967576796" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Jun.jpg", link: "https://drive.usercontent.google.com/download?id=1Ktd_WWI9ZPS08LJrPns17N_wlAn9avuz&export=download&authuser=0&confirm=t&uuid=699a36e8-75b3-4183-a230-b1b3ede9cd13&at=ANTm3cyDmJZ9m0H1uaC3s-XoHvjF:1767967578929" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Hoshi.jpg", link: "https://drive.usercontent.google.com/download?id=1OW_XZ3zLmATgPPdv__i-N736USusb0l9&export=download&authuser=0&confirm=t&uuid=77be9613-5e7d-4924-b3eb-09bada7deb5f&at=ANTm3cy6EbE8HfofbnV7Oa5X9oj-:1767967570974" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Wonwoo.jpg", link: "https://drive.usercontent.google.com/download?id=1oqsOOq1rJcqOcOMQNZD9VWo8zHMO3MWl&export=download&authuser=0&confirm=t&uuid=93aec905-c817-4e2b-be85-8942cd65bece&at=ANTm3cwefVCM_GXeaxs1VmlLcPxq:1767967596140" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Woozi.jpg", link: "https://drive.usercontent.google.com/download?id=1ACNHEjlJ-mnwL4_XrcttEdXOtXYNL4zU&export=download&authuser=0&confirm=t&uuid=a4de3a19-4fc8-440f-b57d-3f2cf254c434&at=ANTm3cyBv9z_CWS8ItRVg51056cO:1767967598524" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Dk.jpg", link: "https://drive.usercontent.google.com/download?id=1aViomKL-L9TBHAF790cR8WKwp2U84X84&export=download&authuser=0&confirm=t&uuid=d15855fb-0c25-4104-bb74-04b03af438d6&at=ANTm3cxyQITX18fwVawubqibT6sW:1767967568215" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Mingyu.jpg", link: "https://drive.usercontent.google.com/download?id=1Z8HyNNZSCHkabLCUcuMk2XyenAeDnKov&export=download&authuser=0&confirm=t&uuid=7bae6ea7-4f1d-406b-b1e4-e51c5e9d20e4&at=ANTm3cyR6nfKSbSqoIPCqN2jzhrb:1767967581299" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20The8.jpg", link: "https://drive.usercontent.google.com/download?id=1RPkt4Bo_vlBdmUFELMu8N96cPAzNe2N5&export=download&authuser=0&confirm=t&uuid=836c6599-5207-4c1a-924c-e682f2d72c9c&at=ANTm3czL-Z6AdAb831A8REVeHdZL:1767967588251" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Seungkwan.jpg", link: "https://drive.usercontent.google.com/download?id=1CqhPty57YtOusbJifQdpR9O02ZOjWhBn&export=download&authuser=0&confirm=t&uuid=6c48631f-7019-441b-b7d7-9ea3156b0a6e&at=ANTm3cyEZaiGEpHpzhbmeqzDjGbA:1767967585676" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Vernon.jpg", link: "https://drive.usercontent.google.com/download?id=1qxgZrZFSpI1oF_36DPj2TIv6sGKcZuSp&export=download&authuser=0&confirm=t&uuid=4c02aace-49b6-44a0-a1b5-514a6700703f&at=ANTm3cwLna3e2tqqAiAaM60ltcQW:1767967591679" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Dino.jpg", link: "https://drive.usercontent.google.com/download?id=1lamZpDuEuknjo4KIgYqrfMrWtMjX1Qk9&export=download&authuser=0&confirm=t&uuid=9b2b9b5f-f67e-46f2-bcb6-976a1b0dc465&at=ANTm3cw_VzIPprjLrjAzvNRcOGPD:1767967565185" }
+            ]
+        }
+    ];
+
+    // Flatten for nav (store objects)
+    let allItems = [];
+    collectionData.forEach(section => {
+        allItems = allItems.concat(section.images);
+    });
+
+    // --- RENDER MENU ---
+    function renderMenu() {
+        const menuContainer = document.getElementById('category-menu');
+        menuContainer.innerHTML = '';
+
+        collectionData.forEach(cat => {
+            // Card Container
+            const card = document.createElement('div');
+            card.className = 'cat-card';
+            card.onclick = () => showCategory(cat.targetId, cat.category);
+
+            // Cover Image (First image of the category)
+            const img = document.createElement('img');
+            img.src = cat.images[0].src;
+            img.loading = "lazy";
+
+            // Title Overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'cat-title-overlay';
+            overlay.innerHTML = `<h3>${cat.category}</h3>`;
+
+            card.appendChild(img);
+            card.appendChild(overlay);
+            menuContainer.appendChild(card);
+        });
+    }
+
+    // --- RENDER GRIDS (BUT HIDE THEM) ---
+    function renderCollection() {
+        let globalIndex = 0;
+        collectionData.forEach(section => {
+            const container = document.getElementById(section.targetId);
+            if(container) {
+                container.innerHTML = "";
+                section.images.forEach(item => {
+                    const div = document.createElement("div");
+                    div.className = "gallery-item";
+                    div.innerHTML = `<img src="${item.src}" loading="lazy">`;
+                    const currentIndex = globalIndex;
+                    div.onclick = () => openLightbox(currentIndex);
+                    container.appendChild(div);
+                    globalIndex++;
+                });
+            }
+        });
+        renderThumbnails(); 
+        renderMenu(); // Init Menu
+    }
+
+    // --- NAVIGATION LOGIC (MENU <-> GALLERY) ---
+    function showCategory(targetId, title) {
+        // Hide Menu
+        document.getElementById('category-menu').style.display = 'none';
+        
+        // Hide all galleries first
+        document.querySelectorAll('.collection-section').forEach(sec => sec.style.display = 'none');
+        
+        // Show specific gallery
+        // Find the section that contains this grid
+        const section = document.querySelector(`.collection-section:has(#${targetId})`) || document.getElementById(targetId).parentElement;
+        if(section) section.style.display = 'block';
+
+        // Update Title and Show Back Button
+        document.getElementById('page-heading').innerText = title;
+        document.getElementById('backToCatBtn').style.display = 'inline-flex';
+        
+        // Scroll top
+        window.scrollTo(0,0);
+    }
+
+    function showMenu() {
+        // Show Menu
+        document.getElementById('category-menu').style.display = 'grid';
+
+        // Hide all galleries
+        document.querySelectorAll('.collection-section').forEach(sec => sec.style.display = 'none');
+
+        // Reset Title and Hide Back Button
+        document.getElementById('page-heading').innerText = 'My Collection';
+        document.getElementById('backToCatBtn').style.display = 'none';
+    }
+
+    // --- THUMBNAIL LOGIC ---
+    function renderThumbnails() {
+        const thumbContainer = document.getElementById('lightbox-thumbs');
+        thumbContainer.innerHTML = '';
+        allItems.forEach((item, index) => {
+            const img = document.createElement('img');
+            img.src = item.src;
+            img.className = 'lb-thumb';
+            img.id = `thumb-${index}`;
+            img.onclick = () => {
+                openLightbox(index);
+            };
+            thumbContainer.appendChild(img);
+        });
+    }
+
+    function highlightThumbnail(index) {
+        document.querySelectorAll('.lb-thumb').forEach(t => t.classList.remove('active'));
+        const activeThumb = document.getElementById(`thumb-${index}`);
+        if(activeThumb) {
+            activeThumb.classList.add('active');
+            activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    }
+
+    // --- LIGHTBOX LOGIC ---
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightbox-img");
+    let currentImageIndex = 0;
+
+    window.openLightbox = function(index) {
+        currentImageIndex = index;
+        updateLightboxImage();
+        lightbox.classList.add("active");
+        document.body.style.overflow = "hidden"; 
+        document.addEventListener('keydown', handleKeyDown);
+    }
+
+    window.closeLightbox = function() {
+        lightbox.classList.remove("active");
+        document.body.style.overflow = "auto";
+        document.removeEventListener('keydown', handleKeyDown);
+    }
+
+    // --- DOWNLOAD BUTTON ---
+    window.downloadImage = function() {
+        const item = allItems[currentImageIndex];
+        if (item && item.link && item.link.startsWith("http")) {
+            window.open(item.link, '_blank');
+        } else {
+            const link = document.createElement('a');
+            link.href = item.src;
+            link.download = "ZoneVault_Image.jpg";
+            link.target = "_blank";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
+    function updateLightboxImage() {
+        if (currentImageIndex < 0) {
+            currentImageIndex = allItems.length - 1;
+        } else if (currentImageIndex >= allItems.length) {
+            currentImageIndex = 0;
+        }
+        const item = allItems[currentImageIndex];
+        lightboxImg.src = item.src;
+        highlightThumbnail(currentImageIndex);
+    }
+
+    function prevImage() {
+        currentImageIndex--;
+        updateLightboxImage();
+    }
+
+    function nextImage() {
+        currentImageIndex++;
+        updateLightboxImage();
+    }
+
+    function handleKeyDown(e) {
+        if (e.key === 'ArrowLeft') prevImage();
+        else if (e.key === 'ArrowRight') nextImage();
+        else if (e.key === 'Escape') closeLightbox();
+    }
+
+    // --- MOBILE SWIPE ---
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const minSwipeDistance = 50; 
+
+    lightbox.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    lightbox.addEventListener('touchmove', function(e) {
+        e.preventDefault(); 
+    }, { passive: false });
+
+    lightbox.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+        const swipeDistance = touchEndX - touchStartX;
+        if (Math.abs(swipeDistance) > minSwipeDistance) {
+            if (swipeDistance > 0) prevImage();
+            else nextImage();
+        }
+    }
+
+    lightbox.addEventListener("click", function(e) {
+        if (e.target === lightbox) {
+            closeLightbox();
+        }
+    });
+
+    renderCollection();
+
+</script>
+
+<script>
+  // --- PROTECTION LOGIC ---
+  const allowedPaths = [
+    '/index.html', '/home.html', '/nanabnb.html', '/newtour.html',
+    'hxwfanconcert.html', '/svtholiday.html', '/arenatour.html',
+    '/svtjapanconcert.html', '/touragain.html', '/gallery.html',
+    '/profile.html', '/soon.html', '/videos.html', '/admin.html', '/collection.html' 
+  ];
+  
+  const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+  const currentPage = window.location.pathname;
+  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+  const referrer = document.referrer;
+  const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
+  
+  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+  if (cameFromAllowedPage || isAdmin) { 
+      sessionStorage.setItem('internalAccess', 'true'); 
+      hasInternalAccess = true; 
+  }
+
+  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
+
+  if (!hasInternalAccess && !isIndexPage && !isAdmin) { 
+      showAccessDeniedModal(); 
+  }
+
+  function showAccessDeniedModal() {
+    const modal = document.createElement('div');
+    modal.className = 'access-denied-modal';
+    const card = document.createElement('div');
+    card.className = 'access-card';
+    card.innerHTML = `<div class="access-icon-box"><i class="fas fa-lock"></i></div><div class="access-title">Access Restricted</div><div class="access-desc">You are not authorized to view this page directly. Please log in or return home.</div><button class="access-btn" onclick="window.location.href='index.html'">Return to Safety</button><div style="margin-top:15px; font-size:12px; color:#555;">Redirecting automatically...</div>`;
+    modal.appendChild(card);
+    document.body.appendChild(modal);
+    setTimeout(() => { window.location.href = "index.html"; }, 3000);
+  }
+</script>
+
+</body>
+</html>
