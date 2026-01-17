@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Zone Vault | Exclusive VOD Experience</title>
+  <title>Zone Vault</title>
   
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="favicon-new.png" type="image/png">
@@ -178,12 +178,15 @@
     .cta-group {
       display: flex; gap: 15px; justify-content: center;
       opacity: 0; animation: fadeIn 1s ease forwards 0.6s;
+      flex-wrap: wrap; /* Ensures buttons stack on very small screens */
     }
     
     .btn-outline {
       padding: 12px 28px; border-radius: 6px; 
       background: transparent; color: #fff; border: 1px solid var(--glass-border);
       font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s;
+      text-decoration: none;
+      display: inline-flex; align-items: center; justify-content: center;
     }
     .btn-outline:hover { background: rgba(255,255,255,0.05); border-color: #fff; }
 
@@ -273,6 +276,10 @@
       
       <div class="cta-group">
         <a href="home" class="btn-primary" style="padding: 12px 30px;">Start Watching</a>
+        
+        <a href="download" class="btn-outline" style="padding: 12px 30px;">
+           <i class="fas fa-download" style="margin-right:8px;"></i> Download App
+        </a>
       </div>
     </div>
   </main>
@@ -328,7 +335,7 @@
         Zone Vault uses <strong>HLS (HTTP Live Streaming)</strong> with <strong>Plyr</strong>, providing smooth, adaptive 
         playback on all devices. Video sources are protected through database, preventing copying and sharing.
       </p>
-    
+      
       <p>To improve performance and flexibility, we are now separating subtitles from the video files.</p>
 
       <h3>Player Features</h3>
