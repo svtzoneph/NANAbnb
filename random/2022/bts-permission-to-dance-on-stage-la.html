@@ -120,24 +120,12 @@
     }
     .progress-area:hover .progress-bar::after { opacity: 1; }
 
-    /* --- NEW: TIME TOOLTIP --- */
+    /* TIME TOOLTIP */
     .time-tooltip {
-        position: absolute;
-        bottom: 25px; /* Above the progress bar */
-        left: 0;
-        transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.8);
-        color: #fff;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-size: 12px;
-        font-weight: 600;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.1s;
-        white-space: nowrap;
-        border: 1px solid rgba(255,255,255,0.1);
-        z-index: 15;
+        position: absolute; bottom: 25px; left: 0; transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8); color: #fff; padding: 5px 10px; border-radius: 5px;
+        font-size: 12px; font-weight: 600; opacity: 0; pointer-events: none;
+        transition: opacity 0.1s; white-space: nowrap; border: 1px solid rgba(255,255,255,0.1); z-index: 15;
     }
     .progress-area:hover .time-tooltip { opacity: 1; }
 
@@ -167,7 +155,6 @@
     .player-wrapper.sub-md video::cue { font-size: 18px; }
     .player-wrapper.sub-lg video::cue { font-size: 24px; }
     
-    /* Dynamic Subtitles (Move up when controls show) */
     video::-webkit-media-text-track-container { transform: translateY(0); transition: transform 0.3s; bottom: 10px; }
     .player-wrapper.user-active video::-webkit-media-text-track-container, 
     .player-wrapper.paused video::-webkit-media-text-track-container { transform: translateY(-60px); }
@@ -187,7 +174,7 @@
     .menu-page.active { display: flex; }
     .settings-header { font-weight: 700; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; cursor: pointer; color: #fff; }
 
-    /* BIG PLAY BTN & SPINNER */
+    /* PLAY BUTTON & SPINNER */
     .center-play-btn {
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px;
         background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); border-radius: 50%;
@@ -202,7 +189,7 @@
     }
     @keyframes spin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
 
-    /* GESTURE RIPPLE */
+    /* RIPPLE */
     .ripple-overlay {
         position: absolute; top: 0; bottom: 0; width: 40%; display: flex; align-items: center; justify-content: center;
         z-index: 5; opacity: 0; pointer-events: none; color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.1); transition: opacity 0.2s;
@@ -211,6 +198,23 @@
     .ripple-overlay.right { right: 0; border-top-left-radius: 50%; border-bottom-left-radius: 50%; }
     .ripple-active { animation: rippleFlash 0.5s ease forwards; }
     @keyframes rippleFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+    /* SECURITY MODAL */
+    .access-denied-modal {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.9); color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        z-index: 11000; flex-direction: column; text-align: center;
+        backdrop-filter: blur(15px); padding: 20px; opacity: 0;
+        animation: fadeIn 0.5s forwards;
+    }
+    @keyframes fadeIn { to { opacity: 1; } }
+    .access-denied-modal button { 
+        margin-top: 20px; padding: 10px 25px; border-radius: 50px; 
+        background: transparent; border: 2px solid white; color: white; cursor: pointer;
+        font-weight: bold; transition: 0.3s;
+    }
+    .access-denied-modal button:hover { background: white; color: black; }
 
     /* LANDSCAPE / MOBILE */
     .back-btn {
@@ -359,7 +363,7 @@
     const centerPlayBtn = document.getElementById('centerPlayBtn');
     const progressBar = document.getElementById('progressBar');
     const progressArea = document.getElementById('progressArea');
-    const timeTooltip = document.getElementById('timeTooltip'); // Tooltip Element
+    const timeTooltip = document.getElementById('timeTooltip'); 
     const timeDisplay = document.getElementById('currentTime');
     const durationDisplay = document.getElementById('duration');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
@@ -434,21 +438,16 @@
         if(video.duration) durationDisplay.innerText = formatTime(video.duration);
     });
 
-    // --- PROGRESS BAR HOVER LOGIC (TOOLTIP) ---
+    // TIME TOOLTIP
     progressArea.addEventListener('mousemove', (e) => {
         const width = progressArea.clientWidth;
         const x = e.offsetX;
         const percent = (x / width);
         const hoverTime = percent * video.duration;
-        
-        // Update Tooltip Text
         timeTooltip.innerText = formatTime(hoverTime);
-        
-        // Update Tooltip Position
         timeTooltip.style.left = `${x}px`;
     });
 
-    // Click to Seek
     progressArea.addEventListener('click', (e) => {
         e.stopPropagation();
         const width = progressArea.clientWidth;
@@ -548,6 +547,42 @@
         else{ wrapper.classList.add('sub-outline'); document.getElementById('style-bg').style.display='none'; document.getElementById('style-outline').style.display='block'; }
     }
     function setSubSize(sz){ wrapper.classList.remove('sub-sm','sub-md','sub-lg'); wrapper.classList.add(sz); }
+
+    // --- 7. RESTORED SECURITY CHECK ---
+    const allowedPaths = [
+        '/index.html', '/home.html', '/nanabnb.html', '/newtour.html', '/hxwfanconcert.html',
+        '/svtholiday.html', '/arenatour.html', '/svtjapanconcert.html', '/touragain.html',
+        '/gallery.html', '/profile.html', '/soon.html'
+    ];
+    const currentPage = window.location.pathname;
+    let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
+    const referrer = document.referrer;
+    const refPath = referrer ? new URL(referrer).pathname : null;
+    const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
+    if (cameFromAllowedPage) { sessionStorage.setItem('internalAccess', 'true'); hasInternalAccess = true; }
+    const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
+    
+    if (!hasInternalAccess && !isIndexPage) { showAccessDeniedModal(); }
+
+    function showAccessDeniedModal() {
+        const modal = document.createElement('div');
+        modal.className = 'access-denied-modal';
+        modal.innerHTML = `
+        <strong style="font-size: 24px; margin-bottom: 10px;">🚫 Access Denied</strong>
+        <div>You cannot access this page directly.<br>Please go through the homepage or allowed sections.</div>
+        <div id="redirectTimer" style="margin-top:10px;">Redirecting in 3 seconds...</div>
+        <button onclick="goBack()">Go Back</button>
+        `;
+        document.body.appendChild(modal);
+        let countdown = 3;
+        const timer = document.getElementById('redirectTimer');
+        const interval = setInterval(() => {
+        countdown--;
+        timer.textContent = `Redirecting in ${countdown} seconds...`;
+        if (countdown <= 0) { clearInterval(interval); window.location.href = "index.html"; }
+        }, 1000);
+    }
+    function goBack() { window.history.back(); }
 </script>
 
 </body>
