@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BTS: Permission to Dance on Stage - LA | Zone Vault</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> 
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+  <link rel="icon" href="favicon-new.png" type="image/png" />
+  <meta name="theme-color" content="#050505">
+
+  <script>
+    (function() {
+        function applyTheme(theme) {
+            if (theme === 'light' || theme === '#ffffff' || theme === 'white') {
+                document.documentElement.classList.add('light-mode');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f0f2f5');
+            } else {
+                document.documentElement.classList.remove('light-mode');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#050505');
+            }
+        }
+        const savedTheme = localStorage.getItem('zoneTheme') || localStorage.getItem('zoneVaultTheme');
+        if (savedTheme) { applyTheme(savedTheme); } 
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) { applyTheme('light'); }
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'zoneTheme' || e.key === 'zoneVaultTheme') { applyTheme(e.newValue); }
+        });
+    })();
+  </script>
+
+  <style>
+    /* VARIABLES */
+    :root {
+        --bg-color: #050505;
+        --text-main: #ffffff;
+        --text-muted: #a1a1aa;
+        --card-bg: rgba(20, 20, 20, 0.6);
+        --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+        --accent: #ffffff;
+        --playlist-hover: rgba(255, 255, 255, 0.1);
+        --highlight: #704db6; 
+    }
+    html.light-mode {
+        --bg-color: #f0f2f5;
+        --text-main: #1a1a1a;
+        --text-muted: #65676b;
+        --card-bg: rgba(255, 255, 255, 0.85);
+        --glass-border: 1px solid rgba(0, 0, 0, 0.05);
+        --accent: #000000;
+        --playlist-hover: rgba(0, 0, 0, 0.05);
+    }
+
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+    body {
+        background-color: var(--bg-color); color: var(--text-main);
+        font-family: 'Inter', sans-serif; margin: 0; padding: 20px;
+        min-height: 100vh; transition: background-color 0.3s ease;
+    }
+
+    .noise-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        pointer-events: none; z-index: -1;
+    }
+
+    .center-logo { display: flex; justify-content: center; margin-bottom: 20px; }
+    .center-logo img { width: 50px; border-radius: 12px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
+
+    .main-layout { max-width: 1000px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 25px; }
+
+    .glass-card {
+        background: var(--card-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border: var(--glass-border); border-radius: 20px; overflow: hidden;
+        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); transition: background 0.3s;
+    }
+
+    /* PLAYER STYLES */
+    .player-container-card { padding: 0; background: #000; }
+    .player-wrapper {
+        position: relative; width: 100%; aspect-ratio: 16/9;
+        background: #000; overflow: hidden; user-select: none; cursor: none;
+    }
+    .player-wrapper.user-active, .player-wrapper.paused { cursor: default; }
+    video { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+    /* CONTROLS OVERLAY */
+    .controls-container {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5) 50%, transparent);
+        padding: 0 20px 20px; opacity: 0; transition: opacity 0.3s ease;
+        display: flex; flex-direction: column; gap: 10px; z-index: 10; pointer-events: none;
+    }
+    .player-wrapper.user-active .controls-container, .player-wrapper.paused .controls-container { opacity: 1; pointer-events: auto; }
+
+    /* PROGRESS BAR */
+    .progress-area {
+        width: 100%; height: 5px; background: rgba(255,255,255,0.2);
+        cursor: pointer; border-radius: 5px; position: relative; transition: height 0.1s;
+    }
+    .progress-area:hover { height: 8px; }
+    .progress-bar {
+        height: 100%; width: 0%; background: var(--highlight);
+        border-radius: 5px; position: relative;
+    }
+    .progress-bar::after {
+        content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+        width: 12px; height: 12px; background: #fff; border-radius: 50%; opacity: 0; transition: opacity 0.2s;
+    }
+    .progress-area:hover .progress-bar::after { opacity: 1; }
+
+    /* --- NEW: TIME TOOLTIP --- */
+    .time-tooltip {
+        position: absolute;
+        bottom: 25px; /* Above the progress bar */
+        left: 0;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 600;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.1s;
+        white-space: nowrap;
+        border: 1px solid rgba(255,255,255,0.1);
+        z-index: 15;
+    }
+    .progress-area:hover .time-tooltip { opacity: 1; }
+
+    /* BUTTONS & VOLUME */
+    .controls-row { display: flex; align-items: center; justify-content: space-between; color: #fff; }
+    .left-controls, .right-controls { display: flex; align-items: center; gap: 15px; }
+    .control-btn {
+        background: none; border: none; color: #fff; cursor: pointer; padding: 0;
+        display: flex; align-items: center; justify-content: center; transition: transform 0.2s;
+    }
+    .control-btn:hover { transform: scale(1.1); color: var(--highlight); }
+    .control-btn span { font-size: 28px; }
+    .time-display { font-size: 13px; font-weight: 500; margin-left: 10px; opacity: 0.9; font-feature-settings: "tnum"; }
+    
+    .volume-container { display: flex; align-items: center; gap: 8px; }
+    .volume-slider { width: 0; height: 4px; background: rgba(255,255,255,0.3); border-radius: 4px; transition: width 0.3s; cursor: pointer; }
+    .volume-container:hover .volume-slider { width: 60px; }
+    .volume-fill { height: 100%; background: #fff; width: 50%; border-radius: 4px; }
+
+    /* SUBTITLES */
+    video::cue { background-color: rgba(0, 0, 0, 0.7); color: #fff; font-family: 'Inter', sans-serif; }
+    .player-wrapper.sub-outline video::cue {
+        background-color: transparent !important;
+        text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000, 1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000 !important;
+    }
+    .player-wrapper.sub-sm video::cue { font-size: 14px; }
+    .player-wrapper.sub-md video::cue { font-size: 18px; }
+    .player-wrapper.sub-lg video::cue { font-size: 24px; }
+    
+    /* Dynamic Subtitles (Move up when controls show) */
+    video::-webkit-media-text-track-container { transform: translateY(0); transition: transform 0.3s; bottom: 10px; }
+    .player-wrapper.user-active video::-webkit-media-text-track-container, 
+    .player-wrapper.paused video::-webkit-media-text-track-container { transform: translateY(-60px); }
+
+    /* SETTINGS MENU */
+    .settings-menu {
+        position: absolute; bottom: 70px; right: 20px;
+        background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px);
+        border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; width: 250px; padding: 10px;
+        display: none; flex-direction: column; z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .settings-menu.active { display: flex; animation: slideUp 0.2s ease; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .settings-item { padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: #eee; font-size: 14px; }
+    .settings-item:hover { background: rgba(255,255,255,0.1); }
+    .menu-page { display: none; flex-direction: column; gap: 2px; }
+    .menu-page.active { display: flex; }
+    .settings-header { font-weight: 700; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; cursor: pointer; color: #fff; }
+
+    /* BIG PLAY BTN & SPINNER */
+    .center-play-btn {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px;
+        background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; border: 2px solid rgba(255,255,255,0.2);
+    }
+    .center-play-btn:hover { background: var(--highlight); border-color: var(--highlight); transform: scale(1.1); }
+    .player-wrapper.playing .center-play-btn { opacity: 0; pointer-events: none; transform: translate(-50%, -50%) scale(0.8); }
+    .spinner {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px;
+        border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--highlight); border-radius: 50%;
+        animation: spin 1s linear infinite; display: none; pointer-events: none;
+    }
+    @keyframes spin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+    /* GESTURE RIPPLE */
+    .ripple-overlay {
+        position: absolute; top: 0; bottom: 0; width: 40%; display: flex; align-items: center; justify-content: center;
+        z-index: 5; opacity: 0; pointer-events: none; color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.1); transition: opacity 0.2s;
+    }
+    .ripple-overlay.left { left: 0; border-top-right-radius: 50%; border-bottom-right-radius: 50%; }
+    .ripple-overlay.right { right: 0; border-top-left-radius: 50%; border-bottom-left-radius: 50%; }
+    .ripple-active { animation: rippleFlash 0.5s ease forwards; }
+    @keyframes rippleFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+    /* LANDSCAPE / MOBILE */
+    .back-btn {
+        position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--card-bg); backdrop-filter: blur(10px);
+        border: var(--glass-border); border-radius: 50%; display: flex; justify-content: center; align-items: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: 0.3s; z-index: 100; cursor: pointer; text-decoration: none;
+    }
+    .back-btn:hover { background: var(--text-main); transform: scale(1.1); }
+    .back-btn svg { stroke: var(--text-main); }
+    .back-btn:hover svg { stroke: var(--bg-color); }
+
+    .metadata-section { padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+    .meta-header h1 { font-size: 28px; font-weight: 700; margin: 0 0 10px 0; color: var(--text-main); }
+    .meta-desc { font-size: 15px; line-height: 1.6; color: var(--text-muted); }
+    .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding-top: 20px; border-top: 1px solid var(--glass-border); }
+    .meta-item strong { color: var(--text-main); display: block; margin-bottom: 4px; }
+    .meta-item span { color: var(--text-muted); font-size: 14px; }
+
+    @media (orientation: landscape) and (max-width: 900px) {
+        body { padding: 0; background: #000; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .main-layout { max-width: 100%; height: 100%; margin: 0; gap: 0; }
+        .center-logo, .back-btn, .glass-card:not(.player-container-card) { display: none !important; }
+        .player-container-card { width: 100% !important; height: 100% !important; border-radius: 0; border: none; display: flex; align-items: center; justify-content: center; }
+        .player-wrapper { height: 100%; width: 100%; margin: 0 auto; }
+        .controls-container { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); padding-bottom: 10px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="noise-overlay"></div>
+
+<div class="center-logo">
+  <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault Logo">
+</div>
+
+<div class="main-layout">
+    
+    <div class="glass-card player-container-card">
+        <div class="player-wrapper sub-md user-active" id="playerWrapper">
+            <div class="spinner" id="spinner"></div>
+            
+            <div class="ripple-overlay left" id="rippleLeft"><span class="material-icons-round">replay_10</span></div>
+            <div class="ripple-overlay right" id="rippleRight"><span class="material-icons-round">forward_10</span></div>
+
+            <div class="center-play-btn" id="centerPlayBtn">
+                <span class="material-icons-round">play_arrow</span>
+            </div>
+
+            <video id="mainVideo" playsinline crossorigin="anonymous"></video>
+
+            <div class="controls-container" id="controlsContainer">
+                <div class="progress-area" id="progressArea">
+                    <div class="progress-bar" id="progressBar"></div>
+                    <div class="time-tooltip" id="timeTooltip">00:00</div>
+                </div>
+
+                <div class="controls-row">
+                    <div class="left-controls">
+                        <button class="control-btn" id="playPauseBtn"><span class="material-icons-round">play_arrow</span></button>
+                        <div class="volume-container">
+                            <button class="control-btn" id="muteBtn"><span class="material-icons-round">volume_up</span></button>
+                            <div class="volume-slider" id="volumeSlider"><div class="volume-fill" id="volumeFill"></div></div>
+                        </div>
+                        <div class="time-display"><span id="currentTime">0:00</span> / <span id="duration">0:00</span></div>
+                    </div>
+                    <div class="right-controls">
+                        <button class="control-btn" id="settingsBtn"><span class="material-icons-round">settings</span></button>
+                        <button class="control-btn" id="fullscreenBtn"><span class="material-icons-round">fullscreen</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-menu" id="settingsMenu">
+                <div class="menu-page active" id="menuMain">
+                    <div class="settings-item" onclick="openSubMenu('menuQuality')"><span>Quality</span> <span id="currentQuality" style="opacity:0.6">Auto</span></div>
+                    <div class="settings-item" onclick="openSubMenu('menuSubs')"><span>Subtitles</span> <span id="currentSub" style="opacity:0.6">Off</span></div>
+                    <div class="settings-item" onclick="openSubMenu('menuSubStyle')"><span>Subtitle Style</span> <span class="material-icons-round" style="font-size:16px">chevron_right</span></div>
+                </div>
+                <div class="menu-page" id="menuQuality">
+                    <div class="settings-header" onclick="closeSubMenu()"><span class="material-icons-round">arrow_back</span> Quality</div>
+                    <div id="qualityList"></div>
+                </div>
+                <div class="menu-page" id="menuSubs">
+                    <div class="settings-header" onclick="closeSubMenu()"><span class="material-icons-round">arrow_back</span> Subtitles</div>
+                    <div id="subsList"></div>
+                </div>
+                <div class="menu-page" id="menuSubStyle">
+                    <div class="settings-header" onclick="closeSubMenu()"><span class="material-icons-round">arrow_back</span> Style</div>
+                    <div class="settings-item" onclick="setSubStyle('bg')"><span>Black Background</span> <span class="material-icons-round check-icon" id="style-bg">check</span></div>
+                    <div class="settings-item" onclick="setSubStyle('outline')"><span>Outline Only</span> <span class="material-icons-round check-icon" id="style-outline" style="display:none">check</span></div>
+                    <div style="padding:10px; border-top:1px solid rgba(255,255,255,0.1); margin-top:5px;">
+                        <span style="font-size:12px; color:#aaa; display:block; margin-bottom:5px;">Size</span>
+                        <div style="display:flex; gap:10px;">
+                            <button onclick="setSubSize('sub-sm')" style="flex:1; background:rgba(255,255,255,0.1); border:none; color:white; padding:5px;">A</button>
+                            <button onclick="setSubSize('sub-md')" style="flex:1; background:rgba(255,255,255,0.1); border:none; color:white; padding:5px; font-size:16px;">A</button>
+                            <button onclick="setSubSize('sub-lg')" style="flex:1; background:rgba(255,255,255,0.1); border:none; color:white; padding:5px; font-size:20px;">A</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="glass-card metadata-section">
+        <div class="meta-header">
+            <h1>BTS: Permission to Dance on Stage - LA</h1>
+            <div style="display:flex; gap:15px; align-items:center; margin-bottom:15px;">
+               <span style="background:var(--playlist-hover); color:var(--text-main); padding:4px 8px; border-radius:4px; font-size:12px; font-weight:700;">HD</span>
+            </div>
+            <div class="meta-desc">
+                Purple colors the city of Los Angeles, as BTS brings their "Permission to Dance" concert to SoFi Stadium for the first time in two years. In a stadium radiating anticipation and cheer, splendid performances from "On" to "Permission to Dance" glorify the stage that now comes to life on screen. Be united once again by the power of music.
+            </div>
+        </div>
+        <div class="meta-grid">
+            <div class="meta-item"><strong>Released</strong><span>2022-09-08</span></div>
+            <div class="meta-item"><strong>Duration</strong><span>130 min</span></div>
+        </div>
+    </div>
+
+</div>
+
+<a href="javascript:history.back()" class="back-btn">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15 18l-6-6 6-6" />
+  </svg>
+</a>
+
+<script>
+    // --- 1. DATA CONFIG ---
+    const VIDEO_URL = "https://f1.megacdn.co:2228/v3-hls-playback/67e3c8c2e191908d78af0965c6a05bf1ce8b84dfbd2cca0f50a6c828490f40b756cf24ca59902c40859ca87290b7fa8d81c359c846116dbe72619adbfb7883493b14885a0f57a3df6bffee9c57d75297fe9dc0a00acda39d6fc08c0feba87b10d7bd974e55b7474fb67628f2ec608a995cce8f9a42d3ac1691a2159b14d119efffc46489162d53291400b3364c58a7e16dded90b20da5031a2398ed37c3e62b28baf754ec6dc609f235881fc595d718df53a7987d1f84130448db6bcf9165e55/playlist.m3u8";
+    
+    const SUBTITLES = [
+        { label: "English", src: "https://cca.megafiles.store/7b/17/7b17d4b121f1ad2bafc0dc81435ed63b/eng-2.vtt", lang: "en" },
+        { label: "Japanese", src: "https://cca.megafiles.store/7b/17/7b17d4b121f1ad2bafc0dc81435ed63b/jpn-14.vtt", lang: "ja" },
+        { label: "Korean", src: "https://cca.megafiles.store/7b/17/7b17d4b121f1ad2bafc0dc81435ed63b/kor-3.vtt", lang: "ko" },
+        { label: "Spanish", src: "https://cca.megafiles.store/7b/17/7b17d4b121f1ad2bafc0dc81435ed63b/spa-9.vtt", lang: "es" }
+    ];
+
+    // --- 2. PLAYER LOGIC ---
+    const video = document.getElementById('mainVideo');
+    const wrapper = document.getElementById('playerWrapper');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const centerPlayBtn = document.getElementById('centerPlayBtn');
+    const progressBar = document.getElementById('progressBar');
+    const progressArea = document.getElementById('progressArea');
+    const timeTooltip = document.getElementById('timeTooltip'); // Tooltip Element
+    const timeDisplay = document.getElementById('currentTime');
+    const durationDisplay = document.getElementById('duration');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const spinner = document.getElementById('spinner');
+    const qualityList = document.getElementById('qualityList');
+    
+    let hls;
+
+    if (Hls.isSupported()) {
+        hls = new Hls();
+        hls.loadSource(VIDEO_URL);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, function () { initQualityOptions(hls.levels); });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = VIDEO_URL;
+        document.getElementById('currentQuality').innerText = "HD";
+    }
+
+    SUBTITLES.forEach(sub => {
+        const track = document.createElement('track');
+        track.kind = 'subtitles'; track.label = sub.label; track.srclang = sub.lang; track.src = sub.src;
+        video.appendChild(track);
+    });
+    initSubMenu();
+
+    // --- 3. AUTO HIDE CONTROLS (2s LOGIC) ---
+    let controlsTimer;
+    function showControls() {
+        wrapper.classList.add('user-active');
+        clearTimeout(controlsTimer);
+        if (!video.paused) {
+            controlsTimer = setTimeout(() => {
+                wrapper.classList.remove('user-active');
+                settingsMenu.style.display = 'none';
+            }, 2000);
+        }
+    }
+    wrapper.addEventListener('mousemove', showControls);
+    wrapper.addEventListener('click', showControls);
+    wrapper.addEventListener('touchstart', showControls);
+    wrapper.addEventListener('keydown', showControls);
+
+    // --- 4. PLAYBACK CONTROLS ---
+    function togglePlay() {
+        if (video.paused) {
+            video.play();
+            wrapper.classList.add('playing'); wrapper.classList.remove('paused');
+            playPauseBtn.innerHTML = '<span class="material-icons-round">pause</span>';
+            showControls();
+        } else {
+            video.pause();
+            wrapper.classList.remove('playing'); wrapper.classList.add('paused');
+            playPauseBtn.innerHTML = '<span class="material-icons-round">play_arrow</span>';
+            clearTimeout(controlsTimer);
+            wrapper.classList.add('user-active');
+        }
+    }
+    playPauseBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
+    centerPlayBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
+    
+    let lastClick = 0;
+    video.addEventListener('click', (e) => {
+        const now = new Date().getTime();
+        if (now - lastClick > 300 && document.getElementById('settingsMenu').style.display !== 'flex') togglePlay();
+        lastClick = now;
+    });
+
+    video.addEventListener('timeupdate', () => {
+        const percent = (video.currentTime / video.duration) * 100;
+        progressBar.style.width = `${percent}%`;
+        timeDisplay.innerText = formatTime(video.currentTime);
+        if(video.duration) durationDisplay.innerText = formatTime(video.duration);
+    });
+
+    // --- PROGRESS BAR HOVER LOGIC (TOOLTIP) ---
+    progressArea.addEventListener('mousemove', (e) => {
+        const width = progressArea.clientWidth;
+        const x = e.offsetX;
+        const percent = (x / width);
+        const hoverTime = percent * video.duration;
+        
+        // Update Tooltip Text
+        timeTooltip.innerText = formatTime(hoverTime);
+        
+        // Update Tooltip Position
+        timeTooltip.style.left = `${x}px`;
+    });
+
+    // Click to Seek
+    progressArea.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const width = progressArea.clientWidth;
+        video.currentTime = (e.offsetX / width) * video.duration;
+    });
+
+    video.addEventListener('waiting', () => spinner.style.display = 'block');
+    video.addEventListener('playing', () => spinner.style.display = 'none');
+
+    const muteBtn = document.getElementById('muteBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const volumeFill = document.getElementById('volumeFill');
+    volumeSlider.addEventListener('click', (e) => { e.stopPropagation(); video.volume = e.offsetX / volumeSlider.clientWidth; updateVolUI(video.volume); });
+    muteBtn.addEventListener('click', (e) => { e.stopPropagation(); video.muted = !video.muted; updateVolUI(video.muted ? 0 : video.volume); });
+    function updateVolUI(vol) { volumeFill.style.width = `${vol * 100}%`; muteBtn.innerHTML = (vol === 0 || video.muted) ? '<span class="material-icons-round">volume_off</span>' : '<span class="material-icons-round">volume_up</span>'; }
+
+    fullscreenBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!document.fullscreenElement) {
+            wrapper.requestFullscreen().then(() => { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(e => {}); });
+            fullscreenBtn.innerHTML = '<span class="material-icons-round">fullscreen_exit</span>';
+        } else {
+            document.exitFullscreen();
+            if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+            fullscreenBtn.innerHTML = '<span class="material-icons-round">fullscreen</span>';
+        }
+    });
+
+    // --- 5. GESTURES ---
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') { e.preventDefault(); togglePlay(); } 
+        else if (e.code === 'ArrowRight') { video.currentTime += 10; triggerRipple('right'); showControls(); } 
+        else if (e.code === 'ArrowLeft') { video.currentTime -= 10; triggerRipple('left'); showControls(); }
+    });
+
+    const rippleLeft = document.getElementById('rippleLeft');
+    const rippleRight = document.getElementById('rippleRight');
+    let touchLastTime = 0;
+    wrapper.addEventListener('touchstart', (e) => {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - touchLastTime;
+        if (tapLength < 300 && tapLength > 0) {
+            const touchX = e.changedTouches[0].clientX;
+            const width = wrapper.clientWidth;
+            if (touchX < width * 0.4) { video.currentTime -= 10; triggerRipple('left'); } 
+            else if (touchX > width * 0.6) { video.currentTime += 10; triggerRipple('right'); }
+            e.preventDefault();
+        }
+        touchLastTime = currentTime;
+    });
+    function triggerRipple(side) {
+        const el = side === 'left' ? rippleLeft : rippleRight;
+        el.classList.remove('ripple-active'); void el.offsetWidth; el.classList.add('ripple-active');
+    }
+    function formatTime(s) {
+        if(isNaN(s)) return "0:00";
+        const m = Math.floor(s / 60); const sec = Math.floor(s % 60);
+        return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+    }
+
+    // --- 6. SETTINGS ---
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsMenu = document.getElementById('settingsMenu');
+    settingsBtn.addEventListener('click', (e) => { e.stopPropagation(); settingsMenu.style.display = settingsMenu.style.display === 'flex' ? 'none' : 'flex'; closeSubMenu(); });
+    document.addEventListener('click', (e) => { if (!settingsMenu.contains(e.target) && e.target !== settingsBtn) settingsMenu.style.display = 'none'; });
+    function openSubMenu(id) { document.querySelectorAll('.menu-page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+    function closeSubMenu() { document.querySelectorAll('.menu-page').forEach(p=>p.classList.remove('active')); document.getElementById('menuMain').classList.add('active'); }
+
+    function initQualityOptions(levels) {
+        qualityList.innerHTML = '';
+        const auto = document.createElement('div'); auto.className='settings-item'; auto.innerHTML='<span>Auto</span>';
+        auto.onclick=()=>{hls.currentLevel=-1; updateQualityLabel('Auto');}; qualityList.appendChild(auto);
+        levels.forEach((lvl, i) => {
+            const item=document.createElement('div'); item.className='settings-item'; item.innerHTML=`<span>${lvl.height}p</span>`;
+            item.onclick=()=>{hls.currentLevel=i; updateQualityLabel(`${lvl.height}p`);}; qualityList.appendChild(item);
+        });
+    }
+    function updateQualityLabel(txt){document.getElementById('currentQuality').innerText=txt; closeSubMenu();}
+
+    function initSubMenu() {
+        const list=document.getElementById('subsList');
+        const off=document.createElement('div'); off.className='settings-item'; off.innerHTML='<span>Off</span>';
+        off.onclick=()=>{switchSub(-1,'Off')}; list.appendChild(off);
+        for(let i=0; i<video.textTracks.length; i++){
+            video.textTracks[i].mode='hidden';
+            const item=document.createElement('div'); item.className='settings-item'; item.innerHTML=`<span>${video.textTracks[i].label}</span>`;
+            item.onclick=()=>{switchSub(i, video.textTracks[i].label)}; list.appendChild(item);
+        }
+    }
+    function switchSub(idx, lbl){
+        for(let i=0; i<video.textTracks.length; i++) video.textTracks[i].mode='hidden';
+        if(idx!==-1) video.textTracks[idx].mode='showing';
+        document.getElementById('currentSub').innerText=lbl; closeSubMenu();
+    }
+    function setSubStyle(style){
+        if(style==='bg'){ wrapper.classList.remove('sub-outline'); document.getElementById('style-bg').style.display='block'; document.getElementById('style-outline').style.display='none'; }
+        else{ wrapper.classList.add('sub-outline'); document.getElementById('style-bg').style.display='none'; document.getElementById('style-outline').style.display='block'; }
+    }
+    function setSubSize(sz){ wrapper.classList.remove('sub-sm','sub-md','sub-lg'); wrapper.classList.add(sz); }
+</script>
+
+</body>
+</html>
