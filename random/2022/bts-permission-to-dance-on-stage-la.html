@@ -104,21 +104,26 @@
     }
     .player-wrapper.user-active .controls-container, .player-wrapper.paused .controls-container { opacity: 1; pointer-events: auto; }
 
-    /* PROGRESS BAR */
+    /* SLIDER / PROGRESS BAR STYLES */
     .progress-area {
         width: 100%; height: 5px; background: rgba(255,255,255,0.2);
         cursor: pointer; border-radius: 5px; position: relative; transition: height 0.1s;
+        touch-action: none; /* Crucial for slider on mobile */
     }
-    .progress-area:hover { height: 8px; }
+    .progress-area:hover, .progress-area.dragging { height: 8px; }
     .progress-bar {
         height: 100%; width: 0%; background: var(--highlight);
-        border-radius: 5px; position: relative;
+        border-radius: 5px; position: relative; pointer-events: none;
     }
     .progress-bar::after {
         content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
-        width: 12px; height: 12px; background: #fff; border-radius: 50%; opacity: 0; transition: opacity 0.2s;
+        width: 14px; height: 14px; background: #fff; border-radius: 50%; 
+        opacity: 0; transition: opacity 0.2s, transform 0.1s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
-    .progress-area:hover .progress-bar::after { opacity: 1; }
+    /* Show knob on hover OR when dragging */
+    .progress-area:hover .progress-bar::after, 
+    .progress-area.dragging .progress-bar::after { opacity: 1; transform: translateY(-50%) scale(1.2); }
 
     /* TIME TOOLTIP */
     .time-tooltip {
@@ -127,7 +132,7 @@
         font-size: 12px; font-weight: 600; opacity: 0; pointer-events: none;
         transition: opacity 0.1s; white-space: nowrap; border: 1px solid rgba(255,255,255,0.1); z-index: 15;
     }
-    .progress-area:hover .time-tooltip { opacity: 1; }
+    .progress-area:hover .time-tooltip, .progress-area.dragging .time-tooltip { opacity: 1; }
 
     /* BUTTONS & VOLUME */
     .controls-row { display: flex; align-items: center; justify-content: space-between; color: #fff; }
@@ -389,21 +394,24 @@
     });
     initSubMenu();
 
-    // --- 3. AUTO HIDE CONTROLS (2s LOGIC) ---
+    // --- 3. AUTO HIDE CONTROLS ---
     let controlsTimer;
     function showControls() {
         wrapper.classList.add('user-active');
         clearTimeout(controlsTimer);
+        
+        // Hide after 2 seconds only if playing
         if (!video.paused) {
             controlsTimer = setTimeout(() => {
-                wrapper.classList.remove('user-active');
-                settingsMenu.style.display = 'none';
+                if (!isDragging) {
+                    wrapper.classList.remove('user-active');
+                    settingsMenu.style.display = 'none';
+                }
             }, 2000);
         }
     }
+
     wrapper.addEventListener('mousemove', showControls);
-    wrapper.addEventListener('click', showControls);
-    wrapper.addEventListener('touchstart', showControls);
     wrapper.addEventListener('keydown', showControls);
 
     // --- 4. PLAYBACK CONTROLS ---
@@ -424,22 +432,95 @@
     playPauseBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
     centerPlayBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
     
+    // --- SMART CLICK HANDLER (FIXED FOR MOBILE) ---
     let lastClick = 0;
     video.addEventListener('click', (e) => {
         const now = new Date().getTime();
-        if (now - lastClick > 300 && document.getElementById('settingsMenu').style.display !== 'flex') togglePlay();
+        
+        // RULE 1: If video is PAUSED, always PLAY.
+        // This ensures the first tap on mobile actually starts the video.
+        if (video.paused) {
+            togglePlay();
+            lastClick = now;
+            return;
+        }
+
+        // RULE 2: If video is PLAYING, but controls are HIDDEN -> Show Controls.
+        if (!wrapper.classList.contains('user-active')) {
+            showControls();
+            lastClick = now;
+            return;
+        }
+
+        // RULE 3: If video is PLAYING and controls are VISIBLE -> Toggle Pause.
+        // (Unless it's a double click or menu is open)
+        if (now - lastClick > 300 && document.getElementById('settingsMenu').style.display !== 'flex') {
+            togglePlay();
+        }
         lastClick = now;
+        showControls(); // Reset timer
     });
 
     video.addEventListener('timeupdate', () => {
-        const percent = (video.currentTime / video.duration) * 100;
-        progressBar.style.width = `${percent}%`;
-        timeDisplay.innerText = formatTime(video.currentTime);
+        if (!isDragging) {
+            const percent = (video.currentTime / video.duration) * 100;
+            progressBar.style.width = `${percent}%`;
+            timeDisplay.innerText = formatTime(video.currentTime);
+        }
         if(video.duration) durationDisplay.innerText = formatTime(video.duration);
     });
 
-    // TIME TOOLTIP
+    // --- 5. DRAGGABLE SLIDER ---
+    let isDragging = false;
+    let wasPausedBeforeDrag = false;
+
+    function handleTimelineUpdate(e) {
+        const rect = progressArea.getBoundingClientRect();
+        let clientX = e.clientX;
+        if(e.type.includes('touch')) { clientX = e.touches[0].clientX; }
+        
+        let x = clientX - rect.left;
+        x = Math.max(0, Math.min(x, rect.width));
+        
+        const percent = (x / rect.width) * 100;
+        progressBar.style.width = `${percent}%`;
+        
+        const hoverTime = (percent / 100) * video.duration;
+        timeTooltip.innerText = formatTime(hoverTime);
+        timeTooltip.style.left = `${x}px`;
+        timeDisplay.innerText = formatTime(hoverTime);
+        video.currentTime = hoverTime;
+    }
+
+    function startDrag(e) {
+        isDragging = true;
+        wasPausedBeforeDrag = video.paused;
+        video.pause(); 
+        wrapper.classList.add('user-active');
+        progressArea.classList.add('dragging'); 
+        handleTimelineUpdate(e); 
+    }
+
+    function endDrag(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        progressArea.classList.remove('dragging');
+        if (!wasPausedBeforeDrag) {
+            video.play();
+            showControls(); 
+        }
+    }
+
+    progressArea.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', (e) => { if(isDragging) handleTimelineUpdate(e); });
+    document.addEventListener('mouseup', endDrag);
+
+    progressArea.addEventListener('touchstart', (e) => { e.preventDefault(); startDrag(e); }, {passive: false});
+    document.addEventListener('touchmove', (e) => { if(isDragging) handleTimelineUpdate(e); }, {passive: false});
+    document.addEventListener('touchend', endDrag);
+
     progressArea.addEventListener('mousemove', (e) => {
+        if (isDragging) return;
         const width = progressArea.clientWidth;
         const x = e.offsetX;
         const percent = (x / width);
@@ -448,11 +529,7 @@
         timeTooltip.style.left = `${x}px`;
     });
 
-    progressArea.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const width = progressArea.clientWidth;
-        video.currentTime = (e.offsetX / width) * video.duration;
-    });
+    // --- END SLIDER ---
 
     video.addEventListener('waiting', () => spinner.style.display = 'block');
     video.addEventListener('playing', () => spinner.style.display = 'none');
@@ -476,7 +553,7 @@
         }
     });
 
-    // --- 5. GESTURES ---
+    // --- 6. GESTURES ---
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Space') { e.preventDefault(); togglePlay(); } 
         else if (e.code === 'ArrowRight') { video.currentTime += 10; triggerRipple('right'); showControls(); } 
@@ -487,6 +564,7 @@
     const rippleRight = document.getElementById('rippleRight');
     let touchLastTime = 0;
     wrapper.addEventListener('touchstart', (e) => {
+        if (isDragging) return; 
         const currentTime = new Date().getTime();
         const tapLength = currentTime - touchLastTime;
         if (tapLength < 300 && tapLength > 0) {
@@ -508,7 +586,7 @@
         return `${m}:${sec < 10 ? '0' : ''}${sec}`;
     }
 
-    // --- 6. SETTINGS ---
+    // --- 7. SETTINGS ---
     const settingsBtn = document.getElementById('settingsBtn');
     const settingsMenu = document.getElementById('settingsMenu');
     settingsBtn.addEventListener('click', (e) => { e.stopPropagation(); settingsMenu.style.display = settingsMenu.style.display === 'flex' ? 'none' : 'flex'; closeSubMenu(); });
@@ -548,7 +626,7 @@
     }
     function setSubSize(sz){ wrapper.classList.remove('sub-sm','sub-md','sub-lg'); wrapper.classList.add(sz); }
 
-    // --- 7. RESTORED SECURITY CHECK ---
+    // --- 8. RESTORED SECURITY CHECK ---
     const allowedPaths = [
         '/index.html', '/home.html', '/nanabnb.html', '/newtour.html', '/hxwfanconcert.html',
         '/svtholiday.html', '/arenatour.html', '/svtjapanconcert.html', '/touragain.html',
