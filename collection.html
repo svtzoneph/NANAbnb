@@ -268,6 +268,7 @@
         padding-bottom: 80px; 
     }
 
+    /* --- NEW ZOOM STYLES --- */
     .lightbox-content {
         max-width: 95vw;
         max-height: 80vh;
@@ -275,6 +276,16 @@
         box-shadow: 0 20px 60px rgba(0,0,0,0.6); 
         border-radius: 4px;
         animation: zoomIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transition: transform 0.2s ease-out; /* Smooth zoom transition */
+        transform-origin: center center;
+        cursor: zoom-in;
+    }
+
+    .lightbox-content.zoomed {
+        cursor: grab;
+    }
+    .lightbox-content.zoomed:active {
+        cursor: grabbing;
     }
 
     @keyframes zoomIn {
@@ -769,7 +780,7 @@
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20Mingyu.jpg", link: "https://drive.usercontent.google.com/download?id=1-6MiuIjgQHmdl02FPumQ9LaAlrgczBtg&export=download&authuser=0&confirm=t&uuid=0a3bef39-ba23-4844-8f62-48b3b64c73b9&at=APcXIO23CarTuOycdpWMZgWfs8YV:1769094919533" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20The%208.jpg", link: "https://drive.usercontent.google.com/download?id=11RKZg_V9yq6WwmPD6yd2lqjQPUD7AJ9r&export=download&authuser=0&confirm=t&uuid=6febd2d1-8327-4329-8eb7-1c0e0871c548&at=APcXIO2fHBSxf6gUK0Yt5_bgf5np:1769094929108" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20Seungkwan.jpg", link: "https://drive.usercontent.google.com/download?id=1wno7z07nF2tCqnrFvZFFgGD6_45OKm3s&export=download&authuser=0&confirm=t&uuid=137aa381-226c-4a0e-8f5e-3d268cf56fae&at=APcXIO3hQ2GKl_c80L0F4Dpm67gg:1769094927205" },
-                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20Vernon.jpg", link: "https://drive.usercontent.google.com/download?id=1qu3r9SbwpgSuyMY4DE8OfUe369o7SfDH&export=download&authuser=0&confirm=t&uuid=de6419f6-b7ff-4358-aa93-1c535d389fd4&at=APcXIO1m8zK6OEtZy1OEliBBoJlm:1769094930552" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20Vernon.jpg", link: "https://drive.usercontent.com/download?id=1qu3r9SbwpgSuyMY4DE8OfUe369o7SfDH&export=download&authuser=0&confirm=t&uuid=de6419f6-b7ff-4358-aa93-1c535d389fd4&at=APcXIO1m8zK6OEtZy1OEliBBoJlm:1769094930552" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20Dino.jpg", link: "https://drive.usercontent.google.com/download?id=1ut4lsQS_kyycjlMrOednIPyRtxIysVV7&export=download&authuser=0&confirm=t&uuid=be4fd1cf-bf88-478c-a3e7-97a8a37b6ff4&at=APcXIO1Of-JiYBt_IYCZ3Q6LxBsf:1769094906795" }
             ]
         },
@@ -825,7 +836,7 @@
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Joshua.jpg", link: "https://drive.usercontent.google.com/download?id=1Z8CTHozvvovBwQFeOFsm0eYbRsQumU2a&export=download&authuser=0&confirm=t&uuid=17e6594d-e170-4bfb-aae8-b32455bfbc2b&at=ANTm3cz1lnResG_pVq_vIW_wxd98:1767965899601" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Jun.jpg", link: "https://drive.usercontent.google.com/download?id=1fsv1u1RJi2Vi8Q_cBgf9wtfdWfl-l4Ue&export=download&authuser=0&confirm=t&uuid=148ba2fa-0faf-4014-ac53-aade1e46a3bb&at=ANTm3cytVyrSuVTXF38XdZcK5jBD:1767965897623" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Hoshi.jpg", link: "https://drive.usercontent.google.com/download?id=15Hy6AI1_cy4gTCIBGdtlV8fIaEkHz0kj&export=download&authuser=0&confirm=t&uuid=49d04a7e-1494-42d7-bf13-7073142b3158&at=ANTm3cxixcdU6Ysh-hk2F7lw3hmD:1767965902141" },
-                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Woozi.jpg", link: "https://drive.usercontent.google.com/download?id=1HBPtCB5RHqXHBjuJj2Q-NlEjjx2i2bdQ&export=download&authuser=0&confirm=t&uuid=464a5731-7f35-4afe-bc68-9bf5e0acc2cb&at=ANTm3cwgd_XaxPI2t4pOKJ57wcfQ:1767965880980" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Woozi.jpg", link: "https://drive.usercontent.com/download?id=1HBPtCB5RHqXHBjuJj2Q-NlEjjx2i2bdQ&export=download&authuser=0&confirm=t&uuid=464a5731-7f35-4afe-bc68-9bf5e0acc2cb&at=ANTm3cwgd_XaxPI2t4pOKJ57wcfQ:1767965880980" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Dk.jpg", link: "https://drive.usercontent.google.com/download?id=1MrA7jvdbqJngJoB0vKHE2J79skLU2ze8&export=download&authuser=0&confirm=t&uuid=21a76af9-6420-4a1d-ba3e-fc7c8078e048&at=ANTm3czVE1C9hPRs96HEDXSwApyX:1767965906068" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Mingyu.jpg", link: "https://drive.usercontent.google.com/download?id=1vt76WL85I-Ugebuwrap2V4Hp_E29Fa0d&export=download&authuser=0&confirm=t&uuid=e5565d46-2791-4c58-be92-92c1284b0bf8&at=ANTm3czXPy2cpZ-kiNuotgJc_Qcq:1767965893374" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20The8.jpg", link: "https://drive.usercontent.google.com/download?id=1MGu26ixI2dA8qq7q6NmgU3FrhGQmtza4&export=download&authuser=0&confirm=t&uuid=cb45a56a-176f-47da-956c-4da8e66f767c&at=ANTm3cyuq1QeI9mBBOahw0SmGJpH:1767965885745" },
@@ -846,7 +857,7 @@
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Hoshi.jpg", link: "https://drive.usercontent.google.com/download?id=1OW_XZ3zLmATgPPdv__i-N736USusb0l9&export=download&authuser=0&confirm=t&uuid=77be9613-5e7d-4924-b3eb-09bada7deb5f&at=ANTm3cy6EbE8HfofbnV7Oa5X9oj-:1767967570974" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Wonwoo.jpg", link: "https://drive.usercontent.google.com/download?id=1oqsOOq1rJcqOcOMQNZD9VWo8zHMO3MWl&export=download&authuser=0&confirm=t&uuid=93aec905-c817-4e2b-be85-8942cd65bece&at=ANTm3cwefVCM_GXeaxs1VmlLcPxq:1767967596140" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Woozi.jpg", link: "https://drive.usercontent.google.com/download?id=1ACNHEjlJ-mnwL4_XrcttEdXOtXYNL4zU&export=download&authuser=0&confirm=t&uuid=a4de3a19-4fc8-440f-b57d-3f2cf254c434&at=ANTm3cyBv9z_CWS8ItRVg51056cO:1767967598524" },
-                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Dk.jpg", link: "https://drive.usercontent.google.com/download?id=1aViomKL-L9TBHAF790cR8WKwp2U84X84&export=download&authuser=0&confirm=t&uuid=d15855fb-0c25-4104-bb74-04b03af438d6&at=ANTm3cxyQITX18fwVawubqibT6sW:1767967568215" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Dk.jpg", link: "https://drive.usercontent.com/download?id=1aViomKL-L9TBHAF790cR8WKwp2U84X84&export=download&authuser=0&confirm=t&uuid=d15855fb-0c25-4104-bb74-04b03af438d6&at=ANTm3cxyQITX18fwVawubqibT6sW:1767967568215" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Mingyu.jpg", link: "https://drive.usercontent.google.com/download?id=1Z8HyNNZSCHkabLCUcuMk2XyenAeDnKov&export=download&authuser=0&confirm=t&uuid=7bae6ea7-4f1d-406b-b1e4-e51c5e9d20e4&at=ANTm3cyR6nfKSbSqoIPCqN2jzhrb:1767967581299" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20The8.jpg", link: "https://drive.usercontent.google.com/download?id=1RPkt4Bo_vlBdmUFELMu8N96cPAzNe2N5&export=download&authuser=0&confirm=t&uuid=836c6599-5207-4c1a-924c-e682f2d72c9c&at=ANTm3czL-Z6AdAb831A8REVeHdZL:1767967588251" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_righthere/%5BRIGHT%20HERE%5D%20Spacial%20Gifts%20Seungkwan.jpg", link: "https://drive.usercontent.google.com/download?id=1CqhPty57YtOusbJifQdpR9O02ZOjWhBn&export=download&authuser=0&confirm=t&uuid=6c48631f-7019-441b-b7d7-9ea3156b0a6e&at=ANTm3cyEZaiGEpHpzhbmeqzDjGbA:1767967585676" },
@@ -969,13 +980,19 @@
         }
     }
 
-    // --- LIGHTBOX LOGIC ---
+    // --- LIGHTBOX LOGIC WITH ZOOM ---
     const lightbox = document.getElementById("lightbox");
     const lightboxImg = document.getElementById("lightbox-img");
     let currentImageIndex = 0;
+    
+    // Zoom variables
+    let scale = 1;
+    const MIN_SCALE = 1;
+    const MAX_SCALE = 4;
 
     window.openLightbox = function(index) {
         currentImageIndex = index;
+        resetZoom(); 
         updateLightboxImage();
         lightbox.classList.add("active");
         document.body.style.overflow = "hidden"; 
@@ -986,7 +1003,33 @@
         lightbox.classList.remove("active");
         document.body.style.overflow = "auto";
         document.removeEventListener('keydown', handleKeyDown);
+        resetZoom();
     }
+
+    function resetZoom() {
+        scale = 1;
+        applyTransform();
+    }
+
+    function applyTransform() {
+        lightboxImg.style.transform = `scale(${scale})`;
+        if (scale > 1) {
+            lightboxImg.classList.add('zoomed');
+        } else {
+            lightboxImg.classList.remove('zoomed');
+        }
+    }
+
+    // --- ZOOM LOGIC (DESKTOP) ---
+    lightbox.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -0.2 : 0.2;
+        scale = Math.min(Math.max(MIN_SCALE, scale + delta), MAX_SCALE);
+        applyTransform();
+    }, { passive: false });
+
+    // --- PINCH ZOOM LOGIC (MOBILE) ---
+    let initialDist = 0;
 
     // --- DOWNLOAD BUTTON ---
     window.downloadImage = function() {
@@ -1010,6 +1053,7 @@
         } else if (currentImageIndex >= allItems.length) {
             currentImageIndex = 0;
         }
+        resetZoom(); // Reset zoom level when image changes
         const item = allItems[currentImageIndex];
         lightboxImg.src = item.src;
         highlightThumbnail(currentImageIndex);
@@ -1031,22 +1075,44 @@
         else if (e.key === 'Escape') closeLightbox();
     }
 
-    // --- MOBILE SWIPE ---
+    // --- MOBILE SWIPE & PINCH ---
     let touchStartX = 0;
     let touchEndX = 0;
     const minSwipeDistance = 50; 
 
     lightbox.addEventListener('touchstart', function(e) {
-        touchStartX = e.changedTouches[0].screenX;
+        if (e.touches.length === 2) {
+            initialDist = Math.hypot(
+                e.touches[0].pageX - e.touches[1].pageX,
+                e.touches[0].pageY - e.touches[1].pageY
+            );
+        } else {
+            touchStartX = e.changedTouches[0].screenX;
+        }
     }, { passive: true });
 
     lightbox.addEventListener('touchmove', function(e) {
-        e.preventDefault(); 
+        if (e.touches.length === 2) {
+            e.preventDefault(); 
+            const dist = Math.hypot(
+                e.touches[0].pageX - e.touches[1].pageX,
+                e.touches[0].pageY - e.touches[1].pageY
+            );
+            const delta = dist / initialDist;
+            scale = Math.min(Math.max(MIN_SCALE, scale * delta), MAX_SCALE);
+            applyTransform();
+            initialDist = dist;
+        } else if (scale === 1) {
+            // Only allow vertical swipe blocking if zoomed out
+            // e.preventDefault(); 
+        }
     }, { passive: false });
 
     lightbox.addEventListener('touchend', function(e) {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
+        if (e.touches.length < 2 && scale === 1) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }
     }, { passive: true });
 
     function handleSwipe() {
@@ -1058,7 +1124,7 @@
     }
 
     lightbox.addEventListener("click", function(e) {
-        if (e.target === lightbox) {
+        if (e.target === lightbox || e.target.classList.contains('lightbox-content-wrapper')) {
             closeLightbox();
         }
     });
@@ -1076,21 +1142,21 @@
     '/profile.html', '/soon.html', '/videos.html', '/admin.html', '/collection.html' 
   ];
   
-  const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
-  const currentPage = window.location.pathname;
-  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
-  const referrer = document.referrer;
-  const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
+  const isAdminFlag = sessionStorage.getItem('isAdmin') === 'true';
+  const currentPagePath = window.location.pathname;
+  let hasInternalAccessFlag = sessionStorage.getItem('internalAccess') === 'true';
+  const referer = document.referrer;
+  const refererPath = referer ? new URL(referer, location.origin).pathname : null;
   
-  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
-  if (cameFromAllowedPage || isAdmin) { 
+  const cameFromAllowedPageFlag = refererPath && allowedPaths.includes(refererPath);
+  if (cameFromAllowedPageFlag || isAdminFlag) { 
       sessionStorage.setItem('internalAccess', 'true'); 
-      hasInternalAccess = true; 
+      hasInternalAccessFlag = true; 
   }
 
-  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
+  const isIndexPagePath = currentPagePath.endsWith('index.html') || currentPagePath === '/';
 
-  if (!hasInternalAccess && !isIndexPage && !isAdmin) { 
+  if (!hasInternalAccessFlag && !isIndexPagePath && !isAdminFlag) { 
       showAccessDeniedModal(); 
   }
 
