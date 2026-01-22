@@ -590,6 +590,10 @@
 
     <div id="galleries-container">
         
+        <div class="collection-section" id="section-6">
+            <div class="gallery-grid" id="grid-category-6"></div>
+        </div>
+        
         <div class="collection-section" id="section-5">
             <div class="gallery-grid" id="grid-category-5"></div>
         </div>
@@ -752,20 +756,21 @@
 
     // --- COLLECTION DATA & LOGIC ---
     const collectionData = [
-        {
-            category: "SEVENTEEN WORLD TOUR [NEW_] IN INCHEON SPECIAL GIFTS",
-            targetId: "grid-category-5",
-            sectionId: "section-5",
+                {
+            category: "SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Fukuoka Show SPECIAL GIFTS",
+            targetId: "grid-category-6",
+            sectionId: "section-6",
             images: [
-                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20SeungcheoL.png", link: "https://drive.usercontent.google.com/download?id=1OG3WFMM3_wVHYgwAKs8g-vD6JOMjePv4&export=download&authuser=0&confirm=t&uuid=dc89feac-1ef2-4343-87b7-0e27f2036341&at=ANTm3czNLcDJmIgv5k61XycCyQz0:1767970217853" },
-                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Joshua.png", link: "https://drive.usercontent.google.com/download?id=1uRA1BOzoyWB0HuUB0vY53YtNALAF2RuE&export=download&authuser=0&confirm=t&uuid=b64e117e-e3dd-4d83-b82d-cd3d75f7e951&at=ANTm3cyntlyrAHU6NPUDGRoJb5kY:1767970209018" },
-                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Jun.png", link: "https://drive.usercontent.google.com/download?id=12w_pB2MSM6b_hr9WkxLv0QkqUZyJgz0E&export=download&authuser=0&confirm=t&uuid=b33b41d1-959a-4f67-82ef-55ea34b07361&at=ANTm3czkvYnaYBvdFmO0teHOgAMi:1767970211967" },
-                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Dk.png", link: "https://drive.usercontent.google.com/download?id=1alWIYhSIWVyLjZacZToQ9gC2GlX9S1q3&export=download&authuser=0&confirm=t&uuid=0e9d902f-896a-408d-a4a0-f4b94befc776&at=ANTm3cwLwhQpQ7enjduRrCK0kINT:1767970205350" },
-                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Mingyu.png", link: "https://drive.usercontent.google.com/download?id=1Cwix_pCLX0WQZhYageQFiUPkCrt1UQFs&export=download&authuser=0&confirm=t&uuid=78c5528d-8639-486d-bcc0-722dc258d22d&at=ANTm3cxtaroDqjVOUU0br5OvRRzT:1767970214673" },
-                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20The8.png", link: "https://drive.usercontent.google.com/download?id=1vJpEknyO9qW6LgNJ2_JB3oX3QYtXD0jF&export=download&authuser=0&confirm=t&uuid=be9cfcbf-cb75-44d5-8e1a-7d7b463ef028&at=ANTm3cxXtQYytylv1m4PsTVg1axQ:1767970223797" },
-                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Seungkwan.png", link: "https://drive.usercontent.google.com/download?id=15ERl4v3WbiAZNM_GCOVzakIZOkTcxSRR&export=download&authuser=0&confirm=t&uuid=c637a438-12c3-4a40-be14-f590e7bd7bb0&at=ANTm3cwMX5OAGgu8QGcUWot8hT5w:1767970220868" },
-                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Vernon.png", link: "https://drive.usercontent.google.com/download?id=1o_UJBprWKYfPj8m0J3Sm6Sy0jFH4MsR6&export=download&authuser=0&confirm=t&uuid=a178234d-dcd4-4cd7-beab-c92efca8c31f&at=ANTm3cxC8eXGcXT_FqN4V27NJrcl:1767970226159" },
-                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Dino.png", link: "https://drive.usercontent.google.com/download?id=19y3lzbjIkZ0BaacQIyLmwl3cvleMAKvc&export=download&authuser=0&confirm=t&uuid=a90063c7-6cdf-47e1-89ab-029544640e0b&at=ANTm3cxqM2fvcRxhZ_BqCGy5RGMz:1767970202844" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20Group.jpg", link: "https://drive.usercontent.google.com/download?id=1O1biKpTaAR06Knc6fZeHGQ3DFIbOaPma&export=download&authuser=0&confirm=t&uuid=f4924412-e97a-423a-b2e4-f2f380df1f4c&at=APcXIO2ZHEEJm5Y4VJ3m3_Pz6APS:1769094909376" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20Seungcheol.jpg", link: "https://drive.usercontent.google.com/download?id=1ptazDuRbpG5RKZHCc4nWUySKJD817Mps&export=download&authuser=0&confirm=t&uuid=e47b6f12-6473-4cc6-845b-6d6ca99704e4&at=APcXIO2zlcYcGdLKAvOrjTc8Lfxt:1769094921112" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20Joshua.jpg", link: "hhttps://drive.usercontent.google.com/download?id=1MUaCtFynQo22Hjup5WKihDXdN3YI1A_W&export=download&authuser=0&confirm=t&uuid=5eea838f-18bb-48ad-bf0a-497f2b26c56f&at=APcXIO0WNLlnXz4dufRuFnjX1RTH:1769094916274" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20Jun.jpg", link: "https://drive.usercontent.google.com/download?id=1ZpMdvcL_kW9yIZPxSyf0CyWqSbVW8RGr&export=download&authuser=0&confirm=t&uuid=44d48ed6-6dfc-4822-89fb-f9a43c69818f&at=APcXIO036I4zxssXDEuzT0GsVkVg:1769094918050" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20Dk.jpg", link: "https://drive.usercontent.google.com/download?id=1sg00aVlHbbyf2VEl-HTGgPgNCqeDtGvu&export=download&authuser=0&confirm=t&uuid=a2438cf9-1d71-460d-9658-88a4df258158&at=APcXIO3CNqZIIUlkH4ImvkD08MKo:1769094908312" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20Mingyu.jpg", link: "https://drive.usercontent.google.com/download?id=1-6MiuIjgQHmdl02FPumQ9LaAlrgczBtg&export=download&authuser=0&confirm=t&uuid=0a3bef39-ba23-4844-8f62-48b3b64c73b9&at=APcXIO23CarTuOycdpWMZgWfs8YV:1769094919533" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20The%208.jpg", link: "https://drive.usercontent.google.com/download?id=11RKZg_V9yq6WwmPD6yd2lqjQPUD7AJ9r&export=download&authuser=0&confirm=t&uuid=6febd2d1-8327-4329-8eb7-1c0e0871c548&at=APcXIO2fHBSxf6gUK0Yt5_bgf5np:1769094929108" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20Seungkwan.jpg", link: "https://drive.usercontent.google.com/download?id=1wno7z07nF2tCqnrFvZFFgGD6_45OKm3s&export=download&authuser=0&confirm=t&uuid=137aa381-226c-4a0e-8f5e-3d268cf56fae&at=APcXIO3hQ2GKl_c80L0F4Dpm67gg:1769094927205" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20Vernon.jpg", link: "https://drive.usercontent.google.com/download?id=1qu3r9SbwpgSuyMY4DE8OfUe369o7SfDH&export=download&authuser=0&confirm=t&uuid=de6419f6-b7ff-4358-aa93-1c535d389fd4&at=APcXIO1m8zK6OEtZy1OEliBBoJlm:1769094930552" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_fukuokanewtour/%5BFUKUOKA%20SHOW%5D%20Dino.jpg", link: "https://drive.usercontent.google.com/download?id=1ut4lsQS_kyycjlMrOednIPyRtxIysVV7&export=download&authuser=0&confirm=t&uuid=be4fd1cf-bf88-478c-a3e7-97a8a37b6ff4&at=APcXIO1Of-JiYBt_IYCZ3Q6LxBsf:1769094906795" }
             ]
         },
         {
@@ -783,6 +788,22 @@
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_osakanewtour/%5BOSAKA%20TOUR%5D%20Seungkwan.jpg", link: "https://drive.usercontent.google.com/download?id=1QmHVfdQqX-JkkEB3jXdTQObX_buhpdHX&export=download&authuser=0&confirm=t&uuid=7dd85f00-76a4-4e32-af1b-dd4f4c4325a9&at=ANTm3czK-DFb9TJvCSNsksDKlIyN:1767971777805" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_osakanewtour/%5BOSAKA%20TOUR%5D%20Vernon.jpg", link: "https://drive.usercontent.google.com/download?id=1aquFXS5KxwP722xfxJnIOCU47pDjpIne&export=download&authuser=0&confirm=t&uuid=4b0ebd93-2840-4605-97c3-2f8591501a67&at=ANTm3cyCbgIymrOthAtMZfo8lERz:1767971783863" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_osakanewtour/%5BOSAKA%20TOUR%5D%20Dino.jpg", link: "https://drive.usercontent.google.com/download?id=1Pa6qk_NTvbT3ssSR--vqCcvKyuHkMmOD&export=download&authuser=0&confirm=t&uuid=04d75216-8394-4ce3-a605-9e857bfa1f4d&at=ANTm3cyNGz0lT2zamj7GLYVcTT0a:1767971761060" }
+            ]
+        },
+        {
+            category: "SEVENTEEN WORLD TOUR [NEW_] IN INCHEON SPECIAL GIFTS",
+            targetId: "grid-category-5",
+            sectionId: "section-5",
+            images: [
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20SeungcheoL.png", link: "https://drive.usercontent.google.com/download?id=1OG3WFMM3_wVHYgwAKs8g-vD6JOMjePv4&export=download&authuser=0&confirm=t&uuid=dc89feac-1ef2-4343-87b7-0e27f2036341&at=ANTm3czNLcDJmIgv5k61XycCyQz0:1767970217853" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Joshua.png", link: "https://drive.usercontent.google.com/download?id=1uRA1BOzoyWB0HuUB0vY53YtNALAF2RuE&export=download&authuser=0&confirm=t&uuid=b64e117e-e3dd-4d83-b82d-cd3d75f7e951&at=ANTm3cyntlyrAHU6NPUDGRoJb5kY:1767970209018" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Jun.png", link: "https://drive.usercontent.google.com/download?id=12w_pB2MSM6b_hr9WkxLv0QkqUZyJgz0E&export=download&authuser=0&confirm=t&uuid=b33b41d1-959a-4f67-82ef-55ea34b07361&at=ANTm3czkvYnaYBvdFmO0teHOgAMi:1767970211967" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Dk.png", link: "https://drive.usercontent.google.com/download?id=1alWIYhSIWVyLjZacZToQ9gC2GlX9S1q3&export=download&authuser=0&confirm=t&uuid=0e9d902f-896a-408d-a4a0-f4b94befc776&at=ANTm3cwLwhQpQ7enjduRrCK0kINT:1767970205350" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Mingyu.png", link: "https://drive.usercontent.google.com/download?id=1Cwix_pCLX0WQZhYageQFiUPkCrt1UQFs&export=download&authuser=0&confirm=t&uuid=78c5528d-8639-486d-bcc0-722dc258d22d&at=ANTm3cxtaroDqjVOUU0br5OvRRzT:1767970214673" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20The8.png", link: "https://drive.usercontent.google.com/download?id=1vJpEknyO9qW6LgNJ2_JB3oX3QYtXD0jF&export=download&authuser=0&confirm=t&uuid=be9cfcbf-cb75-44d5-8e1a-7d7b463ef028&at=ANTm3cxXtQYytylv1m4PsTVg1axQ:1767970223797" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Seungkwan.png", link: "https://drive.usercontent.google.com/download?id=15ERl4v3WbiAZNM_GCOVzakIZOkTcxSRR&export=download&authuser=0&confirm=t&uuid=c637a438-12c3-4a40-be14-f590e7bd7bb0&at=ANTm3cwMX5OAGgu8QGcUWot8hT5w:1767970220868" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Vernon.png", link: "https://drive.usercontent.google.com/download?id=1o_UJBprWKYfPj8m0J3Sm6Sy0jFH4MsR6&export=download&authuser=0&confirm=t&uuid=a178234d-dcd4-4cd7-beab-c92efca8c31f&at=ANTm3cxC8eXGcXT_FqN4V27NJrcl:1767970226159" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_newtour/%5BNEW%20TOUR%5D%20Spacial%20Gifts%20%20Dino.png", link: "https://drive.usercontent.google.com/download?id=19y3lzbjIkZ0BaacQIyLmwl3cvleMAKvc&export=download&authuser=0&confirm=t&uuid=a90063c7-6cdf-47e1-89ab-029544640e0b&at=ANTm3cxqM2fvcRxhZ_BqCGy5RGMz:1767970202844" },
             ]
         },
         {
