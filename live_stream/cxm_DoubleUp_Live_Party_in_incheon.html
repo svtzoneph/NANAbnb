@@ -414,7 +414,7 @@
     </div>
 
     <div id="player-container">
-       <div class="artplayer-app"></div>
+        <div class="artplayer-app"></div>
     </div>
 
     <div id="views-display" class="views-container">
@@ -597,29 +597,42 @@ function showAccessDeniedModal(message) {
         posterContainer.style.display = "flex";
     }
     document.body.style.overflow = 'hidden';
-    if(document.querySelector('.access-denied-modal')) {
-        // If modal already exists, just update text (prevents stacking)
-        document.querySelector('.access-denied-modal').innerHTML = `
-        <strong style="color: #FF4444; font-size: 32px; margin-bottom: 20px;">Access Restricted</strong>
-        <div style="margin-top: 15px; font-size: 16px; max-width: 90%; line-height: 1.4;">${message}</div>
-        <div style="margin-top: 30px;">
-            <button onclick="window.location.reload()" style="background: white; border: none; color: black; padding: 10px 25px; border-radius: 20px; cursor: pointer; font-weight: bold;">RELOAD PAGE</button>
-             <button onclick="smartGoBack()" style="background: transparent; border: 1px solid #666; color: #aaa; padding: 10px 25px; border-radius: 20px; cursor: pointer; margin-left:10px;">GO BACK</button>
-        </div>
-        `;
-        return;
+    
+    // Check if modal already exists
+    let modal = document.querySelector('.access-denied-modal');
+    if(!modal) {
+        modal = document.createElement('div');
+        modal.className = 'access-denied-modal';
+        document.body.appendChild(modal);
     }
 
-    const modal = document.createElement('div');
-    modal.className = 'access-denied-modal';
-    modal.innerHTML = `
-        <strong style="color: #FF4444; font-size: 32px; margin-bottom: 20px;">Access Restricted</strong>
-        <div style="margin-top: 15px; font-size: 16px; max-width: 90%; line-height: 1.4;">${message}</div>
-        <div style="margin-top: 30px;">
-            <button onclick="smartGoBack()" style="background: rgba(255,255,255,0.15); border: 1px solid white; color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer;">GO BACK</button>
-        </div>
-    `;
-    document.body.appendChild(modal);
+    let seconds = 2; // COUNTDOWN SECONDS
+
+    const updateContent = () => {
+        modal.innerHTML = `
+            <strong style="color: #FF4444; font-size: 32px; margin-bottom: 20px;">Access Restricted</strong>
+            <div style="margin-top: 15px; font-size: 16px; max-width: 90%; line-height: 1.4;">${message}</div>
+            <div style="margin-top: 25px; color: #888; font-size: 14px;">
+                Redirecting you back in <span id="deny-timer" style="color:white; font-weight:bold;">${seconds}</span>s...
+            </div>
+            <div style="margin-top: 30px;">
+                <button onclick="smartGoBack()" style="background: white; border: none; color: black; padding: 10px 25px; border-radius: 20px; cursor: pointer; font-weight: bold;">GO BACK NOW</button>
+            </div>
+        `;
+    };
+
+    updateContent();
+
+    const countdown = setInterval(() => {
+        seconds--;
+        const timerSpan = document.getElementById('deny-timer');
+        if(timerSpan) timerSpan.textContent = seconds;
+
+        if (seconds <= 0) {
+            clearInterval(countdown);
+            smartGoBack();
+        }
+    }, 1000);
 }
 
 function removeAccessDeniedModal() {
