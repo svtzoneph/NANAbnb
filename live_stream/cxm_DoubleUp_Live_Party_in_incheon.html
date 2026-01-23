@@ -565,6 +565,7 @@ let currentStreamRef = null; // Stores the current Firebase Listener for stream 
 
 // Access State Globals
 let globalUserVerified = false; 
+let isAdminUser = false; // --- NEW: TRACK ADMIN STATUS ---
 </script>
 
 <script>
@@ -662,8 +663,14 @@ function initPlaylistSync() {
 initPlaylistSync();
 
 
-// --- ONE DEVICE POLICY LOGIC ---
+// --- ONE DEVICE POLICY LOGIC (UPDATED WITH ADMIN BYPASS) ---
 function registerAndMonitorSession(uid) {
+    // --- ADMIN BYPASS: If User is Admin, DO NOT MONITOR SESSION ---
+    if (isAdminUser) {
+        console.log("Admin session: Device monitoring bypassed.");
+        return; 
+    }
+
     // 1. Generate a new session token for THIS specific instance
     localSessionToken = Date.now().toString() + Math.random().toString(36).substr(2, 5);
     
@@ -692,6 +699,26 @@ auth.onAuthStateChanged(user => {
         return;
     }
 
+    // --- ANTI-COPY/PASTE LINK PROTECTION ---
+    // Perform this check BEFORE allowing anything else
+    const urlParams = new URLSearchParams(window.location.search);
+    const linkUid = urlParams.get('uid');
+    
+    // If a UID is in the URL, check it against the logged-in user immediately
+    if (linkUid && linkUid !== user.uid) {
+         // 1. Sanitize URL instantly
+        const cleanUrl = new URL(window.location);
+        cleanUrl.search = '';
+        window.history.replaceState({}, '', cleanUrl);
+
+        // 2. Show error and reset view
+        showSystemMessage("Security Alert: Link sharing is not allowed.");
+        
+        // 3. Stop processing further authorization
+        return;
+    }
+
+
     // 1. Check User Role from Database
     db.ref('users/' + user.uid).once('value').then(snapshot => {
         const userData = snapshot.val() || {};
@@ -701,6 +728,7 @@ auth.onAuthStateChanged(user => {
         if (role === 'admin') {
             console.log("Admin access granted");
             globalUserVerified = true;
+            isAdminUser = true; // --- SET ADMIN FLAG TO TRUE ---
             
             // Show Admin Toast
             const toast = document.getElementById('adminToast');
@@ -718,19 +746,13 @@ auth.onAuthStateChanged(user => {
                  setTimeout(() => { loadAndPlayEpisode(videoId, false); }, 500);
             }
             return; // STOP HERE (Do not run member checks)
+        } else {
+            isAdminUser = false; // Ensure false for members
         }
 
         // --- SCENARIO B: MEMBER (Strict Checks) ---
         
-        // 1. Unique Link Protection (Member Only)
-        const urlParams = new URLSearchParams(window.location.search);
-        const linkUid = urlParams.get('uid');
-        if (linkUid && linkUid !== user.uid) {
-            showSystemMessage("Security Alert: Link does not belong to you.");
-            return;
-        }
-
-        // 2. Permission Check (Member Only)
+        // 1. Permission Check (Member Only)
         const accessRef = db.ref(`page_access/${PAGE_ID}/${user.uid}`);
         accessRef.on('value', (accessSnap) => {
             const isAllowed = accessSnap.val();
@@ -759,7 +781,7 @@ function handleStreamEnded(epId) {
     }
     
     // Show Notification and Return to Lobby
-    showSystemMessage("Stream Ended. Please come back for the next stream!");
+    showSystemMessage("Stream Ended. Please come back for the next event!");
 }
 
 
