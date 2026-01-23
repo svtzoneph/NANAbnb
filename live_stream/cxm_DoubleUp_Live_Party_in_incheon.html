@@ -282,6 +282,24 @@
     .video-wrapper-left { width: 100%; max-width: 1100px; margin: 0 auto; }
   }
 
+  /* --- FULL SCREEN ACCESS DENIED MODAL (FOR LINK PROTECTION) --- */
+  .access-denied-modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 1); /* SOLID BLACK */
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 99999; /* TOPMOST */
+    text-align: center; padding: 20px;
+    flex-direction: column;
+  }
+
+  .redirect-timer {
+      font-size: 20px;
+      color: #ff4444;
+      margin-top: 20px;
+      font-weight: 700;
+  }
+
   /* --- STREAM GUIDELINES MODAL CSS --- */
   .guidelines-modal-overlay {
       display: none; /* Hidden by default */
@@ -622,21 +640,59 @@ function returnToMainView() {
     renderPlaylist(globalUserVerified);
 }
 
+// --- SMART GO BACK (For Link Blocking) ---
+function smartGoBack() {
+    // Clean URL first so they can't reload
+    const url = new URL(window.location);
+    url.search = ''; 
+    window.history.replaceState({}, '', url);
+
+    if (document.referrer) {
+        window.history.back();
+    } else {
+        // If no history (new tab), reload to lobby
+        window.location.reload();
+    }
+}
+
 // --- SHOW SYSTEM NOTIFICATION TOAST ---
 function showSystemMessage(message) {
-    // 1. Close Player Immediately
     returnToMainView();
-    
-    // 2. Show Toast
     const toast = document.getElementById('systemToast');
     toast.innerHTML = message;
     toast.classList.add('show');
-    
-    // 3. Hide after 4 seconds
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 4000);
+    setTimeout(() => { toast.classList.remove('show'); }, 4000);
 }
+
+// --- FULL SCREEN BLOCK MODAL ---
+function showBlockingModal(message) {
+    // 1. Hide Main Content
+    document.querySelector('.main-layout').style.display = 'none';
+    
+    // 2. Create Modal
+    const modal = document.createElement('div');
+    modal.className = 'access-denied-modal';
+    modal.innerHTML = `
+        <strong style="color: #FF4444; font-size: 32px; margin-bottom: 20px;">Access Restricted</strong>
+        <div style="font-size: 18px; max-width: 90%; line-height: 1.4;">${message}</div>
+        <div id="blockTimer" class="redirect-timer">Redirecting in 2...</div>
+    `;
+    document.body.appendChild(modal);
+
+    // 3. Timer Logic
+    let count = 2;
+    const interval = setInterval(() => {
+        count--;
+        const timerElem = document.getElementById('blockTimer');
+        if(timerElem) timerElem.innerText = `Redirecting in ${count}...`;
+        
+        if (count <= 0) {
+            clearInterval(interval);
+            smartGoBack();
+        }
+    }, 1000);
+}
+
 
 // --- NEW FUNCTION: SYNC PLAYLIST STATUS WITH FIREBASE ---
 function initPlaylistSync() {
@@ -645,13 +701,8 @@ function initPlaylistSync() {
         db.ref(`live/${item.id}/status`).on('value', (snapshot) => {
             const status = snapshot.val();
             if (status) {
-                // Update Local Data
                 playlistData[index].status = status;
-                
-                // Re-Render Buttons Immediately
                 renderPlaylist(globalUserVerified);
-                
-                // If currently watching this specific episode and it changes to ended
                 if (window.currentEpData && window.currentEpData.id === item.id && status.toLowerCase() === 'ended') {
                     handleStreamEnded(item.id);
                 }
@@ -659,32 +710,23 @@ function initPlaylistSync() {
         });
     });
 }
-// Start Sync Immediately
 initPlaylistSync();
 
 
 // --- ONE DEVICE POLICY LOGIC (UPDATED WITH ADMIN BYPASS) ---
 function registerAndMonitorSession(uid) {
-    // --- ADMIN BYPASS: If User is Admin, DO NOT MONITOR SESSION ---
     if (isAdminUser) {
         console.log("Admin session: Device monitoring bypassed.");
         return; 
     }
 
-    // 1. Generate a new session token for THIS specific instance
     localSessionToken = Date.now().toString() + Math.random().toString(36).substr(2, 5);
-    
-    // 2. Save this token to Firebase. This overwrites any previous token (kicking out other devices)
     db.ref(`active_sessions/${uid}`).set(localSessionToken);
 
-    // 3. Listen for changes to the token
     const sessionRef = db.ref(`active_sessions/${uid}`);
     sessionRef.on('value', (snapshot) => {
         const serverSession = snapshot.val();
-        
-        // If there is a session on server, and it DOES NOT match my local token
         if (serverSession && serverSession !== localSessionToken) {
-            // Someone else logged in!
             showSystemMessage("Disconnected: Account active on another device.");
         }
     });
@@ -699,27 +741,7 @@ auth.onAuthStateChanged(user => {
         return;
     }
 
-    // --- ANTI-COPY/PASTE LINK PROTECTION ---
-    // Perform this check BEFORE allowing anything else
-    const urlParams = new URLSearchParams(window.location.search);
-    const linkUid = urlParams.get('uid');
-    
-    // If a UID is in the URL, check it against the logged-in user immediately
-    if (linkUid && linkUid !== user.uid) {
-         // 1. Sanitize URL instantly
-        const cleanUrl = new URL(window.location);
-        cleanUrl.search = '';
-        window.history.replaceState({}, '', cleanUrl);
-
-        // 2. Show error and reset view
-        showSystemMessage("Security Alert: Link sharing is not allowed.");
-        
-        // 3. Stop processing further authorization
-        return;
-    }
-
-
-    // 1. Check User Role from Database
+    // 1. Check User Role from Database FIRST (Needed for Admin Bypass)
     db.ref('users/' + user.uid).once('value').then(snapshot => {
         const userData = snapshot.val() || {};
         const role = (userData.role || 'member').toLowerCase();
@@ -728,9 +750,8 @@ auth.onAuthStateChanged(user => {
         if (role === 'admin') {
             console.log("Admin access granted");
             globalUserVerified = true;
-            isAdminUser = true; // --- SET ADMIN FLAG TO TRUE ---
+            isAdminUser = true; 
             
-            // Show Admin Toast
             const toast = document.getElementById('adminToast');
             if(toast) {
                 toast.classList.add('show');
@@ -745,18 +766,27 @@ auth.onAuthStateChanged(user => {
             if (videoId && !window.currentEpData) {
                  setTimeout(() => { loadAndPlayEpisode(videoId, false); }, 500);
             }
-            return; // STOP HERE (Do not run member checks)
+            return; // STOP HERE (Admin can access links freely)
         } else {
             isAdminUser = false; // Ensure false for members
         }
 
         // --- SCENARIO B: MEMBER (Strict Checks) ---
         
-        // 1. Permission Check (Member Only)
+        // 1. STRICT LINK PROTECTION (UID CHECK)
+        const urlParams = new URLSearchParams(window.location.search);
+        const linkUid = urlParams.get('uid');
+        if (linkUid && linkUid !== user.uid) {
+            // STOP EVERYTHING - BLOCK SCREEN
+            showBlockingModal("Security Alert: Link sharing is not allowed.<br>This link does not belong to your account.");
+            return;
+        }
+
+        // 2. Permission Check (Member Only)
         const accessRef = db.ref(`page_access/${PAGE_ID}/${user.uid}`);
         accessRef.on('value', (accessSnap) => {
             const isAllowed = accessSnap.val();
-            globalUserVerified = (isAllowed === true); // Store globally for sync usage
+            globalUserVerified = (isAllowed === true); 
             renderPlaylist(isAllowed === true);
             
             if (isAllowed === true) {
@@ -765,7 +795,6 @@ auth.onAuthStateChanged(user => {
                       setTimeout(() => { loadAndPlayEpisode(videoId, false); }, 500);
                 }
             } else {
-                 // If they were watching, this kicks them out to the lobby
                  if(art) showSystemMessage("Access Revoked.");
             }
         });
@@ -774,13 +803,10 @@ auth.onAuthStateChanged(user => {
 
 // --- HANDLE STREAM ENDED (REALTIME) ---
 function handleStreamEnded(epId) {
-    // Update local data to reflect ended status (Redundant but safe)
     const epIndex = playlistData.findIndex(i => i.id === epId);
     if(epIndex > -1) {
         playlistData[epIndex].status = "ended";
     }
-    
-    // Show Notification and Return to Lobby
     showSystemMessage("Stream Ended. Please come back for the next event!");
 }
 
@@ -791,10 +817,9 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
     if (!ep) return;
 
     // --- GLOBAL TIME CHECK (PHT BASE) ---
-    // Ensure the date string is treated as Philippine Time (GMT+8)
     const today = new Date();
     if (ep.date) {
-        const epDateStr = ep.date + " GMT+0800"; // FORCE PHT TIMEZONE
+        const epDateStr = ep.date + " GMT+0800"; 
         const releaseDate = new Date(epDateStr);
         if (releaseDate > today) { 
             alert(`\nLIVE STREAM DATE (PHT): ${ep.date}`); 
@@ -825,14 +850,12 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
     playerContainer.style.display = "block";
 
     // --- REALTIME LISTENER FOR STREAM STATUS ---
-    // Remove previous listener if exists
     if(currentStreamRef) {
         currentStreamRef.off();
     }
 
     currentStreamRef = db.ref(`live/${ep.id}`);
     
-    // Listen for changes (Status change to 'ended' or URL update)
     currentStreamRef.on('value', (snapshot) => {
       const data = snapshot.val();
       
@@ -841,7 +864,6 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
           return; 
       }
       
-      // CHECK REALTIME STATUS (Active watcher check)
       if (data.status && data.status.toLowerCase() === 'ended') {
           handleStreamEnded(ep.id);
           return;
@@ -851,8 +873,6 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
 
       mainTitle.textContent = data.title || ep.title;
       
-      // Only setup stream if art is null or url changed
-      // (Basic check to avoid re-initializing on small metadata changes)
       if(!art || art.url !== data.url) {
            setupStream(data.url, data.status || ep.status); 
       }
@@ -861,7 +881,7 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
 
 // --- ARTPLAYER SETUP ---
 function setupStream(streamUrl, status) {
-    if(art) { art.destroy(false); } // Destroy old instance
+    if(art) { art.destroy(false); } 
 
     const isLive = status && status.toUpperCase() === 'LIVE';
 
@@ -878,32 +898,29 @@ function setupStream(streamUrl, status) {
                     hls.attachMedia(video);
                     art.hls = hls;
                     
-                    // --- QUALITY SELECTOR LOGIC ---
                     art.on('destroy', () => hls.destroy());
                     hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
                         const levels = hls.levels.map((level, index) => {
                             return {
                                 default: index === hls.currentLevel,
-                                html: level.height + 'p', // e.g. "1080p"
-                                url: level.url || url, // If level doesn't have explicit URL, reuse main
-                                index: index, // store index to switch
+                                html: level.height + 'p', 
+                                url: level.url || url, 
+                                index: index, 
                             };
                         });
                         
-                        // Add "Auto" option
                         levels.unshift({
                             default: true,
                             html: 'Auto',
                             index: -1,
                         });
                         
-                        // Update Artplayer Quality Control
                         art.controls.update({
                             name: 'quality',
                             index: 10,
                             position: 'right',
                             style: { marginRight: '10px' },
-                            html: 'Quality', // Or an icon
+                            html: 'Quality', 
                             selector: levels,
                             onSelect: function (item) {
                                 hls.currentLevel = item.index;
@@ -925,13 +942,12 @@ function setupStream(streamUrl, status) {
         fullscreen: true,
         subtitleOffset: true,
         mutex: true,
-        backdrop: false, /* UPDATED: REMOVED BLACK LAYER OVERLAY */
+        backdrop: false, 
         playsInline: true,
         autoPlayback: true,
         airplay: true,
-        theme: '#ff0033', // Red Theme
+        theme: '#ff0033', 
         
-        // --- LAYERS (UID WATERMARK - NO SPACES) ---
         layers: [
             {
                 name: 'uid-watermark',
@@ -945,30 +961,27 @@ function setupStream(streamUrl, status) {
             }
         ],
 
-        // --- CONTROLS (THE LIVE INDICATOR) ---
         controls: [
             {
                 name: 'live-badge',
-                position: 'left', // Puts it next to play/volume usually
-                index: 30, // Adjust index to place it correctly
+                position: 'left', 
+                index: 30, 
                 html: `<div class="custom-live-badge">LIVE</div>`,
                 tooltip: 'Live Stream',
                 style: {
                     marginLeft: '5px',
-                    marginRight: '25px', /* UPDATED: INCREASED MARGIN TO FIX SPACING */
+                    marginRight: '25px', 
                 }
             }
         ],
     });
 
-    // Update Live Badge Visibility
     art.on('ready', () => {
         const badge = document.querySelector('.custom-live-badge');
         if(badge) {
             badge.style.display = isLive ? 'flex' : 'none';
         }
         
-        // Auto Fullscreen on mobile landscape
         const isMobile = /Mobi|Android|iPad|Tablet/i.test(navigator.userAgent);
         if(isMobile) {
             art.on('fullscreen', (state) => {
@@ -978,7 +991,6 @@ function setupStream(streamUrl, status) {
         }
     });
 
-    // Watch History
     let lastSaveTime = 0;
     art.on('video:timeupdate', () => {
         const user = auth.currentUser;
@@ -1013,18 +1025,15 @@ function renderPlaylist(isUserVerified) {
         const card = document.createElement('div');
         card.className = 'playlist-card';
         
-        // --- GLOBAL PHT DATE CHECK ---
         const today = new Date();
         let isDateLocked = false;
         if (ep.date) {
-            // Append GMT+0800 to force browser to calculate against Philippine time
             const phtDate = new Date(ep.date + " GMT+0800");
             if (phtDate > today) isDateLocked = true;
         }
 
         let badgeHtml = '', buttonClass = 'enter-btn', buttonText = 'LOCKED', buttonDisabled = true;
         
-        // Check local data status (Updated via Sync)
         const isEnded = ep.status && (ep.status.toLowerCase() === 'ended' || ep.status.toLowerCase() === 'done');
 
         if (isEnded) {
@@ -1041,8 +1050,7 @@ function renderPlaylist(isUserVerified) {
 
         let displayDate = "COMING SOON", displayTime = "";
         if(ep.date) {
-            // Display date logic (Keeps formatting nice)
-            const d = new Date(ep.date); // This displays in local user time, which is fine for "reading"
+            const d = new Date(ep.date); 
             const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'], months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
             displayDate = `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}`;
             let h = d.getHours(), m = d.getMinutes(), ampm = h >= 12 ? 'PM' : 'AM';
@@ -1056,7 +1064,6 @@ function renderPlaylist(isUserVerified) {
             const isVerified = e.target.getAttribute('data-verified') === 'true';
             const isEventEnded = e.target.getAttribute('data-ended') === 'true';
             
-            // PHT Time Logic for click
             const dateStr = e.target.getAttribute('data-unlock-time');
             const unlockTime = dateStr ? new Date(dateStr + " GMT+0800") : new Date();
             
@@ -1078,15 +1085,11 @@ function renderPlaylist(isUserVerified) {
 
 function startGlobalTimer() {
     setInterval(() => {
-        const now = new Date(); // Current Absolute Time
+        const now = new Date(); 
         
         document.querySelectorAll('.enter-btn.time-locked').forEach(btn => {
             const dateStr = btn.getAttribute('data-unlock-time');
             if (dateStr) {
-                // FORCE PHT COMPARISON
-                // We add " GMT+0800" so the string is parsed as Philippines time.
-                // The 'now' variable is the user's current time.
-                // If now > 5PM PHT (even if it's 2AM USA), it unlocks.
                 const phtUnlockTime = new Date(dateStr + " GMT+0800");
                 
                 if (now >= phtUnlockTime) {
@@ -1102,7 +1105,6 @@ function startGlobalTimer() {
 }
 startGlobalTimer();
 
-// Content Protection
 document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 document.onkeydown = function(e) { if(e.keyCode == 123) return false; }
 </script>
