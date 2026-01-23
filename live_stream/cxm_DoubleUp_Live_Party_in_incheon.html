@@ -265,7 +265,7 @@
   }
   .enter-btn.active { background: white; color: black; cursor: pointer; }
   .enter-btn.active:hover { background: #e0e0e0; transform: scale(1.05); }
-  .enter-btn.ended { background: #1a1a1a !important; color: #444 !important; border: 1px solid #333 !important; }
+  .enter-btn.ended { background: #1a1a1a !important; color: #444 !important; border: 1px solid #333 !important; cursor: not-allowed; }
 
   /* Mobile Tweaks */
   @media (max-width: 768px) {
@@ -277,16 +277,6 @@
   .center-logo { display: flex; justify-content: center; margin-bottom: 20px; }
   .center-logo img { width: 50px; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
 
-  /* Access Denied / Conflict Modal */
-  .access-denied-modal {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.95); 
-    color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    z-index: 11000; text-align: center; padding: 20px;
-    flex-direction: column;
-  }
-    
   @media (min-width: 900px) {
     .main-layout { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 0 20px; text-align: left; }
     .video-wrapper-left { width: 100%; max-width: 1100px; margin: 0 auto; }
@@ -374,22 +364,41 @@
   }
   .close-guide-btn:hover { background: #444; }
 
-  /* --- ADMIN NOTIFICATION TOAST --- */
-  .admin-toast {
+  /* --- ADMIN & SYSTEM NOTIFICATION TOAST --- */
+  .admin-toast, .system-toast {
       position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-      background: rgba(220, 38, 38, 0.95); /* Intense Red */
-      color: white; padding: 12px 30px; border-radius: 50px;
+      border-radius: 50px;
       font-weight: 700; font-size: 14px; z-index: 20000;
-      box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4);
-      border: 1px solid rgba(255,255,255,0.2);
       backdrop-filter: blur(10px);
       display: flex; align-items: center; gap: 12px;
       transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       pointer-events: none;
       letter-spacing: 0.5px;
       text-transform: uppercase;
+      padding: 12px 30px; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      width: max-content;
+      max-width: 90%;
+      text-align: center;
+      justify-content: center;
   }
-  .admin-toast.show { top: 30px; }
+
+  /* Admin Style */
+  .admin-toast {
+      background: rgba(220, 38, 38, 0.95); 
+      color: white; 
+      border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  /* Generic System/Error Style */
+  .system-toast {
+      background: #222; 
+      color: #fff; 
+      border: 1px solid rgba(255, 68, 68, 0.4);
+      box-shadow: 0 10px 30px rgba(255, 0, 0, 0.15);
+  }
+  
+  .admin-toast.show, .system-toast.show { top: 30px; }
 
 </style>
 </head>
@@ -400,6 +409,9 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
     You are using ADMIN ACCOUNT
 </div>
+
+<div id="systemToast" class="system-toast">
+   </div>
 
 <div class="center-logo">
   <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" loading="lazy" alt="Zone Vault Logo">
@@ -414,7 +426,7 @@
     </div>
 
     <div id="player-container">
-        <div class="artplayer-app"></div>
+       <div class="artplayer-app"></div>
     </div>
 
     <div id="views-display" class="views-container">
@@ -515,12 +527,13 @@
 
 <script>
 // --- CONFIGURATION ---
+// Initial Skeleton Data - Updates via Firebase
 const playlistData = [
   { 
     id: "1", 
     title: "DAY 1 - CxM [DOUBLE UP] LIVE PARTY in INCHEON", 
     status: "live",
-    date: "January 23, 2026 5:30 PM",
+    date: "January 23, 2025 5:30 PM",
     image: "https://uploads.onecompiler.io/43ddry4jt/449datfub/1765871658770_cxm_doubleup_ONLINE_pc.jpg",
   },
     { 
@@ -548,6 +561,10 @@ const currentDateDisplay = document.getElementById('current-date-display');
 window.currentEpData = null;
 let art = null; // Artplayer Instance
 let localSessionToken = null; // Stores this browser's session ID
+let currentStreamRef = null; // Stores the current Firebase Listener for stream status
+
+// Access State Globals
+let globalUserVerified = false; 
 </script>
 
 <script>
@@ -581,64 +598,69 @@ document.getElementById('guidelines-modal').addEventListener('click', function(e
 });
 
 
-function smartGoBack() {
-    if (document.referrer && window.history.length > 1) {
-        window.history.back();
-    } else {
-        window.location.href = 'videos.html';
-    }
-}
-
-function showAccessDeniedModal(message) {
-    if(art) {
-        art.pause();
-        art.destroy(false);
-        playerContainer.style.display = "none";
-        posterContainer.style.display = "flex";
-    }
-    document.body.style.overflow = 'hidden';
+// --- RETURN TO MAIN VIEW LOGIC (Reset to Playlist) ---
+function returnToMainView() {
+    // 1. Destroy Player
+    if(art) { art.destroy(false); art = null; }
     
-    // Check if modal already exists
-    let modal = document.querySelector('.access-denied-modal');
-    if(!modal) {
-        modal = document.createElement('div');
-        modal.className = 'access-denied-modal';
-        document.body.appendChild(modal);
-    }
+    // 2. Hide Player / Show Poster
+    playerContainer.style.display = "none";
+    posterContainer.style.display = "flex";
+    mainTitle.textContent = '';
+    window.currentEpData = null;
 
-    let seconds = 2; // COUNTDOWN SECONDS
+    // 3. Clean URL without refreshing (Remove ?v=...)
+    const url = new URL(window.location);
+    url.search = ''; 
+    window.history.pushState({}, '', url);
 
-    const updateContent = () => {
-        modal.innerHTML = `
-            <strong style="color: #FF4444; font-size: 32px; margin-bottom: 20px;">Access Restricted</strong>
-            <div style="margin-top: 15px; font-size: 16px; max-width: 90%; line-height: 1.4;">${message}</div>
-            <div style="margin-top: 25px; color: #888; font-size: 14px;">
-                Redirecting you back in <span id="deny-timer" style="color:white; font-weight:bold;">${seconds}</span>s...
-            </div>
-            <div style="margin-top: 30px;">
-                <button onclick="smartGoBack()" style="background: white; border: none; color: black; padding: 10px 25px; border-radius: 20px; cursor: pointer; font-weight: bold;">GO BACK NOW</button>
-            </div>
-        `;
-    };
-
-    updateContent();
-
-    const countdown = setInterval(() => {
-        seconds--;
-        const timerSpan = document.getElementById('deny-timer');
-        if(timerSpan) timerSpan.textContent = seconds;
-
-        if (seconds <= 0) {
-            clearInterval(countdown);
-            smartGoBack();
-        }
-    }, 1000);
+    // 4. Reset Body Overflow
+    document.body.style.overflow = 'auto';
+    
+    // 5. Re-render Playlist (uses globalUserVerified state)
+    renderPlaylist(globalUserVerified);
 }
 
-function removeAccessDeniedModal() {
-    const modal = document.querySelector('.access-denied-modal');
-    if(modal) { modal.remove(); document.body.style.overflow = 'auto'; }
+// --- SHOW SYSTEM NOTIFICATION TOAST ---
+function showSystemMessage(message) {
+    // 1. Close Player Immediately
+    returnToMainView();
+    
+    // 2. Show Toast
+    const toast = document.getElementById('systemToast');
+    toast.innerHTML = message;
+    toast.classList.add('show');
+    
+    // 3. Hide after 4 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 4000);
 }
+
+// --- NEW FUNCTION: SYNC PLAYLIST STATUS WITH FIREBASE ---
+function initPlaylistSync() {
+    playlistData.forEach((item, index) => {
+        // Listen to status changes for EACH episode in the playlist
+        db.ref(`live/${item.id}/status`).on('value', (snapshot) => {
+            const status = snapshot.val();
+            if (status) {
+                // Update Local Data
+                playlistData[index].status = status;
+                
+                // Re-Render Buttons Immediately
+                renderPlaylist(globalUserVerified);
+                
+                // If currently watching this specific episode and it changes to ended
+                if (window.currentEpData && window.currentEpData.id === item.id && status.toLowerCase() === 'ended') {
+                    handleStreamEnded(item.id);
+                }
+            }
+        });
+    });
+}
+// Start Sync Immediately
+initPlaylistSync();
+
 
 // --- ONE DEVICE POLICY LOGIC ---
 function registerAndMonitorSession(uid) {
@@ -656,7 +678,7 @@ function registerAndMonitorSession(uid) {
         // If there is a session on server, and it DOES NOT match my local token
         if (serverSession && serverSession !== localSessionToken) {
             // Someone else logged in!
-            showAccessDeniedModal("You have been disconnected because your account was used on another device.<br><br>Only one device is allowed at a time.");
+            showSystemMessage("Disconnected: Account active on another device.");
         }
     });
 }
@@ -664,7 +686,8 @@ function registerAndMonitorSession(uid) {
 // --- UPDATED AUTH & SECURITY LOGIC (ADMIN/MEMBER SPLIT) ---
 auth.onAuthStateChanged(user => {
     if (!user) {
-        showAccessDeniedModal("You must be logged in to view this content.");
+        showSystemMessage("Please log in to view content.");
+        globalUserVerified = false;
         renderPlaylist(false);
         return;
     }
@@ -677,6 +700,7 @@ auth.onAuthStateChanged(user => {
         // --- SCENARIO A: ADMIN (Bypass Everything) ---
         if (role === 'admin') {
             console.log("Admin access granted");
+            globalUserVerified = true;
             
             // Show Admin Toast
             const toast = document.getElementById('adminToast');
@@ -685,8 +709,6 @@ auth.onAuthStateChanged(user => {
                 setTimeout(() => toast.classList.remove('show'), 4000);
             }
 
-            // Bypass Restrictions & Render as Verified
-            removeAccessDeniedModal();
             renderPlaylist(true); 
             
             // Auto-load video if in URL
@@ -704,7 +726,7 @@ auth.onAuthStateChanged(user => {
         const urlParams = new URLSearchParams(window.location.search);
         const linkUid = urlParams.get('uid');
         if (linkUid && linkUid !== user.uid) {
-            showAccessDeniedModal("<b>SECURITY ALERT</b><br>This link does not belong to you.<br><br>Link ID: " + linkUid + "<br>Your ID: " + user.uid);
+            showSystemMessage("Security Alert: Link does not belong to you.");
             return;
         }
 
@@ -712,30 +734,56 @@ auth.onAuthStateChanged(user => {
         const accessRef = db.ref(`page_access/${PAGE_ID}/${user.uid}`);
         accessRef.on('value', (accessSnap) => {
             const isAllowed = accessSnap.val();
+            globalUserVerified = (isAllowed === true); // Store globally for sync usage
             renderPlaylist(isAllowed === true);
             
             if (isAllowed === true) {
-                removeAccessDeniedModal(); 
                 const videoId = urlParams.get('v'); 
                 if (videoId && !window.currentEpData) {
-                     setTimeout(() => { loadAndPlayEpisode(videoId, false); }, 500);
+                      setTimeout(() => { loadAndPlayEpisode(videoId, false); }, 500);
                 }
             } else {
-                showAccessDeniedModal("Your access to this stream has been revoked.<br>UID: " + user.uid);
+                 // If they were watching, this kicks them out to the lobby
+                 if(art) showSystemMessage("Access Revoked.");
             }
         });
     });
 });
+
+// --- HANDLE STREAM ENDED (REALTIME) ---
+function handleStreamEnded(epId) {
+    // Update local data to reflect ended status (Redundant but safe)
+    const epIndex = playlistData.findIndex(i => i.id === epId);
+    if(epIndex > -1) {
+        playlistData[epIndex].status = "ended";
+    }
+    
+    // Show Notification and Return to Lobby
+    showSystemMessage("Stream Ended. Please come back for the next stream!");
+}
+
 
 // --- CORE FUNCTION: PLAY EPISODE (ARTPLAYER) ---
 function loadAndPlayEpisode(epId, updateUrl = true) {
     const ep = playlistData.find(item => item.id === epId);
     if (!ep) return;
 
+    // --- GLOBAL TIME CHECK (PHT BASE) ---
+    // Ensure the date string is treated as Philippine Time (GMT+8)
     const today = new Date();
     if (ep.date) {
-        const releaseDate = new Date(ep.date);
-        if (releaseDate > today) { alert(`\nLIVE STREAM DATE: ${ep.date}`); return; }
+        const epDateStr = ep.date + " GMT+0800"; // FORCE PHT TIMEZONE
+        const releaseDate = new Date(epDateStr);
+        if (releaseDate > today) { 
+            alert(`\nLIVE STREAM DATE (PHT): ${ep.date}`); 
+            return; 
+        }
+    }
+    
+    // Check if locally marked ended
+    if(ep.status && ep.status.toLowerCase() === 'ended') {
+        showSystemMessage("Stream Ended.");
+        return;
     }
     
     // --- ACTIVATE ONE DEVICE POLICY ---
@@ -745,7 +793,6 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
 
     if (updateUrl && auth.currentUser) {
         const titleSlug = ep.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        // GENERATE UNIQUE URL: Adds UID + Random Token to make it look unique/scary to share
         const uniqueToken = Math.random().toString(36).substr(2, 9);
         const newUrl = window.location.pathname + `?v=${ep.id}&uid=${auth.currentUser.uid}&token=${uniqueToken}&title=${titleSlug}`;
         history.pushState({id: ep.id, uid: auth.currentUser.uid}, '', newUrl);
@@ -755,12 +802,38 @@ function loadAndPlayEpisode(epId, updateUrl = true) {
     posterContainer.style.display = "none";
     playerContainer.style.display = "block";
 
-    db.ref(`live/${ep.id}`).once('value').then(snapshot => {
+    // --- REALTIME LISTENER FOR STREAM STATUS ---
+    // Remove previous listener if exists
+    if(currentStreamRef) {
+        currentStreamRef.off();
+    }
+
+    currentStreamRef = db.ref(`live/${ep.id}`);
+    
+    // Listen for changes (Status change to 'ended' or URL update)
+    currentStreamRef.on('value', (snapshot) => {
       const data = snapshot.val();
-      if(!data || !data.url) { alert("Live unavailable"); return; }
       
+      if(!data) { 
+          showSystemMessage("Live Unavailable");
+          return; 
+      }
+      
+      // CHECK REALTIME STATUS (Active watcher check)
+      if (data.status && data.status.toLowerCase() === 'ended') {
+          handleStreamEnded(ep.id);
+          return;
+      }
+      
+      if(!data.url) return;
+
       mainTitle.textContent = data.title || ep.title;
-      setupStream(data.url, ep.status); // Initialize Artplayer
+      
+      // Only setup stream if art is null or url changed
+      // (Basic check to avoid re-initializing on small metadata changes)
+      if(!art || art.url !== data.url) {
+           setupStream(data.url, data.status || ep.status); 
+      }
     });
 }
 
@@ -908,9 +981,7 @@ window.addEventListener('popstate', (event) => {
     if (event.state && event.state.id) {
         loadAndPlayEpisode(event.state.id, false);
     } else {
-        posterContainer.style.display = "flex";
-        playerContainer.style.display = "none";
-        if(art) art.pause();
+        returnToMainView();
     }
 });
 
@@ -919,11 +990,19 @@ function renderPlaylist(isUserVerified) {
     playlistData.forEach(ep => {
         const card = document.createElement('div');
         card.className = 'playlist-card';
+        
+        // --- GLOBAL PHT DATE CHECK ---
         const today = new Date();
         let isDateLocked = false;
-        if (ep.date && new Date(ep.date) > today) isDateLocked = true;
+        if (ep.date) {
+            // Append GMT+0800 to force browser to calculate against Philippine time
+            const phtDate = new Date(ep.date + " GMT+0800");
+            if (phtDate > today) isDateLocked = true;
+        }
 
         let badgeHtml = '', buttonClass = 'enter-btn', buttonText = 'LOCKED', buttonDisabled = true;
+        
+        // Check local data status (Updated via Sync)
         const isEnded = ep.status && (ep.status.toLowerCase() === 'ended' || ep.status.toLowerCase() === 'done');
 
         if (isEnded) {
@@ -940,7 +1019,8 @@ function renderPlaylist(isUserVerified) {
 
         let displayDate = "COMING SOON", displayTime = "";
         if(ep.date) {
-            const d = new Date(ep.date);
+            // Display date logic (Keeps formatting nice)
+            const d = new Date(ep.date); // This displays in local user time, which is fine for "reading"
             const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'], months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
             displayDate = `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}`;
             let h = d.getHours(), m = d.getMinutes(), ampm = h >= 12 ? 'PM' : 'AM';
@@ -953,11 +1033,21 @@ function renderPlaylist(isUserVerified) {
         card.querySelector('button').addEventListener('click', (e) => {
             const isVerified = e.target.getAttribute('data-verified') === 'true';
             const isEventEnded = e.target.getAttribute('data-ended') === 'true';
-            const unlockTime = e.target.getAttribute('data-unlock-time') ? new Date(e.target.getAttribute('data-unlock-time')) : new Date();
+            
+            // PHT Time Logic for click
+            const dateStr = e.target.getAttribute('data-unlock-time');
+            const unlockTime = dateStr ? new Date(dateStr + " GMT+0800") : new Date();
             
             if (isEventEnded) return;
-            if (!isVerified) { alert("Access Denied: Your account is not verified for this event."); return; }
-            if (new Date() >= unlockTime) { loadAndPlayEpisode(ep.id, true); document.querySelector('.video-wrapper-left').scrollIntoView({ behavior: 'smooth' }); } 
+            if (!isVerified) { 
+                showSystemMessage("Access Denied: Your account is not verified for this event.");
+                return; 
+            }
+            
+            if (new Date() >= unlockTime) { 
+                loadAndPlayEpisode(ep.id, true); 
+                document.querySelector('.video-wrapper-left').scrollIntoView({ behavior: 'smooth' }); 
+            } 
             else { alert("Event has not started yet. Please wait."); }
         });
         playlistContainer.appendChild(card);
@@ -966,10 +1056,23 @@ function renderPlaylist(isUserVerified) {
 
 function startGlobalTimer() {
     setInterval(() => {
-        const now = new Date();
+        const now = new Date(); // Current Absolute Time
+        
         document.querySelectorAll('.enter-btn.time-locked').forEach(btn => {
-            if (btn.getAttribute('data-unlock-time') && now >= new Date(btn.getAttribute('data-unlock-time'))) {
-                btn.textContent = 'ENTER'; btn.classList.remove('time-locked'); btn.classList.add('active'); btn.disabled = false;
+            const dateStr = btn.getAttribute('data-unlock-time');
+            if (dateStr) {
+                // FORCE PHT COMPARISON
+                // We add " GMT+0800" so the string is parsed as Philippines time.
+                // The 'now' variable is the user's current time.
+                // If now > 5PM PHT (even if it's 2AM USA), it unlocks.
+                const phtUnlockTime = new Date(dateStr + " GMT+0800");
+                
+                if (now >= phtUnlockTime) {
+                    btn.textContent = 'ENTER'; 
+                    btn.classList.remove('time-locked'); 
+                    btn.classList.add('active'); 
+                    btn.disabled = false;
+                }
             }
         });
         if(currentDateDisplay) currentDateDisplay.textContent = now.toLocaleTimeString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
