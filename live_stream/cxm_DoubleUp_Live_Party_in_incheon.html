@@ -734,19 +734,27 @@ function registerAndMonitorSession(uid) {
 
 // --- UPDATED AUTH & SECURITY LOGIC (ADMIN/MEMBER SPLIT) ---
 auth.onAuthStateChanged(user => {
+    // SCENARIO 1: NOT LOGGED IN
     if (!user) {
-        showSystemMessage("Please log in to view content.");
-        globalUserVerified = false;
-        renderPlaylist(false);
+        showBlockingModal("You must be logged in to view this content.");
         return;
     }
 
-    // 1. Check User Role from Database FIRST (Needed for Admin Bypass)
+    // SCENARIO 1 (PART 2): COPY-PASTE LINK PROTECTION
+    const urlParams = new URLSearchParams(window.location.search);
+    const linkUid = urlParams.get('uid');
+    if (linkUid && linkUid !== user.uid) {
+        showBlockingModal("Access Restricted. Unauthorized link sharing detected.");
+        return;
+    }
+
+
+    // 1. Check User Role from Database FIRST
     db.ref('users/' + user.uid).once('value').then(snapshot => {
         const userData = snapshot.val() || {};
         const role = (userData.role || 'member').toLowerCase();
 
-        // --- SCENARIO A: ADMIN (Bypass Everything) ---
+        // --- ADMIN (Bypass Everything) ---
         if (role === 'admin') {
             console.log("Admin access granted");
             globalUserVerified = true;
@@ -766,22 +774,13 @@ auth.onAuthStateChanged(user => {
             if (videoId && !window.currentEpData) {
                  setTimeout(() => { loadAndPlayEpisode(videoId, false); }, 500);
             }
-            return; // STOP HERE (Admin can access links freely)
+            return; 
         } else {
             isAdminUser = false; // Ensure false for members
         }
 
-        // --- SCENARIO B: MEMBER (Strict Checks) ---
+        // --- MEMBER CHECKS ---
         
-        // 1. STRICT LINK PROTECTION (UID CHECK)
-        const urlParams = new URLSearchParams(window.location.search);
-        const linkUid = urlParams.get('uid');
-        if (linkUid && linkUid !== user.uid) {
-            // STOP EVERYTHING - BLOCK SCREEN
-            showBlockingModal("Security Alert: Link sharing is not allowed.<br>This link does not belong to your account.");
-            return;
-        }
-
         // 2. Permission Check (Member Only)
         const accessRef = db.ref(`page_access/${PAGE_ID}/${user.uid}`);
         accessRef.on('value', (accessSnap) => {
@@ -795,7 +794,10 @@ auth.onAuthStateChanged(user => {
                       setTimeout(() => { loadAndPlayEpisode(videoId, false); }, 500);
                 }
             } else {
-                 if(art) showSystemMessage("Access Revoked.");
+                 // SCENARIO 3: REVOKED WHILE WATCHING
+                 if(art) {
+                     showSystemMessage(`ACCESS REVOKED. You have been removed due to violating live stream rules.<br>UID: ${user.uid}`);
+                 }
             }
         });
     });
@@ -1068,8 +1070,10 @@ function renderPlaylist(isUserVerified) {
             const unlockTime = dateStr ? new Date(dateStr + " GMT+0800") : new Date();
             
             if (isEventEnded) return;
+            
+            // SCENARIO 2: LOGGED IN BUT NO PERMISSION (ON CLICK)
             if (!isVerified) { 
-                showSystemMessage("Access Denied: Your account is not verified for this event.");
+                showSystemMessage(`Access is not given. Please contact the admin.<br>UID: ${auth.currentUser.uid}`);
                 return; 
             }
             
