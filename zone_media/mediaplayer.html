@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MEDIA PLAYER | Zone Vault </title>
+    <style>
+        /* --- CORE RESET --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; user-select: none; }
+        body { 
+            background-color: #050505; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            color: #eee; 
+            overflow: hidden; 
+            height: 100vh; width: 100vw; 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- UTILITIES --- */
+        .hidden { display: none !important; }
+
+        /* --- SCREENS --- */
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            background: radial-gradient(circle at center, #1f1f1f 0%, #000000 100%);
+            padding: 30px;
+            transition: opacity 0.4s ease;
+            z-index: 5;
+        }
+
+        /* --- UI ELEMENTS (Home/Upload) --- */
+        .brand-title { font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #fff; text-transform: uppercase; margin-bottom: 10px; text-shadow: 0 4px 10px rgba(255,255,255,0.1); }
+        .section-title { font-size: 14px; color: #888; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .card-container { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; max-height: 60vh; padding: 5px; }
+        .mode-card { background: #141414; border: 1px solid #333; border-radius: 12px; padding: 25px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; }
+        .mode-card:active { transform: scale(0.98); background: #222; }
+        .mode-info h3 { font-size: 16px; color: #fff; margin-bottom: 5px; }
+        .mode-info p { font-size: 12px; color: #666; }
+        .mode-icon { width: 30px; height: 30px; fill: #555; }
+        .upload-card { position: relative; background: #141414; border: 1px solid #333; border-radius: 10px; padding: 15px; display: flex; flex-direction: row; align-items: center; cursor: pointer; transition: all 0.2s ease; }
+        .upload-card:active { transform: scale(0.98); background: #1a1a1a; }
+        .upload-card.selected { border-color: #666; background: #1f1f1f; }
+        .card-icon { width: 32px; height: 32px; background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; color: #555; flex-shrink: 0; }
+        .upload-card.selected .card-icon { background: #eee; color: #000; }
+        .card-text { display: flex; flex-direction: column; overflow: hidden; }
+        .card-label { font-size: 10px; color: #777; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 2px; }
+        .card-filename { font-size: 13px; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+        .upload-card.selected .card-filename { color: #fff; }
+        input[type="file"] { display: none; }
+        .action-btn { margin-top: 30px; width: 100%; max-width: 200px; padding: 16px 0; background: #222; color: #555; border: none; border-radius: 30px; font-size: 14px; font-weight: 700; letter-spacing: 2px; transition: all 0.3s; pointer-events: none; box-shadow: none; }
+        .action-btn.active { background: #fff; color: #000; cursor: pointer; pointer-events: all; box-shadow: 0 10px 30px rgba(255,255,255,0.15); transform: translateY(-2px); }
+        .back-text-btn { background: none; border: none; color: #555; margin-top: 20px; font-size: 12px; text-transform: uppercase; cursor: pointer; letter-spacing: 1px; }
+
+        /* --- PLAYER LAYOUTS --- */
+        #player-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10; display: none; }
+        #video-container { width: 100%; height: 100%; position: relative; }
+
+        /* SINGLE VIEW */
+        .single-view video { width: 100%; height: 100%; object-fit: contain; }
+
+        /* --- MULTI VIEW LAYOUT (FLEXBOX) --- */
+        .multi-view-layout {
+            display: flex;
+            width: 100%; height: 100%;
+            background: #000;
+        }
+
+        /* --- LEFT STAGE --- */
+        #mv-left-stage {
+            /* UPDATED: flex: 2 makes it take ~66% of width. 
+               This is smaller than before (75%), giving space to the right.
+            */
+            flex: 2; 
+            height: 100%;
+            position: relative;
+            background: #000;
+            
+            /* PADDING: 12px Top/Bottom to create the "Header/Footer" black space */
+            padding: 12px 0; 
+            
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+        #mv-left-stage video {
+            width: 100%; height: 100%;
+            object-fit: contain; /* Keeps entire video visible */
+        }
+
+        /* --- RIGHT STACK --- */
+        #mv-right-stack {
+            /* UPDATED: flex: 1 makes it take ~33% of width.
+               This is wider than before, so videos are bigger on phone.
+            */
+            flex: 1; 
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 4px; /* Small gap between videos */
+            
+            /* PADDING: Matches Left Stage EXACTLY (12px Top/Bottom) */
+            /* Added 4px Left Padding to separate from Main Video */
+            padding: 12px 0 12px 4px;
+            
+            background: #000;
+        }
+
+        .side-vid-cell {
+            flex: 1; 
+            width: 100%;
+            background: #111;
+            overflow: hidden;
+            position: relative;
+        }
+        .side-vid-cell video {
+            width: 100%; height: 100%;
+            object-fit: cover; /* Fills the box */
+        }
+
+        /* --- CONTROLS --- */
+        #custom-subs { position: absolute; bottom: 20px; width: 100%; text-align: center; pointer-events: none; z-index: 5; padding: 0 40px; transition: bottom 0.3s ease; }
+        #custom-subs span { font-size: clamp(18px, 5vw, 26px); color: white; font-weight: 600; line-height: 1.4; text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 4px 6px rgba(0,0,0,0.9); font-family: sans-serif; background: transparent; }
+        #player-wrapper.controls-visible #custom-subs { bottom: 100px; }
+
+        #controls-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; justify-content: space-between; opacity: 0; transition: opacity 0.3s ease; z-index: 20; }
+        #player-wrapper.controls-visible #controls-layer { opacity: 1; }
+
+        .top-bar { padding: 25px; display: flex; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%); }
+        .back-btn-area { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; margin-right: 15px; }
+        .back-btn-area:active { background: rgba(255,255,255,0.15); }
+        .back-icon { width: 28px; height: 28px; fill: none; stroke: #fff; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .video-title { color: #fff; font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.9; }
+
+        .gesture-area { flex-grow: 1; position: relative; display: flex; }
+        .gesture-zone { width: 35%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .gesture-zone.mid { width: 30%; }
+        .tap-anim { background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); border-radius: 50%; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 14px; font-weight: 700; opacity: 0; transform: scale(0.5); }
+        .animate-tap { animation: ripple 0.5s ease-out forwards; }
+        @keyframes ripple { 0% { opacity: 1; transform: scale(0.8); } 100% { opacity: 0; transform: scale(1.6); } }
+
+        .bottom-bar { padding: 10px 25px 35px 25px; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); display: flex; flex-direction: column; gap: 12px; }
+        .slider-container { width: 100%; display: flex; align-items: center; position: relative; height: 20px; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; cursor: pointer; z-index: 3; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #fff; margin-top: -7px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); transition: transform 0.1s; }
+        input[type=range]:active::-webkit-slider-thumb { transform: scale(1.4); }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 2px; background: rgba(255,255,255,0.2); }
+        .progress-fill { position: absolute; left: 0; top: 9px; height: 2px; background: #fff; pointer-events: none; width: 0%; z-index: 2; }
+
+        .controls-row { display: flex; justify-content: space-between; align-items: center; }
+        .left-controls, .right-controls { gap: 18px; display: flex; align-items: center; }
+        button.ctrl-btn { background: none; border: none; color: #fff; cursor: pointer; width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; opacity: 0.9; }
+        button.ctrl-btn svg { width: 26px; height: 26px; fill: currentColor; }
+        .time-display { font-size: 13px; color: #bbb; font-variant-numeric: tabular-nums; font-weight: 500; margin-left: 5px; }
+
+        #settings-menu { position: absolute; bottom: 80px; right: 25px; background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; width: 240px; transform: translateY(20px) scale(0.95); opacity: 0; pointer-events: none; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        #settings-menu.active { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 8px; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 14px; color: #ccc; }
+        .setting-item:last-child { border-bottom: none; }
+        .setting-value { color: #fff; font-weight: 600; cursor: pointer; }
+
+    </style>
+</head>
+<body>
+
+    <div id="mode-screen" class="screen">
+        <div class="brand-title">MEDIA PLAYER</div>
+        <div class="section-title">Select Experience</div>
+
+        <div class="card-container">
+            <div class="mode-card" onclick="goToHome('single')">
+                <div class="mode-info"><h3>Single View</h3><p></p></div>
+                <svg class="mode-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+            </div>
+            <div class="mode-card" onclick="goToHome('multi')">
+                <div class="mode-info"><h3>Multi View</h3><p>1 Main + 3 Angles (Synced)</p></div>
+                <svg class="mode-icon" viewBox="0 0 24 24"><path d="M4 4h10v16H4zM16 4h4v5h-4zM16 10h4v5h-4zM16 16h4v4h-4z" fill="currentColor"/></svg>
+            </div>
+        </div>
+    </div>
+
+    <div id="home-single" class="screen hidden">
+        <div class="brand-title"></div>
+        <div class="section-title">Single View Setup</div>
+        <div class="card-container">
+            <label class="upload-card" id="card-s-vid" for="s-vid-input">
+                <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div>
+                <div class="card-text"><span class="card-label">Main Video</span><span class="card-filename" id="txt-s-vid">Tap to select</span></div>
+            </label>
+            <input type="file" id="s-vid-input" accept="video/*" onchange="handleFile(this, 's-vid')">
+
+            <label class="upload-card" id="card-s-sub" for="s-sub-input">
+                <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
+                <div class="card-text"><span class="card-label">Subtitle (Optional)</span><span class="card-filename" id="txt-s-sub">Tap to select</span></div>
+            </label>
+            <input type="file" id="s-sub-input" accept=".vtt,.srt" onchange="handleFile(this, 's-sub')">
+        </div>
+        <button id="btn-enter-single" class="action-btn" onclick="enterTheater('single')">WATCH NOW</button>
+        <button class="back-text-btn" onclick="goToMode()">Back to Modes</button>
+    </div>
+
+    <div id="home-multi" class="screen hidden">
+        <div class="brand-title"></div>
+        <div class="section-title">Multi View Setup</div>
+        <div class="card-container">
+            <label class="upload-card" id="card-m-main" for="m-main-input">
+                <div class="card-icon" style="background:#333; color:#fff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+                <div class="card-text"><span class="card-label">1. Main View (Left)</span><span class="card-filename" id="txt-m-main">Required</span></div>
+            </label>
+            <input type="file" id="m-main-input" accept="video/*" onchange="handleFile(this, 'm-main')">
+
+            <label class="upload-card" id="card-m-s1" for="m-s1-input">
+                <div class="card-icon"><span style="font-weight:bold; font-size:12px">2</span></div>
+                <div class="card-text"><span class="card-label">Side View 1 (Top)</span><span class="card-filename" id="txt-m-s1">Required</span></div>
+            </label>
+            <input type="file" id="m-s1-input" accept="video/*" onchange="handleFile(this, 'm-s1')">
+
+            <label class="upload-card" id="card-m-s2" for="m-s2-input">
+                <div class="card-icon"><span style="font-weight:bold; font-size:12px">3</span></div>
+                <div class="card-text"><span class="card-label">Side View 2 (Mid)</span><span class="card-filename" id="txt-m-s2">Required</span></div>
+            </label>
+            <input type="file" id="m-s2-input" accept="video/*" onchange="handleFile(this, 'm-s2')">
+
+            <label class="upload-card" id="card-m-s3" for="m-s3-input">
+                <div class="card-icon"><span style="font-weight:bold; font-size:12px">4</span></div>
+                <div class="card-text"><span class="card-label">Side View 3 (Bot)</span><span class="card-filename" id="txt-m-s3">Required</span></div>
+            </label>
+            <input type="file" id="m-s3-input" accept="video/*" onchange="handleFile(this, 'm-s3')">
+
+            <label class="upload-card" id="card-m-sub" for="m-sub-input">
+                <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></div>
+                <div class="card-text"><span class="card-label">Subtitle (Main)</span><span class="card-filename" id="txt-m-sub">Optional</span></div>
+            </label>
+            <input type="file" id="m-sub-input" accept=".vtt,.srt" onchange="handleFile(this, 'm-sub')">
+        </div>
+        <button id="btn-enter-multi" class="action-btn" onclick="enterTheater('multi')">WATCH NOW</button>
+        <button class="back-text-btn" onclick="goToMode()">Back to Modes</button>
+    </div>
+
+    <div id="player-wrapper" class="controls-visible">
+        <div id="video-container"></div>
+        <div id="custom-subs"><span id="sub-text"></span></div>
+        <div id="controls-layer">
+            <div class="top-bar">
+                <div class="back-btn-area" id="btn-back"><svg class="back-icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div>
+                <div class="video-title" id="display-title">Unknown Video</div>
+            </div>
+            <div class="gesture-area">
+                <div class="gesture-zone" id="zone-left"><div class="tap-anim" id="anim-left">-10s</div></div>
+                <div class="gesture-zone mid" id="zone-mid"></div>
+                <div class="gesture-zone" id="zone-right"><div class="tap-anim" id="anim-right">+10s</div></div>
+            </div>
+            <div class="bottom-bar">
+                <div class="slider-container">
+                    <div class="progress-fill" id="progress-fill"></div>
+                    <input type="range" id="seek-slider" min="0" max="100" value="0" step="0.1">
+                </div>
+                <div class="controls-row">
+                    <div class="left-controls">
+                        <button class="ctrl-btn" id="btn-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+                        <button class="ctrl-btn" id="btn-mute"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5zM23 9l-1.41-1.41L18 11.17l-3.59-3.58L13 9l3.59 3.59-3.59 3.59 1.41 1.41L18 14l3.59 3.59 1.41-1.41L19.41 12 23 9z"/></svg></button>
+                        <div class="time-display"><span id="cur-time">0:00</span> / <span id="dur-time">0:00</span></div>
+                    </div>
+                    <div class="right-controls">
+                        <button class="ctrl-btn" id="btn-settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
+                    </div>
+                </div>
+            </div>
+            <div id="settings-menu">
+                <div class="setting-item"><div class="setting-label">Quality</div><div class="setting-value" id="set-quality">Source</div></div>
+                <div class="setting-item"><div class="setting-label">Speed</div><div class="setting-value" id="set-speed">Normal</div></div>
+                <div class="setting-item"><div class="setting-label">Screen Fit</div><div class="setting-value" id="set-fit">Fit</div></div>
+                <div class="setting-item"><div class="setting-label">Subtitles</div><div class="setting-value" id="set-sub">On</div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GLOBAL STATE ---
+        let currentMode = 'single';
+        let files = {}; 
+        let activeVideos = [];
+        let mainVideo = null;
+        let controlsTimeout;
+        let isSettingsOpen = false;
+        let speeds = [0.5, 1.0, 1.25, 1.5, 2.0];
+        let currentSpeedIdx = 1;
+        let isFitCover = false;
+        let areSubsVisible = true;
+
+        // --- NAVIGATION ---
+        function goToMode() {
+            hideAllScreens();
+            document.getElementById('mode-screen').classList.remove('hidden');
+            files = {}; resetUploadCards();
+        }
+
+        function goToHome(mode) {
+            currentMode = mode;
+            hideAllScreens();
+            if(mode === 'single') document.getElementById('home-single').classList.remove('hidden');
+            else document.getElementById('home-multi').classList.remove('hidden');
+        }
+
+        function hideAllScreens() {
+            document.querySelectorAll('.screen').forEach(el => el.classList.add('hidden'));
+            document.getElementById('player-wrapper').style.display = 'none';
+        }
+
+        function resetUploadCards() {
+            document.querySelectorAll('.upload-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.card-filename').forEach(t => {
+                t.innerText = t.id.includes('sub') ? "Optional" : "Required";
+                t.style.color = "#ccc";
+            });
+            document.getElementById('btn-enter-single').classList.remove('active');
+            document.getElementById('btn-enter-multi').classList.remove('active');
+            document.querySelectorAll('input[type="file"]').forEach(i => i.value = '');
+        }
+
+        function handleFile(input, key) {
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                files[key] = file;
+                const txt = document.getElementById('txt-' + key);
+                document.getElementById('card-' + key).classList.add('selected');
+                txt.innerText = file.name;
+                txt.style.color = "#fff";
+                checkReadyState();
+            }
+        }
+
+        function checkReadyState() {
+            if (currentMode === 'single') {
+                if (files['s-vid']) document.getElementById('btn-enter-single').classList.add('active');
+            } else {
+                if (files['m-main'] && files['m-s1'] && files['m-s2'] && files['m-s3']) {
+                    document.getElementById('btn-enter-multi').classList.add('active');
+                }
+            }
+        }
+
+        // --- BUILD PLAYER ---
+        function enterTheater(mode) {
+            if (mode === 'single' && !files['s-vid']) return;
+            if (mode === 'multi' && (!files['m-main'] || !files['m-s1'])) return;
+
+            hideAllScreens();
+            const playerWrapper = document.getElementById('player-wrapper');
+            playerWrapper.style.display = 'block';
+            const container = document.getElementById('video-container');
+            container.innerHTML = ''; 
+            activeVideos = [];
+
+            if (mode === 'single') {
+                container.className = 'single-view';
+                mainVideo = createVideoElement(files['s-vid'], files['s-sub']);
+                container.appendChild(mainVideo);
+                activeVideos.push(mainVideo);
+            } else {
+                // MULTI VIEW CONSTRUCTION (Flexbox Layout)
+                container.className = 'multi-view-layout';
+                
+                // 1. Left Stage
+                const leftStage = document.createElement('div');
+                leftStage.id = 'mv-left-stage';
+                mainVideo = createVideoElement(files['m-main'], files['m-sub']);
+                leftStage.appendChild(mainVideo);
+                container.appendChild(leftStage);
+                activeVideos.push(mainVideo);
+
+                // 2. Right Stack (Video 2, 3, 4)
+                const rightStack = document.createElement('div');
+                rightStack.id = 'mv-right-stack';
+                
+                // Create the 3 side cells
+                activeVideos.push(createSideVideo(files['m-s1'], rightStack));
+                activeVideos.push(createSideVideo(files['m-s2'], rightStack));
+                activeVideos.push(createSideVideo(files['m-s3'], rightStack));
+
+                container.appendChild(rightStack);
+            }
+
+            document.getElementById('display-title').innerText = (mode === 'single' ? files['s-vid'].name : files['m-main'].name);
+
+            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(e=>{});
+            if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(e=>{});
+
+            setupPlayerEvents();
+            
+            // Auto-play (Sabay play)
+            setTimeout(() => {
+                syncAction('play');
+                updatePlayIcon(true);
+                updateVolumeIcon();
+                resetControlsTimer();
+            }, 500);
+        }
+
+        function createVideoElement(vidFile, subFile) {
+            const v = document.createElement('video');
+            v.src = URL.createObjectURL(vidFile);
+            v.playsInline = true;
+            v.preload = "auto"; // Optimize for sync
+            if(subFile) {
+                const t = document.createElement('track');
+                t.kind = 'subtitles'; t.default = true;
+                t.src = URL.createObjectURL(subFile);
+                t.addEventListener('load', () => { v.textTracks[0].mode = "hidden"; });
+                v.appendChild(t);
+            }
+            return v;
+        }
+
+        function createSideVideo(file, container) {
+            const cell = document.createElement('div');
+            cell.className = 'side-vid-cell';
+            const v = document.createElement('video');
+            v.src = URL.createObjectURL(file);
+            v.playsInline = true;
+            v.muted = true; // Side videos always muted
+            v.preload = "auto";
+            cell.appendChild(v);
+            container.appendChild(cell);
+            return v;
+        }
+
+        // --- SYNCHRONIZATION ENGINE ---
+        function syncAction(action, val) {
+            activeVideos.forEach(v => {
+                if (action === 'play') v.play();
+                if (action === 'pause') v.pause();
+                if (action === 'time') v.currentTime = val;
+                if (action === 'rate') v.playbackRate = val;
+            });
+        }
+
+        function setupPlayerEvents() {
+            mainVideo.addEventListener('timeupdate', () => {
+                if(!mainVideo.duration) return;
+                const pct = (mainVideo.currentTime / mainVideo.duration) * 100;
+                document.getElementById('seek-slider').value = pct;
+                document.getElementById('progress-fill').style.width = pct + "%";
+                document.getElementById('cur-time').innerText = formatTime(mainVideo.currentTime);
+                document.getElementById('dur-time').innerText = formatTime(mainVideo.duration);
+
+                // Subtitle Logic
+                const subTextSpan = document.getElementById('sub-text');
+                if(mainVideo.textTracks[0] && mainVideo.textTracks[0].activeCues && mainVideo.textTracks[0].activeCues.length > 0) {
+                    const txt = mainVideo.textTracks[0].activeCues[0].text;
+                    subTextSpan.innerHTML = txt.replace(/(<([^>]+)>)/gi, "");
+                } else {
+                    subTextSpan.innerHTML = "";
+                }
+            });
+
+            mainVideo.onclick = () => { if(!isSettingsOpen) toggleControls(); };
+        }
+
+        // --- CONTROLS ---
+        const btnPlay = document.getElementById('btn-play');
+        const btnMute = document.getElementById('btn-mute');
+        const slider = document.getElementById('seek-slider');
+
+        btnPlay.onclick = () => {
+            if (mainVideo.paused) {
+                syncAction('play');
+                updatePlayIcon(true);
+            } else {
+                syncAction('pause');
+                updatePlayIcon(false);
+            }
+        };
+
+        function updatePlayIcon(isPlaying) {
+            btnPlay.innerHTML = isPlaying 
+                ? '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>' 
+                : '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+        }
+
+        slider.addEventListener('input', (e) => {
+            const time = (e.target.value / 100) * mainVideo.duration;
+            syncAction('time', time);
+        });
+
+        btnMute.onclick = () => {
+            mainVideo.muted = !mainVideo.muted;
+            updateVolumeIcon();
+        };
+
+        function updateVolumeIcon() {
+            if(mainVideo.muted) {
+                 btnMute.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>';
+            } else {
+                 btnMute.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
+            }
+        }
+
+        function formatTime(s) {
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
+        // --- GESTURES & VISIBILITY ---
+        function showControls() {
+            document.getElementById('player-wrapper').classList.add('controls-visible');
+            resetControlsTimer();
+        }
+        function hideControls() {
+            if(mainVideo && mainVideo.paused) return;
+            if(isSettingsOpen) return;
+            document.getElementById('player-wrapper').classList.remove('controls-visible');
+        }
+        function toggleControls() {
+            if (document.getElementById('player-wrapper').classList.contains('controls-visible')) hideControls();
+            else showControls();
+        }
+        function resetControlsTimer() {
+            clearTimeout(controlsTimeout);
+            controlsTimeout = setTimeout(hideControls, 2000);
+        }
+
+        document.getElementById('zone-mid').addEventListener('click', toggleControls);
+        document.getElementById('controls-layer').addEventListener('mousemove', resetControlsTimer);
+
+        let lastTapLeft = 0;
+        let lastTapRight = 0;
+
+        document.getElementById('zone-left').addEventListener('click', () => {
+            const now = new Date().getTime();
+            if (now - lastTapLeft < 300) {
+                syncAction('time', mainVideo.currentTime - 10);
+                triggerAnim('anim-left');
+            }
+            lastTapLeft = now;
+        });
+        document.getElementById('zone-right').addEventListener('click', () => {
+            const now = new Date().getTime();
+            if (now - lastTapRight < 300) {
+                syncAction('time', mainVideo.currentTime + 10);
+                triggerAnim('anim-right');
+            }
+            lastTapRight = now;
+        });
+
+        function triggerAnim(id) {
+            const el = document.getElementById(id);
+            el.classList.remove('animate-tap');
+            void el.offsetWidth;
+            el.classList.add('animate-tap');
+        }
+
+        document.getElementById('btn-back').addEventListener('click', () => {
+            if(document.fullscreenElement) document.exitFullscreen();
+            if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+            syncAction('pause');
+            activeVideos.forEach(v => { v.src = ""; v.load(); });
+            activeVideos = [];
+            goToHome(currentMode);
+        });
+
+        // --- SETTINGS ---
+        document.getElementById('btn-settings').onclick = (e) => {
+            e.stopPropagation();
+            isSettingsOpen = !isSettingsOpen;
+            const menu = document.getElementById('settings-menu');
+            if(isSettingsOpen) menu.classList.add('active'); else menu.classList.remove('active');
+        };
+
+        document.getElementById('set-speed').onclick = function() {
+            currentSpeedIdx = (currentSpeedIdx + 1) % speeds.length;
+            const s = speeds[currentSpeedIdx];
+            syncAction('rate', s);
+            this.innerText = s === 1.0 ? 'Normal' : s + 'x';
+        };
+
+        document.getElementById('set-fit').onclick = function() {
+            isFitCover = !isFitCover;
+            mainVideo.style.objectFit = isFitCover ? 'cover' : 'contain';
+            this.innerText = isFitCover ? 'Zoom' : 'Fit';
+        };
+
+        document.getElementById('set-sub').onclick = function() {
+            areSubsVisible = !areSubsVisible;
+            document.getElementById('custom-subs').style.display = areSubsVisible ? 'block' : 'none';
+            this.innerText = areSubsVisible ? 'On' : 'Off';
+        };
+        document.getElementById('set-quality').onclick = () => alert("Local source detected. Quality adjustment disabled.");
+    </script>
+</body>
+</html>
