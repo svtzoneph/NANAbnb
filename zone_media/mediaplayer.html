@@ -67,43 +67,28 @@
             background: #000;
         }
 
-        /* --- LEFT STAGE --- */
         #mv-left-stage {
-            /* UPDATED: flex: 2 makes it take ~66% of width. 
-               This is smaller than before (75%), giving space to the right.
-            */
             flex: 2; 
             height: 100%;
             position: relative;
             background: #000;
-            
-            /* PADDING: 12px Top/Bottom to create the "Header/Footer" black space */
             padding: 12px 0; 
-            
             display: flex; 
             align-items: center; 
             justify-content: center;
         }
         #mv-left-stage video {
             width: 100%; height: 100%;
-            object-fit: contain; /* Keeps entire video visible */
+            object-fit: contain;
         }
 
-        /* --- RIGHT STACK --- */
         #mv-right-stack {
-            /* UPDATED: flex: 1 makes it take ~33% of width.
-               This is wider than before, so videos are bigger on phone.
-            */
             flex: 1; 
             height: 100%;
             display: flex;
             flex-direction: column;
-            gap: 4px; /* Small gap between videos */
-            
-            /* PADDING: Matches Left Stage EXACTLY (12px Top/Bottom) */
-            /* Added 4px Left Padding to separate from Main Video */
+            gap: 4px; 
             padding: 12px 0 12px 4px;
-            
             background: #000;
         }
 
@@ -116,7 +101,7 @@
         }
         .side-vid-cell video {
             width: 100%; height: 100%;
-            object-fit: cover; /* Fills the box */
+            object-fit: cover;
         }
 
         /* --- CONTROLS --- */
@@ -241,15 +226,19 @@
     <div id="player-wrapper" class="controls-visible">
         <div id="video-container"></div>
         <div id="custom-subs"><span id="sub-text"></span></div>
-        <div id="controls-layer">
+        <div id="controls-layer" onclick="handleGlobalClick(event)">
             <div class="top-bar">
                 <div class="back-btn-area" id="btn-back"><svg class="back-icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></div>
                 <div class="video-title" id="display-title">Unknown Video</div>
             </div>
             <div class="gesture-area">
-                <div class="gesture-zone" id="zone-left"><div class="tap-anim" id="anim-left">-10s</div></div>
+                <div class="gesture-zone" id="zone-left">
+                    <div class="tap-anim" id="anim-left">-10s</div>
+                </div>
                 <div class="gesture-zone mid" id="zone-mid"></div>
-                <div class="gesture-zone" id="zone-right"><div class="tap-anim" id="anim-right">+10s</div></div>
+                <div class="gesture-zone" id="zone-right">
+                    <div class="tap-anim" id="anim-right">+10s</div>
+                </div>
             </div>
             <div class="bottom-bar">
                 <div class="slider-container">
@@ -263,11 +252,12 @@
                         <div class="time-display"><span id="cur-time">0:00</span> / <span id="dur-time">0:00</span></div>
                     </div>
                     <div class="right-controls">
+                        <button class="ctrl-btn" id="btn-fullscreen"><svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></button>
                         <button class="ctrl-btn" id="btn-settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
                     </div>
                 </div>
             </div>
-            <div id="settings-menu">
+            <div id="settings-menu" onclick="event.stopPropagation()">
                 <div class="setting-item"><div class="setting-label">Quality</div><div class="setting-value" id="set-quality">Source</div></div>
                 <div class="setting-item"><div class="setting-label">Speed</div><div class="setting-value" id="set-speed">Normal</div></div>
                 <div class="setting-item"><div class="setting-label">Screen Fit</div><div class="setting-value" id="set-fit">Fit</div></div>
@@ -359,10 +349,7 @@
                 container.appendChild(mainVideo);
                 activeVideos.push(mainVideo);
             } else {
-                // MULTI VIEW CONSTRUCTION (Flexbox Layout)
                 container.className = 'multi-view-layout';
-                
-                // 1. Left Stage
                 const leftStage = document.createElement('div');
                 leftStage.id = 'mv-left-stage';
                 mainVideo = createVideoElement(files['m-main'], files['m-sub']);
@@ -370,15 +357,11 @@
                 container.appendChild(leftStage);
                 activeVideos.push(mainVideo);
 
-                // 2. Right Stack (Video 2, 3, 4)
                 const rightStack = document.createElement('div');
                 rightStack.id = 'mv-right-stack';
-                
-                // Create the 3 side cells
                 activeVideos.push(createSideVideo(files['m-s1'], rightStack));
                 activeVideos.push(createSideVideo(files['m-s2'], rightStack));
                 activeVideos.push(createSideVideo(files['m-s3'], rightStack));
-
                 container.appendChild(rightStack);
             }
 
@@ -389,7 +372,6 @@
 
             setupPlayerEvents();
             
-            // Auto-play (Sabay play)
             setTimeout(() => {
                 syncAction('play');
                 updatePlayIcon(true);
@@ -402,7 +384,7 @@
             const v = document.createElement('video');
             v.src = URL.createObjectURL(vidFile);
             v.playsInline = true;
-            v.preload = "auto"; // Optimize for sync
+            v.preload = "auto";
             if(subFile) {
                 const t = document.createElement('track');
                 t.kind = 'subtitles'; t.default = true;
@@ -419,14 +401,13 @@
             const v = document.createElement('video');
             v.src = URL.createObjectURL(file);
             v.playsInline = true;
-            v.muted = true; // Side videos always muted
+            v.muted = true;
             v.preload = "auto";
             cell.appendChild(v);
             container.appendChild(cell);
             return v;
         }
 
-        // --- SYNCHRONIZATION ENGINE ---
         function syncAction(action, val) {
             activeVideos.forEach(v => {
                 if (action === 'play') v.play();
@@ -445,7 +426,6 @@
                 document.getElementById('cur-time').innerText = formatTime(mainVideo.currentTime);
                 document.getElementById('dur-time').innerText = formatTime(mainVideo.duration);
 
-                // Subtitle Logic
                 const subTextSpan = document.getElementById('sub-text');
                 if(mainVideo.textTracks[0] && mainVideo.textTracks[0].activeCues && mainVideo.textTracks[0].activeCues.length > 0) {
                     const txt = mainVideo.textTracks[0].activeCues[0].text;
@@ -454,16 +434,15 @@
                     subTextSpan.innerHTML = "";
                 }
             });
-
-            mainVideo.onclick = () => { if(!isSettingsOpen) toggleControls(); };
+            // Alisin natin ang direct onclick sa video para sa handleGlobalClick na lang
         }
 
-        // --- CONTROLS ---
         const btnPlay = document.getElementById('btn-play');
         const btnMute = document.getElementById('btn-mute');
         const slider = document.getElementById('seek-slider');
 
-        btnPlay.onclick = () => {
+        btnPlay.onclick = (e) => {
+            e.stopPropagation(); // Iwas trigger ng toggleControls
             if (mainVideo.paused) {
                 syncAction('play');
                 updatePlayIcon(true);
@@ -483,8 +462,10 @@
             const time = (e.target.value / 100) * mainVideo.duration;
             syncAction('time', time);
         });
+        slider.onclick = (e) => e.stopPropagation();
 
-        btnMute.onclick = () => {
+        btnMute.onclick = (e) => {
+            e.stopPropagation();
             mainVideo.muted = !mainVideo.muted;
             updateVolumeIcon();
         };
@@ -503,7 +484,6 @@
             return `${m}:${sec < 10 ? '0' : ''}${sec}`;
         }
 
-        // --- GESTURES & VISIBILITY ---
         function showControls() {
             document.getElementById('player-wrapper').classList.add('controls-visible');
             resetControlsTimer();
@@ -519,16 +499,27 @@
         }
         function resetControlsTimer() {
             clearTimeout(controlsTimeout);
-            controlsTimeout = setTimeout(hideControls, 2000);
+            controlsTimeout = setTimeout(hideControls, 2500); // Binagalan ko konti (2.5s)
         }
 
-        document.getElementById('zone-mid').addEventListener('click', toggleControls);
+        // --- GLOBAL CLICK HANDLER ---
+        function handleGlobalClick(e) {
+            // Kung settings ay nakabukas, isara muna ito sa halip na i-hide ang buong UI
+            if (isSettingsOpen) {
+                isSettingsOpen = false;
+                document.getElementById('settings-menu').classList.remove('active');
+                return;
+            }
+            toggleControls();
+        }
+
         document.getElementById('controls-layer').addEventListener('mousemove', resetControlsTimer);
 
         let lastTapLeft = 0;
         let lastTapRight = 0;
 
-        document.getElementById('zone-left').addEventListener('click', () => {
+        document.getElementById('zone-left').addEventListener('click', (e) => {
+            e.stopPropagation(); // Pigilan ang global click toggle
             const now = new Date().getTime();
             if (now - lastTapLeft < 300) {
                 syncAction('time', mainVideo.currentTime - 10);
@@ -536,7 +527,8 @@
             }
             lastTapLeft = now;
         });
-        document.getElementById('zone-right').addEventListener('click', () => {
+        document.getElementById('zone-right').addEventListener('click', (e) => {
+            e.stopPropagation();
             const now = new Date().getTime();
             if (now - lastTapRight < 300) {
                 syncAction('time', mainVideo.currentTime + 10);
@@ -552,7 +544,8 @@
             el.classList.add('animate-tap');
         }
 
-        document.getElementById('btn-back').addEventListener('click', () => {
+        document.getElementById('btn-back').addEventListener('click', (e) => {
+            e.stopPropagation();
             if(document.fullscreenElement) document.exitFullscreen();
             if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
             syncAction('pause');
@@ -561,7 +554,6 @@
             goToHome(currentMode);
         });
 
-        // --- SETTINGS ---
         document.getElementById('btn-settings').onclick = (e) => {
             e.stopPropagation();
             isSettingsOpen = !isSettingsOpen;
@@ -569,25 +561,69 @@
             if(isSettingsOpen) menu.classList.add('active'); else menu.classList.remove('active');
         };
 
-        document.getElementById('set-speed').onclick = function() {
+        document.getElementById('set-speed').onclick = function(e) {
+            e.stopPropagation();
             currentSpeedIdx = (currentSpeedIdx + 1) % speeds.length;
             const s = speeds[currentSpeedIdx];
             syncAction('rate', s);
             this.innerText = s === 1.0 ? 'Normal' : s + 'x';
         };
 
-        document.getElementById('set-fit').onclick = function() {
+        document.getElementById('set-fit').onclick = function(e) {
+            e.stopPropagation();
             isFitCover = !isFitCover;
             mainVideo.style.objectFit = isFitCover ? 'cover' : 'contain';
             this.innerText = isFitCover ? 'Zoom' : 'Fit';
         };
 
-        document.getElementById('set-sub').onclick = function() {
+        document.getElementById('set-sub').onclick = function(e) {
+            e.stopPropagation();
             areSubsVisible = !areSubsVisible;
             document.getElementById('custom-subs').style.display = areSubsVisible ? 'block' : 'none';
             this.innerText = areSubsVisible ? 'On' : 'Off';
         };
-        document.getElementById('set-quality').onclick = () => alert("Local source detected. Quality adjustment disabled.");
+        document.getElementById('set-quality').onclick = (e) => {
+            e.stopPropagation();
+            alert("Local source detected. Quality adjustment disabled.");
+        };
+
+        // --- ARROW KEY & FULLSCREEN UPDATES ---
+        
+        window.addEventListener('keydown', (e) => {
+            if (!mainVideo || activeVideos.length === 0) return;
+
+            if (e.key === 'ArrowLeft') {
+                syncAction('time', mainVideo.currentTime - 10);
+                triggerAnim('anim-left');
+                showControls();
+            } else if (e.key === 'ArrowRight') {
+                syncAction('time', mainVideo.currentTime + 10);
+                triggerAnim('anim-right');
+                showControls();
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                btnPlay.click();
+                showControls();
+            }
+        });
+
+        const btnFS = document.getElementById('btn-fullscreen');
+        btnFS.onclick = (e) => {
+            e.stopPropagation();
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {});
+                btnFS.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>';
+            } else {
+                document.exitFullscreen();
+                btnFS.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';
+            }
+        };
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                btnFS.innerHTML = '<svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';
+            }
+        });
     </script>
 </body>
 </html>
