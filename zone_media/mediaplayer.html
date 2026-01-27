@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MEDIA PLAYER | Zone Vault </title>
     <style>
         /* --- CORE RESET --- */
@@ -145,6 +145,11 @@
         .setting-item:last-child { border-bottom: none; }
         .setting-value { color: #fff; font-weight: 600; cursor: pointer; }
 
+        /* FIX 2: Hide fullscreen button on mobile devices (max-width 768px) */
+        @media (max-width: 768px) {
+            #btn-fullscreen { display: none !important; }
+        }
+
     </style>
 </head>
 <body>
@@ -179,7 +184,7 @@
                 <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
                 <div class="card-text"><span class="card-label">Subtitle (Optional)</span><span class="card-filename" id="txt-s-sub">Tap to select</span></div>
             </label>
-            <input type="file" id="s-sub-input" accept=".vtt,.srt" onchange="handleFile(this, 's-sub')">
+            <input type="file" id="s-sub-input" accept="*/*" onchange="handleFile(this, 's-sub')">
         </div>
         <button id="btn-enter-single" class="action-btn" onclick="enterTheater('single')">WATCH NOW</button>
         <button class="back-text-btn" onclick="goToMode()">Back to Modes</button>
@@ -217,7 +222,7 @@
                 <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></div>
                 <div class="card-text"><span class="card-label">Subtitle (Main)</span><span class="card-filename" id="txt-m-sub">Optional</span></div>
             </label>
-            <input type="file" id="m-sub-input" accept=".vtt,.srt" onchange="handleFile(this, 'm-sub')">
+            <input type="file" id="m-sub-input" accept="*/*" onchange="handleFile(this, 'm-sub')">
         </div>
         <button id="btn-enter-multi" class="action-btn" onclick="enterTheater('multi')">WATCH NOW</button>
         <button class="back-text-btn" onclick="goToMode()">Back to Modes</button>
