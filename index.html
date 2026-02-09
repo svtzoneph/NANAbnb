@@ -1,532 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Zone Vault</title>
-  
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="favicon-new.png" type="image/png">
-  <meta name="theme-color" content="#0a0a0a">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance - Zone Vault</title>
+    <style>
+        /* STRICTLY PROFESSIONAL BLACK & WHITE 
+           NO BOXES. NO BORDERS. PURE CONTENT.
+        */
+        :root {
+            --bg-color: #000000;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+        }
 
-  <meta name="title" content="Zone Vault">
-  <meta name="description" content="Watch, Enjoy, and Stay Private. The premier destination for exclusive SEVENTEEN content in a secure environment.">
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://zonevault.site/index">
-  <meta property="og:title" content="Zone Vault">
-  <meta property="og:description" content="New Arrival! SEVENTEEN: OUR CHAPTER is finally here!">
-  <meta property="og:image" content="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png">
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            text-align: center;
+        }
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+        /* LAYOUT CONTAINER */
+        .container {
+            max-width: 600px;
+            padding: 20px;
+        }
 
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-1B2RJ659GL');
-  </script>
-    
-  <style>
-    :root {
-      --primary: #ffffff;
-      --secondary: #a1a1aa;
-      --accent: #3b82f6;
-      --bg-dark: #050505;
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --glass-bg: rgba(20, 20, 20, 0.6);
-    }
+        /* LOGO */
+        .logo {
+            width: 160px;
+            height: auto;
+            margin-bottom: 50px;
+            filter: grayscale(100%) contrast(1.1);
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body {
-      background-color: var(--bg-dark);
-      color: var(--primary);
-      font-family: "Inter", sans-serif;
-      overflow-x: hidden;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      -webkit-font-smoothing: antialiased;
-    }
+        /* STATUS BADGE */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
 
-    /* === PRO BACKGROUND === */
-    .bg-gradient {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
-      background: 
-        radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08), transparent 25%), 
-        radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.08), transparent 25%);
-      pointer-events: none;
-    }
-    
-    .noise-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none; z-index: -1;
-    }
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #fff;
+            border-radius: 50%;
+            margin-right: 12px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            animation: pulse 3s infinite ease-in-out;
+        }
 
-    /* === PARTICLES === */
-    #particle-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
-    .particle {
-      position: fixed; background: rgba(255,255,255,0.3); border-radius: 50%;
-      box-shadow: 0 0 10px rgba(255,255,255,0.1);
-      animation: floatUp linear infinite;
-    }
-    @keyframes floatUp {
-      0% { transform: translateY(0) scale(1); opacity: 0; }
-      20% { opacity: 0.5; }
-      100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
-    }
+        @keyframes pulse {
+            0% { opacity: 0.4; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0.4; transform: scale(0.9); }
+        }
 
-    /* === HEADER === */
-    header {
-      width: 100%; position: fixed; top: 0; left: 0; z-index: 100;
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 20px 40px; transition: all 0.4s ease;
-      height: 80px; /* Fixed Height for alignment */
-    }
-    header.scrolled {
-      padding: 10px 40px;
-      height: 70px;
-      background: rgba(5, 5, 5, 0.8);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--glass-border);
-    }
-    
-    .logo {
-        display: flex; align-items: center;
-    }
-    .logo img { height: 40px; width: auto; opacity: 0.9; transition: opacity 0.3s; display: block; }
-    .logo img:hover { opacity: 1; }
+        /* TYPOGRAPHY */
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 300;
+            letter-spacing: -0.5px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            color: #fff;
+        }
 
-    .header-buttons { display: flex; align-items: center; gap: 25px; height: 100%; }
-    
-    /* Clean Text Links (Button & Anchor normalized) */
-    .nav-link {
-      background: transparent; border: none; color: var(--secondary);
-      font-size: 14px; font-weight: 500; cursor: pointer; transition: color 0.3s;
-      text-decoration: none;
-      padding: 0; margin: 0;
-      font-family: inherit;
-      display: flex; align-items: center; /* Ensures text is centered */
-      height: 100%;
-    }
-    .nav-link:hover { color: #fff; }
+        h2 {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+        }
 
-    /* Primary Action Button */
-    .btn-primary {
-      padding: 10px 24px; border-radius: 6px; 
-      background: #fff; color: #000;
-      font-size: 14px; font-weight: 600; text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s; border: none; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center;
-    }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255,255,255,0.15); }
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #666;
+            max-width: 450px;
+            margin: 0 auto 60px auto;
+        }
 
-    /* === MOBILE ADJUSTMENTS === */
-    @media (max-width: 600px) {
-      header { padding: 0 20px; height: 70px; }
-      header.scrolled { padding: 0 20px; height: 60px; }
-      
-      .logo img { height: 32px; }
-      
-      .header-buttons { gap: 12px; }
-      
-      /* Make nav links smaller and aligned */
-      .nav-link { font-size: 12px; }
-      
-      .btn-primary { 
-          padding: 8px 14px; 
-          font-size: 12px; 
-          height: 36px; /* Explicit height for alignment */
-      }
-    }
+        /* FOOTER INFO */
+        .footer {
+            position: absolute;
+            bottom: 40px;
+            width: 100%;
+            text-align: center;
+            font-size: 10px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-    /* === HERO === */
-    main { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; }
-    .welcome {
-      text-align: center; padding: 0 20px; max-width: 800px;
-      margin-top: -60px;
-    }
-    
-    .badge {
-      display: inline-block; padding: 6px 12px; border-radius: 20px;
-      background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
-      font-size: 12px; letter-spacing: 1px; color: var(--secondary); text-transform: uppercase;
-      margin-bottom: 24px; animation: fadeIn 1s ease forwards;
-    }
-
-    .welcome h1 {
-      font-family: "Poppins", sans-serif;
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      font-weight: 700; line-height: 1.1; letter-spacing: -1px;
-      margin-bottom: 20px;
-      background: linear-gradient(180deg, #fff 0%, #ccc 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      animation: fadeIn 1s ease forwards 0.2s; opacity: 0;
-    }
-
-    .welcome p {
-      color: var(--secondary); font-size: clamp(1rem, 2vw, 1.15rem);
-      line-height: 1.6; max-width: 580px; margin: 0 auto 35px;
-      opacity: 0; animation: fadeIn 1s ease forwards 0.4s;
-    }
-
-    .cta-group {
-      display: flex; gap: 15px; justify-content: center;
-      opacity: 0; animation: fadeIn 1s ease forwards 0.6s;
-      flex-wrap: wrap; /* Ensures buttons stack on very small screens */
-    }
-    
-    .btn-outline {
-      padding: 12px 28px; border-radius: 6px; 
-      background: transparent; color: #fff; border: 1px solid var(--glass-border);
-      font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s;
-      text-decoration: none;
-      display: inline-flex; align-items: center; justify-content: center;
-    }
-    .btn-outline:hover { background: rgba(255,255,255,0.05); border-color: #fff; }
-
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* === MODALS (GLASSMORPHISM) === */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-      display: flex; justify-content: center; align-items: center;
-      z-index: 999; opacity: 0; animation: fadeModal 0.4s forwards;
-    }
-    @keyframes fadeModal { to { opacity: 1; } }
-
-    .modal {
-      background: #111;
-      background: rgba(15, 15, 15, 0.95);
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      border-radius: 16px; width: 90%; max-width: 420px;
-      position: relative; transform: scale(0.95); animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      overflow: hidden;
-    }
-    @keyframes popIn { to { transform: scale(1); opacity: 1; } }
-
-    .modal-header {
-      padding: 20px 25px; border-bottom: 1px solid var(--glass-border);
-      display: flex; justify-content: space-between; align-items: center;
-      font-family: "Poppins", sans-serif; font-weight: 600; font-size: 18px; color: #fff;
-    }
-    .close-btn { font-size: 20px; color: var(--secondary); cursor: pointer; transition: color 0.2s; }
-    .close-btn:hover { color: #fff; }
-
-    .modal-content { padding: 30px 25px; text-align: center; }
-    .modal-content p { color: var(--secondary); margin-bottom: 25px; font-size: 0.95rem; line-height: 1.5; }
-
-    .modal-actions { display: flex; flex-direction: column; gap: 10px; }
-    .modal-actions button {
-      width: 100%; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;
-    }
-    .btn-full-primary { background: #fff; border: none; color: #000; }
-    .btn-full-primary:hover { background: #e5e5e5; }
-    .btn-full-outline { background: transparent; border: 1px solid var(--glass-border); color: #fff; }
-    .btn-full-outline:hover { border-color: #fff; }
-
-    /* About Modal Specifics */
-    #aboutModal .modal { max-width: 650px; max-height: 85vh; display: flex; flex-direction: column; }
-    #aboutModal .modal-content { overflow-y: auto; text-align: left; padding-top: 10px; }
-    #aboutModal .modal-content::-webkit-scrollbar { width: 6px; }
-    #aboutModal .modal-content::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-    
-    #aboutModal h2 { color: #fff; font-size: 1.1rem; margin-top: 2rem; margin-bottom: 0.75rem; border-left: 3px solid #fff; padding-left: 10px; }
-    #aboutModal h2:first-child { margin-top: 0.5rem; }
-    #aboutModal p { font-size: 0.95rem; margin-bottom: 1rem; color: #a1a1aa; }
-    #aboutModal ul { padding-left: 20px; color: #a1a1aa; margin-bottom: 1rem; }
-    #aboutModal li { margin-bottom: 6px; }
-    #aboutModal strong { color: #fff; font-weight: 600; }
-
-    /* Footer */
-    footer {
-      border-top: 1px solid var(--glass-border);
-      padding: 30px; text-align: center; color: #444; font-size: 13px;
-    }
-  </style>
+        /* MOBILE OPTIMIZATION */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            p { font-size: 0.9rem; padding: 0 20px; }
+            .logo { width: 130px; margin-bottom: 40px; }
+        }
+    </style>
 </head>
 <body>
 
-  <div class="bg-gradient"></div>
-  <div class="noise-overlay"></div>
-  <div id="particle-container"></div>
+    <div class="container">
+        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault" class="logo">
 
-  <header id="navbar">
-    <div class="logo">
-      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault Logo">
-    </div>
-    <div class="header-buttons">
-      <button class="nav-link" onclick="openAbout()">About</button>
-      <button class="btn-primary" onclick="openModal()">Get Access</button>
-    </div>
-  </header>
 
-  <main>
-    <div class="welcome">
-      <div class="badge">Zone Vault 2.0</div>
-      <h1>Zone Vault</h1>
-      <p>A secure, permission-based sanctuary for exclusive content. Watch SEVENTEEN and more in high-fidelity private streams.</p>
-      
-      <div class="cta-group">
-        <a href="home" class="btn-primary" style="padding: 12px 30px;">Start Watching</a>
+        <h1>We'll be back shortly</h1>
         
-        <a href="download" class="btn-outline" style="padding: 12px 30px;">
-           <i class="fas fa-download" style="margin-right:8px;"></i> Download App
-        </a>
-      </div>
+        <h2>Maintenance in Progress</h2>
+
+        <p>
+            We are currently performing scheduled maintenance. Access to the platform is temporarily unavailable. We apologize for the inconvenience and appreciate your patience.
+        </p>
     </div>
-  </main>
 
-  <div class="modal-overlay" id="welcomeModal" style="display:none;">
-    <div class="modal">
-      <div class="modal-header">
-        <span>Join Zone Vault</span>
-        <span class="close-btn" onclick="closeModal()">&times;</span>
-      </div>
-      <div class="modal-content">
-        <p>To maintain security and exclusivity, Zone Vault requires an account. Please log in or register to continue.</p>
-        <div class="modal-actions">
-          <button class="btn-full-primary" onclick="window.location.href='login'">Log In to Account</button>
-          <button class="btn-full-outline" onclick="window.location.href='register'">Create New Account</button>
-        </div>
-      </div>
+    <div class="footer">
+        &copy; 2026 Zone Vault.
     </div>
-  </div>
 
-  <div class="modal-overlay" id="aboutModal" style="display:none;">
-    <div class="modal">
-      <div class="modal-header">
-        <span>Platform Overview</span>
-        <span class="close-btn" onclick="closeAbout()">&times;</span>
-      </div>
-
-      <div class="modal-content">
-      <h2>How Zone Vault Works</h2>
-      <p>
-        Zone Vault is a private platform created for <strong>exclusive VODs.</strong>. 
-        We use a secure <strong>permission-based system</strong> to verify each user and ensure that only 
-        approved accounts can access this site.
-      </p>
-
-      <h2>How Can I Get Access?</h2>
-      <p>
-      To access this site, you need to <strong>join one of the private streams</strong> we host. Before the stream day, the admin will <strong>send you a complete step-by-step guide</strong> on how to register, log in, and access the site properly.
-      </p>
-
-      <h2>How can i make sure my Information is Secured?</h2>
-      <p>
-        Your privacy and safety are our top priority. We do not store personal information on the site itself.
-        All user data—including your email and profile details—is securely stored in our 
-        <strong>database</strong>.
-      </p>
-      <p>
-        For safety, please create a <strong>unique password</strong> specifically for Zone Vault and avoid reusing your email password.
-      </p>
-
-      <h2>How the Videos Works?</h2>
-      <p>
-        Zone Vault uses <strong>HLS (HTTP Live Streaming)</strong> with <strong>Plyr</strong>, providing smooth, adaptive 
-        playback on all devices. Video sources are protected through database, preventing copying and sharing.
-      </p>
-      
-      <p>To improve performance and flexibility, we are now separating subtitles from the video files.</p>
-
-      <h3>Player Features</h3>
-      <ul>
-        <li>Double-tap left → rewind</li>
-        <li>Double-tap right → fast-forward</li>
-        <li>Double-tap center → pause/play</li>
-        <li>Hold for 3 seconds on desktop → show full controls</li>
-        <li>Auto-adjusting video quality based on internet speed</li>
-        <li>Responsive UI for all devices</li>
-      </ul>
-
-      <h2>How Can I Access the Videos?</h2>
-      <p>
-        Some videos are <strong>free</strong>, while others require access code.  
-        But we have upgraded from access codes to a <strong>permission-access</strong>, allowing us (the admin)
-        to control or give the user a access on specific videos.
-        
-        This upgrade ensures fairness for everyone, and keeps the system more secure and organized.
-      </p>
-
-      <h2>Profile Features</h2>
-      <p>You can now personalize your profile with:</p>
-      <ul>
-        <li>Custom display name</li>
-        <li>Editable bio</li>
-        <li>Uploadable banner image</li>
-        <li>Auto-color adapting background based on your banner</li>
-      </ul>
-
-      <h2>Tips for the Best Experience</h2>
-      <ul>
-        <li>Use modern browsers like <strong>Chrome, Edge, or Safari</strong>.</li>
-        <li>Keep your browser updated for smooth playback.</li>
-        <li>Use a stable internet connection for the best video quality.</li>
-        <li>For support, contact the admin via email.</li>
-      </ul>
-
-    </div>
-  </div>
-</div>
-
-  <script>
-    const container = document.getElementById("particle-container");
-    const particleCount = 60;
-    
-    for(let i = 0; i < particleCount; i++){
-      const particle = document.createElement("div");
-      particle.classList.add("particle");
-      const size = Math.random() * 3 + 1;
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      particle.style.left = `${Math.random() * 100}%`;
-      particle.style.top = `${Math.random() * 100}%`;
-      particle.style.animationDuration = `${40 + Math.random() * 40}s`; 
-      particle.style.animationDelay = `${Math.random() * 20}s`;
-      container.appendChild(particle);
-    }
-
-    // Scroll Effect for Header
-    window.addEventListener('scroll', () => {
-      const header = document.getElementById('navbar');
-      if (window.scrollY > 50) {
-        header.classList.add('scrolled');
-      } else {
-        header.classList.remove('scrolled');
-      }
-    });
-  </script>
-
-  <script>
-    window.onload = function() {
-      const modalShown = localStorage.getItem('welcomeModalShown');
-      if (!modalShown) {
-        // openModal(); 
-      }
-    };
-    function closeModal() {
-      document.getElementById("welcomeModal").style.display = "none";
-      document.body.style.overflow = "auto";
-      localStorage.setItem('welcomeModalShown', 'true');
-    }
-    function openModal() {
-      document.getElementById("welcomeModal").style.display = "flex";
-      document.body.style.overflow = "hidden";
-    }
-    function closeAbout() {
-      document.getElementById("aboutModal").style.display = "none";
-      document.body.style.overflow = "auto";
-    }
-    function openAbout() {
-      document.getElementById("aboutModal").style.display = "flex";
-      document.body.style.overflow = "hidden";
-    }
-    
-    window.onclick = function(event) {
-      if (event.target.classList.contains('modal-overlay')) {
-        event.target.style.display = "none";
-        document.body.style.overflow = "auto";
-      }
-    }
-  </script>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
-
-    let userId = localStorage.getItem("userId");
-    if (!userId) {
-      userId = "user_" + Math.random().toString(36).substring(2, 10);
-      localStorage.setItem("userId", userId);
-    }
-    console.log("Current User ID:", userId);
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-      authDomain: "tvnstream-b4497.firebaseapp.com",
-      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-      projectId: "tvnstream-b4497",
-      storageBucket: "tvnstream-b4497.firebasestorage.app",
-      messagingSenderId: "308384754214",
-      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-      measurementId: "G-VFNH70R4D9"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const messaging = getMessaging(app);
-    const vapidKey = "BM9NB-Q0-KYbhwad-5lhztW0BMpRjKBs67IOtQ7uLBZUKgzmmSmPferlpJnyVbmjo4LlvX0cVF2G_zX1OOHldyE";
-
-    async function initNotifications() {
-      if ('serviceWorker' in navigator) {
-        if (window.location.protocol === 'file:' || window.location.protocol === 'data:' || window.location.href.startsWith('blob:')) {
-            console.warn('⚠️ Service Worker skipped in preview.');
-            return;
-        }
-        try {
-          const registration = await navigator.serviceWorker.register('sw.js');
-          const permission = await Notification.requestPermission();
-          if (permission === 'granted') {
-            const currentToken = await getToken(messaging, { 
-              vapidKey: vapidKey,
-              serviceWorkerRegistration: registration 
-            });
-            if (currentToken) {
-              saveTokenToDatabase(currentToken);
-            }
-          }
-        } catch (err) {
-          console.error('Notification Error:', err);
-        }
-      }
-    }
-
-    function saveTokenToDatabase(token) {
-      update(ref(db, 'userSessions/' + userId), {
-        fcmToken: token,
-        notificationsEnabled: true,
-        lastTokenUpdate: serverTimestamp()
-      });
-    }
-
-    initNotifications();
-
-    onMessage(messaging, (payload) => {
-      const { title, body, icon } = payload.notification;
-      new Notification(title, {
-        body: body,
-        icon: icon || 'https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png'
-      });
-    });
-  </script>
-
-  <script>
-// Service Worker Registration
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').then(reg => {
-    reg.onupdatefound = () => {
-      const newSW = reg.installing;
-      newSW.onstatechange = () => {
-        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-          window.location.reload();
-        }
-      };
-    };
-  }).catch(err => {
-    console.error('Service Worker registration failed:', err);
-  });
-}
-</script>
-  
 </body>
 </html>
