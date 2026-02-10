@@ -2,280 +2,235 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Videos | Zone Vault</title>
    
   <link rel="icon" href="favicon-new.png" type="image/png" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#121212">
-   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-1B2RJ659GL');
-  </script>
 
   <style>
     /* =========================================
-       1. VARIABLES & THEME ENGINE
+       1. VARIABLES & THEME ENGINE (Synced with Collection)
        ========================================= */
     :root {
-        --bg-color: #121212;
-        --text-main: #e0e0e0;
-        --text-muted: #a0a0a0;
-        
-        --sidebar-bg: #18181b; 
-        --sidebar-hover-bg: #27272a;
-        
-        --card-bg: #1e1e1e;
-        --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-        
+        --bg-color: #050505;
+        --text-main: #ffffff;
+        --text-muted: #a1a1aa;
+        --sidebar-bg: #000000;
+        --sidebar-border: 1px solid rgba(255, 255, 255, 0.1);
+        --sidebar-hover: #18181b;
+        --card-bg: #121212;
+        --glass-border: 1px solid rgba(255, 255, 255, 0.08);
         --accent: #ffffff;
-        --input-bg: rgba(255, 255, 255, 0.05);
-        --banner-gradient: linear-gradient(to right, #18181b, #27272a);
+        --status-online: #22c55e;
+        --admin-color: #ef4444; 
         
-        --status-pending: #fbbf24;
-        --status-approved: #4ade80;
-        --status-rejected: #f87171;
-        --youtube-red: #ff0000;
-        --admin-color: #ef4444;
-        --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+        --sidebar-width-collapsed: 64px; 
+        --sidebar-width-expanded: 220px; 
         
-        /* Sidebar Dimensions */
-        --sidebar-width-collapsed: 72px;
-        --sidebar-width-expanded: 260px;
+        --toast-bg: rgba(20, 20, 20, 0.95);
+        --toast-border: 1px solid rgba(255, 255, 255, 0.1);
+        --toast-text: #ffffff;
     }
 
     body.light-mode {
         --bg-color: #f3f4f6;
-        --text-main: #111827;
-        --text-muted: #6b7280;
-        --card-bg: #ffffff;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
         --sidebar-bg: #ffffff;
-        --sidebar-hover-bg: #f9fafb;
-        --glass-border: 1px solid rgba(0, 0, 0, 0.08);
-        --accent: #000000;
-        --input-bg: #f3f4f6;
-        --banner-gradient: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
-        --scrollbar-thumb: rgba(0, 0, 0, 0.2);
+        --sidebar-border: 1px solid rgba(0,0,0,0.05);
+        --sidebar-hover: #f1f5f9;
+        --card-bg: #ffffff;
+        --glass-border: 1px solid rgba(0, 0, 0, 0.06);
+        --accent: #0f172a;
+        --toast-bg: rgba(255, 255, 255, 0.95);
+        --toast-border: 1px solid rgba(0, 0, 0, 0.05);
+        --toast-text: #0f172a;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
 
     body { 
         background-color: var(--bg-color);
         color: var(--text-main);
-        font-family: 'Inter', sans-serif;
+        font-family: 'Outfit', sans-serif;
         min-height: 100vh;
         transition: background-color 0.3s ease, color 0.3s ease;
         overflow-x: hidden;
-        padding-left: var(--sidebar-width-collapsed);
-        background-attachment: fixed;
+        padding-left: var(--sidebar-width-collapsed); 
     }
-
-    /* SCROLL LOCK CLASS */
+    
     body.no-scroll { overflow: hidden; }
 
-    /* Noise Texture */
-    .noise-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
-        pointer-events: none; z-index: -1;
-    }
+    .fade-in { animation: fadeIn 0.8s ease forwards; opacity: 0; transform: translateY(10px); }
+    @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
 
     /* =========================================
-       2. SIDEBAR STYLES
+       2. SIDEBAR STYLES (COMPACT)
        ========================================= */
-    .sidebar-container {
-        display: flex; flex-direction: column; justify-content: space-between;
-        height: 100%; padding-top: 20px;
-    }
-
-    .sidebar-brand {
-        display: flex; align-items: center; padding: 0 20px;
-        height: 50px; margin-bottom: 30px; white-space: nowrap;
-    }
-    .sidebar-brand img { width: 32px; height: auto; min-width: 32px; }
-    .sidebar-brand span {
-        margin-left: 15px; font-weight: 700; font-size: 18px; letter-spacing: -0.5px;
-        color: var(--text-main);
-    }
-
-    /* Navigation */
-    .nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; padding: 0 10px; width: 100%; }
-    
-    .nav-link {
-        display: flex; align-items: center;
-        padding: 12px 14px;
-        color: var(--text-muted);
-        text-decoration: none;
-        border-radius: 12px;
-        transition: all 0.2s;
-        white-space: nowrap;
-        font-size: 14px;
-        font-weight: 500;
-        height: 48px; 
-        cursor: pointer;
-    }
-    
-    .nav-link i {
-        font-size: 18px; min-width: 24px; text-align: center;
-        margin-right: 15px; 
-        transition: margin-right 0.3s;
-    }
-    
-    .nav-link:hover { background: var(--sidebar-hover-bg); color: var(--text-main); }
-    .nav-link.active { background: var(--input-bg); color: var(--text-main); border: 1px solid var(--glass-border); }
-
-    /* Bottom Section */
-    .sidebar-bottom {
-        padding: 15px 10px;
-        border-top: var(--glass-border);
-        display: flex; flex-direction: column; gap: 5px;
-        width: 100%;
-        margin-top: auto; 
-    }
-
-    /* User Profile Widget */
-    .sidebar-user {
-        display: flex; align-items: center;
-        padding: 10px; border-radius: 12px;
-        cursor: pointer; transition: 0.2s;
-        overflow: hidden; margin-top: 5px;
-    }
-    .sidebar-user:hover { background: var(--sidebar-hover-bg); }
-
-    .sidebar-user img {
-        width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
-        min-width: 32px; border: 2px solid var(--accent);
-    }
-    
-    .sidebar-user-info {
-        margin-left: 12px; display: flex; flex-direction: column;
-        white-space: nowrap;
-    }
-    .sidebar-username { font-size: 13px; font-weight: 600; color: var(--text-main); }
-    .sidebar-useremail { font-size: 11px; color: var(--text-muted); }
-
-    /* DESKTOP SIDEBAR */
     .sidebar-desktop {
         position: fixed; top: 0; left: 0; height: 100vh;
         width: var(--sidebar-width-collapsed);
         background: var(--sidebar-bg);
-        border-right: var(--glass-border);
+        border-right: var(--sidebar-border);
         z-index: 1000;
         transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden; 
+        display: flex; flex-direction: column;
     }
-    .sidebar-desktop:hover {
-        width: var(--sidebar-width-expanded);
-        box-shadow: 10px 0 40px rgba(0,0,0,0.1);
+    .sidebar-desktop:hover { width: var(--sidebar-width-expanded); }
+
+    .sidebar-container {
+        display: flex; flex-direction: column; 
+        height: 100%; padding: 15px 0; 
+        width: 100%;
     }
-    /* Animations for Desktop Collapse */
-    .sidebar-desktop .sidebar-brand span, 
-    .sidebar-desktop .nav-text, 
-    .sidebar-desktop .sidebar-user-info,
-    .sidebar-desktop .theme-text {
-        opacity: 0; transition: opacity 0.2s; pointer-events: none;
+
+    .sidebar-brand {
+        display: flex; align-items: center; 
+        height: 40px; margin-bottom: 25px; 
+        width: 100%; white-space: nowrap;
+        position: relative; padding-left: 0;
+        justify-content: center;
+        transition: padding 0.3s ease;
     }
-    .sidebar-desktop .nav-link i { margin-right: 0; }
+    .sidebar-brand img { width: 24px; height: 24px; object-fit: contain; z-index: 2; }
+    .sidebar-brand span {
+        position: absolute; left: 50px; 
+        opacity: 0; font-weight: 700; font-size: 14px; letter-spacing: 0.5px;
+        color: var(--text-main); transition: opacity 0.2s ease; 
+        pointer-events: none; text-transform: uppercase;
+    }
+    .sidebar-desktop:hover .sidebar-brand { justify-content: flex-start; padding-left: 20px; }
+    .sidebar-desktop:hover .sidebar-brand span { opacity: 1; pointer-events: auto; }
+
+    .nav-list { list-style: none; display: flex; flex-direction: column; gap: 4px; width: 100%; }
     
-    .sidebar-desktop:hover .sidebar-brand span, 
-    .sidebar-desktop:hover .nav-text, 
-    .sidebar-desktop:hover .sidebar-user-info,
-    .sidebar-desktop:hover .theme-text {
-        opacity: 1; transition-delay: 0.1s;
+    .nav-link {
+        display: flex; align-items: center;
+        height: 40px; 
+        color: var(--text-muted); text-decoration: none;
+        transition: all 0.2s ease; 
+        font-size: 13px; 
+        font-weight: 500;
+        width: 100%; justify-content: center; position: relative; cursor: pointer;
     }
-    .sidebar-desktop:hover .nav-link i { margin-right: 15px; }
+    .nav-link i { 
+        font-size: 16px; 
+        min-width: 20px; text-align: center; transition: color 0.2s; 
+    }
+    .nav-text { display: none; white-space: nowrap; margin-left: 12px; opacity: 0; transition: opacity 0.2s; }
+    
+    .sidebar-desktop:hover .nav-link { justify-content: flex-start; padding-left: 22px; }
+    .sidebar-desktop:hover .nav-text { display: block; opacity: 1; transition-delay: 0.1s; }
 
-    /* MOBILE SIDEBAR & HEADER */
-    .mobile-header {
-        display: none; padding: 15px 20px;
-        align-items: center; justify-content: space-between; 
-        position: sticky; top: 0; z-index: 90;
-        backdrop-filter: blur(20px); border-bottom: var(--glass-border);
-        background: var(--bg-color); width: 100%;
-    }
-    .mobile-logo-container { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.5px; }
-    .mobile-logo-img { height: 30px; width: auto; }
-    .hamburger { background: transparent; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
-
-    .mobile-sidebar-menu {
-        position: fixed; top: 0; left: -100%; width: 280px; height: 100%;
-        background: var(--sidebar-bg);
-        z-index: 9999; transition: left 0.3s ease; border-right: var(--glass-border);
-    }
-    .mobile-sidebar-menu.open { left: 0; }
-    .mobile-close-btn { 
-        position: absolute; top: 25px; right: 20px; 
-        background: none; border: none; color: var(--text-main); 
-        font-size: 24px; cursor: pointer; z-index: 10;
+    .nav-link:hover { background: var(--sidebar-hover); color: var(--text-main); }
+    .nav-link.active { color: var(--text-main); background: var(--sidebar-hover); }
+    .nav-link.active::before {
+        content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+        background: var(--text-main); 
     }
 
-    /* Switch */
-    .switch { display: block; --width-of-switch: 3.5em; --height-of-switch: 2em; --size-of-icon: 1.4em; --slider-offset: 0.3em; position: relative; width: var(--width-of-switch); height: var(--height-of-switch); }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e7eb; transition: .4s; border-radius: 30px; }
-    .slider:before { position: absolute; content: ""; height: var(--size-of-icon,1.4em); width: var(--size-of-icon,1.4em); border-radius: 20px; left: var(--slider-offset,0.3em); top: 50%; transform: translateY(-50%); background: linear-gradient(40deg,#ff0080,#ff8c00 70%); transition: .4s; }
-    input:checked + .slider { background-color: #3f3f46; }
-    input:checked + .slider:before { left: calc(100% - (var(--size-of-icon,1.4em) + var(--slider-offset,0.3em))); background: #ffffff; }
+    .sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 4px; padding-bottom: 10px; }
+    .text-danger { color: var(--admin-color) !important; font-weight: 600; }
+    .text-danger i { color: var(--admin-color) !important; }
+
+    .sidebar-user {
+        display: flex; align-items: center; justify-content: center;
+        padding: 10px 0; cursor: pointer; transition: 0.2s; margin-top: 5px; border-top: 1px solid var(--sidebar-border);
+    }
+    .sidebar-user:hover { background: var(--sidebar-hover); }
+    .sidebar-user img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid var(--glass-border); }
+    .sidebar-user-info { display: none; margin-left: 10px; }
+    .sidebar-desktop:hover .sidebar-user { justify-content: flex-start; padding-left: 20px; }
+    .sidebar-desktop:hover .sidebar-user-info { display: block; }
+    .sidebar-username { font-size: 13px; font-weight: 600; color: var(--text-main); }
+    .sidebar-useremail { font-size: 10px; color: var(--text-muted); }
 
     /* =========================================
-       3. SEARCH & GRID
+       3. HEADER (SEARCH & NOTIFICATION)
        ========================================= */
-    .main-wrapper { max-width: 1200px; margin: 40px auto; width: 92%; }
-
-    .search-wrapper {
-        position: relative; margin: 0 auto 30px auto; width: 100%; max-width: 600px; z-index: 50;
-    }
-    .search-input {
-        width: 100%; padding: 14px 20px 14px 50px;
-        background: var(--card-bg); border: var(--glass-border);
-        border-radius: 50px; font-size: 15px; color: var(--text-main);
-        outline: none; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease;
-        font-family: 'Inter', sans-serif;
-    }
-    .search-input::placeholder { color: var(--text-muted); opacity: 0.7; }
-    .search-input:focus { border-color: var(--text-main); box-shadow: 0 8px 25px rgba(0,0,0,0.25); background: rgba(255,255,255,0.08); }
+    .app-header { display: flex; justify-content: flex-end; align-items: center; padding: 20px 40px; margin-bottom: 10px; position: relative; }
     
-    .search-icon {
-        position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
-        color: var(--text-muted); font-size: 16px; pointer-events: none; transition: color 0.3s;
+    .header-actions { display: flex; align-items: center; gap: 15px; position: relative; width: 100%; justify-content: flex-end; }
+    
+    .search-box {
+        background: var(--card-bg); border: var(--glass-border);
+        padding: 7px 15px; border-radius: 50px;
+        display: flex; align-items: center; gap: 10px;
+        width: 300px; transition: 0.3s;
     }
-    .search-input:focus + .search-icon { color: var(--text-main); }
+    .search-box:focus-within { border-color: var(--text-muted); width: 350px; }
+    .search-box i { color: var(--text-muted); font-size: 12px; cursor: pointer; }
+    .search-box input { background: transparent; border: none; color: var(--text-main); width: 100%; font-size: 13px; font-family: inherit; }
 
-    .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-    @media (max-width: 1100px) { .grid-container { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 800px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 500px) { .grid-container { grid-template-columns: 1fr; } }
+    .icon-btn {
+        width: 34px; height: 34px; border-radius: 50%;
+        background: var(--card-bg); border: var(--glass-border);
+        color: var(--text-main); display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: 0.2s; position: relative; font-size: 14px;
+        text-decoration: none; 
+    }
+    .icon-btn:hover { background: var(--sidebar-hover); transform: translateY(-2px); }
+    .badge { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--admin-color); border-radius: 50%; border: 2px solid var(--bg-color); display: none; }
+    .badge.active { display: block; }
 
-    /* Video Cards */
+    .notif-modal {
+        position: absolute; top: 50px; right: 0;
+        width: 320px; max-height: 400px;
+        background: var(--card-bg); border: var(--glass-border);
+        border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        display: none; flex-direction: column; z-index: 2000;
+        overflow-y: auto; backdrop-filter: blur(10px);
+    }
+    .notif-modal.active { display: flex; animation: fadeIn 0.3s ease; }
+    .notif-header { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; }
+    .notif-item { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 12px; align-items: flex-start; transition: 0.2s; }
+    .notif-item:hover { background: var(--sidebar-hover); }
+    .notif-icon { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text-main); flex-shrink: 0; }
+    .notif-content h5 { font-size: 13px; color: var(--text-main); margin-bottom: 2px; }
+    .notif-content p { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+    .notif-empty { padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; }
+
+    /* =========================================
+       4. VIDEO GRID STYLES
+       ========================================= */
+    .main-wrapper { max-width: 1600px; margin: 0 auto; width: 100%; padding-bottom: 40px; padding-left: 40px; padding-right: 40px;}
+    
+    .page-title {
+        font-size: 28px; font-weight: 800; margin-bottom: 20px;
+        text-transform: uppercase; letter-spacing: 1px; color: var(--text-main);
+    }
+
+    .grid-container { 
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+        gap: 20px; animation: fadeIn 0.4s ease;
+    }
+
     .video-card {
         background: var(--card-bg); border: var(--glass-border);
         border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;
-        transition: transform 0.2s, box-shadow 0.2s; position: relative;
+        transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; position: relative;
     }
+    .video-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-color: var(--text-main); }
 
     .thumb-wrapper { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .thumb-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+    .thumb-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+    .video-card:hover .thumb-wrapper img { transform: scale(1.05); }
 
     .card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; }
-    .video-meta { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-    .video-title { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; line-height: 1.4; flex-grow: 1; }
-    .video-hashtags { font-size: 11px; color: var(--text-muted); margin-bottom: 15px; }
+    .video-meta { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; font-weight: 600; }
+    .video-title { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; line-height: 1.4; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .video-hashtags { font-size: 11px; color: var(--text-muted); margin-bottom: 15px; opacity: 0.7; }
 
     .card-actions { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
     .btn-watch {
         background: var(--text-main); color: var(--bg-color); border: none; padding: 8px 16px; border-radius: 50px;
-        font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
+        font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s; text-transform: uppercase;
     }
     .btn-watch:hover { opacity: 0.9; transform: scale(1.05); }
 
@@ -288,249 +243,160 @@
     .btn-fav.active { color: gold; border-color: gold; }
 
     .countdown-badge {
-        position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
-        color: white; font-size: 10px; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);
+        position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+        color: white; font-size: 10px; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); font-weight: 600;
     }
 
-    #pagination { text-align: center; margin-top: 30px; display: flex; justify-content: center; gap: 5px; }
+    #pagination { text-align: center; margin-top: 30px; display: flex; justify-content: center; gap: 8px; }
     #pagination button {
         background: var(--card-bg); border: var(--glass-border); color: var(--text-muted);
         width: 35px; height: 35px; border-radius: 8px; cursor: pointer; transition: 0.2s;
+        font-family: inherit; font-weight: 600;
     }
     #pagination button.active { background: var(--text-main); color: var(--bg-color); border-color: var(--text-main); }
-    #pagination button:hover:not(.active) { background: rgba(255,255,255,0.1); }
+    #pagination button:hover:not(.active) { background: var(--sidebar-hover); color: var(--text-main); }
 
     /* =========================================
-       4. HIGH-END FAVORITE MODAL STYLES (Light/Dark Safe)
+       5. MODALS (Favorites & Info)
        ========================================= */
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+        background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
         z-index: 10000; display: none; align-items: center; justify-content: center;
         opacity: 0; transition: opacity 0.3s;
     }
     .modal-overlay.active { opacity: 1; display: flex; }
     
     .modal-box {
-        background: var(--card-bg); /* UPDATED */
-        border: var(--glass-border); /* UPDATED */
-        padding: 0; 
-        border-radius: 20px; 
-        width: 92%; max-width: 550px; 
-        color: var(--text-main); 
-        max-height: 85vh; 
-        display: flex; flex-direction: column;
-        box-shadow: 0 40px 80px rgba(0,0,0,0.6);
-        overflow: hidden; 
-        position: relative;
+        background: var(--card-bg); border: var(--glass-border);
+        padding: 0; border-radius: 20px; width: 92%; max-width: 500px; 
+        color: var(--text-main); max-height: 85vh; display: flex; flex-direction: column;
+        box-shadow: 0 40px 80px rgba(0,0,0,0.6); position: relative;
     }
 
-    /* Modal Header */
     .modal-header {
-        padding: 20px 25px;
-        border-bottom: var(--glass-border);
+        padding: 20px 25px; border-bottom: var(--glass-border);
         display: flex; justify-content: space-between; align-items: center;
-        background: var(--input-bg); /* UPDATED */
+        background: var(--sidebar-hover); border-radius: 20px 20px 0 0;
     }
-    .modal-title { font-size: 20px; font-weight: 700; margin: 0; color: var(--text-main); letter-spacing: -0.5px; }
+    .modal-title { font-size: 16px; font-weight: 700; color: var(--text-main); text-transform: uppercase; }
     .close-modal { 
         background: transparent; border: none; color: var(--text-muted); 
-        width: 30px; height: 30px; border-radius: 50%;
-        font-size: 14px; cursor: pointer; transition: 0.2s; 
-        display: flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; border-radius: 50%; font-size: 16px; 
+        cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center;
     }
-    .close-modal:hover { background: var(--sidebar-hover-bg); color: var(--text-main); } /* UPDATED */
+    .close-modal:hover { background: rgba(255,255,255,0.1); color: var(--text-main); }
 
-    /* Scrollable Content Area */
-    .modal-body {
-        padding: 20px;
-        overflow-y: auto;
-        display: flex; flex-direction: column; gap: 12px;
-    }
-    /* Stylish Scrollbar (Dynamic) */
-    .modal-body::-webkit-scrollbar { width: 6px; }
-    .modal-body::-webkit-scrollbar-track { background: transparent; }
-    .modal-body::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; } /* UPDATED */
-    .modal-body::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-    /* Favorite List Items - "Card Row" Style */
+    .modal-body { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+    
+    /* Fav Item Styles */
     .fav-list-item { 
-        display: flex; align-items: center; gap: 15px; 
-        padding: 12px; 
-        border-radius: 12px; 
-        background: var(--input-bg); /* UPDATED */
-        border: var(--glass-border); /* UPDATED */
-        transition: all 0.2s ease;
+        display: flex; align-items: center; gap: 15px; padding: 10px; 
+        border-radius: 12px; background: var(--bg-color); border: var(--glass-border);
+        transition: 0.2s;
     }
-    .fav-list-item:hover { 
-        background: var(--sidebar-hover-bg); /* UPDATED */
-        border-color: var(--text-muted);
-        transform: translateX(4px);
+    .fav-list-item:hover { border-color: var(--text-muted); }
+    .fav-thumb { width: 80px; aspect-ratio: 16/9; border-radius: 6px; object-fit: cover; }
+    .fav-list-info { flex: 1; min-width: 0; }
+    .fav-list-title { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fav-list-cat { font-size: 10px; color: var(--text-muted); }
+    .fav-actions { display: flex; gap: 10px; }
+    .fav-btn-remove { 
+        color: var(--text-muted); background: none; border: none; cursor: pointer; font-size: 14px; transition: 0.2s;
     }
-
-    .fav-thumb {
-        width: 100px; aspect-ratio: 16/9; 
-        border-radius: 8px; 
-        object-fit: cover; 
-        flex-shrink: 0;
-        background: #000;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    }
-
-    .fav-list-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-    .fav-list-title { 
-        font-size: 15px; font-weight: 600; color: var(--text-main); 
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .fav-list-cat { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 500; }
-
-    .fav-actions { display: flex; gap: 10px; align-items: center; }
-
-    /* Premium Pill Button */
-    .fav-btn-watch {
-        background: var(--text-main); color: var(--bg-color);
-        border: none; padding: 8px 14px; border-radius: 50px;
-        font-size: 12px; font-weight: 700; cursor: pointer; 
-        display: flex; align-items: center; gap: 6px; white-space: nowrap;
-    }
-    /* HOVER EFFECT REMOVED FOR WATCH BUTTON */
-
-    /* Trash Icon */
-    .fav-btn-remove {
-        width: 32px; height: 32px; border-radius: 50%;
-        border: 1px solid var(--glass-border); 
-        background: transparent; color: var(--text-muted);
-        cursor: pointer; transition: 0.2s;
-        display: flex; align-items: center; justify-content: center;
-    }
-    .fav-btn-remove:hover { 
-        color: #ef4444; border-color: #ef4444; 
-        background: rgba(239, 68, 68, 0.1); 
-    }
-
-    /* Empty State */
-    .empty-fav { 
-        text-align: center; padding: 60px 20px; color: var(--text-muted); 
-        display: flex; flex-direction: column; align-items: center; gap: 15px;
-    }
-    .empty-fav i { font-size: 48px; opacity: 0.2; margin-bottom: 5px; }
+    .fav-btn-remove:hover { color: var(--admin-color); }
 
     /* Info Modal Text */
     .info-text p { color: var(--text-muted); font-size: 13px; line-height: 1.6; margin-bottom: 15px; }
     .info-text b { color: var(--text-main); }
-    .info-modal-content { padding: 25px; }
+    
+    /* TOAST */
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--toast-bg); border: var(--toast-border); color: var(--toast-text); padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; z-index: 9999; opacity: 0; pointer-events: none; backdrop-filter: blur(10px); transition: all 0.5s ease; }
+    .toast.show { bottom: 50px; opacity: 1; }
 
-    /* Access Denied Modal */
-    .access-denied-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 10, 10, 0.95); color: #fff; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; z-index: 99999; opacity: 0; animation: fadeIn 0.4s forwards; backdrop-filter: blur(15px); }
-    .access-card { background: #18181b; border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 24px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); transform: translateY(20px); animation: slideUp 0.4s forwards 0.1s; }
+    /* ACCESS DENIED */
+    .access-denied-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(10px); }
+    .access-card { background: #111; border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; text-align: center; color: #fff; max-width: 400px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
     .access-icon-box { width: 60px; height: 60px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 24px; }
-    .access-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; color: #fff; }
-    .access-desc { font-size: 14px; color: #a1a1aa; line-height: 1.5; margin-bottom: 25px; }
-    .access-btn { background: #fff; color: #000; padding: 12px 24px; border-radius: 12px; font-weight: 600; font-size: 14px; border: none; cursor: pointer; transition: all 0.2s; width: 100%; }
-    .access-btn:hover { background: #e5e5e5; transform: translateY(-1px); }
+    .access-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+    .access-desc { font-size: 14px; color: #888; line-height: 1.5; margin-bottom: 25px; }
+    .access-btn { background: #fff; color: #000; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .access-btn:hover { transform: scale(1.05); }
 
-    @keyframes fadeIn { to { opacity: 1; } }
-    @keyframes slideUp { to { transform: translateY(0); } }
+    /* MOBILE */
+    .mobile-header { display: none; padding: 15px 20px; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 90; background: var(--bg-color); border-bottom: var(--glass-border); }
+    .mobile-logo-container { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-main); }
+    .mobile-logo-img { height: 28px; width: auto; }
+    .mobile-sidebar-menu { position: fixed; top: 0; left: -100%; width: 280px; height: 100%; background: var(--sidebar-bg); z-index: 9999; transition: left 0.3s ease; border-right: var(--glass-border); padding-top: 0; display:flex; flex-direction:column; }
+    .mobile-sidebar-menu.open { left: 0; }
 
     @media (max-width: 900px) {
         .sidebar-desktop { display: none; }
         .mobile-header { display: flex; }
         body { padding-left: 0; }
-        .search-wrapper { max-width: 90%; }
+        .app-header { justify-content: space-between; padding: 15px 20px; margin-top: 0; }
+        .header-actions { width: 100%; justify-content: space-between; gap: 10px; }
+        .search-box { width: auto; flex: 1; }
+        .notif-modal { position: absolute; top: 60px; right: 0; left: auto; transform: none; width: 300px; max-width: 90vw; }
+        .main-wrapper { padding: 0 20px 40px 20px; }
+        .grid-container { grid-template-columns: repeat(1, 1fr); gap: 15px; }
+        .video-title { font-size: 13px; }
+    }
+    @media (min-width: 500px) and (max-width: 900px) {
+         .grid-container { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
 
-<div class="noise-overlay"></div>
+<div id="toast" class="toast">
+    <i class="fas fa-check-circle" style="color:var(--status-online);"></i>
+    <span>Welcome to Videos</span>
+</div>
 
 <div class="mobile-header">
     <div class="mobile-logo-container">
          <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault" class="mobile-logo-img">
          <span>ZONE VAULT</span>
     </div>
-    <div style="display:flex; align-items:center; gap:10px;">
-        <button class="hamburger" onclick="toggleMobileSidebar()">
-            <i class="fas fa-bars"></i>
-        </button>
-    </div>
+    <button class="hamburger" onclick="toggleMobileSidebar()" style="background:none; border:none; color:var(--text-main); font-size:20px;">
+        <i class="fas fa-bars"></i>
+    </button>
 </div>
 
 <div id="mobileSidebar" class="mobile-sidebar-menu">
-    <div class="sidebar-container">
-        <button class="mobile-close-btn" onclick="toggleMobileSidebar()">&times;</button>
-
-        <div class="sidebar-top">
-            <div class="sidebar-brand">
-                <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault">
-                <span>ZONE VAULT</span>
+    <div class="sidebar-container" style="padding: 0 20px; height: 100%; display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 20px 0 20px;">
+            <div class="sidebar-brand" style="justify-content: flex-start; margin-bottom: 0; height: auto;">
+                <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" style="width:24px; height:24px;">
+                <span style="opacity:1; position:static; margin-left:12px; transform:none; font-size:14px;">ZONE VAULT</span>
             </div>
-
-            <ul class="nav-list">
-                <li class="nav-item">
-                    <a href="profile.html" class="nav-link">
-                        <i class="fas fa-user"></i> <span>Profile</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="home.html" class="nav-link">
-                        <i class="fas fa-home"></i> <span>Home</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="videos.html" class="nav-link active">
-                        <i class="fas fa-play-circle"></i> <span>Videos</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="random" class="nav-link">
-                        <i class="fas fa-random"></i> <span>Random</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="collection" class="nav-link">
-                        <i class="fas fa-images"></i> <span>Collection</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="live.html" class="nav-link">
-                        <i class="fas fa-broadcast-tower"></i> <span>Live</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" onclick="openFavoriteModal(); return false;" class="nav-link">
-                        <i class="fas fa-star"></i> <span>Favorites</span>
-                    </a>
-                </li>
-            </ul>
+            <button onclick="toggleMobileSidebar()" style="background:none; border:none; color:var(--text-main); font-size:28px; cursor:pointer;">&times;</button>
         </div>
-
-        <div class="sidebar-bottom">
-            <div class="nav-link" style="justify-content:space-between; cursor:default; padding: 10px;">
-                <div style="display:flex; align-items:center;">
-                    <i class="fas fa-moon"></i> 
-                    <span id="theme-text-mobile" class="nav-text" style="font-size:13px; margin-left:10px;">Dark Mode</span>
-                </div>
-                <label class="switch" style="transform:scale(0.65);">
-                    <input type="checkbox" class="theme-checkbox-mobile" onchange="syncTheme(this)">
-                    <span class="slider"></span>
-                </label>
+        <ul class="nav-list" style="padding: 20px 0;">
+            <li class="nav-item"> <a href="profile" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-user" style="margin-right:12px;"></i> Profile</a> </li>
+            <li class="nav-item"> <a href="home" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-home" style="margin-right:12px;"></i> Home</a> </li>
+            <li class="nav-item"> <a href="videos" class="nav-link active" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-play-circle" style="margin-right:12px;"></i> Videos</a> </li>
+            <li class="nav-item"> <a href="random" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-random" style="margin-right:12px;"></i> Random</a> </li>
+            <li class="nav-item"> <a href="collection" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-images" style="margin-right:12px;"></i> Collection</a> </li>
+            <li class="nav-item"> <a href="live" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-broadcast-tower" style="margin-right:12px;"></i> Live</a> </li>
+            <li class="nav-item"> <a href="#" onclick="openFavoriteModal(); return false;" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-star" style="margin-right:12px;"></i> Favorites</a> </li>
+        </ul>
+        <div class="sidebar-bottom" style="margin-top: auto; padding-bottom: 20px;">
+             <div class="nav-link" onclick="toggleTheme()" style="justify-content: flex-start; padding-left: 20px; cursor: pointer;">
+                <i class="fas fa-cog" style="margin-right:12px;"></i> 
+                <span>Switch Theme</span>
             </div>
-
-            <div class="nav-link" style="cursor:default; margin-top:5px; margin-bottom:5px; border:1px solid var(--glass-border);">
-                 <i class="fas fa-shield-alt" id="status-icon-mobile"></i>
-                 <span class="nav-text" id="status-text-mobile" style="margin-left:10px; font-weight:700;">Checking...</span>
+            <div class="nav-link text-danger" style="cursor:default; justify-content: flex-start; padding-left: 20px;">
+                 <i class="fas fa-shield-alt" style="margin-right:12px;"></i>
+                 <span id="status-text-mobile">ADMIN ACCESS</span>
             </div>
-
-            <div class="nav-item">
-                <a href="#" onclick="logout()" class="nav-link" style="color:var(--admin-color);">
-                    <i class="fas fa-sign-out-alt"></i> <span>Log Out</span>
-                </a>
-            </div>
-
-            <div class="sidebar-user" onclick="window.location.href='profile.html'">
+            <a href="#" onclick="logout()" class="nav-link text-danger" style="justify-content: flex-start; padding-left: 20px;">
+                <i class="fas fa-sign-out-alt" style="margin-right:12px;"></i> Log Out
+            </a>
+            <div class="sidebar-user" onclick="window.location.href='profile.html'" style="justify-content: flex-start; padding-left: 20px;">
                 <img id="mobile-sidebar-pic" src="https://via.placeholder.com/150" alt="Profile">
-                <div class="sidebar-user-info">
+                <div class="sidebar-user-info" style="display:block; margin-left:10px;">
                     <div id="mobile-sidebar-name" class="sidebar-username">Loading...</div>
                     <div id="mobile-sidebar-email" class="sidebar-useremail">...</div>
                 </div>
@@ -541,74 +407,31 @@
 
 <aside class="sidebar-desktop">
     <div class="sidebar-container">
-        <div class="sidebar-top">
-            <div class="sidebar-brand">
-                <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo">
-                <span>ZONE VAULT</span>
-            </div>
-
-            <ul class="nav-list">
-                <li class="nav-item">
-                    <a href="profile.html" class="nav-link">
-                        <i class="fas fa-user"></i> <span class="nav-text">Profile</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="home.html" class="nav-link">
-                        <i class="fas fa-home"></i> <span class="nav-text">Home</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="videos.html" class="nav-link active">
-                        <i class="fas fa-play-circle"></i> <span class="nav-text">Videos</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="random" class="nav-link">
-                        <i class="fas fa-random"></i> <span class="nav-text">Random</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="collection" class="nav-link">
-                        <i class="fas fa-images"></i> <span class="nav-text">Collection</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="live.html" class="nav-link">
-                        <i class="fas fa-broadcast-tower"></i> <span class="nav-text">Live</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" onclick="openFavoriteModal(); return false;" class="nav-link">
-                        <i class="fas fa-star"></i> <span class="nav-text">Favorites</span>
-                    </a>
-                </li>
-            </ul>
+        <div class="sidebar-brand">
+            <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo">
+            <span>ZONE VAULT</span>
         </div>
-
+        <ul class="nav-list">
+            <li class="nav-item"> <a href="profile" class="nav-link"><i class="fas fa-user"></i> <span class="nav-text">Profile</span></a> </li>
+            <li class="nav-item"> <a href="home" class="nav-link"><i class="fas fa-home"></i> <span class="nav-text">Home</span></a> </li>
+            <li class="nav-item"> <a href="videos" class="nav-link active"><i class="fas fa-play-circle"></i> <span class="nav-text">Videos</span></a> </li>
+            <li class="nav-item"> <a href="random" class="nav-link"><i class="fas fa-random"></i> <span class="nav-text">Random</span></a> </li>
+            <li class="nav-item"> <a href="collection" class="nav-link"><i class="fas fa-images"></i> <span class="nav-text">Collection</span></a> </li>
+            <li class="nav-item"> <a href="live" class="nav-link"><i class="fas fa-broadcast-tower"></i> <span class="nav-text">Live</span></a> </li>
+            <li class="nav-item"> <a href="#" onclick="openFavoriteModal(); return false;" class="nav-link"><i class="fas fa-star"></i> <span class="nav-text">Favorites</span></a> </li>
+        </ul>
         <div class="sidebar-bottom">
-            <div class="nav-link" style="justify-content:space-between; cursor:default; padding: 10px;">
-                <div style="display:flex; align-items:center;">
-                    <i class="fas fa-moon"></i> 
-                    <span id="theme-text-pc" class="theme-text nav-text" style="font-size:13px; margin-left:10px;">Dark Mode</span>
-                </div>
-                <label class="switch" style="transform:scale(0.65);">
-                    <input type="checkbox" class="theme-checkbox-pc" onchange="syncTheme(this)">
-                    <span class="slider"></span>
-                </label>
+            <div class="nav-link" onclick="toggleTheme()">
+                <i class="fas fa-cog"></i> 
+                <span class="nav-text">Switch Theme</span>
             </div>
-
-            <div class="nav-link" style="cursor:default; margin-top:5px; margin-bottom:5px; border:1px solid var(--glass-border);">
-                 <i class="fas fa-shield-alt" id="status-icon-pc"></i>
-                 <span class="nav-text nav-text" id="status-text-pc" style="margin-left:10px; font-weight:700;">Checking...</span>
+             <div class="nav-link text-danger" style="cursor:default;">
+                 <i class="fas fa-shield-alt"></i>
+                 <span class="nav-text" id="status-text-pc">ADMIN ACCESS</span>
             </div>
-
-            <div class="nav-item">
-                <a href="#" onclick="logout()" class="nav-link" style="color:var(--admin-color);">
-                    <i class="fas fa-sign-out-alt"></i> <span class="nav-text">Log Out</span>
-                </a>
-            </div>
-
+            <a href="#" onclick="logout()" class="nav-link text-danger">
+                <i class="fas fa-sign-out-alt"></i> <span class="nav-text">Log Out</span>
+            </a>
             <div class="sidebar-user" onclick="window.location.href='profile.html'">
                 <img id="sidebar-pic" src="https://via.placeholder.com/150" alt="Profile">
                 <div class="sidebar-user-info">
@@ -620,11 +443,33 @@
     </div>
 </aside>
 
-<div class="main-wrapper">
-    <div class="search-wrapper">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="searchInput" class="search-input" placeholder="Search videos, tags, categories..." oninput="handleSearch(this.value)">
-    </div>
+<div class="main-wrapper fade-in">
+    
+    <header class="app-header">
+        <div class="header-actions">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search videos, tags..." oninput="handleSearch(this.value)">
+            </div>
+            
+            <a href="javascript:void(0)" class="icon-btn" onclick="toggleNotifModal()">
+                <i class="fas fa-bell"></i>
+                <span id="notif-badge" class="badge"></span>
+            </a>
+            
+            <div id="notifModal" class="notif-modal">
+                <div class="notif-header">
+                    <span>Notifications</span>
+                    <i class="fas fa-check-double" style="cursor:pointer;" title="Mark all read"></i>
+                </div>
+                <div id="notif-list">
+                    <div class="notif-empty">Loading notifications...</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <h1 class="page-title">Videos</h1>
 
     <div class="grid-container" id="grid"></div>
      
@@ -648,392 +493,359 @@
 </div>
 
 <div id="infoModal" class="modal-overlay">
-    <div class="modal-box info-modal-content">
-        <button class="close-modal" onclick="closeInfoModal()">&times;</button>
-        <div class="modal-title">Important Notice</div>
-        <div class="info-text">
-            <p><b>Player Update:</b><br>
-            Double tap right to <b>Fast Forward</b>. Double tap left to <b>Rewind</b>. Double tap center to <b>Pause/Play</b>.<br>
-            Hold screen for 2s to show controls.</p>
-            
-            <p><b>Video Quality:</b><br>
-            Quality auto-adjusts based on your internet speed.</p>
-            
-            <hr style="border-color:var(--glass-border); margin:15px 0;">
-            
-            <p><b>PLEASE READ:</b><br>
-            Do not record, reupload, or share content. Unauthorized distribution will result in a <b>permanent ban</b>.</p>
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title">Important Notice</div>
+            <button class="close-modal" onclick="closeInfoModal()">&times;</button>
         </div>
-        <button onclick="closeInfoModal()" class="btn-watch" style="width:100%; margin-top:10px;">I Understand</button>
+        <div class="modal-body">
+             <div class="info-text">
+                <p><b>Player Update:</b><br>
+                Double tap right to <b>Fast Forward</b>. Double tap left to <b>Rewind</b>. Double tap center to <b>Pause/Play</b>.<br>
+                Hold screen for 2s to show controls.</p>
+                
+                <p><b>Video Quality:</b><br>
+                Quality auto-adjusts based on your internet speed.</p>
+                
+                <hr style="border-color:var(--glass-border); margin:15px 0;">
+                
+                <p style="color: var(--admin-color);"><b>PLEASE READ:</b><br>
+                Do not record, reupload, or share content. Unauthorized distribution will result in a <b>permanent ban</b>.</p>
+            </div>
+            <button onclick="closeInfoModal()" class="btn-watch" style="width:100%; margin-top:10px;">I Understand</button>
+        </div>
     </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script>
-/* ==================== Firebase & Data Logic ==================== */
-const firebaseConfig = {
-  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-  authDomain: "tvnstream-b4497.firebaseapp.com",
-  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-  projectId: "tvnstream-b4497",
-  storageBucket: "tvnstream-b4497.appspot.com",
-  messagingSenderId: "308384754214",
-  appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-  measurementId: "G-VFNH70R4D9"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
-let favorites = [];
-let userId = null;
+    // --- FIREBASE INIT ---
+    const firebaseConfig = { apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0", authDomain: "tvnstream-b4497.firebaseapp.com", databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com", projectId: "tvnstream-b4497", storageBucket: "tvnstream-b4497.appspot.com", messagingSenderId: "308384754214", appId: "1:308384754214:web:2938e76cd29b288f75d4e7", measurementId: "G-VFNH70R4D9" };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    
+    let favorites = [];
+    let userId = null;
 
-// Auth & Profile Fetch
-auth.onAuthStateChanged(user => {
-  if (user) {
-    userId = user.uid;
-    loadFavoritesFromFirebase();
-
-    db.ref('users/' + userId).on('value', snapshot => {
-        const data = snapshot.val() || {};
-        const displayName = data.name || "Member";
-        const displayEmail = user.email;
-        const displayPic = data.profilePicture || "https://via.placeholder.com/150";
-        const role = (data.role || "member").toLowerCase();
-
-        // Update Desktop Sidebar
-        const sbName = document.getElementById("sidebar-name");
-        const sbEmail = document.getElementById("sidebar-email");
-        const sbPic = document.getElementById("sidebar-pic");
-        if(sbName) sbName.innerText = displayName;
-        if(sbEmail) sbEmail.innerText = displayEmail;
-        if(sbPic) sbPic.src = displayPic;
-
-        // Update Mobile Sidebar
-        const mbName = document.getElementById("mobile-sidebar-name");
-        const mbEmail = document.getElementById("mobile-sidebar-email");
-        const mbPic = document.getElementById("mobile-sidebar-pic");
-        if(mbName) mbName.innerText = displayName;
-        if(mbEmail) mbEmail.innerText = displayEmail;
-        if(mbPic) mbPic.src = displayPic;
-
-        // --- ROLE INDICATORS ---
-        const isAdm = role === 'admin';
-        const statusTextIds = ['status-text-pc', 'status-text-mobile'];
-        const statusIconIds = ['status-icon-pc', 'status-icon-mobile'];
-
-        statusTextIds.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.innerText = isAdm ? "ADMIN" : "MEMBER";
-                el.style.color = isAdm ? "var(--admin-color)" : "var(--text-muted)";
-            }
-        });
-
-        statusIconIds.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.style.color = isAdm ? "var(--admin-color)" : "var(--text-muted)";
-            }
-        });
-
-        if (isAdm) {
-            // Keep Bypass for Admin
-            sessionStorage.setItem('isAdmin', 'true');
-            sessionStorage.setItem('internalAccess', 'true');
-        } else {
-            sessionStorage.removeItem('isAdmin');
+    // --- TOAST ---
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.getElementById('toast').classList.add('show');
+            setTimeout(() => { document.getElementById('toast').classList.remove('show'); }, 4000);
+        }, 1000);
+        
+        // Info Modal Logic
+        if (!sessionStorage.getItem('infoModalShown')) {
+            document.getElementById('infoModal').classList.add('active');
+            document.body.classList.add('no-scroll');
         }
     });
-  } else {
-    // If no user, redirect or handle anonymously
-    auth.signInAnonymously().catch(console.error);
-  }
-});
 
-window.logout = function() {
-    if(confirm("Are you sure you want to log out?")) {
-        auth.signOut().then(() => window.location.href = "index.html");
+    // --- AUTH LOGIC ---
+    auth.onAuthStateChanged(user => {
+        if(user) {
+            userId = user.uid;
+            loadFavoritesFromFirebase();
+            db.ref('users/' + user.uid).on('value', snap => {
+                const data = snap.val() || {};
+                const name = data.name || "Member";
+                const pic = data.profilePicture || "https://via.placeholder.com/150";
+                const role = (data.role || "member").toLowerCase();
+                const isAdm = role === 'admin';
+
+                document.getElementById("sidebar-name").innerText = name;
+                document.getElementById("sidebar-email").innerText = user.email;
+                document.getElementById("sidebar-pic").src = pic;
+                
+                document.getElementById("mobile-sidebar-name").innerText = name;
+                document.getElementById("mobile-sidebar-email").innerText = user.email;
+                document.getElementById("mobile-sidebar-pic").src = pic;
+
+                const statusTxt = isAdm ? "ADMIN ACCESS" : "MEMBER ACCESS";
+                if(document.getElementById("status-text-pc")) document.getElementById("status-text-pc").innerText = statusTxt;
+                if(document.getElementById("status-text-mobile")) document.getElementById("status-text-mobile").innerText = statusTxt;
+                
+                if (isAdm) { sessionStorage.setItem('isAdmin', 'true'); sessionStorage.setItem('internalAccess', 'true'); }
+            });
+        }
+    });
+
+    window.logout = function() {
+        if(confirm("Are you sure you want to log out?")) {
+            auth.signOut().then(() => window.location.href = "index.html");
+        }
     }
-}
 
-/* ==================== Video Data ==================== */
-const data = [
-  {id:"v0.6", thumb:"https://uploads.onecompiler.io/43ddry4jt/449datfub/1765871658770_cxm_doubleup_ONLINE_pc.jpg", category:"VIDEOS", title:"CxM [DOUBLE UP] LIVE PARTY in INCHEON", hashtags:"NEW ADDED", link:"2025/cxm_in_incheon"},
-  {id:"v0.5", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Fukuoka Show", hashtags:"NEW ADDED", link:"2025/fukuokanewtour"},
-  {id:"v0.4", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Osaka Show", hashtags:"NEW ADDED", link:"2025/japannewtour"},
-  {id:"v0.3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/the-shadow's-edge.jpg", category:"MOVIE", title:"The Shadow's Edge", hashtags:"", link:"2025/the-shadows-edge"},
-  {id:"v0.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svt_ourchapter.jpg", category:"DOCU", title:"SEVENTEEN: OUR CHAPTER", hashtags:"", link:"2025/ourchapterS17N-111025-6B4"},
-  {id:"v0.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png", category:"VARIETY", title:"IN THE SOOP SEVENTEEN ver. Season2", hashtags:"", link:"2021/inthesoop2-N12X5R25-74K2"},
-  {id:"v1.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"SPECIAL", title:"[Let's SVTreaming Day]", hashtags:"", link:"2025/svtreaming1"},
-  {id:"v1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN WORLD TOUR [NEW_] IN INCHEON", hashtags:"", link:"2025/newtour"},
-  {id:"v2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_gwangju.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN GWANGJU", hashtags:"", link:"2025/hxwingwangju"},
-  {id:"v3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_seoul.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN SEOUL", hashtags:"", link:"2025/hxwfanconcert"},
-  {id:"v4", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/nana_bnb.png", category:"VIDEOS", title:"NANA bnb with SEVENTEEN", hashtags:"", link:"2025/nanabnb"},
-  {id:"v5", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/holiday.png", category:"VIDEOS", title:"SEVENTEEN 2025 JAPAN FAN MEETING 'HOLIDAY", hashtags:"", link:"2025/svtholiday"},
-  {id:"v6", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.png", category:"VIDEOS", title:"SEVENTEEN 'RIGHT HERE' WORLD TOUR IN GOYANG", hashtags:"", link:"2024/rightheregoyang"},
-  {id:"v7", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/arena-tour.png", category:"VIDEOS", title:"SEVENTEEN 2018 JAPAN ARENA TOUR 'SVT'", hashtags:"", link:"random/arenatour"},
-  {id:"v8", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/japan-concert.png", category:"VIDEOS", title:"17 JAPAN CONCERT Say the name #SEVENTEEN", hashtags:"", link:"random/svtjapanconcert"},
-  {id:"v9", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/disney.png", category:"VIDEOS", title:"SEVENTEEN TOUR AGAIN DISNEY+", hashtags:"", link:"random/touragain"}
-];
+    // --- NOTIFICATIONS ---
+    const notifList = document.getElementById('notif-list');
+    let latestNotifTimestamp = 0;
 
-let currentPaginationPage = 1;
-let cardsPerPage = window.innerWidth <= 768 ? 4 : 8;
-const grid = document.getElementById("grid");
+    db.ref('notifications').limitToLast(10).on('value', snapshot => {
+        notifList.innerHTML = ''; 
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            const notifs = Object.values(data).reverse(); 
+            
+            notifs.forEach(n => {
+                const item = document.createElement('div');
+                item.className = 'notif-item';
+                item.innerHTML = `<div class="notif-icon"><i class="fas ${n.icon || 'fa-bell'}"></i></div><div class="notif-content"><h5>${n.title}</h5><p>${n.message}</p></div>`;
+                notifList.appendChild(item);
+                if(n.timestamp > latestNotifTimestamp) latestNotifTimestamp = n.timestamp;
+            });
 
-// --- SEARCH LOGIC ---
-let filteredData = [...data];
+            const lastRead = localStorage.getItem('lastReadNotif') || 0;
+            if (latestNotifTimestamp > lastRead) document.getElementById('notif-badge').classList.add('active');
+            else document.getElementById('notif-badge').classList.remove('active');
+        } else {
+            notifList.innerHTML = '<div class="notif-empty">No new notifications</div>';
+        }
+    });
 
-function handleSearch(query) {
-    const term = query.toLowerCase();
-    filteredData = data.filter(item => 
-        item.title.toLowerCase().includes(term) || 
-        item.category.toLowerCase().includes(term) ||
-        item.hashtags.toLowerCase().includes(term)
-    );
-    currentPaginationPage = 1;
-    renderGrid(1);
-}
+    window.toggleNotifModal = function() {
+        const modal = document.getElementById('notifModal');
+        modal.classList.toggle('active');
+        if (modal.classList.contains('active')) {
+            document.getElementById('notif-badge').classList.remove('active');
+            localStorage.setItem('lastReadNotif', latestNotifTimestamp);
+        }
+    }
 
-window.addEventListener('resize', () => {
-    const newLimit = window.innerWidth <= 768 ? 5 : 8;
-    if(newLimit !== cardsPerPage) {
-        cardsPerPage = newLimit;
-        currentPaginationPage = 1; 
+    // --- THEME LOGIC ---
+    function initTheme() {
+        const savedTheme = localStorage.getItem('zoneTheme') || 'dark';
+        if (savedTheme === 'light') document.body.classList.add('light-mode');
+    }
+    
+    window.toggleTheme = function() {
+        document.body.classList.toggle('light-mode');
+        const isLight = document.body.classList.contains('light-mode');
+        localStorage.setItem('zoneTheme', isLight ? 'light' : 'dark');
+    }
+    initTheme();
+
+    // --- VIDEO DATA & GRID LOGIC ---
+    const data = [
+      {id:"v0.6", thumb:"https://uploads.onecompiler.io/43ddry4jt/449datfub/1765871658770_cxm_doubleup_ONLINE_pc.jpg", category:"VIDEOS", title:"CxM [DOUBLE UP] LIVE PARTY in INCHEON", hashtags:"NEW ADDED", link:"2025/cxm_in_incheon"},
+      {id:"v0.5", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Fukuoka Show", hashtags:"NEW ADDED", link:"2025/fukuokanewtour"},
+      {id:"v0.4", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Osaka Show", hashtags:"NEW ADDED", link:"2025/japannewtour"},
+      {id:"v0.3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/the-shadow's-edge.jpg", category:"MOVIE", title:"The Shadow's Edge", hashtags:"", link:"2025/the-shadows-edge"},
+      {id:"v0.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svt_ourchapter.jpg", category:"DOCU", title:"SEVENTEEN: OUR CHAPTER", hashtags:"", link:"2025/ourchapterS17N-111025-6B4"},
+      {id:"v0.2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png", category:"VARIETY", title:"IN THE SOOP SEVENTEEN ver. Season2", hashtags:"", link:"2021/inthesoop2-N12X5R25-74K2"},
+      {id:"v1.1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svtreaming.png", category:"SPECIAL", title:"[Let's SVTreaming Day]", hashtags:"", link:"2025/svtreaming1"},
+      {id:"v1", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN WORLD TOUR [NEW_] IN INCHEON", hashtags:"", link:"2025/newtour"},
+      {id:"v2", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_gwangju.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN GWANGJU", hashtags:"", link:"2025/hxwingwangju"},
+      {id:"v3", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/warning_seoul.png", category:"VIDEOS", title:"HOSHIXWOOZI FAN CONCERT 'WARNING' IN SEOUL", hashtags:"", link:"2025/hxwfanconcert"},
+      {id:"v4", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/nana_bnb.png", category:"VIDEOS", title:"NANA bnb with SEVENTEEN", hashtags:"", link:"2025/nanabnb"},
+      {id:"v5", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/holiday.png", category:"VIDEOS", title:"SEVENTEEN 2025 JAPAN FAN MEETING 'HOLIDAY", hashtags:"", link:"2025/svtholiday"},
+      {id:"v6", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/right-here.png", category:"VIDEOS", title:"SEVENTEEN 'RIGHT HERE' WORLD TOUR IN GOYANG", hashtags:"", link:"2024/rightheregoyang"},
+      {id:"v7", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/arena-tour.png", category:"VIDEOS", title:"SEVENTEEN 2018 JAPAN ARENA TOUR 'SVT'", hashtags:"", link:"random/arenatour"},
+      {id:"v8", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/japan-concert.png", category:"VIDEOS", title:"17 JAPAN CONCERT Say the name #SEVENTEEN", hashtags:"", link:"random/svtjapanconcert"},
+      {id:"v9", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/disney.png", category:"VIDEOS", title:"SEVENTEEN TOUR AGAIN DISNEY+", hashtags:"", link:"random/touragain"}
+    ];
+
+    let currentPaginationPage = 1;
+    let cardsPerPage = window.innerWidth <= 900 ? 6 : 8;
+    const grid = document.getElementById("grid");
+    let filteredData = [...data];
+
+    window.handleSearch = function(query) {
+        const term = query.toLowerCase();
+        filteredData = data.filter(item => 
+            item.title.toLowerCase().includes(term) || 
+            item.category.toLowerCase().includes(term) ||
+            item.hashtags.toLowerCase().includes(term)
+        );
+        currentPaginationPage = 1;
         renderGrid(1);
     }
-});
 
-function renderGrid(page) {
-  grid.innerHTML = "";
-  if (filteredData.length === 0) {
-      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">No videos found matching your search.</div>';
-      document.getElementById("pagination").innerHTML = "";
-      return;
-  }
-  const start = (page-1)*cardsPerPage;
-  const end = start+cardsPerPage;
-  const pageData = filteredData.slice(start,end);
+    window.addEventListener('resize', () => {
+        const newLimit = window.innerWidth <= 900 ? 6 : 8;
+        if(newLimit !== cardsPerPage) {
+            cardsPerPage = newLimit;
+            currentPaginationPage = 1; 
+            renderGrid(1);
+        }
+    });
 
-  pageData.forEach(item => {
-    const el = document.createElement("div");
-    el.className = "video-card";
-    const isFav = favorites.includes(item.id) ? 'active' : '';
-    const starIcon = favorites.includes(item.id) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
-    
-    el.innerHTML = `
-      <div class="thumb-wrapper">
-        <img src="${item.thumb}" loading="lazy" alt="${item.title}">
-        <div class="countdown-badge" data-date="${item.releaseDate || ''}"></div>
-      </div>
-      <div class="card-body">
-        <div class="video-meta">${item.category}</div>
-        <div class="video-title">${item.title}</div>
-        <div class="video-hashtags">${item.hashtags}</div>
-        <div class="card-actions">
-            <button class="btn-watch" onclick="window.location.href='${item.link}'">WATCH NOW</button>
-            <button class="btn-fav ${isFav}" onclick="toggleFavorite('${item.id}')">${starIcon}</button>
-        </div>
-      </div>
-    `;
-    grid.appendChild(el);
-  });
-  renderPagination();
-  startCountdown();
-}
+    function renderGrid(page) {
+        grid.innerHTML = "";
+        if (filteredData.length === 0) {
+            grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">No videos found matching your search.</div>';
+            document.getElementById("pagination").innerHTML = "";
+            return;
+        }
+        const start = (page-1)*cardsPerPage;
+        const end = start+cardsPerPage;
+        const pageData = filteredData.slice(start,end);
 
-function renderPagination() {
-  const pagination = document.getElementById("pagination");
-  pagination.innerHTML = "";
-  const pageCount = Math.ceil(filteredData.length/cardsPerPage);
-  if(pageCount <= 1) return;
-  for(let i=1; i<=pageCount; i++){
-    const btn = document.createElement("button");
-    btn.textContent = i;
-    if(i===currentPaginationPage) btn.classList.add("active");
-    btn.onclick = () => { currentPaginationPage=i; renderGrid(currentPaginationPage); window.scrollTo(0,0); };
-    pagination.appendChild(btn);
-  }
-}
-
-function startCountdown() {
-  document.querySelectorAll(".countdown-badge").forEach(elem => {
-    const dateStr = elem.dataset.date;
-    if (!dateStr) { elem.style.display='none'; return; }
-    const endDate = new Date(dateStr);
-    const update = () => {
-      const now = new Date();
-      const diff = endDate - now;
-      if (diff <= 0) { elem.textContent = "Available Now"; return; }
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      elem.textContent = `${days}d left`;
-    };
-    update();
-  });
-}
-
-function loadFavoritesFromFirebase() {
-  if (!userId) return;
-  db.ref('users/' + userId + '/favorites').on('value', snapshot => {
-    favorites = snapshot.val() || [];
-    renderGrid(currentPaginationPage); 
-  });
-}
-
-function saveFavoritesToFirebase() {
-  if (!userId) return;
-  db.ref('users/' + userId + '/favorites').set(favorites);
-}
-
-window.toggleFavorite = function(id) {
-  if (favorites.includes(id)) {
-    favorites = favorites.filter(f => f !== id);
-  } else {
-    favorites.unshift(id);
-  }
-  saveFavoritesToFirebase();
-}
-
-/* ==================== Improved Modals & UI ==================== */
-window.openFavoriteModal = function() {
-  const list = document.getElementById('favoriteList');
-  list.innerHTML = ''; // Clear previous content
-
-  if (favorites.length === 0) {
-      list.innerHTML = `
-          <div class="empty-fav">
-              <i class="far fa-folder-open"></i>
-              <div>
-                  <div style="font-weight:600; font-size:16px;">Collection is Empty</div>
-                  <div style="font-size:13px; margin-top:5px;">Your favorite videos will appear here.</div>
+        pageData.forEach(item => {
+            const el = document.createElement("div");
+            el.className = "video-card";
+            const isFav = favorites.includes(item.id) ? 'active' : '';
+            const starIcon = favorites.includes(item.id) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+            
+            el.innerHTML = `
+              <div class="thumb-wrapper">
+                <img src="${item.thumb}" loading="lazy" alt="${item.title}">
+                <div class="countdown-badge" data-date="${item.releaseDate || ''}"></div>
               </div>
-          </div>
-      `;
-  } else {
-      favorites.forEach(favId => {
-          const item = data.find(d => d.id === favId);
-          if (item) {
-              const el = document.createElement('div');
-              el.className = 'fav-list-item';
-              el.innerHTML = `
-                  <img src="${item.thumb}" class="fav-thumb" loading="lazy">
-                  <div class="fav-list-info">
-                      <div class="fav-list-title">${item.title}</div>
-                      <div class="fav-list-cat">${item.category}</div>
-                  </div>
-                  <div class="fav-actions">
-                      <button class="fav-btn-watch" onclick="window.location.href='${item.link}'">
-                          Watch Now <i class="fas fa-play-circle"></i>
-                      </button>
-                      <button class="fav-btn-remove" title="Remove" onclick="removeFavFromModal('${item.id}')">
-                          <i class="fas fa-trash-alt"></i>
-                      </button>
-                  </div>
-              `;
-              list.appendChild(el);
-          }
-      });
-  }
-  document.getElementById('favoriteModal').classList.add('active');
-  document.body.classList.add('no-scroll'); // LOCK SCROLL
-}
-
-// Function to remove item instantly from modal without closing it
-window.removeFavFromModal = function(id) {
-    toggleFavorite(id); 
-    openFavoriteModal(); // Re-render the modal list immediately
-}
-
-window.closeFavoriteModal = function() { 
-    document.getElementById('favoriteModal').classList.remove('active'); 
-    document.body.classList.remove('no-scroll'); // UNLOCK SCROLL
-}
-
-window.closeInfoModal = function() { 
-    document.getElementById('infoModal').classList.remove('active'); 
-    sessionStorage.setItem('infoModalShown', 'true'); 
-    document.body.classList.remove('no-scroll'); // UNLOCK SCROLL
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  if (!sessionStorage.getItem('infoModalShown')) {
-    document.getElementById('infoModal').classList.add('active');
-    document.body.classList.add('no-scroll'); // LOCK SCROLL INITIALLY
-  }
-  renderGrid(1); 
-});
-
-// Sidebar Toggle
-window.toggleMobileSidebar = function() { document.getElementById('mobileSidebar').classList.toggle('open'); }
-
-// Theme Logic (Updated)
-function initTheme() {
-    const savedTheme = localStorage.getItem('zoneTheme') || 'dark';
-    const isDark = savedTheme === 'dark';
-    if (!isDark) { document.body.classList.add('light-mode'); }
-    document.querySelectorAll('.theme-checkbox-pc, .theme-checkbox-mobile').forEach(cb => { cb.checked = isDark; });
-    updateThemeText(isDark);
-}
-window.syncTheme = function(el) {
-    const isDark = el.checked;
-    if(isDark) {
-        document.body.classList.remove('light-mode');
-        localStorage.setItem('zoneTheme', 'dark');
-    } else {
-        document.body.classList.add('light-mode');
-        localStorage.setItem('zoneTheme', 'light');
+              <div class="card-body">
+                <div class="video-meta">${item.category}</div>
+                <div class="video-title">${item.title}</div>
+                <div class="video-hashtags">${item.hashtags}</div>
+                <div class="card-actions">
+                    <button class="btn-watch" onclick="window.location.href='${item.link}'">WATCH</button>
+                    <button class="btn-fav ${isFav}" onclick="toggleFavorite('${item.id}')">${starIcon}</button>
+                </div>
+              </div>
+            `;
+            grid.appendChild(el);
+        });
+        renderPagination();
+        startCountdown();
     }
-    document.querySelectorAll('.theme-checkbox-pc, .theme-checkbox-mobile').forEach(cb => { cb.checked = isDark; });
-    updateThemeText(isDark);
-}
-function updateThemeText(isDark) {
-    const text = isDark ? "Dark Mode" : "Light Mode";
-    const pcText = document.getElementById('theme-text-pc');
-    const mobileText = document.getElementById('theme-text-mobile');
-    if(pcText) pcText.innerText = text;
-    if(mobileText) mobileText.innerText = text;
-}
-initTheme();
-</script>
 
-<script>
-  // --- PROTECTION LOGIC (Includes Admin Bypass) ---
-  const allowedPaths = ['/index.html','/home.html','/nanabnb.html','/newtour.html','/hxwfanconcert.html','/svtholiday.html','/arenatour.html','/svtjapanconcert.html','/touragain.html','/gallery.html','/profile.html','/soon.html','/videos.html', '/admin.html'];
-  
-  // Check Admin Status from Session
-  const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+    function renderPagination() {
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+        const pageCount = Math.ceil(filteredData.length/cardsPerPage);
+        if(pageCount <= 1) return;
+        for(let i=1; i<=pageCount; i++){
+            const btn = document.createElement("button");
+            btn.textContent = i;
+            if(i===currentPaginationPage) btn.classList.add("active");
+            btn.onclick = () => { currentPaginationPage=i; renderGrid(currentPaginationPage); window.scrollTo(0,0); };
+            pagination.appendChild(btn);
+        }
+    }
 
-  const currentPage = window.location.pathname;
-  let hasInternalAccess = sessionStorage.getItem('internalAccess') === 'true';
-  const referrer = document.referrer;
-  const refPath = referrer ? new URL(referrer, location.origin).pathname : null;
-  
-  // If coming from allowed page OR is Admin, grant access
-  const cameFromAllowedPage = refPath && allowedPaths.includes(refPath);
-  if (cameFromAllowedPage || isAdmin) { 
-      sessionStorage.setItem('internalAccess', 'true'); 
-      hasInternalAccess = true; 
-  }
-  
-  const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
-  
-  // If NOT internal access AND NOT index page AND NOT admin -> Block
-  if (!hasInternalAccess && !isIndexPage && !isAdmin) { 
-      showAccessDeniedModal(); 
-  }
+    function startCountdown() {
+        document.querySelectorAll(".countdown-badge").forEach(elem => {
+            const dateStr = elem.dataset.date;
+            if (!dateStr) { elem.style.display='none'; return; }
+            const endDate = new Date(dateStr);
+            const update = () => {
+                const now = new Date();
+                const diff = endDate - now;
+                if (diff <= 0) { elem.textContent = "Available Now"; return; }
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                elem.textContent = `${days}d left`;
+            };
+            update();
+        });
+    }
 
-  function showAccessDeniedModal() {
-    const modal = document.createElement('div');
-    modal.className = 'access-denied-modal';
-    const card = document.createElement('div');
-    card.className = 'access-card';
-    card.innerHTML = `<div class="access-icon-box"><i class="fas fa-lock"></i></div><div class="access-title">Access Restricted</div><div class="access-desc">You are not authorized to view this page directly. Please log in or return home.</div><button class="access-btn" onclick="window.location.href='index.html'">Return to Safety</button><div style="margin-top:15px; font-size:12px; color:#555;">Redirecting automatically...</div>`;
-    modal.appendChild(card);
-    document.body.appendChild(modal);
-    setTimeout(() => { window.location.href = "index.html"; }, 3000);
-  }
+    // --- FAVORITES LOGIC ---
+    function loadFavoritesFromFirebase() {
+        if (!userId) return;
+        db.ref('users/' + userId + '/favorites').on('value', snapshot => {
+            favorites = snapshot.val() || [];
+            renderGrid(currentPaginationPage); 
+        });
+    }
+
+    function saveFavoritesToFirebase() {
+        if (!userId) return;
+        db.ref('users/' + userId + '/favorites').set(favorites);
+    }
+
+    window.toggleFavorite = function(id) {
+        if (favorites.includes(id)) {
+            favorites = favorites.filter(f => f !== id);
+        } else {
+            favorites.unshift(id);
+        }
+        saveFavoritesToFirebase();
+    }
+
+    // --- UI HELPERS ---
+    window.toggleMobileSidebar = function() { document.getElementById('mobileSidebar').classList.toggle('open'); }
+    
+    window.openFavoriteModal = function() {
+        const list = document.getElementById('favoriteList');
+        list.innerHTML = ''; 
+
+        if (favorites.length === 0) {
+            list.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted);"><i class="far fa-folder-open" style="font-size:30px; margin-bottom:10px;"></i><br>Collection is Empty</div>`;
+        } else {
+            favorites.forEach(favId => {
+                const item = data.find(d => d.id === favId);
+                if (item) {
+                    const el = document.createElement('div');
+                    el.className = 'fav-list-item';
+                    el.innerHTML = `
+                        <img src="${item.thumb}" class="fav-thumb" loading="lazy">
+                        <div class="fav-list-info">
+                            <div class="fav-list-title">${item.title}</div>
+                            <div class="fav-list-cat">${item.category}</div>
+                        </div>
+                        <div class="fav-actions">
+                            <button class="btn-watch" onclick="window.location.href='${item.link}'" style="padding: 5px 12px; font-size:10px;"><i class="fas fa-play"></i></button>
+                            <button class="fav-btn-remove" onclick="toggleFavorite('${item.id}'); openFavoriteModal();"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    `;
+                    list.appendChild(el);
+                }
+            });
+        }
+        document.getElementById('favoriteModal').classList.add('active');
+        document.body.classList.add('no-scroll');
+    }
+
+    window.closeFavoriteModal = function() { 
+        document.getElementById('favoriteModal').classList.remove('active'); 
+        document.body.classList.remove('no-scroll');
+    }
+    
+    window.closeInfoModal = function() { 
+        document.getElementById('infoModal').classList.remove('active'); 
+        sessionStorage.setItem('infoModalShown', 'true'); 
+        document.body.classList.remove('no-scroll');
+    }
+
+    renderGrid(1);
+
+    // --- SECURITY ---
+    const allowedPaths = ['/index.html', '/home.html', '/nanabnb.html', '/newtour.html', 
+        'hxwfanconcert.html', '/svtholiday.html', '/arenatour.html', 
+        '/svtjapanconcert.html', '/touragain.html', '/gallery.html', 
+        '/profile.html', '/soon.html', '/videos.html', '/admin.html', '/collection.html' 
+    ];
+    
+    const isAdminFlag = sessionStorage.getItem('isAdmin') === 'true';
+    const currentPagePath = window.location.pathname;
+    let hasInternalAccessFlag = sessionStorage.getItem('internalAccess') === 'true';
+    const referer = document.referrer;
+    const refererPath = referer ? new URL(referer, location.origin).pathname : null;
+    
+    const cameFromAllowedPageFlag = refererPath && allowedPaths.includes(refererPath);
+    if (cameFromAllowedPageFlag || isAdminFlag) { 
+        sessionStorage.setItem('internalAccess', 'true'); 
+        hasInternalAccessFlag = true; 
+    }
+
+    const isIndexPagePath = currentPagePath.endsWith('index.html') || currentPagePath === '/';
+
+    if (!hasInternalAccessFlag && !isIndexPagePath && !isAdminFlag) { 
+        showAccessDeniedModal(); 
+    }
+
+    function showAccessDeniedModal() {
+        const modal = document.createElement('div');
+        modal.className = 'access-denied-modal';
+        const card = document.createElement('div');
+        card.className = 'access-card';
+        card.innerHTML = `<div class="access-icon-box"><i class="fas fa-lock"></i></div><div class="access-title">Access Restricted</div><div class="access-desc">You are not authorized to view this page directly. Please log in or return home.</div><button class="access-btn" onclick="window.location.href='index.html'">Return to Safety</button><div style="margin-top:15px; font-size:12px; color:#555;">Redirecting automatically...</div>`;
+        modal.appendChild(card);
+        document.body.appendChild(modal);
+        setTimeout(() => { window.location.href = "index.html"; }, 3000);
+    }
 </script>
 
 </body>
