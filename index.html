@@ -1,150 +1,492 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maintenance - Zone Vault</title>
-    <style>
-        /* STRICTLY PROFESSIONAL BLACK & WHITE 
-           NO BOXES. NO BORDERS. PURE CONTENT.
-        */
-        :root {
-            --bg-color: #000000;
-            --text-main: #ffffff;
-            --text-muted: #888888;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Zone Vault</title>
+   
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="favicon-new.png" type="image/png">
+  <meta name="theme-color" content="#050505">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+  <meta name="title" content="Zone Vault">
+  <meta name="description" content="Watch, Enjoy, and Stay Private. The premier destination for exclusive content in a secure environment.">
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            text-align: center;
-        }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        /* LAYOUT CONTAINER */
-        .container {
-            max-width: 600px;
-            padding: 20px;
-        }
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1B2RJ659GL');
+  </script>
+    
+  <style>
+    /* =========================================
+       1. VARIABLES & THEME ENGINE
+       ========================================= */
+    :root {
+        --bg-color: #050505;
+        --text-main: #ffffff;
+        --text-muted: #a1a1aa;
+        --card-bg: #121212;
+        --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+        --accent: #ffffff;
+        --sidebar-hover: #18181b;
+        --input-bg: rgba(255, 255, 255, 0.05);
+    }
 
-        /* LOGO */
-        .logo {
-            width: 160px;
-            height: auto;
-            margin-bottom: 50px;
-            filter: grayscale(100%) contrast(1.1);
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: "Outfit", sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-        /* STATUS BADGE */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: var(--text-muted);
-            margin-bottom: 30px;
-            opacity: 0.8;
-        }
+    /* === BACKGROUNDS === */
+    .bg-gradient {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+      background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.05), transparent 40%);
+      pointer-events: none;
+    }
+    
+    .noise-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: -1;
+    }
 
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            background-color: #fff;
-            border-radius: 50%;
-            margin-right: 12px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            animation: pulse 3s infinite ease-in-out;
-        }
+    #particle-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .particle {
+      position: fixed; background: rgba(255,255,255,0.2); border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255,255,255,0.05);
+      animation: floatUp linear infinite;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 0; }
+      20% { opacity: 0.5; }
+      100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
+    }
 
-        @keyframes pulse {
-            0% { opacity: 0.4; transform: scale(0.9); }
-            50% { opacity: 1; transform: scale(1.1); }
-            100% { opacity: 0.4; transform: scale(0.9); }
-        }
+    /* === HEADER === */
+    header {
+      width: 100%; position: fixed; top: 0; left: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 40px; transition: all 0.4s ease;
+    }
+    header.scrolled {
+      padding: 15px 40px;
+      background: rgba(5, 5, 5, 0.8);
+      backdrop-filter: blur(15px);
+      border-bottom: var(--glass-border);
+    }
+    
+    .logo { display: flex; align-items: center; gap: 12px; font-weight: 700; letter-spacing: 0.5px; font-size: 18px; }
+    .logo img { height: 32px; width: auto; }
 
-        /* TYPOGRAPHY */
-        h1 {
-            font-size: 2.2rem;
-            font-weight: 300;
-            letter-spacing: -0.5px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            color: #fff;
-        }
+    .header-buttons { display: flex; align-items: center; gap: 20px; }
+    
+    .nav-link {
+      background: transparent; border: none; color: var(--text-muted);
+      font-size: 14px; font-weight: 500; cursor: pointer; transition: color 0.3s;
+      text-decoration: none; font-family: inherit;
+    }
+    .nav-link:hover { color: #fff; }
 
-        h2 {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 40px;
-        }
+    /* === HERO SECTION === */
+    main { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; width: 100%; }
+    
+    .welcome { text-align: center; padding: 0 20px; max-width: 800px; margin-top: -40px; }
+    
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 50px;
+      background: rgba(255,255,255,0.03); border: var(--glass-border);
+      font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 24px; animation: fadeIn 1s ease forwards; backdrop-filter: blur(5px);
+    }
 
-        p {
-            font-size: 1rem;
-            line-height: 1.6;
-            color: #666;
-            max-width: 450px;
-            margin: 0 auto 60px auto;
-        }
+    .welcome h1 {
+      font-size: clamp(3rem, 8vw, 5rem);
+      font-weight: 800; line-height: 1; letter-spacing: -1px; margin-bottom: 20px;
+      color: var(--text-main);
+      animation: fadeIn 1s ease forwards 0.2s; opacity: 0;
+    }
 
-        /* FOOTER INFO */
-        .footer {
-            position: absolute;
-            bottom: 40px;
-            width: 100%;
-            text-align: center;
-            font-size: 10px;
-            color: #333;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+    .welcome p {
+      color: var(--text-muted); font-size: clamp(1rem, 2vw, 1.1rem);
+      line-height: 1.6; max-width: 500px; margin: 0 auto 40px;
+      opacity: 0; animation: fadeIn 1s ease forwards 0.4s;
+    }
 
-        /* MOBILE OPTIMIZATION */
-        @media (max-width: 600px) {
-            h1 { font-size: 1.8rem; }
-            p { font-size: 0.9rem; padding: 0 20px; }
-            .logo { width: 130px; margin-bottom: 40px; }
-        }
-    </style>
+    .cta-group {
+      display: flex; gap: 15px; justify-content: center;
+      opacity: 0; animation: fadeIn 1s ease forwards 0.6s;
+      flex-wrap: wrap; 
+    }
+    
+    .btn-primary {
+      padding: 14px 32px; border-radius: 50px; 
+      background: var(--text-main); color: #000;
+      font-size: 14px; font-weight: 700; text-decoration: none;
+      transition: all 0.2s; border: none; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+    
+    .btn-outline {
+      padding: 14px 32px; border-radius: 50px; 
+      background: transparent; color: #fff; border: 1px solid var(--glass-border);
+      font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); border-color: #fff; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* === MODALS (GLASS) === */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 999; opacity: 0; animation: fadeModal 0.3s forwards;
+    }
+    @keyframes fadeModal { to { opacity: 1; } }
+
+    .modal-box {
+      background: var(--card-bg); border: var(--glass-border);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      border-radius: 24px; width: 90%; max-width: 450px;
+      position: relative; transform: scale(0.95); animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      overflow: hidden; display: flex; flex-direction: column;
+    }
+    /* About Modal Specifics */
+    #aboutModal .modal-box { max-width: 650px; max-height: 85vh; }
+    
+    @keyframes popIn { to { transform: scale(1); opacity: 1; } }
+
+    .modal-header {
+      padding: 20px 25px; border-bottom: var(--glass-border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: 700; font-size: 16px; color: #fff; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .close-btn { font-size: 24px; color: var(--text-muted); cursor: pointer; transition: 0.2s; background: none; border: none; }
+    .close-btn:hover { color: #fff; }
+
+    .modal-content { padding: 30px 25px; text-align: center; overflow-y: auto; max-height: 70vh; }
+    
+    /* Scrollbar for Modal */
+    .modal-content::-webkit-scrollbar { width: 4px; }
+    .modal-content::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+    .modal-content p { color: var(--text-muted); margin-bottom: 25px; font-size: 14px; line-height: 1.6; }
+    .modal-content h2, .modal-content h3 { color: var(--text-main); font-size: 16px; margin-top: 20px; margin-bottom: 10px; text-align: left; }
+    .modal-content ul { text-align: left; padding-left: 20px; color: var(--text-muted); font-size: 13px; line-height: 1.6; }
+    .modal-content li { margin-bottom: 5px; }
+    .modal-content strong { color: var(--text-main); font-weight: 600; }
+
+    .modal-actions { display: flex; flex-direction: column; gap: 12px; }
+    .btn-full { width: 100%; justify-content: center; }
+
+    /* Footer */
+    footer {
+      border-top: var(--glass-border);
+      padding: 30px; text-align: center; color: var(--text-muted); font-size: 12px;
+    }
+    
+    @media (max-width: 600px) {
+        header { padding: 15px 20px; }
+        header.scrolled { padding: 15px 20px; }
+        .logo span { display: none; } /* Hide text on super small screens if needed */
+        .logo img { height: 28px; }
+        .cta-group { flex-direction: column; width: 100%; }
+        .btn-primary, .btn-outline { width: 100%; justify-content: center; }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault" class="logo">
+  <div class="bg-gradient"></div>
+  <div class="noise-overlay"></div>
+  <div id="particle-container"></div>
 
+  <header id="navbar">
+    <div class="logo">
+      <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo">
+      <span>ZONE VAULT</span>
+    </div>
+    <div class="header-buttons">
+      <button class="nav-link" onclick="openAbout()">About</button>
+      <button class="btn-primary" onclick="openModal()" style="padding: 8px 20px; font-size: 12px;">Get Access</button>
+    </div>
+  </header>
 
-        <h1>We'll be back shortly</h1>
+  <main>
+    <div class="welcome">
+      <div class="badge">Zone Vault 2.0</div>
+      <h1>Watch. Enjoy.<br>Stay Private.</h1>
+      <p>A secure, permission-based sanctuary for exclusive content. Watch your favorites and more in high-fidelity private streams.</p>
+      
+      <div class="cta-group">
+        <a href="home" class="btn-primary">
+            Start Watching
+        </a>
         
-        <h2>Maintenance in Progress</h2>
-
-        <p>
-            We are currently performing scheduled maintenance. Access to the platform is temporarily unavailable. We apologize for the inconvenience and appreciate your patience.
-        </p>
+        <a href="download" class="btn-outline">
+           <i class="fab fa-android"></i> Download App
+        </a>
+      </div>
     </div>
+  </main>
 
-    <div class="footer">
-        &copy; 2026 Zone Vault.
+  <div class="modal-overlay" id="welcomeModal" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span>Join Zone Vault</span>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-content">
+        <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 1px solid rgba(255,255,255,0.1);">
+            <i class="fas fa-lock" style="font-size: 24px; color: #fff;"></i>
+        </div>
+        <p>To maintain security and exclusivity, Zone Vault requires an account. Please log in or register to continue.</p>
+        <div class="modal-actions">
+          <a href="login" class="btn-primary btn-full">Log In to Account</a>
+          <a href="register" class="btn-outline btn-full">Create New Account</a>
+        </div>
+      </div>
     </div>
+  </div>
 
+  <div class="modal-overlay" id="aboutModal" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span>Platform Overview</span>
+        <button class="close-btn" onclick="closeAbout()">&times;</button>
+      </div>
+
+      <div class="modal-content" style="text-align: left;">
+      <h2 style="margin-top:0;">How Zone Vault Works</h2>
+      <p>
+        Zone Vault is a private platform created for <strong>exclusive VODs</strong>. 
+        We use a secure <strong>permission-based system</strong> to verify each user and ensure that only 
+        approved accounts can access this site.
+      </p>
+
+      <h2>How Can I Get Access?</h2>
+      <p>
+      To access this site, you need to <strong>join one of the private streams</strong> we host. Before the stream day, the admin will <strong>send you a complete step-by-step guide</strong> on how to register, log in, and access the site properly.
+      </p>
+
+      <h2>How can i make sure my Information is Secured?</h2>
+      <p>
+        Your privacy and safety are our top priority. We do not store personal information on the site itself.
+        All user data—including your email and profile details—is securely stored in our 
+        <strong>database</strong>.
+      </p>
+      <p>
+        For safety, please create a <strong>unique password</strong> specifically for Zone Vault and avoid reusing your email password.
+      </p>
+
+      <h2>How the Videos Works?</h2>
+      <p>
+        Zone Vault uses <strong>HLS (HTTP Live Streaming)</strong> with <strong>Plyr</strong>, providing smooth, adaptive 
+        playback on all devices. Video sources are protected through database, preventing copying and sharing.
+      </p>
+      
+      <p>To improve performance and flexibility, we are now separating subtitles from the video files.</p>
+
+      <h3>Player Features</h3>
+      <ul>
+        <li>Double-tap left → rewind</li>
+        <li>Double-tap right → fast-forward</li>
+        <li>Double-tap center → pause/play</li>
+        <li>Hold for 3 seconds on desktop → show full controls</li>
+        <li>Auto-adjusting video quality based on internet speed</li>
+        <li>Responsive UI for all devices</li>
+      </ul>
+
+      <h2>How Can I Access the Videos?</h2>
+      <p>
+        Some videos are <strong>free</strong>, while others require access code.  
+        But we have upgraded from access codes to a <strong>permission-access</strong>, allowing us (the admin)
+        to control or give the user a access on specific videos.
+        
+        This upgrade ensures fairness for everyone, and keeps the system more secure and organized.
+      </p>
+
+      <h2>Profile Features</h2>
+      <p>You can now personalize your profile with:</p>
+      <ul>
+        <li>Custom display name</li>
+        <li>Editable bio</li>
+        <li>Uploadable banner image</li>
+        <li>Auto-color adapting background based on your banner</li>
+      </ul>
+
+      <h2>Tips for the Best Experience</h2>
+      <ul>
+        <li>Use modern browsers like <strong>Chrome, Edge, or Safari</strong>.</li>
+        <li>Keep your browser updated for smooth playback.</li>
+        <li>Use a stable internet connection for the best video quality.</li>
+        <li>For support, contact the admin via email.</li>
+      </ul>
+      
+      <div style="margin-top: 30px; text-align: center;">
+          <button class="btn-primary" onclick="closeAbout()">Got it</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+    &copy; 2026 Zone Vault. All rights reserved.
+</footer>
+
+  <script>
+    // --- PARTICLES ---
+    const container = document.getElementById("particle-container");
+    const particleCount = 60;
+    
+    for(let i = 0; i < particleCount; i++){
+      const particle = document.createElement("div");
+      particle.classList.add("particle");
+      const size = Math.random() * 3 + 1;
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.top = `${Math.random() * 100}%`;
+      particle.style.animationDuration = `${40 + Math.random() * 40}s`; 
+      particle.style.animationDelay = `${Math.random() * 20}s`;
+      container.appendChild(particle);
+    }
+
+    // --- HEADER SCROLL ---
+    window.addEventListener('scroll', () => {
+      const header = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+
+    // --- MODAL LOGIC ---
+    function closeModal() {
+      document.getElementById("welcomeModal").style.display = "none";
+      document.body.style.overflow = "auto";
+      localStorage.setItem('welcomeModalShown', 'true');
+    }
+    function openModal() {
+      document.getElementById("welcomeModal").style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
+    function closeAbout() {
+      document.getElementById("aboutModal").style.display = "none";
+      document.body.style.overflow = "auto";
+    }
+    function openAbout() {
+      document.getElementById("aboutModal").style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
+    
+    window.onload = function() {
+        const modalShown = localStorage.getItem('welcomeModalShown');
+        // Uncomment to force welcome modal
+        // if (!modalShown) openModal(); 
+    };
+    
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal-overlay')) {
+        event.target.style.display = "none";
+        document.body.style.overflow = "auto";
+      }
+    }
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+      authDomain: "tvnstream-b4497.firebaseapp.com",
+      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+      projectId: "tvnstream-b4497",
+      storageBucket: "tvnstream-b4497.firebasestorage.app",
+      messagingSenderId: "308384754214",
+      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+      measurementId: "G-VFNH70R4D9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    // const db = getDatabase(app); // Database ref kept if needed later, but not used for logging now
+    const messaging = getMessaging(app);
+    const vapidKey = "BM9NB-Q0-KYbhwad-5lhztW0BMpRjKBs67IOtQ7uLBZUKgzmmSmPferlpJnyVbmjo4LlvX0cVF2G_zX1OOHldyE";
+
+    async function initNotifications() {
+      if ('serviceWorker' in navigator) {
+        if (window.location.protocol === 'file:' || window.location.protocol === 'data:' || window.location.href.startsWith('blob:')) {
+            console.warn('⚠️ Service Worker skipped in preview.');
+            return;
+        }
+        try {
+          const registration = await navigator.serviceWorker.register('sw.js');
+          const permission = await Notification.requestPermission();
+          if (permission === 'granted') {
+            const currentToken = await getToken(messaging, { 
+              vapidKey: vapidKey,
+              serviceWorkerRegistration: registration 
+            });
+            // Token retrieved but NOT saved to DB to respect privacy request
+            if (currentToken) {
+                console.log("Notification permission granted."); 
+            }
+          }
+        } catch (err) {
+          console.error('Notification Error:', err);
+        }
+      }
+    }
+
+    initNotifications();
+
+    onMessage(messaging, (payload) => {
+      const { title, body, icon } = payload.notification;
+      new Notification(title, {
+        body: body,
+        icon: icon || 'https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png'
+      });
+    });
+  </script>
+
+  <script>
+    // Service Worker Registration Handler
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        reg.onupdatefound = () => {
+          const newSW = reg.installing;
+          newSW.onstatechange = () => {
+            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+              window.location.reload();
+            }
+          };
+        };
+      }).catch(err => {
+        console.error('Service Worker registration failed:', err);
+      });
+    }
+  </script>
 </body>
 </html>
