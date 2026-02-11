@@ -203,8 +203,34 @@
         font-size: 28px; font-weight: 800; margin-bottom: 20px; padding: 0 40px;
         text-transform: uppercase; letter-spacing: 1px; color: var(--text-main);
     }
+    
+    /* ---- LIVE BROADCAST DIVIDER ---- */
+    .live-divider {
+        display: flex;
+        align-items: center;
+        padding: 0 40px;
+        margin-top: 40px;    /* Added Space from top cards */
+        margin-bottom: 25px; /* Added Space for bottom cards */
+        width: 100%;
+    }
+    .live-divider span {
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--text-muted);
+        margin-right: 15px;
+        white-space: nowrap;
+    }
+    .live-divider .line {
+        flex-grow: 1;
+        height: 1px;
+        background: linear-gradient(to right, var(--text-muted), transparent);
+        opacity: 0.3;
+    }
 
-    #grid {
+    /* Grid Layouts */
+    .grid-container {
         display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
         gap: 20px; padding: 0 40px; animation: fadeIn 0.4s ease;
     }
@@ -218,14 +244,13 @@
         transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
         position: relative;
     }
-    .video-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-color: var(--text-main); }
+ 
 
     .thumb-wrapper {
         position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden;
         border-bottom: 1px solid rgba(255,255,255,0.05);
     }
     .thumb-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
-    .video-card:hover .thumb-wrapper img { transform: scale(1.05); }
 
     .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
     
@@ -279,8 +304,8 @@
         .search-box { width: auto; flex: 1; }
         .notif-modal { position: absolute; top: 60px; right: 0; left: auto; transform: none; width: 300px; max-width: 90vw; }
         .main-wrapper { padding: 0 0 40px 0; }
-        .page-title, #grid { padding: 0 20px; }
-        #grid { grid-template-columns: 1fr; }
+        .page-title, .grid-container, .live-divider { padding: 0 20px; } 
+        .grid-container { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -317,7 +342,6 @@
             <li class="nav-item"> <a href="random" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-random" style="margin-right:12px;"></i> Random</a> </li>
             <li class="nav-item"> <a href="collection" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-images" style="margin-right:12px;"></i> Collection</a> </li>
             <li class="nav-item"> <a href="live" class="nav-link active" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-broadcast-tower" style="margin-right:12px;"></i> Live</a> </li>
-            <li class="nav-item"> <a href="#" onclick="openFavoriteModal(); return false;" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-star" style="margin-right:12px;"></i> Favorites</a> </li>
         </ul>
         <div class="sidebar-bottom" style="margin-top: auto; padding-bottom: 20px;">
              <div class="nav-link" onclick="toggleTheme()" style="justify-content: flex-start; padding-left: 20px; cursor: pointer;">
@@ -355,7 +379,6 @@
             <li class="nav-item"> <a href="random" class="nav-link"><i class="fas fa-random"></i> <span class="nav-text">Random</span></a> </li>
             <li class="nav-item"> <a href="collection" class="nav-link"><i class="fas fa-images"></i> <span class="nav-text">Collection</span></a> </li>
             <li class="nav-item"> <a href="live" class="nav-link active"><i class="fas fa-broadcast-tower"></i> <span class="nav-text">Live</span></a> </li>
-            <li class="nav-item"> <a href="#" onclick="openFavoriteModal(); return false;" class="nav-link"><i class="fas fa-star"></i> <span class="nav-text">Favorites</span></a> </li>
         </ul>
         <div class="sidebar-bottom">
             <div class="nav-link" onclick="toggleTheme()">
@@ -407,7 +430,14 @@
 
     <h1 class="page-title">Live Events</h1>
 
-    <div id="grid"></div>
+    <div id="grid" class="grid-container"></div>
+
+    <div class="live-divider">
+        <span>Live Broadcast</span>
+        <div class="line"></div>
+    </div>
+
+    <div id="grid-broadcast" class="grid-container"></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -499,7 +529,7 @@ window.toggleNotifModal = function() {
     }
 }
 
-/* ==================== Live Data & Search ==================== */
+/* ==================== Live Data (TOP GRID) ==================== */
 const data = [
   {
       id: "v9", 
@@ -511,27 +541,68 @@ const data = [
   }
 ];
 
+/* ==================== Broadcast Data (BOTTOM GRID) ==================== */
+const broadcastData = [
+  {
+      id: "b1", 
+      thumb: "https://uploads.onecompiler.io/43ddry4jt/44d9cktck/tbs-channel-1-jp.png", 
+      category: "JAPAN TV CHANNEL", 
+      title: "TBS Channel 1", 
+      hashtags: "", 
+      link: "livebroadcast/live1"
+  },
+  
+    {
+      id: "b2", 
+      thumb: "https://uploads.onecompiler.io/43ddry4jt/44d98kevu/Screenshot%202026-02-11%20115433.png", 
+      category: "KOREAN TV CHANNEL", 
+      title: "MBC", 
+      hashtags: "", 
+      link: "livebroadcast/live2"
+  },
+  
+      {
+      id: "b3", 
+      thumb: "https://uploads.onecompiler.io/43ddry4jt/44d98kevu/download.webp", 
+      category: "KOREAN TV CHANNEL", 
+      title: "Channel A", 
+      hashtags: "", 
+      link: "livebroadcast/live3"
+  }
+];
+
 let filteredData = [...data];
 const grid = document.getElementById("grid");
+const gridBroadcast = document.getElementById("grid-broadcast");
 
 window.handleSearch = function(query) {
     const term = query.toLowerCase();
+    
+    // Filter Top Grid
     filteredData = data.filter(item => 
         item.title.toLowerCase().includes(term) || 
         item.category.toLowerCase().includes(term) ||
         item.hashtags.toLowerCase().includes(term)
     );
-    renderGrid();
+    renderGrid(grid, filteredData, "ENTER EVENT");
+    
+    // Filter Bottom Grid
+    const filteredBroadcast = broadcastData.filter(item => 
+        item.title.toLowerCase().includes(term) || 
+        item.category.toLowerCase().includes(term)
+    );
+    renderGrid(gridBroadcast, filteredBroadcast, "WATCH NOW");
 }
 
-function renderGrid() {
-  grid.innerHTML = "";
-  if(filteredData.length === 0) {
-      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">No live events found.</div>';
+// Unified Render Function with Dynamic Button Text
+function renderGrid(container, items, btnLabel = "ENTER EVENT") {
+  container.innerHTML = "";
+  if(items.length === 0) {
+      container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">No events found.</div>';
       return;
   }
    
-  filteredData.forEach(item => {
+  items.forEach(item => {
     const el = document.createElement("div");
     el.className = "video-card";
     
@@ -545,11 +616,11 @@ function renderGrid() {
         <div class="video-title">${item.title}</div>
         <div class="video-hashtags">${item.hashtags}</div>
         <div class="card-actions">
-            <button class="btn-watch" onclick="window.location.href='${item.link}'">ENTER EVENT</button>
+            <button class="btn-watch" onclick="window.location.href='${item.link}'">${btnLabel}</button>
         </div>
       </div>
     `;
-    grid.appendChild(el);
+    container.appendChild(el);
   });
   startCountdown();
 }
@@ -587,8 +658,9 @@ window.toggleTheme = function() {
 }
 initTheme();
 
-// Initial Render
-renderGrid();
+// Initial Render for BOTH grids
+renderGrid(grid, data, "ENTER EVENT");
+renderGrid(gridBroadcast, broadcastData, "WATCH NOW");
 
 // --- SECURITY ---
 const allowedPaths = ['/index.html', '/home.html', '/nanabnb.html', '/newtour.html', 
