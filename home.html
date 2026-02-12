@@ -646,6 +646,12 @@
     // --- AUTH ---
     auth.onAuthStateChanged(user => {
         if (user) {
+            // FIX: Explicitly grant internal access when Firebase confirms user
+            sessionStorage.setItem('internalAccess', 'true');
+            // If the access denied modal showed up by mistake, remove it now
+            const modal = document.querySelector('.access-denied-modal');
+            if(modal) modal.remove();
+
             db.ref('users/' + user.uid).on('value', snapshot => {
                 if (snapshot.exists()) {
                     const data = snapshot.val();
@@ -730,7 +736,10 @@
   if (cameFromAllowedPage || isAdmin) { sessionStorage.setItem('internalAccess', 'true'); hasInternalAccess = true; }
   const isIndexPage = currentPage.endsWith('index.html') || currentPage === '/';
   
-  if (!hasInternalAccess && !isIndexPage && !isAdmin) { 
+  // FIX: Check if Firebase has a saved session in LocalStorage (prevents immediate block on reload)
+  const hasCachedSession = Object.keys(localStorage).some(key => key.startsWith('firebase:authUser'));
+
+  if (!hasInternalAccess && !isIndexPage && !isAdmin && !hasCachedSession) { 
       showAccessDeniedModal(); 
   }
 
