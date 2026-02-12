@@ -47,9 +47,9 @@
       color: var(--text-main);
       font-family: "Outfit", sans-serif;
       overflow-x: hidden;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      /* Body no longer controls layout, the wrapper does */
+      width: 100%;
+      height: 100%;
     }
 
     /* === LOADING SCREEN STYLES === */
@@ -75,11 +75,18 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    /* Hide main content initially */
+    /* === MAIN LAYOUT WRAPPER (THE FIX) === */
     #main-app-content {
         opacity: 0;
         transition: opacity 0.8s ease;
-        visibility: hidden; /* Use visibility so it doesn't take clicks */
+        visibility: hidden;
+        
+        /* This fixes the bunched up layout */
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* Fallback */
+        min-height: 100dvh; /* Mobile fix for address bars */
+        width: 100%;
     }
 
     /* === BACKGROUNDS === */
@@ -133,9 +140,19 @@
     .nav-link:hover { color: #fff; }
 
     /* === HERO SECTION === */
-    main { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; width: 100%; }
+    main { 
+        flex: 1; /* This pushes footer down */
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        position: relative; 
+        z-index: 2; 
+        width: 100%;
+        padding-top: 80px; /* Prevent overlap with fixed header */
+        padding-bottom: 40px;
+    }
     
-    .welcome { text-align: center; padding: 0 20px; max-width: 800px; margin-top: -40px; }
+    .welcome { text-align: center; padding: 0 20px; max-width: 800px; }
     
     .badge {
       display: inline-flex; align-items: center; gap: 6px;
@@ -231,12 +248,14 @@
     footer {
       border-top: var(--glass-border);
       padding: 30px; text-align: center; color: var(--text-muted); font-size: 12px;
+      /* Ensure footer sits at bottom */
+      margin-top: auto;
     }
     
     @media (max-width: 600px) {
         header { padding: 15px 20px; }
         header.scrolled { padding: 15px 20px; }
-        .logo span { display: none; } /* Hide text on super small screens if needed */
+        .logo span { display: none; } 
         .logo img { height: 28px; }
         .cta-group { flex-direction: column; width: 100%; }
         .btn-primary, .btn-outline { width: 100%; justify-content: center; }
