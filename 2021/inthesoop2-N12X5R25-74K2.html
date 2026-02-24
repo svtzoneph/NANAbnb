@@ -126,7 +126,7 @@
 
     @media (max-width: 900px) {
         .art-subtitle {
-            font-size: 12px !important;
+            font-size: 18px !important; /* Mobile font size adjusted perfectly */
             margin-bottom: 20px !important;
         }
     }
@@ -161,7 +161,7 @@
         }
     }
 
-    /* STICKY VIDEO FIXED: Low Z-index so playlist scrolls OVER it */
+    /* STICKY VIDEO FIXED: Low Z-index so playlist scrolls OVER it natively */
     .video-wrapper-left { 
         width: 100%;
         position: sticky;
@@ -257,7 +257,9 @@
         backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
         border: var(--glass-border); border-radius: 20px; overflow: hidden;
         box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);
-        display: flex; flex-direction: column; max-height: calc(100vh - 100px);
+        display: flex; flex-direction: column; 
+        /* THE REAL FIX: Adjusted 100px to 180px to account for the logo & padding. No more annoying desktop scroll! */
+        max-height: calc(100vh - 180px); 
     }
 
     .current-episode-header {
@@ -351,7 +353,7 @@
         .center-logo { margin-bottom: 20px; }
         
         #poster-container, #player-container { border-radius: 16px; }
-        .playlist-card { max-height: none; }
+        .playlist-card { max-height: none; } /* On mobile, allowing flow restores overlap behavior */
         #playlist-items { max-height: 400px; } 
 
         .current-episode-header { padding: 20px 16px; }
