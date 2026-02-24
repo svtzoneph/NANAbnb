@@ -14,7 +14,7 @@
 
   <style>
     /* =========================================
-       1. VARIABLES & THEME ENGINE (Synced with Collection)
+       1. VARIABLES & THEME ENGINE (Synced)
        ========================================= */
     :root {
         --bg-color: #050505;
@@ -36,7 +36,6 @@
         --toast-border: 1px solid rgba(255, 255, 255, 0.1);
         --toast-text: #ffffff;
 
-        /* ADAPTIVE GLASS VARIABLES */
         --glass-bg-adaptive: rgba(255, 255, 255, 0.05);
         --glass-border-adaptive: rgba(255, 255, 255, 0.1);
         --glass-shadow-adaptive: rgba(0, 0, 0, 0.3);
@@ -56,7 +55,6 @@
         --toast-border: 1px solid rgba(0, 0, 0, 0.05);
         --toast-text: #0f172a;
 
-        /* ADAPTIVE GLASS VARIABLES */
         --glass-bg-adaptive: rgba(255, 255, 255, 0.65);
         --glass-border-adaptive: rgba(0, 0, 0, 0.05);
         --glass-shadow-adaptive: rgba(0, 0, 0, 0.05);
@@ -162,39 +160,34 @@
     .sidebar-useremail { font-size: 10px; color: var(--text-muted); }
 
     /* =========================================
-       3. HEADER (SEARCH & NOTIFICATION) - LIQUID GLASS
+       3. NOTIFICATION BUTTON (Synced with Home)
        ========================================= */
-    .app-header { display: flex; justify-content: flex-end; align-items: center; padding: 20px 40px; margin-bottom: 10px; position: relative; }
-    
-    .header-actions { display: flex; align-items: center; gap: 15px; position: relative; width: 100%; justify-content: flex-end; }
-    
-    .search-box {
-        background: var(--glass-bg-adaptive); border: 1px solid var(--glass-border-adaptive);
-        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-        box-shadow: 0 4px 15px var(--glass-shadow-adaptive);
-        padding: 7px 15px; border-radius: 50px;
-        display: flex; align-items: center; gap: 10px;
-        width: 300px; transition: 0.3s;
+    .hero-notif-btn {
+        position: absolute;
+        top: 30px;
+        right: 40px;
+        z-index: 20;
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.5); 
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: 0.2s;
+        font-size: 16px; text-decoration: none;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
-    .search-box:focus-within { border-color: var(--text-muted); width: 350px; }
-    .search-box i { color: var(--text-main); font-size: 12px; cursor: pointer; }
-    .search-box input { background: transparent; border: none; color: var(--text-main); width: 100%; font-size: 13px; font-family: inherit; }
-
-    .icon-btn {
-        width: 36px; height: 36px; border-radius: 50%;
-        background: var(--glass-bg-adaptive); border: 1px solid var(--glass-border-adaptive);
-        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-        box-shadow: 0 4px 15px var(--glass-shadow-adaptive);
-        color: var(--text-main); display: flex; align-items: center; justify-content: center;
-        cursor: pointer; transition: 0.2s; position: relative; font-size: 14px;
-        text-decoration: none; 
+    .hero-notif-btn:hover { background: rgba(0,0,0,0.7); transform: translateY(-2px); }
+    .hero-notif-btn .badge { 
+        position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; 
+        background: var(--admin-color); border-radius: 50%; 
+        border: 2px solid rgba(0,0,0,0.5); display: none; 
     }
-    .icon-btn:hover { background: var(--sidebar-hover); transform: translateY(-2px); }
-    .badge { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--admin-color); border-radius: 50%; border: 2px solid var(--bg-color); display: none; }
-    .badge.active { display: block; }
+    .hero-notif-btn .badge.active { display: block; }
 
     .notif-modal {
-        position: absolute; top: 70px; right: 40px;
+        position: absolute; top: 80px; right: 40px;
         width: 320px; max-height: 400px;
         background: var(--card-bg); border: var(--glass-border);
         border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -213,7 +206,7 @@
     /* =========================================
        4. VIDEO GRID STYLES
        ========================================= */
-    .main-wrapper { max-width: 1600px; margin: 0 auto; width: 100%; padding-bottom: 40px; padding-left: 40px; padding-right: 40px; position: relative;}
+    .main-wrapper { max-width: 1600px; margin: 0 auto; width: 100%; padding-bottom: 40px; padding-left: 40px; padding-right: 40px; position: relative; padding-top: 40px;}
     
     .page-title {
         font-size: 28px; font-weight: 800; margin-bottom: 20px;
@@ -271,7 +264,7 @@
     #pagination button:hover:not(.active) { background: var(--sidebar-hover); color: var(--text-main); }
 
     /* =========================================
-       5. MODALS (Favorites & Info)
+       5. MODALS
        ========================================= */
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -303,24 +296,20 @@
 
     .modal-body { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
     
-    /* Fav Item Styles */
     .fav-list-item { 
         display: flex; align-items: center; gap: 15px; padding: 10px; 
         border-radius: 12px; background: var(--bg-color); border: var(--glass-border);
         transition: 0.2s;
     }
-    .fav-list-item:hover { border-color: var(--text-muted); }
     .fav-thumb { width: 80px; aspect-ratio: 16/9; border-radius: 6px; object-fit: cover; }
     .fav-list-info { flex: 1; min-width: 0; }
     .fav-list-title { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .fav-list-cat { font-size: 10px; color: var(--text-muted); }
-    .fav-actions { display: flex; gap: 10px; }
     .fav-btn-remove { 
         color: var(--text-muted); background: none; border: none; cursor: pointer; font-size: 14px; transition: 0.2s;
     }
     .fav-btn-remove:hover { color: var(--admin-color); }
 
-    /* Info Modal Text */
     .info-text p { color: var(--text-muted); font-size: 13px; line-height: 1.6; margin-bottom: 15px; }
     .info-text b { color: var(--text-main); }
     
@@ -328,18 +317,7 @@
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--toast-bg); border: var(--toast-border); color: var(--toast-text); padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; z-index: 9999; opacity: 0; pointer-events: none; backdrop-filter: blur(10px); transition: all 0.5s ease; }
     .toast.show { bottom: 50px; opacity: 1; }
 
-    /* ACCESS DENIED */
-    .access-denied-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(10px); }
-    .access-card { background: #111; border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; text-align: center; color: #fff; max-width: 400px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-    .access-icon-box { width: 60px; height: 60px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 24px; }
-    .access-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
-    .access-desc { font-size: 14px; color: #888; line-height: 1.5; margin-bottom: 25px; }
-    .access-btn { background: #fff; color: #000; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-    .access-btn:hover { transform: scale(1.05); }
-
-    /* =========================================
-       6. MOBILE RESPONSIVENESS (LIQUID GLASS)
-       ========================================= */
+    /* MOBILE RESPONSIVENESS */
     .mobile-header { 
         display: none; padding: 20px 20px; align-items: flex-start; justify-content: space-between; 
         position: fixed; top: 0; left: 0; width: 100%; z-index: 900; 
@@ -371,19 +349,14 @@
 
     .mobile-sidebar-menu { 
         position: fixed; top: 0; left: -100%; width: 280px; height: 100%; 
-        
-        /* --- FORCE DARK MODE FOR THE SIDEBAR ONLY --- */
         --text-main: #ffffff;
         --text-muted: #a1a1aa;
         --sidebar-hover: rgba(255, 255, 255, 0.1);
         --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-        
-        /* --- LIQUID GLASS EFFECT (Always Dark) --- */
         background: rgba(0, 0, 0, 0.75); 
         backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         border-right: var(--glass-border);
         box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
-        
         z-index: 9999; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         padding-top: 0; display: flex; flex-direction: column; 
     }
@@ -393,21 +366,10 @@
         .sidebar-desktop { display: none; }
         .mobile-header { display: flex; }
         body { padding-left: 0; }
-        
-        /* Adjusted so content fits nicely below the new floating header */
+        .hero-notif-btn { display: none !important; }
         .main-wrapper { padding-top: 80px; padding-left: 20px; padding-right: 20px;} 
-        
-        /* Keep header but hide desktop bell, center the search bar */
-        .app-header { justify-content: center; padding: 15px 0; margin-top: 0; }
-        .header-actions { width: 100%; justify-content: center; }
-        .header-actions .icon-btn { display: none; } /* Hide desktop bell */
-        .search-box { width: 100%; max-width: 400px; }
-        
-        /* Fixed Notif Modal for mobile (aligned perfectly under new header bell) */
         .notif-modal { position: fixed; top: 75px; right: 20px; width: 300px; max-width: 90vw; z-index: 2000; left: auto; transform: none; }
-        
         .grid-container { grid-template-columns: repeat(1, 1fr); gap: 15px; }
-        .video-title { font-size: 13px; }
     }
     @media (min-width: 500px) and (max-width: 900px) {
          .grid-container { grid-template-columns: repeat(2, 1fr); }
@@ -528,19 +490,10 @@
         </div>
     </div>
 
-    <header class="app-header">
-        <div class="header-actions">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search videos, tags..." oninput="handleSearch(this.value)">
-            </div>
-            
-            <a href="javascript:void(0)" class="icon-btn" onclick="toggleNotifModal()">
-                <i class="fas fa-bell"></i>
-                <span id="notif-badge" class="badge"></span>
-            </a>
-        </div>
-    </header>
+    <a href="javascript:void(0)" class="hero-notif-btn" onclick="toggleNotifModal()">
+        <i class="fas fa-bell"></i>
+        <span id="notif-badge" class="badge"></span>
+    </a>
 
     <h1 class="page-title">Videos</h1>
 
@@ -604,21 +557,17 @@
     let favorites = [];
     let userId = null;
 
-    // --- TOAST ---
     window.addEventListener('load', () => {
         setTimeout(() => {
             document.getElementById('toast').classList.add('show');
             setTimeout(() => { document.getElementById('toast').classList.remove('show'); }, 4000);
         }, 1000);
-        
-        // Info Modal Logic
         if (!sessionStorage.getItem('infoModalShown')) {
             document.getElementById('infoModal').classList.add('active');
             document.body.classList.add('no-scroll');
         }
     });
 
-    // --- AUTH LOGIC ---
     auth.onAuthStateChanged(user => {
         if(user) {
             userId = user.uid;
@@ -629,19 +578,15 @@
                 const pic = data.profilePicture || "https://via.placeholder.com/150";
                 const role = (data.role || "member").toLowerCase();
                 const isAdm = role === 'admin';
-
                 document.getElementById("sidebar-name").innerText = name;
                 document.getElementById("sidebar-email").innerText = user.email;
                 document.getElementById("sidebar-pic").src = pic;
-                
                 document.getElementById("mobile-sidebar-name").innerText = name;
                 document.getElementById("mobile-sidebar-email").innerText = user.email;
                 document.getElementById("mobile-sidebar-pic").src = pic;
-
                 const statusTxt = isAdm ? "ADMIN ACCESS" : "MEMBER ACCESS";
                 if(document.getElementById("status-text-pc")) document.getElementById("status-text-pc").innerText = statusTxt;
                 if(document.getElementById("status-text-mobile")) document.getElementById("status-text-mobile").innerText = statusTxt;
-                
                 if (isAdm) { sessionStorage.setItem('isAdmin', 'true'); sessionStorage.setItem('internalAccess', 'true'); }
             });
         }
@@ -653,16 +598,13 @@
         }
     }
 
-    // --- NOTIFICATIONS ---
     const notifList = document.getElementById('notif-list');
     let latestNotifTimestamp = 0;
-
     db.ref('notifications').limitToLast(10).on('value', snapshot => {
         notifList.innerHTML = ''; 
         if (snapshot.exists()) {
             const data = snapshot.val();
             const notifs = Object.values(data).reverse(); 
-            
             notifs.forEach(n => {
                 const item = document.createElement('div');
                 item.className = 'notif-item';
@@ -670,11 +612,9 @@
                 notifList.appendChild(item);
                 if(n.timestamp > latestNotifTimestamp) latestNotifTimestamp = n.timestamp;
             });
-
             const lastRead = localStorage.getItem('lastReadNotif') || 0;
             const badgeDesktop = document.getElementById('notif-badge');
             const badgeMobile = document.getElementById('notif-badge-mobile');
-            
             if (latestNotifTimestamp > lastRead) {
                 if(badgeDesktop) badgeDesktop.classList.add('active');
                 if(badgeMobile) badgeMobile.classList.add('active');
@@ -699,12 +639,10 @@
         }
     }
 
-    // --- THEME LOGIC ---
     function initTheme() {
         const savedTheme = localStorage.getItem('zoneTheme') || 'dark';
         if (savedTheme === 'light') document.body.classList.add('light-mode');
     }
-    
     window.toggleTheme = function() {
         document.body.classList.toggle('light-mode');
         const isLight = document.body.classList.contains('light-mode');
@@ -712,7 +650,6 @@
     }
     initTheme();
 
-    // --- VIDEO DATA & GRID LOGIC ---
     const data = [
       {id:"v0.6", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/CXM.png", category:"VIDEOS", title:"CxM [DOUBLE UP] LIVE PARTY in INCHEON", hashtags:"NEW ADDED", link:"2025/cxm_in_incheon"},
       {id:"v0.5", thumb:"https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png", category:"VIDEOS", title:"SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Fukuoka Show", hashtags:"NEW ADDED", link:"2025/fukuokanewtour"},
@@ -735,18 +672,6 @@
     let currentPaginationPage = 1;
     let cardsPerPage = window.innerWidth <= 900 ? 6 : 8;
     const grid = document.getElementById("grid");
-    let filteredData = [...data];
-
-    window.handleSearch = function(query) {
-        const term = query.toLowerCase();
-        filteredData = data.filter(item => 
-            item.title.toLowerCase().includes(term) || 
-            item.category.toLowerCase().includes(term) ||
-            item.hashtags.toLowerCase().includes(term)
-        );
-        currentPaginationPage = 1;
-        renderGrid(1);
-    }
 
     window.addEventListener('resize', () => {
         const newLimit = window.innerWidth <= 900 ? 6 : 8;
@@ -759,21 +684,15 @@
 
     function renderGrid(page) {
         grid.innerHTML = "";
-        if (filteredData.length === 0) {
-            grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">No videos found matching your search.</div>';
-            document.getElementById("pagination").innerHTML = "";
-            return;
-        }
         const start = (page-1)*cardsPerPage;
         const end = start+cardsPerPage;
-        const pageData = filteredData.slice(start,end);
+        const pageData = data.slice(start,end);
 
         pageData.forEach(item => {
             const el = document.createElement("div");
             el.className = "video-card";
             const isFav = favorites.includes(item.id) ? 'active' : '';
             const starIcon = favorites.includes(item.id) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
-            
             el.innerHTML = `
               <div class="thumb-wrapper">
                 <img src="${item.thumb}" loading="lazy" alt="${item.title}">
@@ -798,7 +717,7 @@
     function renderPagination() {
         const pagination = document.getElementById("pagination");
         pagination.innerHTML = "";
-        const pageCount = Math.ceil(filteredData.length/cardsPerPage);
+        const pageCount = Math.ceil(data.length/cardsPerPage);
         if(pageCount <= 1) return;
         for(let i=1; i<=pageCount; i++){
             const btn = document.createElement("button");
@@ -825,7 +744,6 @@
         });
     }
 
-    // --- FAVORITES LOGIC ---
     function loadFavoritesFromFirebase() {
         if (!userId) return;
         db.ref('users/' + userId + '/favorites').on('value', snapshot => {
@@ -848,13 +766,11 @@
         saveFavoritesToFirebase();
     }
 
-    // --- UI HELPERS ---
     window.toggleMobileSidebar = function() { document.getElementById('mobileSidebar').classList.toggle('open'); }
     
     window.openFavoriteModal = function() {
         const list = document.getElementById('favoriteList');
         list.innerHTML = ''; 
-
         if (favorites.length === 0) {
             list.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted);"><i class="far fa-folder-open" style="font-size:30px; margin-bottom:10px;"></i><br>Collection is Empty</div>`;
         } else {
@@ -895,7 +811,6 @@
 
     renderGrid(1);
 
-    // --- SECURITY ---
     const allowedPaths = ['/index.html', '/home.html', '/nanabnb.html', '/newtour.html', 
         'hxwfanconcert.html', '/svtholiday.html', '/arenatour.html', 
         '/svtjapanconcert.html', '/touragain.html', '/gallery.html', 
@@ -907,15 +822,12 @@
     let hasInternalAccessFlag = sessionStorage.getItem('internalAccess') === 'true';
     const referer = document.referrer;
     const refererPath = referer ? new URL(referer, location.origin).pathname : null;
-    
     const cameFromAllowedPageFlag = refererPath && allowedPaths.includes(refererPath);
     if (cameFromAllowedPageFlag || isAdminFlag) { 
         sessionStorage.setItem('internalAccess', 'true'); 
         hasInternalAccessFlag = true; 
     }
-
     const isIndexPagePath = currentPagePath.endsWith('index.html') || currentPagePath === '/';
-
     if (!hasInternalAccessFlag && !isIndexPagePath && !isAdminFlag) { 
         showAccessDeniedModal(); 
     }
