@@ -39,7 +39,7 @@ messaging.onBackgroundMessage((payload) => {
 // ============================
 // 2. CACHING
 // ============================
-const CACHE_NAME = 'zonevault-v143'; // UPDATED VERSION
+const CACHE_NAME = 'zonevault-v145'; // UPDATED VERSION
 const urlsToCache = [
   './',
   './index.html',
