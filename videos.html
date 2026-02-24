@@ -35,6 +35,11 @@
         --toast-bg: rgba(20, 20, 20, 0.95);
         --toast-border: 1px solid rgba(255, 255, 255, 0.1);
         --toast-text: #ffffff;
+
+        /* ADAPTIVE GLASS VARIABLES */
+        --glass-bg-adaptive: rgba(255, 255, 255, 0.05);
+        --glass-border-adaptive: rgba(255, 255, 255, 0.1);
+        --glass-shadow-adaptive: rgba(0, 0, 0, 0.3);
     }
 
     body.light-mode {
@@ -50,6 +55,11 @@
         --toast-bg: rgba(255, 255, 255, 0.95);
         --toast-border: 1px solid rgba(0, 0, 0, 0.05);
         --toast-text: #0f172a;
+
+        /* ADAPTIVE GLASS VARIABLES */
+        --glass-bg-adaptive: rgba(255, 255, 255, 0.65);
+        --glass-border-adaptive: rgba(0, 0, 0, 0.05);
+        --glass-shadow-adaptive: rgba(0, 0, 0, 0.05);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -152,25 +162,29 @@
     .sidebar-useremail { font-size: 10px; color: var(--text-muted); }
 
     /* =========================================
-       3. HEADER (SEARCH & NOTIFICATION)
+       3. HEADER (SEARCH & NOTIFICATION) - LIQUID GLASS
        ========================================= */
     .app-header { display: flex; justify-content: flex-end; align-items: center; padding: 20px 40px; margin-bottom: 10px; position: relative; }
     
     .header-actions { display: flex; align-items: center; gap: 15px; position: relative; width: 100%; justify-content: flex-end; }
     
     .search-box {
-        background: var(--card-bg); border: var(--glass-border);
+        background: var(--glass-bg-adaptive); border: 1px solid var(--glass-border-adaptive);
+        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        box-shadow: 0 4px 15px var(--glass-shadow-adaptive);
         padding: 7px 15px; border-radius: 50px;
         display: flex; align-items: center; gap: 10px;
         width: 300px; transition: 0.3s;
     }
     .search-box:focus-within { border-color: var(--text-muted); width: 350px; }
-    .search-box i { color: var(--text-muted); font-size: 12px; cursor: pointer; }
+    .search-box i { color: var(--text-main); font-size: 12px; cursor: pointer; }
     .search-box input { background: transparent; border: none; color: var(--text-main); width: 100%; font-size: 13px; font-family: inherit; }
 
     .icon-btn {
-        width: 34px; height: 34px; border-radius: 50%;
-        background: var(--card-bg); border: var(--glass-border);
+        width: 36px; height: 36px; border-radius: 50%;
+        background: var(--glass-bg-adaptive); border: 1px solid var(--glass-border-adaptive);
+        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        box-shadow: 0 4px 15px var(--glass-shadow-adaptive);
         color: var(--text-main); display: flex; align-items: center; justify-content: center;
         cursor: pointer; transition: 0.2s; position: relative; font-size: 14px;
         text-decoration: none; 
@@ -180,7 +194,7 @@
     .badge.active { display: block; }
 
     .notif-modal {
-        position: absolute; top: 50px; right: 0;
+        position: absolute; top: 70px; right: 40px;
         width: 320px; max-height: 400px;
         background: var(--card-bg); border: var(--glass-border);
         border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -199,7 +213,7 @@
     /* =========================================
        4. VIDEO GRID STYLES
        ========================================= */
-    .main-wrapper { max-width: 1600px; margin: 0 auto; width: 100%; padding-bottom: 40px; padding-left: 40px; padding-right: 40px;}
+    .main-wrapper { max-width: 1600px; margin: 0 auto; width: 100%; padding-bottom: 40px; padding-left: 40px; padding-right: 40px; position: relative;}
     
     .page-title {
         font-size: 28px; font-weight: 800; margin-bottom: 20px;
@@ -323,22 +337,75 @@
     .access-btn { background: #fff; color: #000; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: 0.2s; }
     .access-btn:hover { transform: scale(1.05); }
 
-    /* MOBILE */
-    .mobile-header { display: none; padding: 15px 20px; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 90; background: var(--bg-color); border-bottom: var(--glass-border); }
-    .mobile-logo-container { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-main); }
-    .mobile-logo-img { height: 28px; width: auto; }
-    .mobile-sidebar-menu { position: fixed; top: 0; left: -100%; width: 280px; height: 100%; background: var(--sidebar-bg); z-index: 9999; transition: left 0.3s ease; border-right: var(--glass-border); padding-top: 0; display:flex; flex-direction:column; }
+    /* =========================================
+       6. MOBILE RESPONSIVENESS (LIQUID GLASS)
+       ========================================= */
+    .mobile-header { 
+        display: none; padding: 20px 20px; align-items: flex-start; justify-content: space-between; 
+        position: fixed; top: 0; left: 0; width: 100%; z-index: 900; 
+        background: transparent; border: none; pointer-events: none; 
+    }
+    
+    .mobile-logo-container { 
+        display: flex; align-items: center; gap: 10px; font-weight: 700; color: #ffffff; 
+        background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        padding: 6px 16px; height: 40px; border-radius: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); pointer-events: auto; 
+    }
+    
+    .mobile-logo-img { height: 24px; width: auto; }
+
+    .glass-btn {
+        background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2); color: #ffffff; 
+        width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 18px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); pointer-events: auto; position: relative;
+        text-decoration: none;
+    }
+    .glass-btn .badge { 
+        position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; 
+        background: var(--admin-color); border-radius: 50%; 
+        border: 2px solid rgba(0,0,0,0.5); display: none; 
+    }
+    .glass-btn .badge.active { display: block; }
+
+    .mobile-sidebar-menu { 
+        position: fixed; top: 0; left: -100%; width: 280px; height: 100%; 
+        
+        /* --- FORCE DARK MODE FOR THE SIDEBAR ONLY --- */
+        --text-main: #ffffff;
+        --text-muted: #a1a1aa;
+        --sidebar-hover: rgba(255, 255, 255, 0.1);
+        --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+        
+        /* --- LIQUID GLASS EFFECT (Always Dark) --- */
+        background: rgba(0, 0, 0, 0.75); 
+        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        border-right: var(--glass-border);
+        box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
+        
+        z-index: 9999; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding-top: 0; display: flex; flex-direction: column; 
+    }
     .mobile-sidebar-menu.open { left: 0; }
 
     @media (max-width: 900px) {
         .sidebar-desktop { display: none; }
         .mobile-header { display: flex; }
         body { padding-left: 0; }
-        .app-header { justify-content: space-between; padding: 15px 20px; margin-top: 0; }
-        .header-actions { width: 100%; justify-content: space-between; gap: 10px; }
-        .search-box { width: auto; flex: 1; }
-        .notif-modal { position: absolute; top: 60px; right: 0; left: auto; transform: none; width: 300px; max-width: 90vw; }
-        .main-wrapper { padding: 0 20px 40px 20px; }
+        
+        /* Adjusted so content fits nicely below the new floating header */
+        .main-wrapper { padding-top: 80px; padding-left: 20px; padding-right: 20px;} 
+        
+        /* Keep header but hide desktop bell, center the search bar */
+        .app-header { justify-content: center; padding: 15px 0; margin-top: 0; }
+        .header-actions { width: 100%; justify-content: center; }
+        .header-actions .icon-btn { display: none; } /* Hide desktop bell */
+        .search-box { width: 100%; max-width: 400px; }
+        
+        /* Fixed Notif Modal for mobile (aligned perfectly under new header bell) */
+        .notif-modal { position: fixed; top: 75px; right: 20px; width: 300px; max-width: 90vw; z-index: 2000; left: auto; transform: none; }
+        
         .grid-container { grid-template-columns: repeat(1, 1fr); gap: 15px; }
         .video-title { font-size: 13px; }
     }
@@ -359,9 +426,15 @@
          <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault" class="mobile-logo-img">
          <span>ZONE VAULT</span>
     </div>
-    <button class="hamburger" onclick="toggleMobileSidebar()" style="background:none; border:none; color:var(--text-main); font-size:20px;">
-        <i class="fas fa-bars"></i>
-    </button>
+    <div style="display: flex; gap: 10px; pointer-events: auto;">
+        <a href="javascript:void(0)" class="glass-btn" onclick="toggleNotifModal()">
+            <i class="fas fa-bell"></i>
+            <span id="notif-badge-mobile" class="badge"></span>
+        </a>
+        <button class="glass-btn" onclick="toggleMobileSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
 </div>
 
 <div id="mobileSidebar" class="mobile-sidebar-menu">
@@ -445,6 +518,16 @@
 
 <div class="main-wrapper fade-in">
     
+    <div id="notifModal" class="notif-modal">
+        <div class="notif-header">
+            <span>Notifications</span>
+            <i class="fas fa-check-double" style="cursor:pointer;" title="Mark all read"></i>
+        </div>
+        <div id="notif-list">
+            <div class="notif-empty">Loading notifications...</div>
+        </div>
+    </div>
+
     <header class="app-header">
         <div class="header-actions">
             <div class="search-box">
@@ -456,16 +539,6 @@
                 <i class="fas fa-bell"></i>
                 <span id="notif-badge" class="badge"></span>
             </a>
-            
-            <div id="notifModal" class="notif-modal">
-                <div class="notif-header">
-                    <span>Notifications</span>
-                    <i class="fas fa-check-double" style="cursor:pointer;" title="Mark all read"></i>
-                </div>
-                <div id="notif-list">
-                    <div class="notif-empty">Loading notifications...</div>
-                </div>
-            </div>
         </div>
     </header>
 
@@ -599,8 +672,16 @@
             });
 
             const lastRead = localStorage.getItem('lastReadNotif') || 0;
-            if (latestNotifTimestamp > lastRead) document.getElementById('notif-badge').classList.add('active');
-            else document.getElementById('notif-badge').classList.remove('active');
+            const badgeDesktop = document.getElementById('notif-badge');
+            const badgeMobile = document.getElementById('notif-badge-mobile');
+            
+            if (latestNotifTimestamp > lastRead) {
+                if(badgeDesktop) badgeDesktop.classList.add('active');
+                if(badgeMobile) badgeMobile.classList.add('active');
+            } else {
+                if(badgeDesktop) badgeDesktop.classList.remove('active');
+                if(badgeMobile) badgeMobile.classList.remove('active');
+            }
         } else {
             notifList.innerHTML = '<div class="notif-empty">No new notifications</div>';
         }
@@ -610,7 +691,10 @@
         const modal = document.getElementById('notifModal');
         modal.classList.toggle('active');
         if (modal.classList.contains('active')) {
-            document.getElementById('notif-badge').classList.remove('active');
+            const badgeDesktop = document.getElementById('notif-badge');
+            const badgeMobile = document.getElementById('notif-badge-mobile');
+            if(badgeDesktop) badgeDesktop.classList.remove('active');
+            if(badgeMobile) badgeMobile.classList.remove('active');
             localStorage.setItem('lastReadNotif', latestNotifTimestamp);
         }
     }
