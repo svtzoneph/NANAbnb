@@ -28,6 +28,7 @@
         --accent: #ffffff;
         --status-online: #22c55e;
         --admin-color: #ef4444; 
+        --youtube-red: #ff0000;
         
         --sidebar-width-collapsed: 64px; 
         --sidebar-width-expanded: 220px; 
@@ -150,40 +151,45 @@
     .sidebar-useremail { font-size: 10px; color: var(--text-muted); }
 
     /* =========================================
-       3. HEADER (SEARCH & NOTIFICATION)
+       3. NOTIFICATION
        ========================================= */
-    .app-header { display: flex; justify-content: flex-end; align-items: center; padding: 20px 40px; margin-bottom: 10px; position: relative; }
-    
-    .header-actions { display: flex; align-items: center; gap: 15px; position: relative; }
-    
-    .search-box {
-        background: var(--card-bg); border: var(--glass-border);
-        padding: 7px 15px; border-radius: 50px;
-        display: flex; align-items: center; gap: 10px;
-        width: 240px; transition: 0.3s;
-    }
-    .search-box:focus-within { border-color: var(--text-muted); width: 270px; }
-    .search-box i { color: var(--text-muted); font-size: 12px; cursor: pointer; }
-    .search-box input { background: transparent; border: none; color: var(--text-main); width: 100%; font-size: 13px; font-family: inherit; }
 
-    .icon-btn {
-        width: 34px; height: 34px; border-radius: 50%;
-        background: var(--card-bg); border: var(--glass-border);
-        color: var(--text-main); display: flex; align-items: center; justify-content: center;
-        cursor: pointer; transition: 0.2s; position: relative; font-size: 14px;
-        text-decoration: none; 
+    /* FLOATING NOTIFICATION (Synced) */
+    .hero-notif-btn {
+        position: fixed;
+        top: 30px;
+        right: 40px;
+        z-index: 2000;
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.5); 
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: 0.2s;
+        font-size: 16px; text-decoration: none;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
-    .icon-btn:hover { background: var(--sidebar-hover); transform: translateY(-2px); }
-    .badge { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--admin-color); border-radius: 50%; border: 2px solid var(--bg-color); display: none; }
-    .badge.active { display: block; }
+    body.light-mode .hero-notif-btn { background: rgba(255,255,255,0.5); color: #000; border: 1px solid rgba(0,0,0,0.1); }
+    .hero-notif-btn:hover { background: rgba(0,0,0,0.7); transform: translateY(-2px); }
+    body.light-mode .hero-notif-btn:hover { background: rgba(255,255,255,0.8); }
 
-    .notif-modal {
-        position: absolute; top: 50px; right: 0;
-        width: 320px; max-height: 400px;
-        background: var(--card-bg); border: var(--glass-border);
-        border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        display: none; flex-direction: column; z-index: 2000;
-        overflow-y: auto; backdrop-filter: blur(10px);
+    .hero-notif-btn .badge { 
+        position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; 
+        background: var(--admin-color); border-radius: 50%; 
+        border: 2px solid rgba(0,0,0,0.5); display: none; 
+    }
+    .hero-notif-btn .badge.active { display: block; }
+
+    .notif-modal { 
+        position: fixed; 
+        top: 80px; right: 40px; 
+        width: 320px; max-height: 400px; background: var(--card-bg); 
+        border: var(--glass-border); border-radius: 12px; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none; 
+        flex-direction: column; z-index: 2000; overflow-y: auto; 
+        backdrop-filter: blur(10px); 
     }
     .notif-modal.active { display: flex; animation: fadeIn 0.3s ease; }
     .notif-header { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; }
@@ -197,7 +203,7 @@
     /* =========================================
        4. COLLECTION LAYOUT
        ========================================= */
-    .main-wrapper { max-width: 1600px; margin: 0 auto; width: 100%; padding-bottom: 40px; }
+    .main-wrapper { max-width: 1600px; margin: 0 auto; width: 100%; padding-bottom: 40px; padding-top: 40px;}
     
     .page-title {
         font-size: 28px; font-weight: 800; margin-bottom: 20px;
@@ -279,7 +285,7 @@
     .lightbox-btn:hover { background: white; color: black; transform: scale(1.1); }
 
     /* TOAST */
-    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--toast-bg); border: var(--toast-border); color: var(--toast-text); padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; box-shadow: var(--toast-shadow); z-index: 9999; opacity: 0; pointer-events: none; backdrop-filter: blur(10px); transition: all 0.5s ease; }
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--toast-bg); border: var(--toast-border); color: var(--toast-text); padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; z-index: 9999; opacity: 0; pointer-events: none; backdrop-filter: blur(10px); transition: all 0.5s ease; }
     .toast.show { bottom: 50px; opacity: 1; }
 
     /* ACCESS DENIED */
@@ -291,24 +297,74 @@
     .access-btn { background: #fff; color: #000; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: 0.2s; }
     .access-btn:hover { transform: scale(1.05); }
 
-    /* MOBILE */
-    .mobile-header { display: none; padding: 15px 20px; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 90; background: var(--bg-color); border-bottom: var(--glass-border); }
-    .mobile-logo-container { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-main); }
-    .mobile-logo-img { height: 28px; width: auto; }
-    .mobile-sidebar-menu { position: fixed; top: 0; left: -100%; width: 280px; height: 100%; background: var(--sidebar-bg); z-index: 9999; transition: left 0.3s ease; border-right: var(--glass-border); padding-top: 0; display:flex; flex-direction:column; }
+    /* =========================================
+       5. MOBILE RESPONSIVENESS (LIQUID GLASS)
+       ========================================= */
+    .mobile-header { 
+        display: none; padding: 20px 20px; align-items: flex-start; justify-content: space-between; 
+        position: fixed; top: 0; left: 0; width: 100%; z-index: 900; 
+        background: transparent; border: none; pointer-events: none; 
+    }
+    
+    .mobile-logo-container { 
+        display: flex; align-items: center; gap: 10px; font-weight: 700; color: #ffffff; 
+        background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        padding: 6px 16px; height: 40px; border-radius: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); pointer-events: auto; 
+    }
+    
+    .mobile-logo-img { height: 24px; width: auto; }
+
+    .glass-btn {
+        background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2); color: #ffffff; 
+        width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 18px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); pointer-events: auto; position: relative;
+        text-decoration: none;
+    }
+    .glass-btn:hover { background: rgba(0, 0, 0, 0.7); }
+    
+    .glass-btn .badge { 
+        position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; 
+        background: var(--admin-color); border-radius: 50%; 
+        border: 2px solid rgba(0,0,0,0.5); display: none; 
+    }
+    .glass-btn .badge.active { display: block; }
+
+    .mobile-sidebar-menu { 
+        position: fixed; top: 0; left: -100%; width: 280px; height: 100%; 
+        
+        /* --- FORCE DARK MODE FOR THE SIDEBAR ONLY --- */
+        --text-main: #ffffff;
+        --text-muted: #a1a1aa;
+        --sidebar-hover: rgba(255, 255, 255, 0.1);
+        --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+        
+        /* --- LIQUID GLASS EFFECT (Always Dark) --- */
+        background: rgba(0, 0, 0, 0.75); 
+        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        border-right: var(--glass-border);
+        box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
+        
+        z-index: 9999; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding-top: 0; display: flex; flex-direction: column; 
+    }
     .mobile-sidebar-menu.open { left: 0; }
 
     @media (max-width: 900px) {
         .sidebar-desktop { display: none; }
         .mobile-header { display: flex; }
         body { padding-left: 0; }
-        .app-header { justify-content: space-between; padding: 15px 20px; margin-top: 0; }
-        .header-actions { width: 100%; justify-content: space-between; gap: 10px; }
-        .search-box { width: auto; flex: 1; }
-        .notif-modal { position: absolute; top: 60px; right: 0; left: auto; transform: none; width: 300px; max-width: 90vw; }
+        
+        /* Mobile Desktop notification hides */
+        .hero-notif-btn { display: none !important; }
+        
+        .notif-modal { position: fixed; top: 75px; right: 20px; width: 300px; max-width: 90vw; z-index: 2000; left: auto; transform: none; }
+        
         .category-menu-grid, .collection-section, .gallery-grid { padding: 0 20px; }
         .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .cat-card { aspect-ratio: 4/3; }
+        .main-wrapper { padding-top: 80px; }
     }
   </style>
 </head>
@@ -324,9 +380,15 @@
          <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault" class="mobile-logo-img">
          <span>ZONE VAULT</span>
     </div>
-    <button class="hamburger" onclick="toggleMobileSidebar()" style="background:none; border:none; color:var(--text-main); font-size:20px;">
-        <i class="fas fa-bars"></i>
-    </button>
+    <div style="display: flex; gap: 10px; pointer-events: auto;">
+        <a href="javascript:void(0)" class="glass-btn" onclick="toggleNotifModal()">
+            <i class="fas fa-bell"></i>
+            <span id="notif-badge-mobile" class="badge"></span>
+        </a>
+        <button class="glass-btn" onclick="toggleMobileSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
 </div>
 
 <div id="mobileSidebar" class="mobile-sidebar-menu">
@@ -342,9 +404,9 @@
             <li class="nav-item"> <a href="profile" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-user" style="margin-right:12px;"></i> Profile</a> </li>
             <li class="nav-item"> <a href="home" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-home" style="margin-right:12px;"></i> Home</a> </li>
             <li class="nav-item"> <a href="videos" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-play-circle" style="margin-right:12px;"></i> Videos</a> </li>
-            <li class="nav-item"> <a href="random" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-random" style="margin-right:12px;"></i> Random</a> </li>
             <li class="nav-item"> <a href="collection" class="nav-link active" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-images" style="margin-right:12px;"></i> Collection</a> </li>
             <li class="nav-item"> <a href="live" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-broadcast-tower" style="margin-right:12px;"></i> Live</a> </li>
+            <li class="nav-item"> <a href="#" onclick="alert('Favorites are on the Videos page'); return false;" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-star" style="margin-right:12px;"></i> Favorites</a> </li>
         </ul>
         <div class="sidebar-bottom" style="margin-top: auto; padding-bottom: 20px;">
              <div class="nav-link" onclick="toggleTheme()" style="justify-content: flex-start; padding-left: 20px; cursor: pointer;">
@@ -408,29 +470,20 @@
 
 <div class="main-wrapper fade-in">
     
-    <header class="app-header">
-        <div class="header-actions">
-            <div class="search-box">
-                <i class="fas fa-search" onclick="performGlobalSearch()"></i>
-                <input type="text" id="searchInput" placeholder="Search collection...">
-            </div>
-            
-            <a href="javascript:void(0)" class="icon-btn" onclick="toggleNotifModal()">
-                <i class="fas fa-bell"></i>
-                <span id="notif-badge" class="badge"></span>
-            </a>
-            
-            <div id="notifModal" class="notif-modal">
-                <div class="notif-header">
-                    <span>Notifications</span>
-                    <i class="fas fa-check-double" style="cursor:pointer;" title="Mark all read"></i>
-                </div>
-                <div id="notif-list">
-                    <div class="notif-empty">Loading notifications...</div>
-                </div>
-            </div>
+    <div id="notifModal" class="notif-modal">
+        <div class="notif-header">
+            <span>Notifications</span>
+            <i class="fas fa-check-double" style="cursor:pointer;" title="Mark all read"></i>
         </div>
-    </header>
+        <div id="notif-list">
+            <div class="notif-empty">Loading notifications...</div>
+        </div>
+    </div>
+
+    <a href="javascript:void(0)" class="hero-notif-btn" onclick="toggleNotifModal()">
+        <i class="fas fa-bell"></i>
+        <span id="notif-badge" class="badge"></span>
+    </a>
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 40px;">
         <h1 class="page-title" id="page-heading">My Collection</h1>
@@ -490,40 +543,6 @@
         }, 1000);
     });
 
-    // --- SEARCH LOGIC (LOCAL + GLOBAL) ---
-    const searchInput = document.getElementById('searchInput');
-
-    function performGlobalSearch() {
-        const query = searchInput.value.trim();
-        if(query) window.location.href = 'search.html?q=' + encodeURIComponent(query);
-    }
-
-    searchInput.addEventListener('keyup', function(event) {
-        const searchTerm = event.target.value.toLowerCase();
-        
-        // 1. Filter Category Cards (Menu)
-        const categories = document.querySelectorAll('.cat-card');
-        categories.forEach(cat => {
-            const title = cat.querySelector('h3').innerText.toLowerCase();
-            if (title.includes(searchTerm)) cat.style.display = 'block';
-            else cat.style.display = 'none';
-        });
-
-        // 2. Filter Gallery Items (Images)
-        const items = document.querySelectorAll('.gallery-item');
-        items.forEach(item => {
-            const img = item.querySelector('img');
-            const altText = img ? img.alt.toLowerCase() : '';
-            if (altText.includes(searchTerm)) item.style.display = 'block';
-            else item.style.display = 'none';
-        });
-
-        // 3. Global Search on Enter
-        if (event.key === 'Enter') {
-            performGlobalSearch();
-        }
-    });
-
     // --- NOTIFICATIONS ---
     const notifList = document.getElementById('notif-list');
     let latestNotifTimestamp = 0;
@@ -543,8 +562,16 @@
             });
 
             const lastRead = localStorage.getItem('lastReadNotif') || 0;
-            if (latestNotifTimestamp > lastRead) document.getElementById('notif-badge').classList.add('active');
-            else document.getElementById('notif-badge').classList.remove('active');
+            const badgeDesktop = document.getElementById('notif-badge');
+            const badgeMobile = document.getElementById('notif-badge-mobile');
+            
+            if (latestNotifTimestamp > lastRead) {
+                if(badgeDesktop) badgeDesktop.classList.add('active');
+                if(badgeMobile) badgeMobile.classList.add('active');
+            } else {
+                if(badgeDesktop) badgeDesktop.classList.remove('active');
+                if(badgeMobile) badgeMobile.classList.remove('active');
+            }
         } else {
             notifList.innerHTML = '<div class="notif-empty">No new notifications</div>';
         }
@@ -554,7 +581,10 @@
         const modal = document.getElementById('notifModal');
         modal.classList.toggle('active');
         if (modal.classList.contains('active')) {
-            document.getElementById('notif-badge').classList.remove('active');
+            const badgeDesktop = document.getElementById('notif-badge');
+            const badgeMobile = document.getElementById('notif-badge-mobile');
+            if(badgeDesktop) badgeDesktop.classList.remove('active');
+            if(badgeMobile) badgeMobile.classList.remove('active');
             localStorage.setItem('lastReadNotif', latestNotifTimestamp);
         }
     }
@@ -612,7 +642,7 @@
 
     // --- COLLECTION DATA & LOGIC ---
     const collectionData = [
-                               {
+                                {
             category: "CXM [DOUBLE UP] LIVE PARTY in INCHEON ALL DAY PASS SPECIAL GIFTS",
             targetId: "grid-category-7",
             sectionId: "section-7",
@@ -621,7 +651,7 @@
                 { src: "https://res.cloudinary.com/dp6x9xmku/image/upload/v1771169288/Screenshot_2026-02-15_232110_fwjqhu.png", link: "https://drive.usercontent.google.com/download?id=1JhRIFNVGpTUvvxV71HrcA-YeR7mNY5wy&export=download&authuser=0&confirm=t&uuid=42450925-b120-4789-b3bc-9f04a628bb10&at=APcXIO3WpcktBvTMKM6OwF69wrYa:1771169601972" },
             ]
         },
-               
+                
                 {
             category: "SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Fukuoka Show SPECIAL GIFTS",
             targetId: "grid-category-6",
@@ -691,7 +721,7 @@
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Joshua.jpg", link: "https://drive.usercontent.google.com/download?id=1Z8CTHozvvovBwQFeOFsm0eYbRsQumU2a&export=download&authuser=0&confirm=t&uuid=17e6594d-e170-4bfb-aae8-b32455bfbc2b&at=ANTm3cz1lnResG_pVq_vIW_wxd98:1767965899601" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Jun.jpg", link: "https://drive.usercontent.google.com/download?id=1fsv1u1RJi2Vi8Q_cBgf9wtfdWfl-l4Ue&export=download&authuser=0&confirm=t&uuid=148ba2fa-0faf-4014-ac53-aade1e46a3bb&at=ANTm3cytVyrSuVTXF38XdZcK5jBD:1767965897623" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Hoshi.jpg", link: "https://drive.usercontent.google.com/download?id=15Hy6AI1_cy4gTCIBGdtlV8fIaEkHz0kj&export=download&authuser=0&confirm=t&uuid=49d04a7e-1494-42d7-bf13-7073142b3158&at=ANTm3cxixcdU6Ysh-hk2F7lw3hmD:1767965902141" },
-                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Woozi.jpg", link: "https://drive.usercontent.com/download?id=1HBPtCB5RHqXHBjuJj2Q-NlEjjx2i2bdQ&export=download&authuser=0&confirm=t&uuid=464a5731-7f35-4afe-bc68-9bf5e0acc2cb&at=ANTm3cwgd_XaxPI2t4pOKJ57wcfQ:1767965880980" },
+                { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Woozi.jpg", link: "https://drive.usercontent.google.com/download?id=1HBPtCB5RHqXHBjuJj2Q-NlEjjx2i2bdQ&export=download&authuser=0&confirm=t&uuid=464a5731-7f35-4afe-bc68-9bf5e0acc2cb&at=ANTm3cwgd_XaxPI2t4pOKJ57wcfQ:1767965880980" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Dk.jpg", link: "https://drive.usercontent.google.com/download?id=1MrA7jvdbqJngJoB0vKHE2J79skLU2ze8&export=download&authuser=0&confirm=t&uuid=21a76af9-6420-4a1d-ba3e-fc7c8078e048&at=ANTm3czVE1C9hPRs96HEDXSwApyX:1767965906068" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20Mingyu.jpg", link: "https://drive.usercontent.google.com/download?id=1vt76WL85I-Ugebuwrap2V4Hp_E29Fa0d&export=download&authuser=0&confirm=t&uuid=e5565d46-2791-4c58-be92-92c1284b0bf8&at=ANTm3czXPy2cpZ-kiNuotgJc_Qcq:1767965893374" },
                 { src: "https://raw.githubusercontent.com/svtzoneph/gallery/refs/heads/main/images/special_gift_holiday/%5BHOLIDAY%5D%20Spacial%20Gifts%20The8.jpg", link: "https://drive.usercontent.google.com/download?id=1MGu26ixI2dA8qq7q6NmgU3FrhGQmtza4&export=download&authuser=0&confirm=t&uuid=cb45a56a-176f-47da-956c-4da8e66f767c&at=ANTm3cyuq1QeI9mBBOahw0SmGJpH:1767965885745" },
