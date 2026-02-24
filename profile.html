@@ -129,33 +129,34 @@
     .sidebar-useremail { font-size: 10px; color: var(--text-muted); }
 
     /* =========================================
-       3. HEADER (NOTIFICATION)
+       3. NOTIFICATION BUTTON & MODAL
        ========================================= */
     .app-header { display: flex; justify-content: flex-end; align-items: center; padding: 20px 40px; margin-bottom: 10px; }
     
     .header-actions { display: flex; align-items: center; gap: 15px; }
     
-    .icon-btn {
-        width: 36px; height: 36px; border-radius: 50%;
-        background: var(--glass-bg-adaptive); border: 1px solid var(--glass-border-adaptive);
-        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-        box-shadow: 0 4px 15px var(--glass-shadow-adaptive);
-        color: var(--text-main); display: flex; align-items: center; justify-content: center;
-        cursor: pointer; transition: 0.2s; position: relative; font-size: 14px;
+    .desktop-notif-btn {
+        width: 40px; height: 40px; border-radius: 50%;
+        background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2);
+        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        color: #fff; display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: 0.2s; position: relative; font-size: 16px;
         text-decoration: none; 
     }
-    .icon-btn:hover { background: var(--sidebar-hover); transform: translateY(-2px); }
-    .badge { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--admin-color); border-radius: 50%; border: 2px solid var(--bg-color); display: none; }
+    body.light-mode .desktop-notif-btn { background: rgba(255,255,255,0.5); color: #000; border: 1px solid rgba(0,0,0,0.1); }
+    .desktop-notif-btn:hover { background: rgba(0,0,0,0.7); transform: translateY(-2px); }
+    body.light-mode .desktop-notif-btn:hover { background: rgba(255,255,255,0.8); }
+
+    .badge { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--admin-color); border-radius: 50%; border: 2px solid rgba(0,0,0,0.5); display: none; }
     .badge.active { display: block; }
 
-    /* MODAL NOW POSITIONS CORRECTLY OUTSIDE THE HEADER */
-    .notif-modal {
-        position: absolute; top: 70px; right: 40px;
-        width: 320px; max-height: 400px;
-        background: var(--card-bg); border: var(--glass-border);
-        border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        display: none; flex-direction: column; z-index: 2000;
-        overflow-y: auto; backdrop-filter: blur(10px);
+    .notif-modal { 
+        position: absolute; top: 70px; right: 40px; 
+        width: 320px; max-height: 400px; background: var(--card-bg); 
+        border: var(--glass-border); border-radius: 12px; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none; 
+        flex-direction: column; z-index: 2000; overflow-y: auto; 
+        backdrop-filter: blur(10px); 
     }
     .notif-modal.active { display: flex; animation: fadeIn 0.3s ease; }
     .notif-header { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; }
@@ -288,6 +289,8 @@
         font-size: 18px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); pointer-events: auto; position: relative;
         text-decoration: none;
     }
+    .glass-btn:hover { background: rgba(0, 0, 0, 0.7); }
+    
     .glass-btn .badge { 
         position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; 
         background: var(--admin-color); border-radius: 50%; 
@@ -445,7 +448,7 @@
 
     <header class="app-header">
         <div class="header-actions">
-            <a href="javascript:void(0)" class="icon-btn" onclick="toggleNotifModal()">
+            <a href="javascript:void(0)" class="desktop-notif-btn" onclick="toggleNotifModal()">
                 <i class="fas fa-bell"></i>
                 <span id="notif-badge" class="badge"></span>
             </a>
