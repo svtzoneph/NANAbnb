@@ -17,14 +17,30 @@
        1. VARIABLES & THEME ENGINE
        ========================================= */
     :root {
+        /* EXACT ZONE VAULT LIQUID PILL EFFECT (For Logo, Buttons, & Modal) */
+        --zv-liquid-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 100%);
+        --zv-liquid-blur: blur(2px); 
+        --zv-liquid-border: 1px solid rgba(255, 255, 255, 0.3);
+        --zv-liquid-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 2px 3px rgba(255, 255, 255, 0.5), inset 0 -1px 3px rgba(0, 0, 0, 0.2);
+        --zv-liquid-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.1) 100%);
+
+        /* Liquid Engine (For Sidebar only) */
+        --liquid-blur: blur(4px);
+        --glass-surface: rgba(20, 20, 25, 0.4);
+        --glass-surface-hover: rgba(40, 40, 45, 0.6);
+        --glass-border-top: 1px solid rgba(255, 255, 255, 0.08);
+
         --bg-color: #050505;
         --text-main: #ffffff;
         --text-muted: #a1a1aa;
-        --sidebar-bg: #000000;
-        --sidebar-border: 1px solid rgba(255, 255, 255, 0.1);
         --sidebar-hover: #18181b;
-        --card-bg: #121212;
-        --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+        
+        /* Card specifics */
+        --card-bg: rgba(20, 20, 25, 0.6); /* Slightly more solid for profile cards */
+        --card-border: 1px solid rgba(255, 255, 255, 0.08);
+        --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        --card-backdrop: blur(12px);
+
         --accent: #ffffff;
         --status-online: #22c55e;
         --admin-color: #ef4444; 
@@ -33,42 +49,41 @@
         --sidebar-width-collapsed: 64px; 
         --sidebar-width-expanded: 220px; 
         
-        --toast-bg: rgba(20, 20, 20, 0.95);
-        --toast-border: 1px solid rgba(255, 255, 255, 0.1);
-        --toast-text: #ffffff;
-        
         --input-bg: rgba(255, 255, 255, 0.05);
         --banner-gradient: linear-gradient(135deg, #18181b, #000000);
-
-        /* ADAPTIVE GLASS VARIABLES */
-        --glass-bg-adaptive: rgba(255, 255, 255, 0.05);
-        --glass-border-adaptive: rgba(255, 255, 255, 0.1);
-        --glass-shadow-adaptive: rgba(0, 0, 0, 0.3);
     }
 
     body.light-mode {
         --bg-color: #f3f4f6;
         --text-main: #0f172a;
         --text-muted: #64748b;
-        --sidebar-bg: #ffffff;
-        --sidebar-border: 1px solid rgba(0,0,0,0.05);
-        --sidebar-hover: #f1f5f9;
+        --sidebar-hover: #e2e8f0;
+        
+        /* Light mode profile cards (Solid & clean like the screenshot) */
         --card-bg: #ffffff;
-        --glass-border: 1px solid rgba(0, 0, 0, 0.06);
-        --accent: #0f172a;
-        --toast-bg: rgba(255, 255, 255, 0.95);
-        --toast-border: 1px solid rgba(0, 0, 0, 0.05);
-        --toast-text: #0f172a;
-        --input-bg: #f3f4f6;
+        --card-border: 1px solid rgba(0, 0, 0, 0.08);
+        --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        --card-backdrop: none;
 
-        /* ADAPTIVE GLASS VARIABLES */
-        --glass-bg-adaptive: rgba(255, 255, 255, 0.65);
-        --glass-border-adaptive: rgba(0, 0, 0, 0.05);
-        --glass-shadow-adaptive: rgba(0, 0, 0, 0.05);
+        --accent: #0f172a;
+        --input-bg: #f1f5f9;
+
+        /* Light mode liquid variants */
+        --zv-liquid-bg: linear-gradient(135deg, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0.02) 100%);
+        --zv-liquid-border: 1px solid rgba(0, 0, 0, 0.1);
+        --zv-liquid-shadow: 0 8px 20px rgba(0, 0, 0, 0.05), inset 0 2px 3px rgba(255, 255, 255, 0.6), inset 0 -1px 3px rgba(0, 0, 0, 0.05);
+        --zv-liquid-hover: linear-gradient(135deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.04) 100%);
+
+        --glass-surface: rgba(255, 255, 255, 0.6);
+        --glass-surface-hover: rgba(255, 255, 255, 0.9);
+        --glass-border-top: 1px solid rgba(255, 255, 255, 0.4);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
 
+    /* =========================================
+       2. AMBIENT BACKGROUND
+       ========================================= */
     body { 
         background-color: var(--bg-color);
         color: var(--text-main);
@@ -77,25 +92,38 @@
         transition: background-color 0.3s ease, color 0.3s ease;
         overflow-x: hidden;
         padding-left: var(--sidebar-width-collapsed); 
+        position: relative;
     }
-    
+
+    body::before, body::after {
+        content: ''; position: fixed; border-radius: 50%;
+        filter: blur(120px); z-index: -1; opacity: 0.4; pointer-events: none;
+        display: none; 
+    }
+    body::before { width: 600px; height: 600px; background: radial-gradient(circle, #1a2340, transparent 70%); top: -100px; left: -100px; }
+    body::after { width: 500px; height: 500px; background: radial-gradient(circle, #2b1130, transparent 70%); bottom: 10%; right: -50px; }
+    body.light-mode::before { background: radial-gradient(circle, #93c5fd, transparent 70%); opacity: 0.6; }
+    body.light-mode::after { background: radial-gradient(circle, #fbcfe8, transparent 70%); opacity: 0.6; }
+
     .fade-in { animation: fadeIn 0.8s ease forwards; opacity: 0; transform: translateY(10px); }
     @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
 
     /* =========================================
-       2. SIDEBAR STYLES
+       3. LIQUID SIDEBAR & MENUS
        ========================================= */
     .sidebar-desktop {
         position: fixed; top: 0; left: 0; height: 100vh;
         width: var(--sidebar-width-collapsed);
-        background: var(--sidebar-bg);
-        border-right: var(--sidebar-border);
+        background: var(--glass-surface);
+        backdrop-filter: var(--liquid-blur);
+        -webkit-backdrop-filter: var(--liquid-blur);
+        border-right: var(--glass-border-top);
         z-index: 1000;
-        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s;
         overflow: hidden; 
         display: flex; flex-direction: column;
     }
-    .sidebar-desktop:hover { width: var(--sidebar-width-expanded); }
+    .sidebar-desktop:hover { width: var(--sidebar-width-expanded); background: var(--glass-surface-hover); }
 
     .sidebar-container { display: flex; flex-direction: column; height: 100%; padding: 15px 0; width: 100%; }
 
@@ -106,22 +134,22 @@
     .sidebar-desktop:hover .sidebar-brand span { opacity: 1; pointer-events: auto; }
 
     .nav-list { list-style: none; display: flex; flex-direction: column; gap: 4px; width: 100%; }
-    .nav-link { display: flex; align-items: center; height: 40px; color: var(--text-muted); text-decoration: none; transition: all 0.2s ease; font-size: 13px; font-weight: 500; width: 100%; justify-content: center; position: relative; cursor: pointer; }
-    .nav-link i { font-size: 16px; min-width: 20px; text-align: center; transition: color 0.2s; }
+    .nav-link { display: flex; align-items: center; height: 40px; color: var(--text-muted); text-decoration: none; transition: all 0.3s ease; font-size: 13px; font-weight: 500; width: 100%; justify-content: center; position: relative; cursor: pointer; }
+    .nav-link i { font-size: 16px; min-width: 20px; text-align: center; transition: color 0.3s; }
     .nav-text { display: none; white-space: nowrap; margin-left: 12px; opacity: 0; transition: opacity 0.2s; }
     .sidebar-desktop:hover .nav-link { justify-content: flex-start; padding-left: 22px; }
     .sidebar-desktop:hover .nav-text { display: block; opacity: 1; transition-delay: 0.1s; }
-    .nav-link:hover { background: var(--sidebar-hover); color: var(--text-main); }
-    .nav-link.active { color: var(--text-main); background: var(--sidebar-hover); }
+    .nav-link:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+    .nav-link.active { color: var(--text-main); background: rgba(255,255,255,0.08); }
     .nav-link.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--text-main); }
 
     .sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 4px; padding-bottom: 10px; }
     .text-danger { color: var(--admin-color) !important; font-weight: 600; }
     .text-danger i { color: var(--admin-color) !important; }
 
-    .sidebar-user { display: flex; align-items: center; justify-content: center; padding: 10px 0; cursor: pointer; transition: 0.2s; margin-top: 5px; border-top: 1px solid var(--sidebar-border); }
-    .sidebar-user:hover { background: var(--sidebar-hover); }
-    .sidebar-user img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid var(--glass-border); }
+    .sidebar-user { display: flex; align-items: center; justify-content: center; padding: 10px 0; cursor: pointer; transition: 0.3s; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .sidebar-user:hover { background: rgba(255,255,255,0.05); }
+    .sidebar-user img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: var(--glass-border-top); }
     .sidebar-user-info { display: none; margin-left: 10px; }
     .sidebar-desktop:hover .sidebar-user { justify-content: flex-start; padding-left: 20px; }
     .sidebar-desktop:hover .sidebar-user-info { display: block; }
@@ -129,53 +157,76 @@
     .sidebar-useremail { font-size: 10px; color: var(--text-muted); }
 
     /* =========================================
-       3. NOTIFICATION BUTTON & MODAL
+       4. THE ZONE VAULT LIQUID BUTTONS & MODAL (FIXED)
        ========================================= */
-    .app-header { display: flex; justify-content: flex-end; align-items: center; padding: 20px 40px; margin-bottom: 10px; }
-    
-    .header-actions { display: flex; align-items: center; gap: 15px; }
-    
-    .desktop-notif-btn {
-        width: 40px; height: 40px; border-radius: 50%;
-        background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2);
-        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-        color: #fff; display: flex; align-items: center; justify-content: center;
-        cursor: pointer; transition: 0.2s; position: relative; font-size: 16px;
-        text-decoration: none; 
+    .hero-notif-btn, .glass-btn {
+        background: var(--zv-liquid-bg);
+        backdrop-filter: var(--zv-liquid-blur);
+        -webkit-backdrop-filter: var(--zv-liquid-blur);
+        border: var(--zv-liquid-border);
+        box-shadow: var(--zv-liquid-shadow);
+        color: var(--text-main);
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: all 0.3s ease;
+        text-decoration: none;
     }
-    body.light-mode .desktop-notif-btn { background: rgba(255,255,255,0.5); color: #000; border: 1px solid rgba(0,0,0,0.1); }
-    .desktop-notif-btn:hover { background: rgba(0,0,0,0.7); transform: translateY(-2px); }
-    body.light-mode .desktop-notif-btn:hover { background: rgba(255,255,255,0.8); }
-
-    .badge { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background: var(--admin-color); border-radius: 50%; border: 2px solid rgba(0,0,0,0.5); display: none; }
-    .badge.active { display: block; }
+    
+    .hero-notif-btn { 
+        position: fixed; /* FIXED POSITION LIKE HOME.HTML */
+        top: 30px; right: 40px; 
+        z-index: 1000; 
+        width: 46px; height: 46px; border-radius: 50%; font-size: 18px; 
+    }
+    .glass-btn { width: 44px; height: 44px; border-radius: 50%; font-size: 18px; pointer-events: auto; position: relative; }
+    
+    .hero-notif-btn:hover, .glass-btn:hover { background: var(--zv-liquid-hover); transform: translateY(-2px); }
+    
+    .hero-notif-btn .badge, .glass-btn .badge { 
+        position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; 
+        background: var(--admin-color); border-radius: 50%; 
+        border: 2px solid var(--bg-color); display: none; 
+    }
+    .hero-notif-btn .badge.active, .glass-btn .badge.active { display: block; }
 
     .notif-modal { 
-        position: absolute; top: 70px; right: 40px; 
-        width: 320px; max-height: 400px; background: var(--card-bg); 
-        border: var(--glass-border); border-radius: 12px; 
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none; 
-        flex-direction: column; z-index: 2000; overflow-y: auto; 
-        backdrop-filter: blur(10px); 
+        position: fixed; /* FIXED POSITION LIKE HOME.HTML */
+        top: 85px; right: 40px; 
+        width: 340px; max-height: 400px; 
+        background: var(--zv-liquid-bg);
+        backdrop-filter: var(--zv-liquid-blur); 
+        -webkit-backdrop-filter: var(--zv-liquid-blur);
+        border: var(--zv-liquid-border);
+        box-shadow: var(--zv-liquid-shadow);
+        border-radius: 20px; display: none; flex-direction: column; z-index: 2000; overflow-y: auto; 
     }
-    .notif-modal.active { display: flex; animation: fadeIn 0.3s ease; }
-    .notif-header { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; }
-    .notif-item { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 12px; align-items: flex-start; transition: 0.2s; }
-    .notif-item:hover { background: var(--sidebar-hover); }
-    .notif-icon { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text-main); flex-shrink: 0; }
-    .notif-content h5 { font-size: 13px; color: var(--text-main); margin-bottom: 2px; }
-    .notif-content p { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
-    .notif-empty { padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; }
+    .notif-modal.active { display: flex; animation: liquidPop 0.3s ease; }
+    @keyframes liquidPop { 0% { opacity: 0; transform: scale(0.95) translateY(-10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+    
+    .notif-header { padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; font-size: 15px; display: flex; justify-content: space-between; }
+    .notif-item { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 14px; align-items: flex-start; transition: 0.3s; }
+    .notif-item:hover { background: rgba(255,255,255,0.1); }
+    .notif-icon { width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-main); flex-shrink: 0; }
+    .notif-content h5 { font-size: 14px; color: var(--text-main); margin-bottom: 4px; }
+    .notif-content p { font-size: 12px; color: var(--text-main); opacity: 0.8; line-height: 1.4; }
+    .notif-empty { padding: 30px; text-align: center; color: var(--text-muted); font-size: 13px; }
 
     /* =========================================
-       4. PROFILE CONTENT
+       5. PROFILE CONTENT (CARD LAYOUT FIX)
        ========================================= */
-    .main-wrapper { max-width: 1000px; margin: 0 auto; width: 100%; padding-bottom: 40px; padding-left: 20px; padding-right: 20px; position: relative;}
+    .main-wrapper { 
+        max-width: 1000px; margin: 0 auto; width: 100%; 
+        padding-top: 40px; padding-bottom: 40px; padding-left: 20px; padding-right: 20px; 
+        position: relative;
+    }
     
     .glass-card {
-        background: var(--card-bg); border: var(--glass-border);
-        border-radius: 16px; overflow: hidden;
-        box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.2);
+        background: var(--card-bg); 
+        border: var(--card-border);
+        border-radius: 20px; 
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        backdrop-filter: var(--card-backdrop);
+        -webkit-backdrop-filter: var(--card-backdrop);
         display: flex; flex-direction: column;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
@@ -186,30 +237,32 @@
         position: relative; transition: background 0.5s ease;
     }
 
-    .profile-body { padding: 0 30px 30px; position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
-    .avatar-wrapper { margin-top: -60px; position: relative; cursor: pointer; display: inline-block; }
+    .profile-body { padding: 0 30px 35px; position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .avatar-wrapper { margin-top: -65px; position: relative; cursor: pointer; display: inline-block; }
     .profile-img {
-        width: 120px; height: 120px; border-radius: 50%;
-        border: 4px solid var(--card-bg); object-fit: cover; background: #000;
+        width: 130px; height: 130px; border-radius: 50%;
+        border: 5px solid var(--card-bg); object-fit: cover; background: #000;
         transition: transform 0.2s;
     }
-    .avatar-wrapper:hover .profile-img { transform: scale(1.02); filter: brightness(0.8); }
+    .avatar-wrapper:hover .profile-img { transform: scale(1.02); filter: brightness(0.9); }
     .avatar-icon {
-        position: absolute; bottom: 5px; right: 5px;
-        background: var(--accent); color: var(--bg-color);
-        width: 30px; height: 30px; border-radius: 50%;
-        display: flex; align-items: center; justify-content: center; border: 2px solid var(--card-bg);
+        position: absolute; bottom: 8px; right: 8px;
+        background: var(--text-main); color: var(--bg-color);
+        width: 32px; height: 32px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; border: 3px solid var(--card-bg);
     }
 
-    .user-info h1 { font-size: 24px; font-weight: 700; margin-top: 15px; }
-    .user-info p.email { color: var(--text-muted); font-size: 13px; margin-bottom: 8px; }
+    .user-info h1 { font-size: 26px; font-weight: 700; margin-top: 15px; margin-bottom: 5px; color: var(--text-main); }
+    .user-info p.email { color: var(--text-muted); font-size: 14px; margin-bottom: 8px; }
+    .user-info p.role { font-size: 12px; font-weight: 700; letter-spacing: 1px; color: var(--text-main); margin-bottom: 20px; text-transform: uppercase;}
     .user-info p.bio { color: var(--text-main); font-size: 14px; max-width: 500px; margin: 0 auto 20px; line-height: 1.5; opacity: 0.9; }
     
-    .btn { padding: 10px 20px; border-radius: 50px; border: none; cursor: pointer; font-weight: 600; font-size: 12px; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-family: inherit; }
+    .btn { padding: 10px 20px; border-radius: 50px; border: none; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-family: inherit; }
     .btn-primary { background: var(--text-main); color: var(--bg-color); }
-    .btn-secondary { background: transparent; border: 1px solid var(--glass-border); color: var(--text-main); }
-    .btn-secondary:hover { border-color: var(--text-main); }
+    .btn-secondary { background: transparent; color: var(--text-main); }
+    .btn-secondary:hover { opacity: 0.7; }
 
+    /* Forms */
     .input-group { margin-bottom: 15px; text-align: left; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto;}
     .input-group label { display: block; font-size: 12px; margin-bottom: 5px; color: var(--text-muted); font-weight: 600; }
     .styled-input {
@@ -219,15 +272,17 @@
     }
     input[type="color"].styled-input { padding: 2px 4px; height: 42px; cursor: pointer; }
 
+    /* Bottom Grids */
     .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 24px; }
-    .card-header { padding: 20px; border-bottom: var(--glass-border); font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
-    .card-content { padding: 20px; font-size: 14px; color: var(--text-main); min-height: 100px; flex: 1;}
+    .card-header { padding: 20px 25px; border-bottom: var(--card-border); font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+    .card-content { padding: 25px; font-size: 14px; color: var(--text-main); min-height: 100px; flex: 1;}
 
-    .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 8px; }
-    .info-row:last-child { margin-bottom: 0; border-bottom: none; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px; }
+    body.light-mode .info-row { border-bottom: 1px solid rgba(0,0,0,0.03); }
+    .info-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
     .info-label { color: var(--text-muted); font-weight: 500; font-size: 13px; }
-    .info-value { font-weight: 600; font-size: 13px; }
-    .uid-badge { font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; background: var(--input-bg); padding: 4px 8px; border-radius: 4px; border: var(--glass-border); user-select: all; color: var(--text-muted); letter-spacing: -0.5px;}
+    .info-value { font-weight: 700; font-size: 13px; }
+    .uid-badge { font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; background: var(--input-bg); padding: 6px 10px; border-radius: 6px; border: var(--glass-border); user-select: all; color: var(--text-muted); letter-spacing: 0.5px;}
 
     /* History List */
     .history-item { display: flex; gap: 12px; margin-bottom: 15px; cursor: pointer; padding: 10px; border-radius: 12px; transition: all 0.2s; border: 1px solid transparent; }
@@ -246,90 +301,73 @@
     
     /* Avatar Modal */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 10000; display: none; align-items: center; justify-content: center; }
-    .modal-box { background: var(--card-bg); border: 1px solid var(--glass-border); padding: 25px; border-radius: 16px; width: 90%; max-width: 450px; color: var(--text-main); max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    .modal-box-avatar { background: var(--card-bg); border: 1px solid var(--glass-border); padding: 25px; border-radius: 20px; width: 90%; max-width: 450px; color: var(--text-main); max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
     .avatar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
     .avatar-option { width: 100%; aspect-ratio: 1/1; border-radius: 50%; cursor: pointer; transition: 0.2s; border: 2px solid transparent;}
     .avatar-option:hover { transform: scale(1.1); border-color: var(--text-main); }
 
-    /* TOAST */
-    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--toast-bg); border: var(--toast-border); color: var(--toast-text); padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; z-index: 9999; opacity: 0; pointer-events: none; backdrop-filter: blur(10px); transition: all 0.5s ease; }
-    .toast.show { bottom: 50px; opacity: 1; }
+    /* Modals & Toasts */
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--zv-liquid-bg); border: var(--zv-liquid-border); box-shadow: var(--zv-liquid-shadow); color: var(--text-main); padding: 14px 28px; border-radius: 30px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 12px; z-index: 9999; opacity: 0; pointer-events: none; backdrop-filter: var(--zv-liquid-blur); -webkit-backdrop-filter: var(--zv-liquid-blur); transition: all 0.6s ease; }
+    .toast.show { bottom: 50px; opacity: 1; transform: translateX(-50%) translateY(0); }
     
-    /* ACCESS DENIED */
-    .access-denied-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(10px); }
-    .access-card { background: #111; border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; text-align: center; color: #fff; max-width: 400px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-    .access-icon-box { width: 60px; height: 60px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 24px; }
-    .access-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
-    .access-desc { font-size: 14px; color: #888; line-height: 1.5; margin-bottom: 25px; }
-    .access-btn { background: #fff; color: #000; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-    .access-btn:hover { transform: scale(1.05); }
+    .access-denied-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(3,3,5,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+    .access-card { background: var(--zv-liquid-bg); border: var(--zv-liquid-border); padding: 50px; border-radius: 30px; text-align: center; color: #fff; max-width: 420px; width: 90%; box-shadow: var(--zv-liquid-shadow); backdrop-filter: var(--zv-liquid-blur); }
+    .access-icon-box { width: 70px; height: 70px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; font-size: 28px; border-top: 1px solid rgba(239, 68, 68, 0.5); }
+    .access-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
+    .access-desc { font-size: 15px; color: #bbb; line-height: 1.6; margin-bottom: 30px; }
+    .access-btn { background: #fff; color: #000; border: none; padding: 14px 35px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+    .access-btn:hover { transform: scale(1.05) translateY(-2px); }
 
     /* =========================================
-       5. MOBILE RESPONSIVENESS (LIQUID GLASS)
+       6. MOBILE RESPONSIVENESS (LIQUID GLASS)
        ========================================= */
     .mobile-header { 
         display: none; padding: 20px 20px; align-items: flex-start; justify-content: space-between; 
-        position: fixed; top: 0; left: 0; width: 100%; z-index: 900; 
-        background: transparent; border: none; pointer-events: none; 
+        position: fixed; top: 0; left: 0; width: 100%; z-index: 900; background: transparent; border: none; pointer-events: none; 
     }
     
     .mobile-logo-container { 
-        display: flex; align-items: center; gap: 10px; font-weight: 700; color: #ffffff; 
-        background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-        padding: 6px 16px; height: 40px; border-radius: 30px;
-        border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); pointer-events: auto; 
+        display: flex; align-items: center; gap: 12px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;
+        background: var(--zv-liquid-bg);
+        backdrop-filter: var(--zv-liquid-blur); 
+        -webkit-backdrop-filter: var(--zv-liquid-blur);
+        border: var(--zv-liquid-border);
+        box-shadow: var(--zv-liquid-shadow);
+        padding: 6px 18px; height: 46px; border-radius: 30px; pointer-events: auto; 
     }
-    
-    .mobile-logo-img { height: 24px; width: auto; }
-
-    .glass-btn {
-        background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2); color: #ffffff; 
-        width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        font-size: 18px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); pointer-events: auto; position: relative;
-        text-decoration: none;
-    }
-    .glass-btn:hover { background: rgba(0, 0, 0, 0.7); }
-    
-    .glass-btn .badge { 
-        position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; 
-        background: var(--admin-color); border-radius: 50%; 
-        border: 2px solid rgba(0,0,0,0.5); display: none; 
-    }
-    .glass-btn .badge.active { display: block; }
+    .mobile-logo-img { height: 26px; width: auto; }
 
     .mobile-sidebar-menu { 
-        position: fixed; top: 0; left: -100%; width: 280px; height: 100%; 
-        
-        /* --- FORCE DARK MODE FOR THE SIDEBAR ONLY --- */
-        --text-main: #ffffff;
-        --text-muted: #a1a1aa;
-        --sidebar-hover: rgba(255, 255, 255, 0.1);
-        --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-        
-        /* --- LIQUID GLASS EFFECT (Always Dark) --- */
-        background: rgba(0, 0, 0, 0.75); 
-        backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-        border-right: var(--glass-border);
-        box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
-        
-        z-index: 9999; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        padding-top: 0; display: flex; flex-direction: column; 
+        position: fixed; top: 0; left: -100%; width: 300px; height: 100%; 
+        --text-main: #ffffff; --text-muted: #a1a1aa;
+        background: rgba(15, 15, 20, 0.8); 
+        backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 9999; transition: left 0.5s cubic-bezier(0.16, 1, 0.3, 1); padding-top: 0; display: flex; flex-direction: column; 
     }
     .mobile-sidebar-menu.open { left: 0; }
 
     @media (max-width: 900px) {
+        :root { --zv-liquid-blur: blur(2px); }
+
+        body.light-mode {
+            --zv-liquid-bg: linear-gradient(135deg, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0.02) 100%);
+            --zv-liquid-border: 1px solid rgba(0, 0, 0, 0.1);
+            --zv-liquid-shadow: 0 8px 20px rgba(0, 0, 0, 0.05), inset 0 2px 3px rgba(255, 255, 255, 0.6), inset 0 -1px 3px rgba(0, 0, 0, 0.05);
+            --zv-liquid-hover: linear-gradient(135deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.04) 100%);
+        }
+
+        body::before, body::after { display: block; }
+
         .sidebar-desktop { display: none; }
         .mobile-header { display: flex; }
         body { padding-left: 0; }
         
-        /* Hide entire desktop header on mobile */
-        .app-header { display: none; }
+        .hero-notif-btn { display: none !important; }
         
         .main-wrapper { padding-top: 80px; } 
         
-        /* Mobile Modal Position Fix */
-        .notif-modal { position: fixed; top: 75px; right: 20px; width: 300px; max-width: 90vw; z-index: 2000; left: auto; transform: none; }
+        .notif-modal { position: fixed; top: 75px; right: 20px; width: 320px; max-width: 90vw; z-index: 2000; left: auto; transform: none; }
         .grid-container { grid-template-columns: 1fr; gap: 20px; }
     }
   </style>
@@ -346,7 +384,8 @@
          <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault" class="mobile-logo-img">
          <span>ZONE VAULT</span>
     </div>
-    <div style="display: flex; gap: 10px; pointer-events: auto;">
+    
+    <div style="display: flex; gap: 12px; pointer-events: auto;">
         <a href="javascript:void(0)" class="glass-btn" onclick="toggleNotifModal()">
             <i class="fas fa-bell"></i>
             <span id="notif-badge-mobile" class="badge"></span>
@@ -359,35 +398,35 @@
 
 <div id="mobileSidebar" class="mobile-sidebar-menu">
     <div class="sidebar-container" style="padding: 0 20px; height: 100%; display: flex; flex-direction: column;">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 20px 0 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 25px 20px 0 20px;">
             <div class="sidebar-brand" style="justify-content: flex-start; margin-bottom: 0; height: auto;">
-                <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" style="width:24px; height:24px;">
-                <span style="opacity:1; position:static; margin-left:12px; transform:none; font-size:14px;">ZONE VAULT</span>
+                <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" style="width:28px; height:28px;">
+                <span style="opacity:1; position:static; margin-left:14px; transform:none; font-size:16px;">ZONE VAULT</span>
             </div>
-            <button onclick="toggleMobileSidebar()" style="background:none; border:none; color:var(--text-main); font-size:28px; cursor:pointer;">&times;</button>
+            <button onclick="toggleMobileSidebar()" style="background:none; border:none; color:var(--text-main); font-size:32px; cursor:pointer;">&times;</button>
         </div>
-        <ul class="nav-list" style="padding: 20px 0;">
-            <li class="nav-item"> <a href="profile" class="nav-link active" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-user" style="margin-right:12px;"></i> Profile</a> </li>
-            <li class="nav-item"> <a href="home" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-home" style="margin-right:12px;"></i> Home</a> </li>
-            <li class="nav-item"> <a href="videos" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-play-circle" style="margin-right:12px;"></i> Videos</a> </li>
-            <li class="nav-item"> <a href="collection" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-images" style="margin-right:12px;"></i> Collection</a> </li>
-            <li class="nav-item"> <a href="live" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-broadcast-tower" style="margin-right:12px;"></i> Live</a> </li>
+        <ul class="nav-list" style="padding: 30px 0;">
+            <li class="nav-item"> <a href="profile" class="nav-link active" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-user" style="margin-right:15px;"></i> Profile</a> </li>
+            <li class="nav-item"> <a href="home" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-home" style="margin-right:15px;"></i> Home</a> </li>
+            <li class="nav-item"> <a href="videos" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-play-circle" style="margin-right:15px;"></i> Videos</a> </li>
+            <li class="nav-item"> <a href="collection" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-images" style="margin-right:15px;"></i> Collection</a> </li>
+            <li class="nav-item"> <a href="live" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-broadcast-tower" style="margin-right:15px;"></i> Live</a> </li>
         </ul>
-        <div class="sidebar-bottom" style="margin-top: auto; padding-bottom: 20px;">
+        <div class="sidebar-bottom" style="margin-top: auto; padding-bottom: 25px;">
              <div class="nav-link" onclick="toggleTheme()" style="justify-content: flex-start; padding-left: 20px; cursor: pointer;">
-                <i class="fas fa-cog" style="margin-right:12px;"></i> 
+                <i class="fas fa-cog" style="margin-right:15px;"></i> 
                 <span>Switch Theme</span>
             </div>
             <div class="nav-link text-danger" style="cursor:default; justify-content: flex-start; padding-left: 20px;">
-                 <i class="fas fa-shield-alt" style="margin-right:12px;"></i>
+                 <i class="fas fa-shield-alt" style="margin-right:15px;"></i>
                  <span id="status-text-mobile">ADMIN ACCESS</span>
             </div>
             <a href="#" onclick="logout()" class="nav-link text-danger" style="justify-content: flex-start; padding-left: 20px;">
-                <i class="fas fa-sign-out-alt" style="margin-right:12px;"></i> Log Out
+                <i class="fas fa-sign-out-alt" style="margin-right:15px;"></i> Log Out
             </a>
-            <div class="sidebar-user" onclick="window.location.href='profile.html'" style="justify-content: flex-start; padding-left: 20px;">
-                <img id="mobile-sidebar-pic" src="https://via.placeholder.com/150" alt="Profile">
-                <div class="sidebar-user-info" style="display:block; margin-left:10px;">
+            <div class="sidebar-user" onclick="window.location.href='profile.html'" style="justify-content: flex-start; padding-left: 20px; padding-top: 20px;">
+                <img id="mobile-sidebar-pic" src="https://via.placeholder.com/150" alt="Profile" style="width:36px; height:36px;">
+                <div class="sidebar-user-info" style="display:block; margin-left:12px;">
                     <div id="mobile-sidebar-name" class="sidebar-username">Loading...</div>
                     <div id="mobile-sidebar-email" class="sidebar-useremail">...</div>
                 </div>
@@ -432,27 +471,22 @@
     </div>
 </aside>
 
-<div class="main-wrapper fade-in">
-    
-    <div id="notifModal" class="notif-modal">
-        <div class="notif-header">
-            <span>Notifications</span>
-            <i class="fas fa-check-double" style="cursor:pointer;" title="Mark all read"></i>
-        </div>
-        <div id="notif-list">
-            <div class="notif-empty">Loading notifications...</div>
-        </div>
+<a href="javascript:void(0)" class="hero-notif-btn" onclick="toggleNotifModal()">
+    <i class="fas fa-bell"></i>
+    <span id="notif-badge" class="badge"></span>
+</a>
+
+<div id="notifModal" class="notif-modal">
+    <div class="notif-header">
+        <span>Notifications</span>
+        <i class="fas fa-check-double" style="cursor:pointer;" title="Mark all read"></i>
     </div>
+    <div id="notif-list">
+        <div class="notif-empty">Loading notifications...</div>
+    </div>
+</div>
 
-    <header class="app-header">
-        <div class="header-actions">
-            <a href="javascript:void(0)" class="desktop-notif-btn" onclick="toggleNotifModal()">
-                <i class="fas fa-bell"></i>
-                <span id="notif-badge" class="badge"></span>
-            </a>
-        </div>
-    </header>
-
+<div class="main-wrapper fade-in">
     <div class="glass-card">
         <div class="banner"></div>
         <div class="profile-body">
@@ -465,6 +499,7 @@
                 <div id="display-mode">
                     <h1 id="display-name">Loading User...</h1>
                     <p class="email" id="display-email">...</p>
+                    <p class="role" id="display-role">MEMBER</p>
                     <p class="bio" id="display-bio">Loading bio...</p>
                     <button class="btn btn-secondary" onclick="toggleEditMode()">
                         <i class="fas fa-pencil-alt"></i> Edit Profile
@@ -533,7 +568,7 @@
 </div>
 
 <div id="avatarModal" class="modal-overlay">
-    <div class="modal-box">
+    <div class="modal-box-avatar">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h3 style="margin:0;">Select Avatar</h3>
             <button onclick="document.getElementById('avatarModal').style.display='none'" style="background:none; border:none; color:var(--text-main); font-size:20px; cursor:pointer;">&times;</button>
@@ -674,7 +709,11 @@
 
                 // Role & Admin
                 const roleEl = document.getElementById('user-role');
+                const displayRoleEl = document.getElementById('display-role');
+                
                 roleEl.innerText = role.toUpperCase();
+                displayRoleEl.innerText = role.toUpperCase();
+                
                 const isAdm = role === 'admin';
                 const statusTxt = isAdm ? "ADMIN ACCESS" : "MEMBER ACCESS";
                 
@@ -683,10 +722,12 @@
 
                 if(isAdm) {
                     roleEl.style.color = 'var(--admin-color)';
+                    displayRoleEl.style.color = 'var(--admin-color)';
                     sessionStorage.setItem('isAdmin', 'true');
                     sessionStorage.setItem('internalAccess', 'true');
                 } else {
                     roleEl.style.color = 'var(--text-main)';
+                    displayRoleEl.style.color = 'var(--text-muted)';
                     sessionStorage.removeItem('isAdmin');
                 }
             });
@@ -698,7 +739,7 @@
                 if(status) {
                     const fmt = status.charAt(0).toUpperCase() + status.slice(1);
                     el.innerText = fmt;
-                    if(status === 'pending') el.style.color = 'var(--status-online)'; // Using green for visual pop or define pending color
+                    if(status === 'pending') el.style.color = 'var(--status-online)';
                     else if(status === 'approved') el.style.color = 'var(--status-online)';
                     else if(status === 'rejected') el.style.color = 'var(--admin-color)';
                 } else {
@@ -759,7 +800,7 @@
                             if(item.duration > 0) percent = (item.currentTime / item.duration) * 100;
                             
                             const targetPage = item.page || 'videos.html';
-                            const targetLink = `${targetPage}?v=${item.id}`; // Simple redirect logic if needed
+                            const targetLink = `${targetPage}?v=${item.id}`;
 
                             historyHTML += `
                             <div class="history-item" onclick="window.location.href='${item.link || '#'}'">
