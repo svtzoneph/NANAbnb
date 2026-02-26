@@ -104,6 +104,10 @@
         transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s;
         overflow: hidden; 
         display: flex; flex-direction: column;
+        
+        /* HARDWARE ACCELERATION FOR SMOOTH DESKTOP EXPANSION */
+        will-change: width;
+        -webkit-transform: translateZ(0);
     }
     .sidebar-desktop:hover { 
         width: var(--sidebar-width-expanded); 
@@ -157,7 +161,7 @@
         text-decoration: none;
     }
     
-    /* DESKTOP NOTIF BUTTON - NAKA-STOCK SA HEADER (HINDI SASAMA SA SCROLL) */
+    /* DESKTOP NOTIF BUTTON - ABSOLUTE (HINDI SASAMA PABABA) */
     .hero-notif-btn { 
         position: absolute !important; 
         top: 30px; right: 40px; 
@@ -175,7 +179,7 @@
     }
     .hero-notif-btn .badge.active, .glass-btn .badge.active { display: block; }
 
-    /* DESKTOP MODAL - NAKA-STOCK SA HEADER (HINDI SASAMA SA SCROLL) */
+    /* DESKTOP NOTIF MODAL - ABSOLUTE (HINDI SASAMA PABABA) */
     .notif-modal { 
         position: absolute !important; 
         top: 85px; right: 40px; 
@@ -341,12 +345,17 @@
     }
     .mobile-logo-img { height: 26px; width: auto; }
 
+    /* HARDWARE ACCELERATED MOBILE SIDEBAR FOR BUTTERY SMOOTH ANIMATION AND AUTO FIT */
     .mobile-sidebar-menu { 
         position: fixed; 
         top: 20px; 
-        left: -320px;
+        left: 20px; 
         width: 280px; 
-        height: calc(100vh - 40px); 
+        
+        /* THE MAGIC FIX: 100dvh auto fits screen size dynamically ignoring URL bar */
+        height: calc(100vh - 40px);
+        height: calc(100dvh - 40px); 
+        
         border-radius: 30px; 
         background: var(--zv-liquid-bg); 
         backdrop-filter: var(--zv-liquid-blur); 
@@ -354,12 +363,30 @@
         border: var(--zv-liquid-border);
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.3);
         z-index: 9999; 
-        transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease; 
+        
+        /* NO LAG FIX: Using GPU acceleration to prevent UI stalling */
+        transform: translateX(calc(-100% - 40px));
+        -webkit-transform: translateX(calc(-100% - 40px)) translateZ(0);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease; 
+        will-change: transform;
+        
         display: flex; 
         flex-direction: column; 
         overflow: hidden; 
     }
-    .mobile-sidebar-menu.open { left: 20px; }
+    .mobile-sidebar-menu.open { 
+        transform: translateX(0); 
+        -webkit-transform: translateX(0) translateZ(0);
+    }
+    
+    /* Allowing scroll inside mobile sidebar just in case screen is extra small */
+    .mobile-sidebar-menu .sidebar-container {
+        overflow-y: auto;
+        padding: 20px 20px;
+    }
+    .mobile-sidebar-menu .sidebar-container::-webkit-scrollbar {
+        display: none;
+    }
 
     @media (max-width: 900px) {
         .sidebar-desktop { display: none; }
@@ -371,7 +398,7 @@
         
         .main-wrapper { padding-top: 80px; padding-left: 20px; padding-right: 20px;} 
         
-        /* MOBILE MODAL - SASAMA SA SCROLL (Naka-attach sa mobile header) */
+        /* MOBILE MODAL - FIXED (SASAMA SA SCROLL) */
         .notif-modal { 
             position: fixed !important; 
             top: 75px !important; 
@@ -411,7 +438,7 @@
 </div>
 
 <div id="mobileSidebar" class="mobile-sidebar-menu">
-    <div class="sidebar-container" style="padding: 30px 20px; height: 100%; display: flex; flex-direction: column;">
+    <div class="sidebar-container">
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 0 20px 0;">
             <div class="sidebar-brand" style="justify-content: flex-start; margin-bottom: 0; height: auto;">
                 <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" style="width:28px; height:28px;">
