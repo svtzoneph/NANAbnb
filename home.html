@@ -17,25 +17,19 @@
        1. VARIABLES 
        ========================================= */
     :root {
-        /* EXACT ZONE VAULT LIQUID PILL EFFECT (For Logo, Buttons, & Modal) */
+        /* EXACT ZONE VAULT LIQUID PILL EFFECT */
         --zv-liquid-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 100%);
-        --zv-liquid-blur: blur(2px); /* Binabaan nang husto para mas clear yung likod */
+        --zv-liquid-blur: blur(12px); /* Unified & slightly reduced blur for all headers/sidebars */
         --zv-liquid-border: 1px solid rgba(255, 255, 255, 0.3);
         --zv-liquid-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 2px 3px rgba(255, 255, 255, 0.5), inset 0 -1px 3px rgba(0, 0, 0, 0.2);
         --zv-liquid-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.1) 100%);
 
-        /* Liquid Engine (For Sidebar only) */
-        --liquid-blur: blur(4px);
-        --glass-surface: rgba(20, 20, 25, 0.4);
-        --glass-surface-hover: rgba(40, 40, 45, 0.6);
-        --glass-border-top: 1px solid rgba(255, 255, 255, 0.08);
-        
-        /* Solid Colors for Cards */
-        --card-bg: #121215;
+        /* Solid Colors for Cards - SOFT DARK THEME */
+        --card-bg: #1c1c22; 
         --glass-border: 1px solid rgba(255, 255, 255, 0.08);
-        --sidebar-hover: #1e1e24;
+        --sidebar-hover: #282830; 
 
-        --bg-color: #050505;
+        --bg-color: #121216; 
         --text-main: #ffffff;
         --text-muted: #a1a1aa;
         
@@ -54,14 +48,12 @@
         --glass-border: 1px solid rgba(0, 0, 0, 0.08);
         --sidebar-hover: #e2e8f0;
 
-        --zv-liquid-bg: linear-gradient(135deg, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0.02) 100%);
-        --zv-liquid-border: 1px solid rgba(0, 0, 0, 0.1);
-        --zv-liquid-shadow: 0 8px 20px rgba(0, 0, 0, 0.05), inset 0 2px 3px rgba(255, 255, 255, 0.6), inset 0 -1px 3px rgba(0, 0, 0, 0.05);
-        --zv-liquid-hover: linear-gradient(135deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.04) 100%);
+        /* Adjusted Light Mode Liquid to be a Frosted White for better contrast */
+        --zv-liquid-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 100%);
+        --zv-liquid-border: 1px solid rgba(255, 255, 255, 0.8);
+        --zv-liquid-shadow: 0 8px 20px rgba(0, 0, 0, 0.05), inset 0 2px 3px rgba(255, 255, 255, 0.8), inset 0 -1px 3px rgba(0, 0, 0, 0.05);
+        --zv-liquid-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%);
 
-        --glass-surface: rgba(255, 255, 255, 0.6);
-        --glass-surface-hover: rgba(255, 255, 255, 0.9);
-        --glass-border-top: 1px solid rgba(255, 255, 255, 0.4);
         --text-main: #0f172a;
         --text-muted: #64748b;
     }
@@ -78,7 +70,7 @@
         min-height: 100vh;
         transition: background-color 0.3s ease, color 0.3s ease;
         overflow-x: hidden;
-        padding-left: var(--sidebar-width-collapsed); 
+        padding-left: calc(var(--sidebar-width-collapsed) + 40px); 
         position: relative;
     }
 
@@ -86,16 +78,21 @@
     @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
 
     /* =========================================
-       3. LIQUID SIDEBAR & MENUS 
+       3. LIQUID SIDEBAR BUBBLE & MENUS 
        ========================================= */
     .sidebar-desktop {
-        position: fixed; top: 0; left: 0; height: 100vh;
+        position: fixed; 
+        top: 20px; 
+        left: 20px; 
+        height: calc(100vh - 40px); 
+        border-radius: 30px; 
         width: var(--sidebar-width-collapsed);
         
-        background: var(--glass-surface);
-        backdrop-filter: var(--liquid-blur);
-        -webkit-backdrop-filter: var(--liquid-blur);
-        border-right: var(--glass-border-top);
+        background: var(--zv-liquid-bg);
+        backdrop-filter: var(--zv-liquid-blur);
+        -webkit-backdrop-filter: var(--zv-liquid-blur);
+        border: var(--zv-liquid-border);
+        box-shadow: var(--zv-liquid-shadow);
         
         z-index: 1000;
         transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s;
@@ -104,10 +101,10 @@
     }
     .sidebar-desktop:hover { 
         width: var(--sidebar-width-expanded); 
-        background: var(--glass-surface-hover);
+        background: var(--zv-liquid-hover); 
     }
 
-    .sidebar-container { display: flex; flex-direction: column; height: 100%; padding: 15px 0; width: 100%; }
+    .sidebar-container { display: flex; flex-direction: column; height: 100%; padding: 30px 0; width: 100%; }
 
     .sidebar-brand { display: flex; align-items: center; height: 40px; margin-bottom: 25px; width: 100%; white-space: nowrap; position: relative; padding-left: 0; justify-content: center; transition: padding 0.3s ease; }
     .sidebar-brand img { width: 24px; height: 24px; object-fit: contain; z-index: 2; }
@@ -122,17 +119,17 @@
     .sidebar-desktop:hover .nav-link { justify-content: flex-start; padding-left: 22px; }
     .sidebar-desktop:hover .nav-text { display: block; opacity: 1; transition-delay: 0.1s; }
     
-    .nav-link:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
-    .nav-link.active { color: var(--text-main); background: rgba(255,255,255,0.08); }
+    .nav-link:hover { background: rgba(128,128,128,0.1); color: var(--text-main); }
+    .nav-link.active { color: var(--text-main); background: rgba(128,128,128,0.15); }
     .nav-link.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--text-main); }
 
-    .sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 4px; padding-bottom: 10px; }
+    .sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 4px; padding-bottom: 0px; }
     .text-danger { color: var(--admin-color) !important; font-weight: 600; }
     .text-danger i { color: var(--admin-color) !important; }
 
-    .sidebar-user { display: flex; align-items: center; justify-content: center; padding: 10px 0; cursor: pointer; transition: 0.3s; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); }
-    .sidebar-user:hover { background: rgba(255,255,255,0.05); }
-    .sidebar-user img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: var(--glass-border-top); }
+    .sidebar-user { display: flex; align-items: center; justify-content: center; padding: 10px 0; cursor: pointer; transition: 0.3s; margin-top: 5px; border-top: 1px solid rgba(128,128,128,0.1); }
+    .sidebar-user:hover { background: rgba(128,128,128,0.1); }
+    .sidebar-user img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
     .sidebar-user-info { display: none; margin-left: 10px; }
     .sidebar-desktop:hover .sidebar-user { justify-content: flex-start; padding-left: 20px; }
     .sidebar-desktop:hover .sidebar-user-info { display: block; }
@@ -140,7 +137,7 @@
     .sidebar-useremail { font-size: 10px; color: var(--text-muted); }
 
     /* =========================================
-       THE ZONE VAULT LIQUID BUTTONS & MODAL (FIXED SCROLL)
+       THE ZONE VAULT LIQUID BUTTONS & MODAL (DESKTOP)
        ========================================= */
     .hero-notif-btn, .glass-btn {
         background: var(--zv-liquid-bg);
@@ -156,9 +153,9 @@
     }
     
     .hero-notif-btn { 
-        position: fixed; /* SUSUNOD SA SCROLL */
+        position: absolute !important; 
         top: 30px; right: 40px; 
-        z-index: 1000; 
+        z-index: 9999; 
         width: 46px; height: 46px; border-radius: 50%; font-size: 18px; 
     }
     .glass-btn { width: 44px; height: 44px; border-radius: 50%; font-size: 18px; pointer-events: auto; position: relative; }
@@ -176,7 +173,7 @@
     .hero-notif-btn .badge.active, .glass-btn .badge.active { display: block; }
 
     .notif-modal { 
-        position: fixed; /* SUSUNOD SA SCROLL AT NASA ILALIM NG BELL */
+        position: absolute !important; 
         top: 85px; right: 40px; 
         width: 340px; max-height: 400px; 
         
@@ -186,15 +183,15 @@
         border: var(--zv-liquid-border);
         box-shadow: var(--zv-liquid-shadow);
         
-        border-radius: 20px; display: none; flex-direction: column; z-index: 2000; overflow-y: auto; 
+        border-radius: 20px; display: none; flex-direction: column; z-index: 9999; overflow-y: auto; 
     }
     .notif-modal.active { display: flex; animation: liquidPop 0.3s ease; }
     @keyframes liquidPop { 0% { opacity: 0; transform: scale(0.95) translateY(-10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
     
-    .notif-header { padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; font-size: 15px; display: flex; justify-content: space-between; }
-    .notif-item { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 14px; align-items: flex-start; transition: 0.3s; }
-    .notif-item:hover { background: rgba(255,255,255,0.1); }
-    .notif-icon { width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-main); flex-shrink: 0; }
+    .notif-header { padding: 18px; border-bottom: 1px solid rgba(128,128,128,0.2); font-weight: 600; font-size: 15px; display: flex; justify-content: space-between; }
+    .notif-item { padding: 14px 18px; border-bottom: 1px solid rgba(128,128,128,0.1); display: flex; gap: 14px; align-items: flex-start; transition: 0.3s; }
+    .notif-item:hover { background: rgba(128,128,128,0.1); }
+    .notif-icon { width: 34px; height: 34px; border-radius: 50%; background: rgba(128,128,128,0.2); border: 1px solid rgba(128,128,128,0.3); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-main); flex-shrink: 0; }
     .notif-content h5 { font-size: 14px; color: var(--text-main); margin-bottom: 4px; }
     .notif-content p { font-size: 12px; color: var(--text-main); opacity: 0.8; line-height: 1.4; }
     .notif-empty { padding: 30px; text-align: center; color: var(--text-muted); font-size: 13px; }
@@ -202,7 +199,7 @@
     /* =========================================
        4. HERO SECTION 
        ========================================= */
-    .main-wrapper { max-width: 1600px; margin: 0 auto; width: 100%; padding-bottom: 40px; }
+    .main-wrapper { max-width: 1600px; margin: 0 auto; width: 100%; padding-bottom: 40px; position: relative;}
 
     .hero-container { 
         position: relative; width: 100%; margin: 0 0 40px 0; 
@@ -211,7 +208,7 @@
     }
     .hero-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
     .hero-bg-image img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.8s ease; }
-    .hero-overlay { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 60%, transparent 100%); }
+    .hero-overlay { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to right, rgba(18,18,22,0.95) 0%, rgba(18,18,22,0.4) 60%, transparent 100%); }
     
     .hero-content-box { position: relative; z-index: 2; padding: 0 60px; width: 100%; max-width: 850px; }
     .hero-content-box h1 { font-size: 4.2rem; font-weight: 800; line-height: 1.1; margin-bottom: 15px; color: #fff; }
@@ -270,7 +267,7 @@
     .card-head { padding: 22px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid transparent; }
     .card-head h4 { font-size: 16px; font-weight: 600; color: var(--text-main); margin: 0; letter-spacing: -0.2px; }
     .card-body { max-height: 0; opacity: 0; overflow: hidden; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); padding: 0 22px; color: var(--text-muted); font-size: 14px; line-height: 1.6; }
-    .info-card.open .card-body { max-height: 800px; opacity: 1; padding: 22px; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.3); }
+    .info-card.open .card-body { max-height: 800px; opacity: 1; padding: 22px; border-top: 1px solid rgba(128,128,128,0.1); background: rgba(128,128,128,0.05); }
     .rotate-icon { transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); color: var(--text-muted); font-size: 13px; }
     .info-card.open .rotate-icon { transform: rotate(90deg); color: var(--text-main); }
 
@@ -279,11 +276,11 @@
     .toast.show { bottom: 50px; opacity: 1; transform: translateX(-50%) translateY(0); }
 
     .access-denied-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(3,3,5,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
-    .access-card { background: var(--zv-liquid-bg); border: var(--zv-liquid-border); padding: 50px; border-radius: 30px; text-align: center; color: #fff; max-width: 420px; width: 90%; box-shadow: var(--zv-liquid-shadow); backdrop-filter: var(--zv-liquid-blur); }
+    .access-card { background: var(--zv-liquid-bg); border: var(--zv-liquid-border); padding: 50px; border-radius: 30px; text-align: center; color: var(--text-main); max-width: 420px; width: 90%; box-shadow: var(--zv-liquid-shadow); backdrop-filter: blur(15px); }
     .access-icon-box { width: 70px; height: 70px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; font-size: 28px; border-top: 1px solid rgba(239, 68, 68, 0.5); }
     .access-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
-    .access-desc { font-size: 15px; color: #bbb; line-height: 1.6; margin-bottom: 30px; }
-    .access-btn { background: #fff; color: #000; border: none; padding: 14px 35px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+    .access-desc { font-size: 15px; color: var(--text-muted); line-height: 1.6; margin-bottom: 30px; }
+    .access-btn { background: var(--text-main); color: var(--bg-color); border: none; padding: 14px 35px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; }
     .access-btn:hover { transform: scale(1.05) translateY(-2px); }
 
     /* =========================================
@@ -294,9 +291,10 @@
         position: fixed; top: 0; left: 0; width: 100%; z-index: 900; background: transparent; border: none; pointer-events: none; 
     }
     
-    /* ZONE VAULT PILL LIQUID EFFECT for Mobile Logo */
     .mobile-logo-container { 
-        display: flex; align-items: center; gap: 12px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;
+        display: flex; align-items: center; gap: 12px; font-weight: 800; 
+        color: var(--text-main); 
+        letter-spacing: -0.5px;
         background: var(--zv-liquid-bg);
         backdrop-filter: var(--zv-liquid-blur); 
         -webkit-backdrop-filter: var(--zv-liquid-blur);
@@ -306,29 +304,30 @@
     }
     .mobile-logo-img { height: 26px; width: auto; }
 
+    /* MOBILE SIDEBAR */
     .mobile-sidebar-menu { 
-        position: fixed; top: 0; left: -100%; width: 300px; height: 100%; 
-        --text-main: #ffffff; --text-muted: #a1a1aa;
-        background: rgba(15, 15, 20, 0.8); 
-        backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-        z-index: 9999; transition: left 0.5s cubic-bezier(0.16, 1, 0.3, 1); padding-top: 0; display: flex; flex-direction: column; 
+        position: fixed; 
+        top: 20px; 
+        left: -320px;
+        width: 280px; 
+        height: calc(100vh - 40px); 
+        border-radius: 30px; 
+        
+        background: var(--zv-liquid-bg); 
+        backdrop-filter: var(--zv-liquid-blur); 
+        -webkit-backdrop-filter: var(--zv-liquid-blur);
+        border: var(--zv-liquid-border);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.3);
+        
+        z-index: 9999; 
+        transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease; 
+        display: flex; 
+        flex-direction: column; 
+        overflow: hidden; 
     }
-    .mobile-sidebar-menu.open { left: 0; }
+    .mobile-sidebar-menu.open { left: 20px; }
 
     @media (max-width: 900px) {
-        /* FIXED VARIABLES FOR MOBILE */
-        :root {
-            --zv-liquid-blur: blur(2px);
-        }
-
-        body.light-mode {
-            --zv-liquid-bg: linear-gradient(135deg, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0.02) 100%);
-            --zv-liquid-border: 1px solid rgba(0, 0, 0, 0.1);
-            --zv-liquid-shadow: 0 8px 20px rgba(0, 0, 0, 0.05), inset 0 2px 3px rgba(255, 255, 255, 0.6), inset 0 -1px 3px rgba(0, 0, 0, 0.05);
-            --zv-liquid-hover: linear-gradient(135deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.04) 100%);
-        }
-
         .sidebar-desktop { display: none; }
         .mobile-header { display: flex; }
         body { padding-left: 0; }
@@ -336,16 +335,19 @@
         .hero-notif-btn { display: none !important; }
         
         .hero-container { width: 100%; height: auto; min-height: 60vh; margin: 0 0 30px 0; border-radius: 0; align-items: flex-end; padding-bottom: 30px; }
-        .hero-overlay { background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 60%, transparent 100%); }
+        .hero-overlay { background: linear-gradient(to top, rgba(18,18,22,1) 0%, rgba(18,18,22,0.5) 60%, transparent 100%); }
         .hero-content-box { text-align: center; padding: 25px; display: flex; flex-direction: column; align-items: center; }
         
-        /* HIDE "Zone Vault" H1 ON MOBILE */
         .hero-content-box h1 { display: none; }
         
         .hero-content-box p { font-size: 1.05rem; max-width: 100%; margin-bottom: 25px; }
         
-        /* Modal on Mobile follows scroll directly below the bell inside mobile-header */
-        .notif-modal { position: fixed; top: 75px; right: 20px; width: 320px; max-width: 90vw; z-index: 2000; }
+        .notif-modal { 
+            position: fixed !important; 
+            top: 75px !important; 
+            right: 20px !important; 
+            width: 320px; max-width: 90vw; z-index: 9999; 
+        }
         
         .thumbnails-floating { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 5px; }
         .thumb-btn { width: 60px; height: 38px; }
@@ -366,6 +368,21 @@
     <span>Welcome back to Zone Vault</span>
 </div>
 
+<div id="notifModal" class="notif-modal">
+    <div class="notif-header">
+        <span>Notifications</span>
+        <i class="fas fa-check-double" style="cursor:pointer;" title="Mark all read"></i>
+    </div>
+    <div id="notif-list">
+        <div class="notif-empty">Loading notifications...</div>
+    </div>
+</div>
+
+<a href="javascript:void(0)" class="hero-notif-btn" onclick="toggleNotifModal()">
+    <i class="fas fa-bell"></i>
+    <span id="notif-badge" class="badge"></span>
+</a>
+
 <div class="mobile-header">
     <div class="mobile-logo-container">
          <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Zone Vault" class="mobile-logo-img">
@@ -384,22 +401,25 @@
 </div>
 
 <div id="mobileSidebar" class="mobile-sidebar-menu">
-    <div class="sidebar-container" style="padding: 0 20px; height: 100%; display: flex; flex-direction: column;">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 25px 20px 0 20px;">
+    <div class="sidebar-container" style="padding: 30px 20px; height: 100%; display: flex; flex-direction: column;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 0 20px 0;">
             <div class="sidebar-brand" style="justify-content: flex-start; margin-bottom: 0; height: auto;">
                 <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" style="width:28px; height:28px;">
-                <span style="opacity:1; position:static; margin-left:14px; transform:none; font-size:16px;">ZONE VAULT</span>
+                <span style="opacity:1; position:static; margin-left:14px; transform:none; font-size:16px; color:var(--text-main);">ZONE VAULT</span>
             </div>
-            <button onclick="toggleMobileSidebar()" style="background:none; border:none; color:var(--text-main); font-size:32px; cursor:pointer;">&times;</button>
+            <button onclick="toggleMobileSidebar()" style="background:none; border:none; color:var(--text-main); font-size:32px; cursor:pointer; margin-top: -5px;">&times;</button>
         </div>
-        <ul class="nav-list" style="padding: 30px 0;">
+
+        <ul class="nav-list" style="padding: 20px 0;">
             <li class="nav-item"> <a href="profile" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-user" style="margin-right:15px;"></i> Profile</a> </li>
             <li class="nav-item"> <a href="home" class="nav-link active" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-home" style="margin-right:15px;"></i> Home</a> </li>
             <li class="nav-item"> <a href="videos" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-play-circle" style="margin-right:15px;"></i> Videos</a> </li>
             <li class="nav-item"> <a href="collection" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-images" style="margin-right:15px;"></i> Collection</a> </li>
             <li class="nav-item"> <a href="live" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-broadcast-tower" style="margin-right:15px;"></i> Live</a> </li>
         </ul>
-        <div class="sidebar-bottom" style="margin-top: auto; padding-bottom: 25px;">
+
+        <div class="sidebar-bottom" style="margin-top: auto; padding-bottom: 0;">
              <div class="nav-link" onclick="toggleTheme()" style="justify-content: flex-start; padding-left: 20px; cursor: pointer;">
                 <i class="fas fa-cog" style="margin-right:15px;"></i> 
                 <span>Switch Theme</span>
@@ -419,6 +439,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -460,21 +481,6 @@
 
 <div class="main-wrapper fade-in">
 
-    <div id="notifModal" class="notif-modal">
-        <div class="notif-header">
-            <span>Notifications</span>
-            <i class="fas fa-check-double" style="cursor:pointer;" title="Mark all read"></i>
-        </div>
-        <div id="notif-list">
-            <div class="notif-empty">Loading notifications...</div>
-        </div>
-    </div>
-
-    <a href="javascript:void(0)" class="hero-notif-btn" onclick="toggleNotifModal()">
-        <i class="fas fa-bell"></i>
-        <span id="notif-badge" class="badge"></span>
-    </a>
-
     <div class="hero-container">
         <div class="hero-bg-image">
              <img id="mainDisplay" src="https://uploads.onecompiler.io/432zqmf3k/43stbsa4p/1.png" alt="Main">
@@ -501,11 +507,22 @@
     </div>
 
     <div class="swipe-scroller drag-scrollable" id="recentlyAddedScroller">
+        <div class="swipe-card" onclick="window.location.href='2024/8th_caratland'">
+            <div class="swipe-thumbnail">
+                <img src="https://res.cloudinary.com/dp6x9xmku/image/upload/v1772085168/This_live_event_has_ended._svopgf.png" alt="Video">
+                <div class="play-overlay"><i class="fas fa-play"></i></div>
+                <span class="duration-badge">VOD</span>
+            </div>
+            <div class="swipe-info">
+                <h4>SEVENTEEN IN CARAT LAND 2024 SVT 8TH FAN MEETING</h4>
+            </div>
+        </div>
+        
         <div class="swipe-card" onclick="window.location.href='2025/cxm_in_incheon'">
             <div class="swipe-thumbnail">
                 <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/CXM.png" alt="Video">
                 <div class="play-overlay"><i class="fas fa-play"></i></div>
-                <span class="duration-badge">DAY 1 - DAY 2</span>
+                <span class="duration-badge">CONCERT</span>
             </div>
             <div class="swipe-info">
                 <h4>CxM [DOUBLE UP] LIVE PARTY in INCHEON</h4>
@@ -516,7 +533,7 @@
             <div class="swipe-thumbnail">
                 <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png" alt="Video">
                 <div class="play-overlay"><i class="fas fa-play"></i></div>
-                <span class="duration-badge">DAY 1 - DAY 2</span>
+                <span class="duration-badge">CONCERT</span>
             </div>
             <div class="swipe-info">
                 <h4>SEVENTEEN WORLD TOUR [NEW_] Fukuoka Show</h4>
@@ -527,7 +544,7 @@
             <div class="swipe-thumbnail">
                 <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png" alt="Video">
                 <div class="play-overlay"><i class="fas fa-play"></i></div>
-                <span class="duration-badge">DAY 1-DAY 2-DAY 3</span>
+                <span class="duration-badge">CONCERT</span>
             </div>
             <div class="swipe-info">
                 <h4>SEVENTEEN WORLD TOUR [NEW_] Osaka Show</h4>
@@ -538,7 +555,7 @@
             <div class="swipe-thumbnail">
                 <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/the-shadow's-edge.jpg" alt="Video">
                 <div class="play-overlay"><i class="fas fa-play"></i></div>
-                <span class="duration-badge">2:21:45</span>
+                <span class="duration-badge">MOVIE</span>
             </div>
             <div class="swipe-info">
                 <h4>The Shadow's Edge</h4>
@@ -549,7 +566,7 @@
             <div class="swipe-thumbnail">
                 <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/svt_ourchapter.jpg" alt="Video">
                 <div class="play-overlay"><i class="fas fa-play"></i></div>
-                <span class="duration-badge">FULL EPISODE</span>
+                <span class="duration-badge">DOCU</span>
             </div>
             <div class="swipe-info">
                 <h4>SEVENTEEN: OUR CHAPTER</h4>
@@ -560,7 +577,7 @@
             <div class="swipe-thumbnail">
                 <img src="https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/inthesoop2.png" alt="Video">
                 <div class="play-overlay"><i class="fas fa-play"></i></div>
-                <span class="duration-badge">FULL EPISODE</span>
+                <span class="duration-badge">VARIETY</span>
             </div>
             <div class="swipe-info">
                 <h4>IN THE SOOP SEVENTEEN ver. Season2</h4>
