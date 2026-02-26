@@ -14,28 +14,25 @@
 
   <style>
     /* =========================================
-       1. VARIABLES & THEME ENGINE (Synced)
+       1. VARIABLES & THEME ENGINE
        ========================================= */
     :root {
-        /* EXACT ZONE VAULT LIQUID PILL EFFECT (For Logo, Buttons, & Modal) */
+        /* EXACT ZONE VAULT LIQUID PILL EFFECT */
         --zv-liquid-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 100%);
-        --zv-liquid-blur: blur(2px); /* Binabaan nang husto para mas clear yung likod */
+        --zv-liquid-blur: blur(12px); 
         --zv-liquid-border: 1px solid rgba(255, 255, 255, 0.3);
         --zv-liquid-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 2px 3px rgba(255, 255, 255, 0.5), inset 0 -1px 3px rgba(0, 0, 0, 0.2);
         --zv-liquid-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.1) 100%);
 
-        /* Liquid Engine (For Sidebar only) */
-        --liquid-blur: blur(4px);
-        --glass-surface: rgba(20, 20, 25, 0.4);
-        --glass-surface-hover: rgba(40, 40, 45, 0.6);
-        --glass-border-top: 1px solid rgba(255, 255, 255, 0.08);
-        
-        --bg-color: #050505;
+        /* Solid Colors for Cards - SOFT DARK THEME */
+        --card-bg: #1c1c22; 
+        --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+        --sidebar-hover: #282830; 
+
+        --bg-color: #121216; 
         --text-main: #ffffff;
         --text-muted: #a1a1aa;
-        --sidebar-hover: #18181b;
-        --card-bg: #121212;
-        --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+        
         --accent: #ffffff;
         --status-online: #22c55e;
         --admin-color: #ef4444; 
@@ -45,24 +42,21 @@
         --sidebar-width-expanded: 220px; 
     }
 
+    /* Light Mode */
     body.light-mode {
         --bg-color: #f3f4f6;
-        --text-main: #0f172a;
-        --text-muted: #64748b;
-        --sidebar-hover: #e2e8f0;
         --card-bg: #ffffff;
         --glass-border: 1px solid rgba(0, 0, 0, 0.08);
-        --accent: #0f172a;
+        --sidebar-hover: #e2e8f0;
 
-        /* Light mode liquid variants (Subtle dark translucent instead of opaque white) */
-        --zv-liquid-bg: linear-gradient(135deg, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0.02) 100%);
-        --zv-liquid-border: 1px solid rgba(0, 0, 0, 0.1);
-        --zv-liquid-shadow: 0 8px 20px rgba(0, 0, 0, 0.05), inset 0 2px 3px rgba(255, 255, 255, 0.6), inset 0 -1px 3px rgba(0, 0, 0, 0.05);
-        --zv-liquid-hover: linear-gradient(135deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.04) 100%);
+        /* Adjusted Light Mode Liquid */
+        --zv-liquid-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 100%);
+        --zv-liquid-border: 1px solid rgba(255, 255, 255, 0.8);
+        --zv-liquid-shadow: 0 8px 20px rgba(0, 0, 0, 0.05), inset 0 2px 3px rgba(255, 255, 255, 0.8), inset 0 -1px 3px rgba(0, 0, 0, 0.05);
+        --zv-liquid-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%);
 
-        --glass-surface: rgba(255, 255, 255, 0.6);
-        --glass-surface-hover: rgba(255, 255, 255, 0.9);
-        --glass-border-top: 1px solid rgba(255, 255, 255, 0.4);
+        --text-main: #0f172a;
+        --text-muted: #64748b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -77,41 +71,41 @@
         min-height: 100vh;
         transition: background-color 0.3s ease, color 0.3s ease;
         overflow-x: hidden;
-        padding-left: var(--sidebar-width-collapsed); 
+        padding-left: calc(var(--sidebar-width-collapsed) + 40px); 
         position: relative;
     }
-
-    body::before, body::after {
-        content: ''; position: fixed; border-radius: 50%;
-        filter: blur(120px); z-index: -1; opacity: 0.4; pointer-events: none;
-        display: none; 
-    }
-    body::before { width: 600px; height: 600px; background: radial-gradient(circle, #1a2340, transparent 70%); top: -100px; left: -100px; }
-    body::after { width: 500px; height: 500px; background: radial-gradient(circle, #2b1130, transparent 70%); bottom: 10%; right: -50px; }
-    body.light-mode::before { background: radial-gradient(circle, #93c5fd, transparent 70%); opacity: 0.6; }
-    body.light-mode::after { background: radial-gradient(circle, #fbcfe8, transparent 70%); opacity: 0.6; }
 
     .fade-in { animation: fadeIn 0.8s ease forwards; opacity: 0; transform: translateY(10px); }
     @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
 
     /* =========================================
-       3. LIQUID SIDEBAR & MENUS
+       3. LIQUID SIDEBAR BUBBLE & MENUS 
        ========================================= */
     .sidebar-desktop {
-        position: fixed; top: 0; left: 0; height: 100vh;
+        position: fixed; 
+        top: 20px; 
+        left: 20px; 
+        height: calc(100vh - 40px); 
+        border-radius: 30px; 
         width: var(--sidebar-width-collapsed);
-        background: var(--glass-surface);
-        backdrop-filter: var(--liquid-blur);
-        -webkit-backdrop-filter: var(--liquid-blur);
-        border-right: var(--glass-border-top);
+        
+        background: var(--zv-liquid-bg);
+        backdrop-filter: var(--zv-liquid-blur);
+        -webkit-backdrop-filter: var(--zv-liquid-blur);
+        border: var(--zv-liquid-border);
+        box-shadow: var(--zv-liquid-shadow);
+        
         z-index: 1000;
         transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s;
         overflow: hidden; 
         display: flex; flex-direction: column;
     }
-    .sidebar-desktop:hover { width: var(--sidebar-width-expanded); background: var(--glass-surface-hover); }
+    .sidebar-desktop:hover { 
+        width: var(--sidebar-width-expanded); 
+        background: var(--zv-liquid-hover); 
+    }
 
-    .sidebar-container { display: flex; flex-direction: column; height: 100%; padding: 15px 0; width: 100%; }
+    .sidebar-container { display: flex; flex-direction: column; height: 100%; padding: 30px 0; width: 100%; }
 
     .sidebar-brand { display: flex; align-items: center; height: 40px; margin-bottom: 25px; width: 100%; white-space: nowrap; position: relative; padding-left: 0; justify-content: center; transition: padding 0.3s ease; }
     .sidebar-brand img { width: 24px; height: 24px; object-fit: contain; z-index: 2; }
@@ -125,17 +119,18 @@
     .nav-text { display: none; white-space: nowrap; margin-left: 12px; opacity: 0; transition: opacity 0.2s; }
     .sidebar-desktop:hover .nav-link { justify-content: flex-start; padding-left: 22px; }
     .sidebar-desktop:hover .nav-text { display: block; opacity: 1; transition-delay: 0.1s; }
-    .nav-link:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
-    .nav-link.active { color: var(--text-main); background: rgba(255,255,255,0.08); }
+    
+    .nav-link:hover { background: rgba(128,128,128,0.1); color: var(--text-main); }
+    .nav-link.active { color: var(--text-main); background: rgba(128,128,128,0.15); }
     .nav-link.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--text-main); }
 
-    .sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 4px; padding-bottom: 10px; }
+    .sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 4px; padding-bottom: 0px; }
     .text-danger { color: var(--admin-color) !important; font-weight: 600; }
     .text-danger i { color: var(--admin-color) !important; }
 
-    .sidebar-user { display: flex; align-items: center; justify-content: center; padding: 10px 0; cursor: pointer; transition: 0.3s; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); }
-    .sidebar-user:hover { background: rgba(255,255,255,0.05); }
-    .sidebar-user img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: var(--glass-border-top); }
+    .sidebar-user { display: flex; align-items: center; justify-content: center; padding: 10px 0; cursor: pointer; transition: 0.3s; margin-top: 5px; border-top: 1px solid rgba(128,128,128,0.1); }
+    .sidebar-user:hover { background: rgba(128,128,128,0.1); }
+    .sidebar-user img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
     .sidebar-user-info { display: none; margin-left: 10px; }
     .sidebar-desktop:hover .sidebar-user { justify-content: flex-start; padding-left: 20px; }
     .sidebar-desktop:hover .sidebar-user-info { display: block; }
@@ -143,7 +138,7 @@
     .sidebar-useremail { font-size: 10px; color: var(--text-muted); }
 
     /* =========================================
-       4. THE ZONE VAULT LIQUID BUTTONS & MODAL
+       4. THE ZONE VAULT LIQUID BUTTONS & MODAL 
        ========================================= */
     .hero-notif-btn, .glass-btn {
         background: var(--zv-liquid-bg);
@@ -157,10 +152,11 @@
         text-decoration: none;
     }
     
+    /* DESKTOP: ABSOLUTE - MAIIWAN SA TAAS NG PAGE KAHIT MAG SCROLL PABABA */
     .hero-notif-btn { 
-        position: fixed; /* SUSUNOD SA SCROLL */
+        position: absolute !important; 
         top: 30px; right: 40px; 
-        z-index: 1000; 
+        z-index: 9999; 
         width: 46px; height: 46px; border-radius: 50%; font-size: 18px; 
     }
     .glass-btn { width: 44px; height: 44px; border-radius: 50%; font-size: 18px; pointer-events: auto; position: relative; }
@@ -174,8 +170,9 @@
     }
     .hero-notif-btn .badge.active, .glass-btn .badge.active { display: block; }
 
+    /* DESKTOP: ABSOLUTE - MAIIWAN SA TAAS NG PAGE KAHIT MAG SCROLL PABABA */
     .notif-modal { 
-        position: fixed; /* SUSUNOD SA SCROLL */
+        position: absolute !important; 
         top: 85px; right: 40px; 
         width: 340px; max-height: 400px; 
         background: var(--zv-liquid-bg);
@@ -183,15 +180,15 @@
         -webkit-backdrop-filter: var(--zv-liquid-blur);
         border: var(--zv-liquid-border);
         box-shadow: var(--zv-liquid-shadow);
-        border-radius: 20px; display: none; flex-direction: column; z-index: 2000; overflow-y: auto; 
+        border-radius: 20px; display: none; flex-direction: column; z-index: 9999; overflow-y: auto; 
     }
     .notif-modal.active { display: flex; animation: liquidPop 0.3s ease; }
     @keyframes liquidPop { 0% { opacity: 0; transform: scale(0.95) translateY(-10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
     
-    .notif-header { padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; font-size: 15px; display: flex; justify-content: space-between; }
-    .notif-item { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 14px; align-items: flex-start; transition: 0.3s; }
-    .notif-item:hover { background: rgba(255,255,255,0.1); }
-    .notif-icon { width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-main); flex-shrink: 0; }
+    .notif-header { padding: 18px; border-bottom: 1px solid rgba(128,128,128,0.2); font-weight: 600; font-size: 15px; display: flex; justify-content: space-between; }
+    .notif-item { padding: 14px 18px; border-bottom: 1px solid rgba(128,128,128,0.1); display: flex; gap: 14px; align-items: flex-start; transition: 0.3s; }
+    .notif-item:hover { background: rgba(128,128,128,0.1); }
+    .notif-icon { width: 34px; height: 34px; border-radius: 50%; background: rgba(128,128,128,0.2); border: 1px solid rgba(128,128,128,0.3); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-main); flex-shrink: 0; }
     .notif-content h5 { font-size: 14px; color: var(--text-main); margin-bottom: 4px; }
     .notif-content p { font-size: 12px; color: var(--text-main); opacity: 0.8; line-height: 1.4; }
     .notif-empty { padding: 30px; text-align: center; color: var(--text-muted); font-size: 13px; }
@@ -280,16 +277,16 @@
     .lightbox-btn { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; backdrop-filter: blur(5px); font-size: 16px; }
     .lightbox-btn:hover { background: white; color: black; transform: scale(1.1); }
 
-    /* Modals & Toasts (Liquid updates) */
+    /* Modals & Toasts */
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--zv-liquid-bg); border: var(--zv-liquid-border); box-shadow: var(--zv-liquid-shadow); color: var(--text-main); padding: 14px 28px; border-radius: 30px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 12px; z-index: 9999; opacity: 0; pointer-events: none; backdrop-filter: var(--zv-liquid-blur); -webkit-backdrop-filter: var(--zv-liquid-blur); transition: all 0.6s ease; }
     .toast.show { bottom: 50px; opacity: 1; transform: translateX(-50%) translateY(0); }
     
     .access-denied-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(3,3,5,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
-    .access-card { background: var(--zv-liquid-bg); border: var(--zv-liquid-border); padding: 50px; border-radius: 30px; text-align: center; color: #fff; max-width: 420px; width: 90%; box-shadow: var(--zv-liquid-shadow); backdrop-filter: var(--zv-liquid-blur); }
+    .access-card { background: var(--zv-liquid-bg); border: var(--zv-liquid-border); padding: 50px; border-radius: 30px; text-align: center; color: var(--text-main); max-width: 420px; width: 90%; box-shadow: var(--zv-liquid-shadow); backdrop-filter: var(--zv-liquid-blur); }
     .access-icon-box { width: 70px; height: 70px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; font-size: 28px; border-top: 1px solid rgba(239, 68, 68, 0.5); }
     .access-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
-    .access-desc { font-size: 15px; color: #bbb; line-height: 1.6; margin-bottom: 30px; }
-    .access-btn { background: #fff; color: #000; border: none; padding: 14px 35px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+    .access-desc { font-size: 15px; color: var(--text-muted); line-height: 1.6; margin-bottom: 30px; }
+    .access-btn { background: var(--text-main); color: var(--bg-color); border: none; padding: 14px 35px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; }
     .access-btn:hover { transform: scale(1.05) translateY(-2px); }
 
     /* =========================================
@@ -297,12 +294,12 @@
        ========================================= */
     .mobile-header { 
         display: none; padding: 20px 20px; align-items: flex-start; justify-content: space-between; 
-        position: fixed; top: 0; left: 0; width: 100%; z-index: 900; background: transparent; border: none; pointer-events: none; 
+        position: fixed; /* MOBILE HEADER: SASAMA SA SCROLL */
+        top: 0; left: 0; width: 100%; z-index: 900; background: transparent; border: none; pointer-events: none; 
     }
     
-    /* ZONE VAULT PILL LIQUID EFFECT for Mobile Logo */
     .mobile-logo-container { 
-        display: flex; align-items: center; gap: 12px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;
+        display: flex; align-items: center; gap: 12px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;
         background: var(--zv-liquid-bg);
         backdrop-filter: var(--zv-liquid-blur); 
         -webkit-backdrop-filter: var(--zv-liquid-blur);
@@ -313,39 +310,46 @@
     .mobile-logo-img { height: 26px; width: auto; }
 
     .mobile-sidebar-menu { 
-        position: fixed; top: 0; left: -100%; width: 300px; height: 100%; 
-        --text-main: #ffffff; --text-muted: #a1a1aa;
-        background: rgba(15, 15, 20, 0.8); 
-        backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-        z-index: 9999; transition: left 0.5s cubic-bezier(0.16, 1, 0.3, 1); padding-top: 0; display: flex; flex-direction: column; 
+        position: fixed; 
+        top: 20px; 
+        left: -320px;
+        width: 280px; 
+        height: calc(100vh - 40px); 
+        border-radius: 30px; 
+        background: var(--zv-liquid-bg); 
+        backdrop-filter: var(--zv-liquid-blur); 
+        -webkit-backdrop-filter: var(--zv-liquid-blur);
+        border: var(--zv-liquid-border);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.3);
+        z-index: 9999; 
+        transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease; 
+        display: flex; 
+        flex-direction: column; 
+        overflow: hidden; 
     }
-    .mobile-sidebar-menu.open { left: 0; }
+    .mobile-sidebar-menu.open { left: 20px; }
 
     @media (max-width: 900px) {
-        :root { --zv-liquid-blur: blur(2px); }
-
-        body.light-mode {
-            --zv-liquid-bg: linear-gradient(135deg, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0.02) 100%);
-            --zv-liquid-border: 1px solid rgba(0, 0, 0, 0.1);
-            --zv-liquid-shadow: 0 8px 20px rgba(0, 0, 0, 0.05), inset 0 2px 3px rgba(255, 255, 255, 0.6), inset 0 -1px 3px rgba(0, 0, 0, 0.05);
-            --zv-liquid-hover: linear-gradient(135deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.04) 100%);
-        }
-
-        body::before, body::after { display: block; }
-
         .sidebar-desktop { display: none; }
         .mobile-header { display: flex; }
         body { padding-left: 0; }
         
+        /* HIDE DESKTOP ABSOLUTE NOTIF BTN ON MOBILE */
         .hero-notif-btn { display: none !important; }
         
-        .notif-modal { position: fixed; top: 75px; right: 20px; width: 320px; max-width: 90vw; z-index: 2000; left: auto; transform: none; }
+        .main-wrapper { padding-top: 80px; } 
+        
+        /* MOBILE NOTIF MODAL: FIXED - SASAMA SA SCROLL */
+        .notif-modal { 
+            position: fixed !important; 
+            top: 75px !important; 
+            right: 20px !important; 
+            width: 320px; max-width: 90vw; z-index: 9999; left: auto; transform: none; 
+        }
         
         .category-menu-grid, .collection-section, .gallery-grid { padding: 0 20px; }
         .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .cat-card { aspect-ratio: 4/3; }
-        .main-wrapper { padding-top: 80px; }
     }
   </style>
 </head>
@@ -374,23 +378,22 @@
 </div>
 
 <div id="mobileSidebar" class="mobile-sidebar-menu">
-    <div class="sidebar-container" style="padding: 0 20px; height: 100%; display: flex; flex-direction: column;">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 25px 20px 0 20px;">
+    <div class="sidebar-container" style="padding: 30px 20px; height: 100%; display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 0 20px 0;">
             <div class="sidebar-brand" style="justify-content: flex-start; margin-bottom: 0; height: auto;">
                 <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" style="width:28px; height:28px;">
-                <span style="opacity:1; position:static; margin-left:14px; transform:none; font-size:16px;">ZONE VAULT</span>
+                <span style="opacity:1; position:static; margin-left:14px; transform:none; font-size:16px; color:var(--text-main);">ZONE VAULT</span>
             </div>
-            <button onclick="toggleMobileSidebar()" style="background:none; border:none; color:var(--text-main); font-size:32px; cursor:pointer;">&times;</button>
+            <button onclick="toggleMobileSidebar()" style="background:none; border:none; color:var(--text-main); font-size:32px; cursor:pointer; margin-top: -5px;">&times;</button>
         </div>
-        <ul class="nav-list" style="padding: 30px 0;">
+        <ul class="nav-list" style="padding: 20px 0;">
             <li class="nav-item"> <a href="profile" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-user" style="margin-right:15px;"></i> Profile</a> </li>
             <li class="nav-item"> <a href="home" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-home" style="margin-right:15px;"></i> Home</a> </li>
             <li class="nav-item"> <a href="videos" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-play-circle" style="margin-right:15px;"></i> Videos</a> </li>
             <li class="nav-item"> <a href="collection" class="nav-link active" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-images" style="margin-right:15px;"></i> Collection</a> </li>
             <li class="nav-item"> <a href="live" class="nav-link" style="justify-content: flex-start; padding-left: 20px;"><i class="fas fa-broadcast-tower" style="margin-right:15px;"></i> Live</a> </li>
-            
         </ul>
-        <div class="sidebar-bottom" style="margin-top: auto; padding-bottom: 25px;">
+        <div class="sidebar-bottom" style="margin-top: auto; padding-bottom: 0;">
              <div class="nav-link" onclick="toggleTheme()" style="justify-content: flex-start; padding-left: 20px; cursor: pointer;">
                 <i class="fas fa-cog" style="margin-right:15px;"></i> 
                 <span>Switch Theme</span>
@@ -454,18 +457,17 @@
     <span id="notif-badge" class="badge"></span>
 </a>
 
-<div class="main-wrapper fade-in">
-    
-    <div id="notifModal" class="notif-modal">
-        <div class="notif-header">
-            <span>Notifications</span>
-            <i class="fas fa-check-double" style="cursor:pointer;" title="Mark all read"></i>
-        </div>
-        <div id="notif-list">
-            <div class="notif-empty">Loading notifications...</div>
-        </div>
+<div id="notifModal" class="notif-modal">
+    <div class="notif-header">
+        <span>Notifications</span>
+        <i class="fas fa-check-double" style="cursor:pointer;" title="Mark all read"></i>
     </div>
+    <div id="notif-list">
+        <div class="notif-empty">Loading notifications...</div>
+    </div>
+</div>
 
+<div class="main-wrapper fade-in">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 40px;">
         <h1 class="page-title" id="page-heading">My Collection</h1>
         <button id="backToCatBtn" class="back-to-cat-btn" onclick="showMenu()">
@@ -474,7 +476,7 @@
     </div>
 
     <div id="category-menu" class="category-menu-grid">
-        </div>
+    </div>
 
     <div id="galleries-container">
         <div class="collection-section" id="section-7"><div class="gallery-grid" id="grid-category-7"></div></div>
@@ -502,7 +504,7 @@
     </div>
 
     <div id="lightbox-thumbs" class="lightbox-thumbs">
-        </div>
+    </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
