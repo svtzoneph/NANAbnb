@@ -98,6 +98,10 @@
         transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s;
         overflow: hidden; 
         display: flex; flex-direction: column;
+        
+        /* HARDWARE ACCELERATION */
+        will-change: width;
+        -webkit-transform: translateZ(0);
     }
     .sidebar-desktop:hover { 
         width: var(--sidebar-width-expanded); 
@@ -137,7 +141,7 @@
     .sidebar-useremail { font-size: 10px; color: var(--text-muted); }
 
     /* =========================================
-       THE ZONE VAULT LIQUID BUTTONS & MODAL (DESKTOP)
+       4. THE ZONE VAULT LIQUID BUTTONS & MODAL (DESKTOP)
        ========================================= */
     .hero-notif-btn, .glass-btn {
         background: var(--zv-liquid-bg);
@@ -152,6 +156,7 @@
         text-decoration: none;
     }
     
+    /* DESKTOP NOTIF BUTTON - NAKA-STOCK SA HEADER (HINDI SASAMA SA SCROLL) */
     .hero-notif-btn { 
         position: absolute !important; 
         top: 30px; right: 40px; 
@@ -172,6 +177,7 @@
     }
     .hero-notif-btn .badge.active, .glass-btn .badge.active { display: block; }
 
+    /* DESKTOP NOTIF MODAL - NAKA-STOCK SA HEADER (HINDI SASAMA SA SCROLL) */
     .notif-modal { 
         position: absolute !important; 
         top: 85px; right: 40px; 
@@ -288,7 +294,8 @@
        ========================================= */
     .mobile-header { 
         display: none; padding: 20px 20px; align-items: flex-start; justify-content: space-between; 
-        position: fixed; top: 0; left: 0; width: 100%; z-index: 900; background: transparent; border: none; pointer-events: none; 
+        position: fixed !important; /* MOBILE HEADER: SASAMA SA SCROLL */
+        top: 0; left: 0; width: 100%; z-index: 900; background: transparent; border: none; pointer-events: none; 
     }
     
     .mobile-logo-container { 
@@ -304,34 +311,54 @@
     }
     .mobile-logo-img { height: 26px; width: auto; }
 
-    /* MOBILE SIDEBAR */
+    /* MOBILE SIDEBAR - HARDWARE ACCELERATED AND AUTO-FIT */
     .mobile-sidebar-menu { 
         position: fixed; 
         top: 20px; 
-        left: -320px;
+        left: 20px;
         width: 280px; 
-        height: calc(100vh - 40px); 
-        border-radius: 30px; 
         
+        /* THE MAGIC FIX: 100dvh auto fits screen size dynamically ignoring URL bar */
+        height: calc(100vh - 40px);
+        height: calc(100dvh - 40px); 
+        
+        border-radius: 30px; 
         background: var(--zv-liquid-bg); 
         backdrop-filter: var(--zv-liquid-blur); 
         -webkit-backdrop-filter: var(--zv-liquid-blur);
         border: var(--zv-liquid-border);
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.3);
-        
         z-index: 9999; 
-        transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease; 
+        
+        /* NO LAG FIX: Using GPU acceleration to prevent UI stalling */
+        transform: translateX(calc(-100% - 40px));
+        -webkit-transform: translateX(calc(-100% - 40px)) translateZ(0);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease; 
+        will-change: transform;
+        
         display: flex; 
         flex-direction: column; 
         overflow: hidden; 
     }
-    .mobile-sidebar-menu.open { left: 20px; }
+    .mobile-sidebar-menu.open { 
+        transform: translateX(0); 
+        -webkit-transform: translateX(0) translateZ(0);
+    }
+    
+    .mobile-sidebar-menu .sidebar-container {
+        overflow-y: auto;
+        padding: 20px 20px;
+    }
+    .mobile-sidebar-menu .sidebar-container::-webkit-scrollbar {
+        display: none;
+    }
 
     @media (max-width: 900px) {
         .sidebar-desktop { display: none; }
         .mobile-header { display: flex; }
         body { padding-left: 0; }
         
+        /* HIDE DESKTOP ABSOLUTE NOTIF BTN ON MOBILE */
         .hero-notif-btn { display: none !important; }
         
         .hero-container { width: 100%; height: auto; min-height: 60vh; margin: 0 0 30px 0; border-radius: 0; align-items: flex-end; padding-bottom: 30px; }
@@ -342,11 +369,12 @@
         
         .hero-content-box p { font-size: 1.05rem; max-width: 100%; margin-bottom: 25px; }
         
+        /* MOBILE NOTIF MODAL - FIXED (SASAMA SA SCROLL) */
         .notif-modal { 
             position: fixed !important; 
             top: 75px !important; 
             right: 20px !important; 
-            width: 320px; max-width: 90vw; z-index: 9999; 
+            width: 320px; max-width: 90vw; z-index: 9999; left: auto; transform: none; 
         }
         
         .thumbnails-floating { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 5px; }
@@ -368,6 +396,11 @@
     <span>Welcome back to Zone Vault</span>
 </div>
 
+<a href="javascript:void(0)" class="hero-notif-btn" onclick="toggleNotifModal()">
+    <i class="fas fa-bell"></i>
+    <span id="notif-badge" class="badge"></span>
+</a>
+
 <div id="notifModal" class="notif-modal">
     <div class="notif-header">
         <span>Notifications</span>
@@ -377,11 +410,6 @@
         <div class="notif-empty">Loading notifications...</div>
     </div>
 </div>
-
-<a href="javascript:void(0)" class="hero-notif-btn" onclick="toggleNotifModal()">
-    <i class="fas fa-bell"></i>
-    <span id="notif-badge" class="badge"></span>
-</a>
 
 <div class="mobile-header">
     <div class="mobile-logo-container">
@@ -401,8 +429,7 @@
 </div>
 
 <div id="mobileSidebar" class="mobile-sidebar-menu">
-    <div class="sidebar-container" style="padding: 30px 20px; height: 100%; display: flex; flex-direction: column;">
-        
+    <div class="sidebar-container">
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 0 20px 0;">
             <div class="sidebar-brand" style="justify-content: flex-start; margin-bottom: 0; height: auto;">
                 <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" alt="Logo" style="width:28px; height:28px;">
@@ -439,7 +466,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
