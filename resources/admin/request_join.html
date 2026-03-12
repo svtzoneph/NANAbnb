@@ -205,7 +205,7 @@
     const { useState, useEffect } = React;
 
     function AdminDashboard() {
-      const [sidebarOpen, setSidebarOpen] = useState(false); // NEW: Sidebar State
+      const [sidebarOpen, setSidebarOpen] = useState(false);
       const [user, setUser] = useState(null);
       const [requests, setRequests] = useState([]);
       const [loading, setLoading] = useState(true);
@@ -280,18 +280,18 @@
         <React.Fragment>
 
           {/* =========================================
-              NEW: HEADER / TOP NAV
+              HEADER / TOP NAV
               ========================================= */}
           <nav className="top-nav">
             <div className="menu-trigger" onClick={() => setSidebarOpen(true)}>
               <i className="fas fa-bars-staggered"></i>
             </div>
             <div className="logo">ZONE VAULT</div>
-            <div style={{width: '24px'}}></div> {/* Spacer to keep logo centered */}
+            <div style={{width: '24px'}}></div>
           </nav>
 
           {/* =========================================
-              NEW: SIDEBAR 
+              SIDEBAR 
               ========================================= */}
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
           <aside className={`sidebar ${sidebarOpen ? 'active' : ''}`}>
@@ -300,19 +300,25 @@
               <p style={{fontSize: '13px', color: 'var(--text-muted)'}}>Management Suite</p>
             </div>
 
-            <a href="requests.html" className="nav-btn active">
+            <a href="panel.html" className="nav-btn">
+              <i className="fas fa-house"></i>
+              <span>Admin Home</span>
+            </a>
+
+            {/* This is the active page, so the highlight goes here! */}
+            <a href="request_join.html" className="nav-btn active">
               <i className="fas fa-user-plus"></i>
               <span>Request Join</span>
             </a>
 
-            <a href="page-access.html" className="nav-btn">
+            <a href="page_access.html" className="nav-btn">
               <i className="fas fa-shield-halved"></i>
               <span>Page Access</span>
             </a>
           </aside>
 
           {/* =========================================
-              MAIN CONTENT (Your exact existing logic)
+              MAIN CONTENT 
               ========================================= */}
           <main className="main-content">
             <header>
