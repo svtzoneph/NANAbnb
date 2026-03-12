@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
-  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
     /* === THEME VARIABLES === */
     :root {
@@ -22,6 +22,7 @@
         --accent-approve: #22c55e;
         --accent-decline: #ef4444;
         --accent-blue: #38bdf8;
+        --sidebar-width: 280px; /* Added for sidebar */
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -30,10 +31,6 @@
       background-color: var(--bg-color);
       color: var(--text-main);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 20px;
       overflow-x: hidden;
     }
 
@@ -48,8 +45,33 @@
       z-index: -1; pointer-events: none;
     }
 
+    /* =========================================
+       NEW: TOP NAV & SIDEBAR STYLES
+       ========================================= */
+    .top-nav { width: 100%; padding: 20px 25px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 999; background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(15px); border-bottom: var(--glass-border); }
+    .menu-trigger { font-size: 22px; cursor: pointer; color: var(--text-main); padding: 5px; }
+    .logo { font-weight: 700; letter-spacing: -0.5px; font-size: 20px; }
+
+    .sidebar { position: fixed; top: 0; left: -100%; width: var(--sidebar-width); height: 100%; background: var(--card-bg); border-right: var(--glass-border); z-index: 1001; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); padding: 40px 20px; }
+    .sidebar.active { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.8); }
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s; }
+    .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+    .nav-btn { width: 100%; padding: 16px 20px; border-radius: 12px; color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; border: 1px solid transparent; background: transparent; font-size: 15px; text-decoration: none; }
+    .nav-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: rgba(255,255,255,0.1); }
+    .nav-btn.active { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: rgba(255,255,255,0.1); }
+    .nav-btn i { font-size: 18px; width: 20px; text-align: center; }
+
+    /* =========================================
+       MAIN CONTENT WRAPPER
+       ========================================= */
+    .main-content {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 40px 20px; width: 100%; max-width: 1100px; margin: 0 auto;
+    }
+
     /* Header & Diagnostics */
-    header { position: relative; text-align: center; margin-bottom: 40px; width: 100%; max-width: 1100px; }
+    header { position: relative; text-align: center; margin-bottom: 40px; width: 100%; }
     h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
     
     .diagnostic-box {
@@ -97,7 +119,6 @@
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
       width: 100%;
-      max-width: 1100px;
     }
 
     /* Glass Cards (Pages) */
@@ -187,11 +208,12 @@
     .error-text { color: var(--accent-decline); margin-top: 10px; font-weight: bold; }
 
     @media (max-width: 600px) {
-      body { padding: 20px 15px; }
-      h1 { font-size: 26px; margin-right: 40px; } /* Prevent title from overlapping button */
+      .main-content { padding: 30px 15px; }
+      h1 { font-size: 26px; margin-right: 40px; } 
       .requests-grid { grid-template-columns: 1fr; }
       .modal-card { padding: 25px 20px; }
       .add-btn-top-right { width: 40px; height: 40px; font-size: 16px; }
+      .sidebar { width: 80%; }
     }
   </style>
 </head>
@@ -200,7 +222,7 @@
   <div class="bg-gradient"></div>
   <div class="noise-overlay"></div>
   
-  <div id="root" style="width: 100%; display: flex; flex-direction: column; align-items: center;"></div>
+  <div id="root" style="width: 100%;"></div>
 
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -247,6 +269,7 @@
     ];
 
     function PageAccessApp() {
+      const [sidebarOpen, setSidebarOpen] = useState(false); // NEW: Sidebar State
       const [user, setUser] = useState(null);
       const [authLoading, setAuthLoading] = useState(true);
       const [isAdmin, setIsAdmin] = useState(false);
@@ -277,7 +300,7 @@
                 setIsAdmin(true);
                 setUsersError(null);
                 
-                // Fetch dynamic pages list (the ones you add via the button)
+                // Fetch dynamic pages list
                 const pagesRef = window.fbRef(window.db, 'pages');
                 window.fbOnValue(pagesRef, (pagesSnap) => {
                   const data = pagesSnap.val() || {};
@@ -363,55 +386,93 @@
 
       return (
         <React.Fragment>
-          <header>
-            <h1>Page Access Control</h1>
-            
-            {/* Top Right Plus Button (Admins Only) */}
-            {isAdmin && (
-              <button className="add-btn-top-right" onClick={() => setIsAddModalOpen(true)} title="Add New Page">
-                <i className="fas fa-plus"></i>
-              </button>
+
+          {/* =========================================
+              NEW: HEADER / TOP NAV
+              ========================================= */}
+          <nav className="top-nav">
+            <div className="menu-trigger" onClick={() => setSidebarOpen(true)}>
+              <i className="fas fa-bars-staggered"></i>
+            </div>
+            <div className="logo">ZONE VAULT</div>
+            <div style={{width: '24px'}}></div> {/* Spacer to keep logo centered */}
+          </nav>
+
+          {/* =========================================
+              NEW: SIDEBAR 
+              ========================================= */}
+          <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
+          <aside className={`sidebar ${sidebarOpen ? 'active' : ''}`}>
+            <div style={{marginBottom: '40px', paddingLeft: '15px'}}>
+              <h3 style={{fontSize: '22px', fontWeight: '700'}}>Admin Panel</h3>
+              <p style={{fontSize: '13px', color: 'var(--text-muted)'}}>Management Suite</p>
+            </div>
+
+            <a href="requests.html" className="nav-btn">
+              <i className="fas fa-user-plus"></i>
+              <span>Request Join</span>
+            </a>
+
+            <a href="page-access.html" className="nav-btn active">
+              <i className="fas fa-shield-halved"></i>
+              <span>Page Access</span>
+            </a>
+          </aside>
+
+          {/* =========================================
+              MAIN CONTENT (Your perfectly intact page)
+              ========================================= */}
+          <main className="main-content">
+            <header>
+              <h1>Page Access Control</h1>
+              
+              {/* Top Right Plus Button (Admins Only) */}
+              {isAdmin && (
+                <button className="add-btn-top-right" onClick={() => setIsAddModalOpen(true)} title="Add New Page">
+                  <i className="fas fa-plus"></i>
+                </button>
+              )}
+
+              <div className="diagnostic-box">
+                {authLoading ? (
+                   <p><i className="fas fa-spinner fa-spin"></i> Checking credentials...</p>
+                ) : user ? (
+                   <p>
+                     Logged in as: <strong>{user.email}</strong>
+                     <span className={`status-badge ${isAdmin ? 'status-admin' : 'status-user'}`}>
+                       {isAdmin ? 'ADMIN VERIFIED' : 'NOT AN ADMIN'}
+                     </span>
+                   </p>
+                ) : (
+                   <p style={{color: "var(--accent-decline)"}}><i className="fas fa-lock"></i> Not logged in.</p>
+                )}
+              </div>
+            </header>
+
+            {usersError && (
+               <div className="empty-state" style={{maxWidth: "600px"}}>
+                  <i className="fas fa-exclamation-triangle" style={{color: 'var(--accent-decline)'}}></i>
+                  <p className="error-text" style={{color: 'var(--accent-decline)', fontWeight: 'bold'}}>{usersError}</p>
+               </div>
             )}
 
-            <div className="diagnostic-box">
-              {authLoading ? (
-                 <p><i className="fas fa-spinner fa-spin"></i> Checking credentials...</p>
-              ) : user ? (
-                 <p>
-                   Logged in as: <strong>{user.email}</strong>
-                   <span className={`status-badge ${isAdmin ? 'status-admin' : 'status-user'}`}>
-                     {isAdmin ? 'ADMIN VERIFIED' : 'NOT AN ADMIN'}
-                   </span>
-                 </p>
-              ) : (
-                 <p style={{color: "var(--accent-decline)"}}><i className="fas fa-lock"></i> Not logged in.</p>
-              )}
-            </div>
-          </header>
-
-          {usersError && (
-             <div className="empty-state" style={{maxWidth: "600px"}}>
-                <i className="fas fa-exclamation-triangle" style={{color: 'var(--accent-decline)'}}></i>
-                <p className="error-text" style={{color: 'var(--accent-decline)', fontWeight: 'bold'}}>{usersError}</p>
-             </div>
-          )}
-
-          {/* Cards Grid */}
-          <div className="requests-grid">
-            {allDisplayPages.map(page => (
-              <div 
-                key={page.id} 
-                className={`glass-card ${!isAdmin ? 'disabled' : ''}`} 
-                onClick={() => isAdmin && setSelectedPage(page)}
-              >
-                <img src={page.image} className="card-img" alt={page.name} onError={(e) => { e.target.src="https://placehold.co/600x400/121212/555?text=No+Image" }}/>
-                <div className="card-content">
-                  <h3>{page.name}</h3>
-                  <small>Node: {page.id}</small>
+            {/* Cards Grid */}
+            <div className="requests-grid">
+              {allDisplayPages.map(page => (
+                <div 
+                  key={page.id} 
+                  className={`glass-card ${!isAdmin ? 'disabled' : ''}`} 
+                  onClick={() => isAdmin && setSelectedPage(page)}
+                >
+                  <img src={page.image} className="card-img" alt={page.name} onError={(e) => { e.target.src="https://placehold.co/600x400/121212/555?text=No+Image" }}/>
+                  <div className="card-content">
+                    <h3>{page.name}</h3>
+                    <small>Node: {page.id}</small>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </main>
 
           {/* -----------------------------
               MODAL 1: ACCESS CONTROL 
