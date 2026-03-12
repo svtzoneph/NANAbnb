@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Page Access Control | Zone Vault</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* === THEME VARIABLES === */
+    :root {
+        --bg-color: #050505;
+        --text-main: #ffffff;
+        --text-muted: #a1a1aa;
+        --card-bg: #121212;
+        --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+        --input-bg: rgba(255, 255, 255, 0.05);
+        --accent-approve: #22c55e;
+        --accent-decline: #ef4444;
+        --accent-blue: #38bdf8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      overflow-x: hidden;
+    }
+
+    /* Background Effects */
+    .bg-gradient {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+      background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.05), transparent 40%);
+    }
+    .noise-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+      z-index: -1; pointer-events: none;
+    }
+
+    /* Header & Diagnostics */
+    header { position: relative; text-align: center; margin-bottom: 40px; width: 100%; max-width: 1100px; }
+    h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
+    
+    .diagnostic-box {
+      background: rgba(255,255,255,0.03);
+      border: var(--glass-border);
+      border-radius: 12px;
+      padding: 15px;
+      display: inline-block;
+      text-align: left;
+      margin-top: 10px;
+    }
+    .diagnostic-box p { margin: 5px 0; font-size: 14px; color: var(--text-muted); }
+    .status-badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-left: 8px; }
+    .status-admin { background: rgba(34, 197, 94, 0.2); color: var(--accent-approve); }
+    .status-user { background: rgba(239, 68, 68, 0.2); color: var(--accent-decline); }
+
+    /* Top Right Plus Button */
+    .add-btn-top-right {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.05);
+      border: var(--glass-border);
+      color: var(--text-main);
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .add-btn-top-right:hover {
+      background: var(--text-main);
+      color: #000;
+      transform: scale(1.1) rotate(90deg);
+    }
+
+    /* Layout Grids */
+    .requests-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    /* Glass Cards (Pages) */
+    .glass-card {
+      background: var(--card-bg);
+      border: var(--glass-border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      transition: transform 0.2s, border-color 0.2s;
+      animation: popIn 0.4s ease forwards;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+    .glass-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
+    .glass-card.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .card-img { width: 100%; height: 150px; object-fit: cover; border-bottom: var(--glass-border); }
+    .card-content { padding: 20px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .card-content h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; line-height: 1.3; }
+    .card-content small { color: var(--text-muted); font-size: 12px; font-family: monospace; word-break: break-all; }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+      padding: 20px;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    
+    .modal-card {
+      background: var(--card-bg); border: var(--glass-border);
+      border-radius: 24px; padding: 30px; width: 100%; max-width: 500px; max-height: 90vh;
+      display: flex; flex-direction: column;
+      transform: scale(0.95) translateY(10px); 
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .modal-overlay.active .modal-card { transform: scale(1) translateY(0); }
+
+    .input-icon-group { position: relative; margin: 10px 0; }
+    .input-icon-group i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+    .custom-input {
+      width: 100%; padding: 14px 16px 14px 44px;
+      background: var(--input-bg); border: var(--glass-border);
+      border-radius: 12px; color: var(--text-main); font-size: 14px; outline: none; transition: 0.3s;
+    }
+    .custom-input:focus { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); }
+
+    .user-list { flex: 1; overflow-y: auto; margin-bottom: 20px; padding-right: 5px; }
+    .user-list::-webkit-scrollbar { width: 6px; }
+    .user-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
+    .user-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+    .user-row { 
+      display: flex; justify-content: space-between; align-items: center; 
+      padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px; transition: background 0.2s;
+    }
+    .user-row:hover { background: rgba(255,255,255,0.02); }
+
+    .switch { position: relative; display: inline-block; width: 46px; height: 26px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .3s; border-radius: 34px; border: var(--glass-border); }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: var(--text-muted); transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background-color: rgba(34, 197, 94, 0.2); border-color: var(--accent-approve); }
+    input:checked + .slider:before { transform: translateX(20px); background-color: var(--accent-approve); }
+
+    .btn {
+      width: 100%; padding: 14px; border-radius: 50px; border: none;
+      font-size: 14px; font-weight: 600; cursor: pointer; color: #000;
+      background: var(--text-main); transition: all 0.2s; margin-top: 10px;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+    .btn-cancel { background: transparent; color: var(--text-main); border: 1px solid var(--text-muted); }
+    .btn-cancel:hover { background: rgba(255,255,255,0.05); box-shadow: none; transform: none; }
+
+    .empty-state { text-align: center; color: var(--text-muted); padding: 40px; grid-column: 1/-1; }
+    .empty-state i { font-size: 40px; margin-bottom: 15px; opacity: 0.5; }
+    .error-text { color: var(--accent-decline); margin-top: 10px; font-weight: bold; }
+
+    @media (max-width: 600px) {
+      body { padding: 20px 15px; }
+      h1 { font-size: 26px; margin-right: 40px; } /* Prevent title from overlapping button */
+      .requests-grid { grid-template-columns: 1fr; }
+      .modal-card { padding: 25px 20px; }
+      .add-btn-top-right { width: 40px; height: 40px; font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-gradient"></div>
+  <div class="noise-overlay"></div>
+  
+  <div id="root" style="width: 100%; display: flex; flex-direction: column; align-items: center;"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, onValue, set, off } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+      authDomain: "tvnstream-b4497.firebaseapp.com",
+      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+      projectId: "tvnstream-b4497",
+      storageBucket: "tvnstream-b4497.appspot.com",
+      messagingSenderId: "308384754214",
+      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    window.db = getDatabase(app);
+    window.auth = getAuth(app);
+    window.fbRef = ref;
+    window.fbOnValue = onValue;
+    window.fbSet = set;
+    window.fbOff = off;
+    window.fbOnAuthStateChanged = onAuthStateChanged;
+
+    window.firebaseIsReady = true;
+    if (typeof window.mountReactApp === 'function') window.mountReactApp();
+  </script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    // --- YOUR HARDCODED PAGES ARE BACK HERE ---
+    const PAGE_CATEGORIES = [
+      { id: "wendy_world_tour", name: "2025-26 WENDY 1st WORLD TOUR [W:EALIVE] ENCORE", image: "https://res.cloudinary.com/dp6x9xmku/image/upload/v1772344056/2025-26_WENDY_1st_WORLD_TOUR_W_EALIVE_ENCORE_yb3aws.png" },
+      { id: "cxmdoubleup", name: "CxM [DOUBLE UP] LIVE PARTY in INCHEON", image: "https://uploads.onecompiler.io/43ddry4jt/449datfub/1765871658770_cxm_doubleup_ONLINE_pc.jpg" },
+      { id: "live_access", name: "LIVE ACCESS", image: "https://uploads.onecompiler.io/43ddry4jt/449datfub/1765871658770_cxm_doubleup_ONLINE_pc.jpg" },
+      { id: "fukuokashow", name: "SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Fukuoka Show", image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png" },
+      { id: "jpnnewtour", name: "SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Osaka Show", image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png" }
+    ];
+
+    function PageAccessApp() {
+      const [user, setUser] = useState(null);
+      const [authLoading, setAuthLoading] = useState(true);
+      const [isAdmin, setIsAdmin] = useState(false);
+      
+      const [dynamicPages, setDynamicPages] = useState([]); // Pages added via the "+" button
+      const [allUsers, setAllUsers] = useState({});
+      const [usersError, setUsersError] = useState(null);
+      
+      // Modals State
+      const [selectedPage, setSelectedPage] = useState(null);
+      const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+      const [permissions, setPermissions] = useState({});
+      const [searchTerm, setSearchTerm] = useState("");
+
+      // Form State for Add Page
+      const [newPage, setNewPage] = useState({ id: "", name: "", image: "", filename: "" });
+
+      useEffect(() => {
+        const unsubscribeAuth = window.fbOnAuthStateChanged(window.auth, (currentUser) => {
+          setUser(currentUser);
+          
+          if (currentUser) {
+            const myProfileRef = window.fbRef(window.db, `users/${currentUser.uid}`);
+            window.fbOnValue(myProfileRef, (snap) => {
+              const myData = snap.val();
+              
+              if (myData && myData.role === 'admin') {
+                setIsAdmin(true);
+                setUsersError(null);
+                
+                // Fetch dynamic pages list (the ones you add via the button)
+                const pagesRef = window.fbRef(window.db, 'pages');
+                window.fbOnValue(pagesRef, (pagesSnap) => {
+                  const data = pagesSnap.val() || {};
+                  setDynamicPages(Object.values(data));
+                });
+
+                // Fetch all users
+                const allUsersRef = window.fbRef(window.db, 'users');
+                window.fbOnValue(allUsersRef, (usersSnap) => {
+                  setAllUsers(usersSnap.val() || {});
+                });
+              } else {
+                setIsAdmin(false);
+                setUsersError(`Access Denied: You do not have admin permissions.`);
+              }
+              setAuthLoading(false);
+            });
+          } else {
+            setAuthLoading(false);
+            setIsAdmin(false);
+            setAllUsers({});
+          }
+        });
+        return () => unsubscribeAuth();
+      }, []);
+
+      // Load permissions when an access modal opens
+      useEffect(() => {
+        if (!selectedPage || !isAdmin) return;
+        
+        const permsRef = window.fbRef(window.db, `page_access/${selectedPage.id}`);
+        const listener = window.fbOnValue(permsRef, (snapshot) => {
+          setPermissions(snapshot.val() || {});
+        });
+
+        return () => window.fbOff(permsRef, 'value', listener);
+      }, [selectedPage, isAdmin]);
+
+      const handleToggleAccess = (uid, currentAccess) => {
+        if (!selectedPage) return;
+        const newAccess = !currentAccess;
+        const accessRef = window.fbRef(window.db, `page_access/${selectedPage.id}/${uid}`);
+        
+        setPermissions(prev => ({ ...prev, [uid]: newAccess }));
+        window.fbSet(accessRef, newAccess).catch(err => {
+          alert(`Error saving permission.`);
+          setPermissions(prev => ({ ...prev, [uid]: currentAccess }));
+        });
+      };
+
+      // Create a New Page
+      const handleCreatePage = () => {
+        if (!newPage.id || !newPage.name) {
+           return alert("Node ID and Display Name are required!");
+        }
+        
+        const safeId = newPage.id.toLowerCase().replace(/[^a-z0-9_]/g, '');
+        
+        const newPageRef = window.fbRef(window.db, `pages/${safeId}`);
+        window.fbSet(newPageRef, {
+          id: safeId,
+          name: newPage.name,
+          image: newPage.image || "https://placehold.co/600x400/121212/555?text=No+Image",
+          filename: newPage.filename || ""
+        }).then(() => {
+          setIsAddModalOpen(false);
+          setNewPage({ id: "", name: "", image: "", filename: "" });
+        }).catch(err => {
+          alert("Error creating page. Check console.");
+          console.error(err);
+        });
+      };
+
+      const filteredUsers = useMemo(() => {
+        return Object.entries(allUsers).filter(([uid, data]) => {
+          const searchString = `${data.name || ''} ${data.email || uid}`.toLowerCase();
+          return searchString.includes(searchTerm.toLowerCase());
+        });
+      }, [allUsers, searchTerm]);
+
+      // Combine Hardcoded + Dynamic Pages
+      const allDisplayPages = [...PAGE_CATEGORIES, ...dynamicPages];
+
+      return (
+        <React.Fragment>
+          <header>
+            <h1>Page Access Control</h1>
+            
+            {/* Top Right Plus Button (Admins Only) */}
+            {isAdmin && (
+              <button className="add-btn-top-right" onClick={() => setIsAddModalOpen(true)} title="Add New Page">
+                <i className="fas fa-plus"></i>
+              </button>
+            )}
+
+            <div className="diagnostic-box">
+              {authLoading ? (
+                 <p><i className="fas fa-spinner fa-spin"></i> Checking credentials...</p>
+              ) : user ? (
+                 <p>
+                   Logged in as: <strong>{user.email}</strong>
+                   <span className={`status-badge ${isAdmin ? 'status-admin' : 'status-user'}`}>
+                     {isAdmin ? 'ADMIN VERIFIED' : 'NOT AN ADMIN'}
+                   </span>
+                 </p>
+              ) : (
+                 <p style={{color: "var(--accent-decline)"}}><i className="fas fa-lock"></i> Not logged in.</p>
+              )}
+            </div>
+          </header>
+
+          {usersError && (
+             <div className="empty-state" style={{maxWidth: "600px"}}>
+                <i className="fas fa-exclamation-triangle" style={{color: 'var(--accent-decline)'}}></i>
+                <p className="error-text" style={{color: 'var(--accent-decline)', fontWeight: 'bold'}}>{usersError}</p>
+             </div>
+          )}
+
+          {/* Cards Grid */}
+          <div className="requests-grid">
+            {allDisplayPages.map(page => (
+              <div 
+                key={page.id} 
+                className={`glass-card ${!isAdmin ? 'disabled' : ''}`} 
+                onClick={() => isAdmin && setSelectedPage(page)}
+              >
+                <img src={page.image} className="card-img" alt={page.name} onError={(e) => { e.target.src="https://placehold.co/600x400/121212/555?text=No+Image" }}/>
+                <div className="card-content">
+                  <h3>{page.name}</h3>
+                  <small>Node: {page.id}</small>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* -----------------------------
+              MODAL 1: ACCESS CONTROL 
+              ----------------------------- */}
+          <div className={`modal-overlay ${selectedPage ? 'active' : ''}`}>
+            {selectedPage && (
+              <div className="modal-card">
+                <div>
+                  <h3 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '4px', color: 'var(--text-main)' }}>
+                    Access: {selectedPage.name}
+                  </h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '13px', fontFamily: 'monospace' }}>
+                    Database: page_access/{selectedPage.id}
+                  </p>
+                </div>
+
+                <div className="input-icon-group">
+                  <i className="fas fa-search"></i>
+                  <input 
+                    type="text" 
+                    className="custom-input" 
+                    placeholder="Search by name or email..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+
+                <div className="user-list">
+                  {filteredUsers.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
+                      No users found.
+                    </div>
+                  ) : (
+                    filteredUsers.map(([uid, userData]) => {
+                      const hasAccess = permissions[uid] === true;
+                      return (
+                        <div key={uid} className="user-row">
+                          <div className="user-info">
+                            <strong style={{color:"var(--text-main)", fontSize:"15px", display:"block", marginBottom:"3px"}}>{userData.name || 'Unknown User'}</strong>
+                            <small style={{color:"var(--text-muted)", fontSize:"12px"}}>{userData.email || uid}</small>
+                          </div>
+                          <label className="switch">
+                            <input type="checkbox" checked={hasAccess} onChange={() => handleToggleAccess(uid, hasAccess)} />
+                            <span className="slider"></span>
+                          </label>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                <button className="btn" onClick={() => setSelectedPage(null)}>Close Panel</button>
+              </div>
+            )}
+          </div>
+
+          {/* -----------------------------
+              MODAL 2: ADD NEW PAGE 
+              ----------------------------- */}
+          <div className={`modal-overlay ${isAddModalOpen ? 'active' : ''}`}>
+             <div className="modal-card" style={{maxHeight: 'none'}}>
+                <h3 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '20px', color: 'var(--text-main)' }}>
+                  Create New Page
+                </h3>
+                
+                <div className="input-icon-group">
+                  <i className="fas fa-fingerprint"></i>
+                  <input type="text" className="custom-input" placeholder="Node ID (e.g. jpnnewtour)" 
+                         value={newPage.id} onChange={(e) => setNewPage({...newPage, id: e.target.value})} />
+                </div>
+                
+                <div className="input-icon-group">
+                  <i className="fas fa-heading"></i>
+                  <input type="text" className="custom-input" placeholder="Display Name (Event Title)" 
+                         value={newPage.name} onChange={(e) => setNewPage({...newPage, name: e.target.value})} />
+                </div>
+
+                <div className="input-icon-group">
+                  <i className="fas fa-image"></i>
+                  <input type="text" className="custom-input" placeholder="Image URL (Optional)" 
+                         value={newPage.image} onChange={(e) => setNewPage({...newPage, image: e.target.value})} />
+                </div>
+                
+                <div className="input-icon-group" style={{marginBottom: "30px"}}>
+                  <i className="fas fa-link"></i>
+                  <input type="text" className="custom-input" placeholder="Filename / URL Path (Optional)" 
+                         value={newPage.filename} onChange={(e) => setNewPage({...newPage, filename: e.target.value})} />
+                </div>
+
+                <button className="btn" onClick={handleCreatePage}>Save to Database</button>
+                <button className="btn btn-cancel" onClick={() => setIsAddModalOpen(false)}>Cancel</button>
+             </div>
+          </div>
+
+        </React.Fragment>
+      );
+    }
+
+    window.mountReactApp = () => {
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<PageAccessApp />);
+    };
+    if (window.firebaseIsReady) window.mountReactApp();
+  </script>
+</body>
+</html>
