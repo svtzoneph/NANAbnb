@@ -31,6 +31,10 @@
       background-color: var(--bg-color);
       color: var(--text-main);
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
       overflow-x: hidden;
     }
 
@@ -45,33 +49,8 @@
       z-index: -1; pointer-events: none;
     }
 
-    /* =========================================
-       NEW: TOP NAV & SIDEBAR STYLES
-       ========================================= */
-    .top-nav { width: 100%; padding: 20px 25px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 999; background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(15px); border-bottom: var(--glass-border); }
-    .menu-trigger { font-size: 22px; cursor: pointer; color: var(--text-main); padding: 5px; }
-    .logo { font-weight: 700; letter-spacing: -0.5px; font-size: 20px; }
-
-    .sidebar { position: fixed; top: 0; left: -100%; width: var(--sidebar-width); height: 100%; background: var(--card-bg); border-right: var(--glass-border); z-index: 1001; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); padding: 40px 20px; }
-    .sidebar.active { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.8); }
-    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s; }
-    .sidebar-overlay.active { opacity: 1; visibility: visible; }
-
-    .nav-btn { width: 100%; padding: 16px 20px; border-radius: 12px; color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; border: 1px solid transparent; background: transparent; font-size: 15px; text-decoration: none; }
-    .nav-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: rgba(255,255,255,0.1); }
-    .nav-btn.active { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: rgba(255,255,255,0.1); }
-    .nav-btn i { font-size: 18px; width: 20px; text-align: center; }
-
-    /* =========================================
-       MAIN CONTENT WRAPPER
-       ========================================= */
-    .main-content {
-      display: flex; flex-direction: column; align-items: center;
-      padding: 40px 20px; width: 100%; max-width: 1100px; margin: 0 auto;
-    }
-
     /* Header & Diagnostics */
-    header { position: relative; text-align: center; margin-bottom: 40px; width: 100%; }
+    header { position: relative; text-align: center; margin-bottom: 40px; width: 100%; max-width: 1100px; }
     h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
     
     .diagnostic-box {
@@ -119,6 +98,7 @@
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
       width: 100%;
+      max-width: 1100px;
     }
 
     /* Glass Cards (Pages) */
@@ -207,8 +187,25 @@
     .empty-state i { font-size: 40px; margin-bottom: 15px; opacity: 0.5; }
     .error-text { color: var(--accent-decline); margin-top: 10px; font-weight: bold; }
 
+    /* =========================================
+       NEW: TOP NAV & SIDEBAR STYLES
+       ========================================= */
+    .top-nav { width: 100%; padding: 20px 25px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 999; background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(15px); border-bottom: var(--glass-border); }
+    .menu-trigger { font-size: 22px; cursor: pointer; color: var(--text-main); padding: 5px; }
+    .logo { font-weight: 700; letter-spacing: -0.5px; font-size: 20px; }
+
+    .sidebar { position: fixed; top: 0; left: -100%; width: var(--sidebar-width); height: 100%; background: var(--card-bg); border-right: var(--glass-border); z-index: 1001; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); padding: 40px 20px; }
+    .sidebar.active { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.8); }
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s; }
+    .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+    .nav-btn { width: 100%; padding: 16px 20px; border-radius: 12px; color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; border: 1px solid transparent; background: transparent; font-size: 15px; text-decoration: none; }
+    .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: rgba(255,255,255,0.1); }
+    .nav-btn i { font-size: 18px; width: 20px; text-align: center; }
+
     @media (max-width: 600px) {
-      .main-content { padding: 30px 15px; }
+      body { padding: 0; }
+      .main-content-wrapper { padding: 30px 15px; width: 100%; }
       h1 { font-size: 26px; margin-right: 40px; } 
       .requests-grid { grid-template-columns: 1fr; }
       .modal-card { padding: 25px 20px; }
@@ -222,7 +219,7 @@
   <div class="bg-gradient"></div>
   <div class="noise-overlay"></div>
   
-  <div id="root" style="width: 100%;"></div>
+  <div id="root" style="width: 100%; display: flex; flex-direction: column; align-items: center;"></div>
 
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -388,18 +385,18 @@
         <React.Fragment>
 
           {/* =========================================
-              NEW: HEADER / TOP NAV
+              HEADER / TOP NAV
               ========================================= */}
           <nav className="top-nav">
             <div className="menu-trigger" onClick={() => setSidebarOpen(true)}>
               <i className="fas fa-bars-staggered"></i>
             </div>
             <div className="logo">ZONE VAULT</div>
-            <div style={{width: '24px'}}></div> {/* Spacer to keep logo centered */}
+            <div style={{width: '24px'}}></div>
           </nav>
 
           {/* =========================================
-              NEW: SIDEBAR 
+              SIDEBAR 
               ========================================= */}
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
           <aside className={`sidebar ${sidebarOpen ? 'active' : ''}`}>
@@ -408,26 +405,27 @@
               <p style={{fontSize: '13px', color: 'var(--text-muted)'}}>Management Suite</p>
             </div>
 
-          <a href="panel" className="nav-btn active">
-            <i className="fas fa-house"></i>
-            <span>Admin Home</span>
-          </a>
+            <a href="panel.html" className="nav-btn">
+              <i className="fas fa-house"></i>
+              <span>Admin Home</span>
+            </a>
 
-          <a href="request_join" className="nav-btn">
-            <i className="fas fa-user-plus"></i>
-            <span>Request Join</span>
-          </a>
+            <a href="request_join.html" className="nav-btn">
+              <i className="fas fa-user-plus"></i>
+              <span>Request Join</span>
+            </a>
 
-          <a href="page_access" className="nav-btn">
-            <i className="fas fa-shield-halved"></i>
-            <span>Page Access</span>
-          </a>
+            {/* Active highlight moved to Page Access! */}
+            <a href="page_access.html" className="nav-btn active">
+              <i className="fas fa-shield-halved"></i>
+              <span>Page Access</span>
+            </a>
           </aside>
 
           {/* =========================================
-              MAIN CONTENT (Your perfectly intact page)
+              MAIN CONTENT 
               ========================================= */}
-          <main className="main-content">
+          <div className="main-content-wrapper" style={{padding: '40px 20px', width: '100%', maxWidth: '1100px'}}>
             <header>
               <h1>Page Access Control</h1>
               
@@ -455,7 +453,7 @@
             </header>
 
             {usersError && (
-               <div className="empty-state" style={{maxWidth: "600px"}}>
+               <div className="empty-state" style={{maxWidth: "600px", margin: "0 auto"}}>
                   <i className="fas fa-exclamation-triangle" style={{color: 'var(--accent-decline)'}}></i>
                   <p className="error-text" style={{color: 'var(--accent-decline)', fontWeight: 'bold'}}>{usersError}</p>
                </div>
@@ -477,7 +475,7 @@
                 </div>
               ))}
             </div>
-          </main>
+          </div>
 
           {/* -----------------------------
               MODAL 1: ACCESS CONTROL 
