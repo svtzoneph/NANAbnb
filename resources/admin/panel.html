@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Home | Zone Vault</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+        --bg-color: #050505;
+        --text-main: #ffffff;
+        --text-muted: #a1a1aa;
+        --card-bg: #121212;
+        --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+        --accent-blue: #38bdf8;
+        --sidebar-width: 280px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+    body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+
+    /* Backgrounds */
+    .bg-gradient { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.05), transparent 40%); }
+    .noise-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E"); z-index: -1; pointer-events: none; }
+
+    /* Top Nav */
+    .top-nav { width: 100%; padding: 20px 25px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 999; background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(15px); border-bottom: var(--glass-border); }
+    .menu-trigger { font-size: 22px; cursor: pointer; color: var(--text-main); padding: 5px; }
+    .logo { font-weight: 700; letter-spacing: -0.5px; font-size: 20px; }
+
+    /* Sidebar */
+    .sidebar { position: fixed; top: 0; left: -100%; width: var(--sidebar-width); height: 100%; background: var(--card-bg); border-right: var(--glass-border); z-index: 1001; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); padding: 40px 20px; }
+    .sidebar.active { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.8); }
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s; }
+    .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+    .nav-btn { width: 100%; padding: 16px 20px; border-radius: 12px; color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; border: 1px solid transparent; background: transparent; font-size: 15px; text-decoration: none; }
+    .nav-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: rgba(255,255,255,0.1); }
+    .nav-btn i { font-size: 18px; width: 20px; text-align: center; }
+
+    /* Main Content */
+    .container { padding: 60px 20px; text-align: center; max-width: 800px; margin: 0 auto; animation: slideUp 0.6s ease; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .admin-card { background: var(--card-bg); border: var(--glass-border); border-radius: 24px; padding: 40px 30px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+    h2 { font-size: 32px; font-weight: 700; margin-bottom: 10px; }
+    p { color: var(--text-muted); line-height: 1.6; margin-bottom: 30px; }
+
+    .welcome-pill { display: inline-block; padding: 6px 15px; border-radius: 50px; background: rgba(56, 189, 248, 0.1); color: var(--accent-blue); font-size: 13px; font-weight: 600; margin-bottom: 20px; border: 1px solid rgba(56, 189, 248, 0.2); }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+      .sidebar { width: 80%; }
+      h2 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-gradient"></div>
+<div class="noise-overlay"></div>
+
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel">
+  const { useState } = React;
+
+  function AdminHome() {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+      <React.Fragment>
+        {/* Top Navbar */}
+        <nav className="top-nav">
+          <div className="menu-trigger" onClick={() => setIsOpen(true)}>
+            <i className="fas fa-bars-staggered"></i>
+          </div>
+          <div className="logo">ZONE VAULT</div>
+          <div style={{width: '24px'}}></div> {/* Spacer for symmetry */}
+        </nav>
+
+        {/* Sidebar Overlay */}
+        <div className={`sidebar-overlay ${isOpen ? 'active' : ''}`} onClick={() => setIsOpen(false)}></div>
+
+        {/* Sidebar Menu */}
+        <aside className={`sidebar ${isOpen ? 'active' : ''}`}>
+          <div style={{marginBottom: '40px', paddingLeft: '15px'}}>
+            <h3 style={{fontSize: '22px', fontWeight: '700'}}>Admin Panel</h3>
+            <p style={{fontSize: '13px', color: 'var(--text-muted)'}}>Management Suite</p>
+          </div>
+
+          {/* TWO BUTTONS WITH HREF */}
+          <a href="requests.html" className="nav-btn">
+            <i className="fas fa-user-plus"></i>
+            <span>Request Join</span>
+          </a>
+
+          <a href="page-access.html" className="nav-btn">
+            <i className="fas fa-shield-halved"></i>
+            <span>Page Access</span>
+          </a>
+        </aside>
+
+        {/* Main Landing Area */}
+        <main className="container">
+          <div className="admin-card">
+            <div className="welcome-pill">System Administrator</div>
+            <h2>Welcome Back</h2>
+            <p>Select a management tool from the sidebar to manage vault entries and control event page permissions.</p>
+            
+            <div style={{display: 'flex', justifyContent: 'center', gap: '15px'}}>
+               <i className="fas fa-circle-check" style={{color: 'var(--accent-blue)', fontSize: '20px'}}></i>
+               <span style={{fontSize: '14px', color: 'var(--text-muted)'}}>Server Status: Online</span>
+            </div>
+          </div>
+        </main>
+      </React.Fragment>
+    );
+  }
+
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(<AdminHome />);
+</script>
+
+</body>
+</html>
