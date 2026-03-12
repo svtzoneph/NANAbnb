@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin | Zone Vault</title>
+  <title>Admin Home | Zone Vault</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,7 +41,7 @@
     .sidebar-overlay.active { opacity: 1; visibility: visible; }
 
     .nav-btn { width: 100%; padding: 16px 20px; border-radius: 12px; color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; border: 1px solid transparent; background: transparent; font-size: 15px; text-decoration: none; }
-    .nav-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: rgba(255,255,255,0.1); }
+    .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: rgba(255,255,255,0.1); }
     .nav-btn i { font-size: 18px; width: 20px; text-align: center; }
 
     /* Main Content */
@@ -99,7 +99,11 @@
             <p style={{fontSize: '13px', color: 'var(--text-muted)'}}>Management Suite</p>
           </div>
 
-          {/* TWO BUTTONS WITH HREF */}
+          <a href="panel" className="nav-btn active">
+            <i className="fas fa-house"></i>
+            <span>Admin Home</span>
+          </a>
+
           <a href="request_join" className="nav-btn">
             <i className="fas fa-user-plus"></i>
             <span>Request Join</span>
