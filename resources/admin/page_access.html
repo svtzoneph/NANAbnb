@@ -22,7 +22,7 @@
         --accent-approve: #22c55e;
         --accent-decline: #ef4444;
         --accent-blue: #38bdf8;
-        --sidebar-width: 280px; /* Added for sidebar */
+        --sidebar-width: 280px; 
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -31,10 +31,6 @@
       background-color: var(--bg-color);
       color: var(--text-main);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 20px;
       overflow-x: hidden;
     }
 
@@ -49,8 +45,32 @@
       z-index: -1; pointer-events: none;
     }
 
+    /* =========================================
+       TOP NAV & SIDEBAR STYLES
+       ========================================= */
+    .top-nav { width: 100%; padding: 20px 25px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 999; background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(15px); border-bottom: var(--glass-border); }
+    .menu-trigger { font-size: 22px; cursor: pointer; color: var(--text-main); padding: 5px; }
+    .logo { font-weight: 700; letter-spacing: -0.5px; font-size: 20px; }
+
+    .sidebar { position: fixed; top: 0; left: -100%; width: var(--sidebar-width); height: 100%; background: var(--card-bg); border-right: var(--glass-border); z-index: 1001; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); padding: 40px 20px; }
+    .sidebar.active { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.8); }
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s; }
+    .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+    .nav-btn { width: 100%; padding: 16px 20px; border-radius: 12px; color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; border: 1px solid transparent; background: transparent; font-size: 15px; text-decoration: none; }
+    .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: rgba(255,255,255,0.1); }
+    .nav-btn i { font-size: 18px; width: 20px; text-align: center; }
+
+    /* =========================================
+       MAIN CONTENT WRAPPER
+       ========================================= */
+    .main-content {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 40px 20px; width: 100%; max-width: 1100px; margin: 0 auto;
+    }
+
     /* Header & Diagnostics */
-    header { position: relative; text-align: center; margin-bottom: 40px; width: 100%; max-width: 1100px; }
+    header { position: relative; text-align: center; margin-bottom: 40px; width: 100%; }
     h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
     
     .diagnostic-box {
@@ -98,7 +118,6 @@
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
       width: 100%;
-      max-width: 1100px;
     }
 
     /* Glass Cards (Pages) */
@@ -187,25 +206,8 @@
     .empty-state i { font-size: 40px; margin-bottom: 15px; opacity: 0.5; }
     .error-text { color: var(--accent-decline); margin-top: 10px; font-weight: bold; }
 
-    /* =========================================
-       NEW: TOP NAV & SIDEBAR STYLES
-       ========================================= */
-    .top-nav { width: 100%; padding: 20px 25px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 999; background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(15px); border-bottom: var(--glass-border); }
-    .menu-trigger { font-size: 22px; cursor: pointer; color: var(--text-main); padding: 5px; }
-    .logo { font-weight: 700; letter-spacing: -0.5px; font-size: 20px; }
-
-    .sidebar { position: fixed; top: 0; left: -100%; width: var(--sidebar-width); height: 100%; background: var(--card-bg); border-right: var(--glass-border); z-index: 1001; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); padding: 40px 20px; }
-    .sidebar.active { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.8); }
-    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s; }
-    .sidebar-overlay.active { opacity: 1; visibility: visible; }
-
-    .nav-btn { width: 100%; padding: 16px 20px; border-radius: 12px; color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; border: 1px solid transparent; background: transparent; font-size: 15px; text-decoration: none; }
-    .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: rgba(255,255,255,0.1); }
-    .nav-btn i { font-size: 18px; width: 20px; text-align: center; }
-
     @media (max-width: 600px) {
-      body { padding: 0; }
-      .main-content-wrapper { padding: 30px 15px; width: 100%; }
+      .main-content { padding: 30px 15px; }
       h1 { font-size: 26px; margin-right: 40px; } 
       .requests-grid { grid-template-columns: 1fr; }
       .modal-card { padding: 25px 20px; }
@@ -219,7 +221,7 @@
   <div class="bg-gradient"></div>
   <div class="noise-overlay"></div>
   
-  <div id="root" style="width: 100%; display: flex; flex-direction: column; align-items: center;"></div>
+  <div id="root" style="width: 100%;"></div>
 
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -256,7 +258,6 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
 
-    // --- YOUR HARDCODED PAGES ARE BACK HERE ---
     const PAGE_CATEGORIES = [
       { id: "wendy_world_tour", name: "2025-26 WENDY 1st WORLD TOUR [W:EALIVE] ENCORE", image: "https://res.cloudinary.com/dp6x9xmku/image/upload/v1772344056/2025-26_WENDY_1st_WORLD_TOUR_W_EALIVE_ENCORE_yb3aws.png" },
       { id: "cxmdoubleup", name: "CxM [DOUBLE UP] LIVE PARTY in INCHEON", image: "https://uploads.onecompiler.io/43ddry4jt/449datfub/1765871658770_cxm_doubleup_ONLINE_pc.jpg" },
@@ -266,45 +267,39 @@
     ];
 
     function PageAccessApp() {
-      const [sidebarOpen, setSidebarOpen] = useState(false); // NEW: Sidebar State
+      const [sidebarOpen, setSidebarOpen] = useState(false);
       const [user, setUser] = useState(null);
       const [authLoading, setAuthLoading] = useState(true);
       const [isAdmin, setIsAdmin] = useState(false);
       
-      const [dynamicPages, setDynamicPages] = useState([]); // Pages added via the "+" button
+      const [dynamicPages, setDynamicPages] = useState([]);
       const [allUsers, setAllUsers] = useState({});
       const [usersError, setUsersError] = useState(null);
       
-      // Modals State
       const [selectedPage, setSelectedPage] = useState(null);
       const [isAddModalOpen, setIsAddModalOpen] = useState(false);
       const [permissions, setPermissions] = useState({});
       const [searchTerm, setSearchTerm] = useState("");
 
-      // Form State for Add Page
       const [newPage, setNewPage] = useState({ id: "", name: "", image: "", filename: "" });
 
       useEffect(() => {
         const unsubscribeAuth = window.fbOnAuthStateChanged(window.auth, (currentUser) => {
           setUser(currentUser);
-          
           if (currentUser) {
             const myProfileRef = window.fbRef(window.db, `users/${currentUser.uid}`);
             window.fbOnValue(myProfileRef, (snap) => {
               const myData = snap.val();
-              
               if (myData && myData.role === 'admin') {
                 setIsAdmin(true);
                 setUsersError(null);
                 
-                // Fetch dynamic pages list
                 const pagesRef = window.fbRef(window.db, 'pages');
                 window.fbOnValue(pagesRef, (pagesSnap) => {
                   const data = pagesSnap.val() || {};
                   setDynamicPages(Object.values(data));
                 });
 
-                // Fetch all users
                 const allUsersRef = window.fbRef(window.db, 'users');
                 window.fbOnValue(allUsersRef, (usersSnap) => {
                   setAllUsers(usersSnap.val() || {});
@@ -324,15 +319,12 @@
         return () => unsubscribeAuth();
       }, []);
 
-      // Load permissions when an access modal opens
       useEffect(() => {
         if (!selectedPage || !isAdmin) return;
-        
         const permsRef = window.fbRef(window.db, `page_access/${selectedPage.id}`);
         const listener = window.fbOnValue(permsRef, (snapshot) => {
           setPermissions(snapshot.val() || {});
         });
-
         return () => window.fbOff(permsRef, 'value', listener);
       }, [selectedPage, isAdmin]);
 
@@ -348,14 +340,11 @@
         });
       };
 
-      // Create a New Page
       const handleCreatePage = () => {
         if (!newPage.id || !newPage.name) {
            return alert("Node ID and Display Name are required!");
         }
-        
         const safeId = newPage.id.toLowerCase().replace(/[^a-z0-9_]/g, '');
-        
         const newPageRef = window.fbRef(window.db, `pages/${safeId}`);
         window.fbSet(newPageRef, {
           id: safeId,
@@ -378,7 +367,6 @@
         });
       }, [allUsers, searchTerm]);
 
-      // Combine Hardcoded + Dynamic Pages
       const allDisplayPages = [...PAGE_CATEGORIES, ...dynamicPages];
 
       return (
@@ -415,7 +403,6 @@
               <span>Request Join</span>
             </a>
 
-            {/* Active highlight moved to Page Access! */}
             <a href="page_access.html" className="nav-btn active">
               <i className="fas fa-shield-halved"></i>
               <span>Page Access</span>
@@ -425,7 +412,7 @@
           {/* =========================================
               MAIN CONTENT 
               ========================================= */}
-          <div className="main-content-wrapper" style={{padding: '40px 20px', width: '100%', maxWidth: '1100px'}}>
+          <main className="main-content">
             <header>
               <h1>Page Access Control</h1>
               
@@ -475,7 +462,7 @@
                 </div>
               ))}
             </div>
-          </div>
+          </main>
 
           {/* -----------------------------
               MODAL 1: ACCESS CONTROL 
