@@ -708,7 +708,6 @@
                 
                 const bio = data.bio || "No bio set.";
                 const pic = data.profilePicture || "https://via.placeholder.com/150";
-                const role = (data.role || "member").toLowerCase();
                 const bannerColor = data.bannerColor || "#27272a"; 
                 
                 const bannerEl = document.querySelector('.banner');
@@ -729,14 +728,22 @@
                 document.getElementById('mobile-sidebar-email').innerText = user.email;
                 document.getElementById('mobile-sidebar-pic').src = pic;
 
-                // Role & Admin
+                // Role & Admin Fix
+                const rawRole = (data.role || "member").toLowerCase();
+                
+                // Force "user" to display as "MEMBER"
+                let displayRoleText = rawRole.toUpperCase();
+                if (displayRoleText === "USER") {
+                    displayRoleText = "MEMBER";
+                }
+                
                 const roleEl = document.getElementById('user-role');
                 const displayRoleEl = document.getElementById('display-role');
                 
-                roleEl.innerText = role.toUpperCase();
-                displayRoleEl.innerText = role.toUpperCase();
+                roleEl.innerText = displayRoleText;
+                displayRoleEl.innerText = displayRoleText;
                 
-                const isAdm = role === 'admin';
+                const isAdm = rawRole === 'admin';
                 const statusTxt = isAdm ? "ADMIN ACCESS" : "MEMBER ACCESS";
                 
                 if(document.getElementById("status-text-pc")) document.getElementById("status-text-pc").innerText = statusTxt;
