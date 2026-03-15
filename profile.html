@@ -702,7 +702,10 @@
             // 1. Fetch Profile
             db.ref('users/' + uid).on('value', snap => {
                 const data = snap.val() || {};
-                const name = data.name || "Member";
+                
+                // FIX APPLIED HERE: Looks for name, then telegramUsername, then defaults to Member
+                const name = data.name || data.telegramUsername || "Member";
+                
                 const bio = data.bio || "No bio set.";
                 const pic = data.profilePicture || "https://via.placeholder.com/150";
                 const role = (data.role || "member").toLowerCase();
