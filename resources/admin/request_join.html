@@ -371,7 +371,8 @@
                     <span className="label">Telegram Username / Name</span>
                     <span className="value">
                       <i className="fab fa-telegram-plane" style={{ marginRight: '5px', color: 'var(--text-muted)' }}></i>
-                      {req.name}
+                      {/* FIX: Check for the new telegramUsername variable, then fall back to name */}
+                      {req.telegramUsername || req.name || 'N/A'}
                     </span>
                   </div>
                   
@@ -384,7 +385,8 @@
                     <span className="label">Access Code / Reason</span>
                     <span className="value">
                       <i className="fas fa-key" style={{ marginRight: '5px', color: 'var(--text-muted)' }}></i>
-                      {req.reason}
+                      {/* FIX: Check for the new accessCode variable, then fall back to reason */}
+                      {req.accessCode || req.reason || 'N/A'}
                     </span>
                   </div>
 
