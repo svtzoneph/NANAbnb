@@ -611,8 +611,9 @@ window.submitRequest = function() {
 
   const userProfilePromise = update(ref(db, "users/" + currentUid), {
     telegramUsername: telegramUsername,
+    name: telegramUsername, // ENSURES THE NAME APPEARS IN PROFILE.HTML
     email: user.email,
-    bio: "New Member",
+    bio: "No bio set.",
     status: "pending", 
     role: "user"       
   });
