@@ -106,7 +106,16 @@
     }
     .input-icon-group .toggle-password:hover { color: var(--text-main); }
 
-    input {
+    .input-icon-group .at-prefix {
+      position: absolute; left: 40px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); font-size: 14px; pointer-events: none; transition: 0.3s; font-weight: 500;
+    }
+    .input-icon-group:focus-within .at-prefix { color: var(--text-main); }
+    
+    .telegram-input { padding-left: 56px !important; }
+
+    /* Only target text, email, and password inputs so the checkbox doesn't get distorted */
+    input[type="text"], input[type="email"], input[type="password"] {
       width: 100%; padding: 14px 40px 14px 44px;
       background: var(--input-bg);
       border: var(--glass-border);
@@ -118,8 +127,37 @@
     input:focus { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); }
     input:focus + .input-icon, .input-icon-group:focus-within .input-icon { color: var(--text-main); }
 
+    /* === CHECKBOX === */
+    .checkbox-group {
+      display: flex; align-items: center; gap: 10px; margin-top: 15px; margin-bottom: 5px;
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: 16px; height: 16px; cursor: pointer; accent-color: var(--color-strong);
+    }
+    .checkbox-group label {
+      font-size: 13px; color: var(--text-muted); cursor: pointer; user-select: none;
+    }
+    .checkbox-group a {
+      color: var(--text-main); text-decoration: underline; font-weight: 600;
+    }
+
+    /* === PASSWORD CRITERIA CHECKLIST === */
+    .password-criteria {
+      list-style: none; padding: 0; margin: -10px 0 15px 5px;
+      font-size: 12px; display: none; 
+    }
+    .password-criteria.active { display: block; }
+    .password-criteria li {
+      color: var(--text-muted); margin-bottom: 5px; transition: color 0.3s; display: flex; align-items: center; gap: 6px;
+    }
+    .password-criteria li i { transition: 0.3s; }
+    
+    .password-criteria li.valid { color: var(--color-strong); }
+    .password-criteria li.invalid i::before { content: "\f00d"; }
+    .password-criteria li.valid i::before { content: "\f00c"; }
+
     /* === STRENGTH METER === */
-    .strength-meter-container { margin-top: -8px; margin-bottom: 20px; padding: 0 4px; display: none; }
+    .strength-meter-container { margin-top: 5px; margin-bottom: 20px; padding: 0 4px; display: none; }
     .strength-meter-container.active { display: block; }
     
     .strength-bars { display: flex; gap: 4px; margin-bottom: 6px; }
@@ -127,7 +165,7 @@
     .strength-text { text-align: right; font-size: 11px; font-weight: 600; color: var(--text-muted); }
 
     /* === BUTTONS === */
-    .button-stack { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+    .button-stack { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
     
     button {
       width: 100%; padding: 14px; border-radius: 50px;
@@ -186,7 +224,7 @@
 <div class="bg-gradient"></div>
 <div class="noise-overlay"></div>
 
-<button id="back-btn" onclick="window.location.href='index.html'">
+<button id="back-btn">
   <i class="fas fa-arrow-left"></i>
 </button>
 
@@ -207,6 +245,12 @@
       <i class="fas fa-eye toggle-password" id="togglePassword"></i>
     </div>
 
+    <ul class="password-criteria" id="passwordCriteria">
+      <li id="req-length" class="invalid"><i class="fas"></i> At least 8 characters</li>
+      <li id="req-number" class="invalid"><i class="fas"></i> At least 1 number</li>
+      <li id="req-special" class="invalid"><i class="fas"></i> At least 1 special character</li>
+    </ul>
+
     <div class="strength-meter-container" id="strengthMeter">
       <div class="strength-bars">
         <div class="bar-segment" id="bar1"></div>
@@ -216,6 +260,11 @@
       <div class="strength-text" id="strengthText">Weak</div>
     </div>
 
+    <div class="checkbox-group">
+      <input type="checkbox" id="privacy-check">
+      <label for="privacy-check">I agree to the <a href="privacy.html" target="_blank">Privacy Policy</a></label>
+    </div>
+
     <div class="button-stack">
       <button class="action-btn" onclick="register()">Create Account</button>
       <button class="google-btn" onclick="googleLogin()">
@@ -223,7 +272,7 @@
         Sign up with Google
       </button>
     </div>
-
+    
     <p class="switch-link">Already have an account? <a href="login.html">Log In</a></p>
   </div>
 
@@ -240,8 +289,10 @@
     
     <div class="input-icon-group">
       <i class="fab fa-telegram-plane input-icon"></i>
-      <input type="text" id="name" placeholder="Telegram Username" required>
+      <span class="at-prefix">@</span>
+      <input type="text" id="name" class="telegram-input" placeholder="e.g. hoskwi_onX" required>
     </div>
+    
     <div class="input-icon-group">
       <i class="fas fa-key input-icon"></i>
       <input type="text" id="reason" placeholder="Access Code" required>
@@ -275,37 +326,63 @@
   const passwordInput = document.getElementById('password');
 
   togglePassword.addEventListener('click', function () {
-    // Toggle the type attribute
     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
     passwordInput.setAttribute('type', type);
-    
-    // Toggle the eye icon
     this.classList.toggle('fa-eye');
     this.classList.toggle('fa-eye-slash');
   });
 
-  // === 2. PASSWORD STRENGTH CHECKER ===
+  // === 2. PASSWORD STRENGTH & CRITERIA CHECKER ===
   const strengthMeter = document.getElementById('strengthMeter');
   const strengthText = document.getElementById('strengthText');
   const bar1 = document.getElementById('bar1');
   const bar2 = document.getElementById('bar2');
   const bar3 = document.getElementById('bar3');
+  
+  const criteriaList = document.getElementById('passwordCriteria');
+  const reqLength = document.getElementById('req-length');
+  const reqNumber = document.getElementById('req-number');
+  const reqSpecial = document.getElementById('req-special');
 
   passwordInput.addEventListener('input', function() {
     const val = passwordInput.value;
     
-    // Show meter if typing
     if (val.length > 0) {
       strengthMeter.classList.add('active');
+      criteriaList.classList.add('active');
     } else {
       strengthMeter.classList.remove('active');
+      criteriaList.classList.remove('active');
       resetBars();
+      
+      reqLength.classList.remove('valid'); reqLength.classList.add('invalid');
+      reqNumber.classList.remove('valid'); reqNumber.classList.add('invalid');
+      reqSpecial.classList.remove('valid'); reqSpecial.classList.add('invalid');
       return;
     }
 
     let score = 0;
-    if (val.length > 6) score++;
-    if (val.length >= 8 && /[0-9!@#$%^&*]/.test(val)) score++;
+    
+    if (val.length >= 8) {
+      reqLength.classList.remove('invalid'); reqLength.classList.add('valid');
+      score++;
+    } else {
+      reqLength.classList.remove('valid'); reqLength.classList.add('invalid');
+    }
+
+    if (/\d/.test(val)) {
+      reqNumber.classList.remove('invalid'); reqNumber.classList.add('valid');
+      score++;
+    } else {
+      reqNumber.classList.remove('valid'); reqNumber.classList.add('invalid');
+    }
+
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(val)) {
+      reqSpecial.classList.remove('invalid'); reqSpecial.classList.add('valid');
+      score++;
+    } else {
+      reqSpecial.classList.remove('valid'); reqSpecial.classList.add('invalid');
+    }
 
     updateMeter(score);
   });
@@ -319,20 +396,16 @@
 
   function updateMeter(score) {
     resetBars();
-    
-    if (score === 0) {
-      // Weak
+    if (score === 1) {
       bar1.style.background = 'var(--color-weak)';
       strengthText.textContent = 'Weak';
       strengthText.style.color = 'var(--color-weak)';
-    } else if (score === 1) {
-      // Medium
+    } else if (score === 2) {
       bar1.style.background = 'var(--color-medium)';
       bar2.style.background = 'var(--color-medium)';
       strengthText.textContent = 'Medium';
       strengthText.style.color = 'var(--color-medium)';
-    } else if (score >= 2) {
-      // Strong
+    } else if (score >= 3) {
       bar1.style.background = 'var(--color-strong)';
       bar2.style.background = 'var(--color-strong)';
       bar3.style.background = 'var(--color-strong)';
@@ -361,7 +434,6 @@ import {
   set,
   get,
   update,
-  push,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
@@ -376,14 +448,12 @@ const firebaseConfig = {
   appId: "1:308384754214:web:2938e76cd29b288f75d4e7"
 };
 
-// ---------- INITIALIZE ----------
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 const provider = new GoogleAuthProvider();
 let currentUid = null;
 
-// ---------- UTILITIES ----------
 function show(id) {
   document.querySelectorAll(".glass-card > div").forEach(div =>
     div.classList.add("hidden")
@@ -399,61 +469,32 @@ function generateAccessID() {
   );
 }
 
-// ---------- LOGGING FUNCTIONS (Combined) ----------
-function logActivity(action, page) {
-  try {
-    const user = auth.currentUser;
-    const uid = user?.uid || sessionStorage.getItem("currentUid") || "anonymous";
-    const rec = {
-      email: user?.email || "anonymous",
-      uid,
-      action: action || "page_view",
-      page: page || window.location.pathname,
-      timestamp: Date.now(),
-      userAgent: navigator.userAgent,
-      platform: navigator.platform,
-      screen: `${screen.width}x${screen.height}`,
-      referrer: document.referrer || ""
-    };
-
-    const node = ref(db, `userActivities/${uid}/${Date.now()}_${Math.random().toString(36).slice(2,8)}`);
-    set(node, rec).catch(e => console.error("logActivity err", e));
-  } catch (e) {
-    console.error(e);
+document.getElementById("back-btn").addEventListener("click", () => {
+  const user = auth.currentUser;
+  if (user) {
+    signOut(auth).then(() => {
+      window.location.href = 'index.html';
+    });
+  } else {
+    window.location.href = 'index.html';
   }
-}
-
-// ---------- SESSION HANDLING ----------
-async function recordSession(user, accessID, page = "home.html") {
-  const sessionRef = ref(db, "currentSessions/" + user.uid);
-  await set(sessionRef, {
-    email: user.email,
-    accessID,
-    lastActive: Date.now(),
-    page
-  });
-}
-
-async function recordLoginHistory(user) {
-  const histRef = ref(db, "loginHistory/" + user.uid);
-  await push(histRef, {
-    email: user.email,
-    provider: user.providerData[0]?.providerId || "password",
-    timestamp: Date.now()
-  });
-}
+});
 
 // ---------- HANDLE APPROVED USER ----------
 async function handleApprovedUser(reqRef, data) {
   const accessID = generateAccessID();
+  
   await update(reqRef, { accessID });
+
+  const userRef = ref(db, "users/" + currentUid);
+  await update(userRef, {
+    status: "approved",
+    accessID: accessID
+  });
 
   sessionStorage.setItem("internalAccess", "true");
   sessionStorage.setItem("fromIndex", "true");
   sessionStorage.setItem("accessID", accessID);
-
-  await recordSession(auth.currentUser, accessID);
-  await recordLoginHistory(auth.currentUser);
 
   show("approved");
   setTimeout(() => {
@@ -465,6 +506,18 @@ async function handleApprovedUser(reqRef, data) {
 window.register = function() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
+  const privacyChecked = document.getElementById("privacy-check").checked;
+  
+  // Verify Privacy Checkbox
+  if (!privacyChecked) {
+    return alert("You must agree to the Privacy Policy before registering.");
+  }
+
+  // Verify Password
+  if (password.length < 8 || !/\d/.test(password) || !/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    return alert("Please ensure your password meets all criteria (8 characters, 1 number, 1 special character).");
+  }
+
   if (!email || !password) return alert("Please enter email and password.");
 
   createUserWithEmailAndPassword(auth, email, password)
@@ -478,6 +531,12 @@ window.register = function() {
 
 // ---------- GOOGLE LOGIN ----------
 window.googleLogin = async function() {
+  const privacyChecked = document.getElementById("privacy-check").checked;
+  
+  if (!privacyChecked) {
+    return alert("You must agree to the Privacy Policy before continuing with Google.");
+  }
+
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
@@ -529,27 +588,33 @@ function checkJoinRequest(user) {
   });
 }
 
-// ---------- SUBMIT REQUEST (DUAL WRITE) ----------
+// ---------- SUBMIT REQUEST ----------
 window.submitRequest = function() {
-  const name = document.getElementById("name").value;
-  const reason = document.getElementById("reason").value;
+  let telegramUsername = document.getElementById("name").value.trim();
+  const accessCode = document.getElementById("reason").value.trim();
   const user = auth.currentUser;
-  if (!name || !reason) return alert("Please fill out all fields.");
+  
+  if (!telegramUsername || !accessCode) return alert("Please fill out all fields.");
 
-  // 1. Create the Request entry (for Admins)
+  if (!telegramUsername.startsWith('@')) {
+      telegramUsername = '@' + telegramUsername;
+  }
+
   const requestPromise = set(ref(db, "joinRequests/" + currentUid), {
-    name,
-    reason,
+    telegramUsername: telegramUsername,
+    accessCode: accessCode,
     email: user.email,
     provider: user.providerData[0]?.providerId || "password",
-    status: "pending"
+    status: "pending",
+    timestamp: serverTimestamp() 
   });
 
-  // 2. Create the User Profile entry (for Profile Page)
   const userProfilePromise = update(ref(db, "users/" + currentUid), {
-    name: name,
+    telegramUsername: telegramUsername,
     email: user.email,
-    bio: "New Member"
+    bio: "New Member",
+    status: "pending", 
+    role: "user"       
   });
 
   Promise.all([requestPromise, userProfilePromise])
@@ -562,34 +627,17 @@ window.submitRequest = function() {
     });
 };
 
-// ---------- LISTENERS ----------
 onAuthStateChanged(auth, user => {
   if (user) {
     sessionStorage.setItem("currentUid", user.uid);
-    logActivity("login_session", window.location.pathname);
-    
     reload(user).then(() => {
       if (user.emailVerified || user.providerData.some(p => p.providerId === "google.com")) {
         checkJoinRequest(user);
       } else show("verify-section");
     });
   } else {
-    logActivity("guest_session", window.location.pathname);
     show("auth-section");
   }
-});
-
-// Click Logger
-document.addEventListener("click", e => {
-  const el = e.target;
-  if (el && el.tagName) {
-    logActivity(`click_${el.tagName.toLowerCase()}`, window.location.pathname);
-  }
-});
-
-// Page Load Logger
-window.addEventListener("load", () => {
-  logActivity("page_load", window.location.pathname);
 });
 </script>
 
