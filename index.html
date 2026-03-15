@@ -74,7 +74,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    /* === MAIN LAYOUT WRAPPER (THE FIX) === */
+    /* === MAIN LAYOUT WRAPPER === */
     #main-app-content {
         opacity: 0;
         transition: opacity 0.8s ease;
@@ -213,7 +213,6 @@
       position: relative; transform: scale(0.95); animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       overflow: hidden; display: flex; flex-direction: column;
     }
-    /* About Modal Specifics */
     #aboutModal .modal-box { max-width: 650px; max-height: 85vh; }
     
     @keyframes popIn { to { transform: scale(1); opacity: 1; } }
@@ -228,7 +227,6 @@
 
     .modal-content { padding: 30px 25px; text-align: center; overflow-y: auto; max-height: 70vh; }
     
-    /* Scrollbar for Modal */
     .modal-content::-webkit-scrollbar { width: 4px; }
     .modal-content::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
 
@@ -384,13 +382,13 @@
           <div class="badge">Zone Vault 2.0</div>
           <h1>Watch. Enjoy.<br>Stay Private.</h1>
           <p>A secure, permission-based sanctuary for exclusive content. Watch your favorites and more in high-fidelity private streams.</p>
-           
-          <div class="cta-group">
-            <a href="home" class="btn-primary">
-                Start Watching
-            </a>
             
-            <a href="download" class="btn-outline">
+          <div class="cta-group">
+            <button onclick="openModal()" class="btn-primary">
+                <i class="fas fa-lock"></i> Get Access
+            </button>
+            
+            <a href="https://raw.githubusercontent.com/svtzoneph/NANAbnb/refs/heads/main/apps/Zone%20Vault.apk" class="btn-outline" download>
                <i class="fab fa-android"></i> Download App
             </a>
           </div>
@@ -409,8 +407,8 @@
             </div>
             <p>To maintain security and exclusivity, Zone Vault requires an account. Please log in or register to continue.</p>
             <div class="modal-actions">
-              <a href="login" class="btn-primary btn-full">Log In to Account</a>
-              <a href="register" class="btn-outline btn-full">Create New Account</a>
+              <a href="login.html" class="btn-primary btn-full">Log In to Account</a>
+              <a href="register.html" class="btn-outline btn-full">Create New Account</a>
             </div>
           </div>
         </div>
@@ -562,15 +560,12 @@
       if (notification) {
         notification.classList.remove("show");
       }
-      // Removed the localStorage setItem here so it always shows
     }
     
     window.onload = function() {
         const modalShown = localStorage.getItem('welcomeModalShown');
-        // Uncomment to force welcome modal
-        // if (!modalShown) openModal(); 
 
-        // Trigger App Notification after 2.5 seconds (always runs)
+        // Trigger App Notification after 2.5 seconds
         setTimeout(() => {
             const appNotif = document.getElementById('appNotification');
             if (appNotif) {
@@ -589,7 +584,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    // ADDED ref and get for checking approval status
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 
@@ -606,17 +602,37 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getDatabase(app); // Initialized database
     const messaging = getMessaging(app);
     const vapidKey = "BM9NB-Q0-KYbhwad-5lhztW0BMpRjKBs67IOtQ7uLBZUKgzmmSmPferlpJnyVbmjo4LlvX0cVF2G_zX1OOHldyE";
 
-    // --- PRELOADER & AUTH CHECK ---
+    // --- PRELOADER & SMART AUTH ROUTING ---
     const loader = document.getElementById('auth-loader');
     const mainContent = document.getElementById('main-app-content');
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
-        console.log("User detected. Redirecting to Home...");
-        window.location.href = "home.html";
+        console.log("User detected. Checking approval status...");
+        
+        try {
+            // Check their status in the database first
+            const reqRef = ref(db, "joinRequests/" + user.uid);
+            const snapshot = await get(reqRef);
+            const data = snapshot.val();
+            
+            // If they are fully approved, route straight to home.html
+            if (data && data.status === "approved") {
+                window.location.href = "home.html";
+            } else {
+                // If they are pending, denied, or haven't finished the form, route to register.html
+                window.location.href = "register.html";
+            }
+        } catch (error) {
+            console.error("Error checking status:", error);
+            // Fallback: send to register page if there's a network issue
+            window.location.href = "register.html"; 
+        }
+
       } else {
         console.log("No user logged in. Showing Landing Page.");
         loader.style.opacity = '0';
