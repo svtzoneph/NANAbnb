@@ -294,28 +294,32 @@
               SIDEBAR 
               ========================================= */}
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
-          <aside className={`sidebar ${sidebarOpen ? 'active' : ''}`}>
-            <div style={{marginBottom: '40px', paddingLeft: '15px'}}>
-              <h3 style={{fontSize: '22px', fontWeight: '700'}}>Admin Panel</h3>
-              <p style={{fontSize: '13px', color: 'var(--text-muted)'}}>Management Suite</p>
-            </div>
+         <aside class="sidebar">
+  <div style="margin-bottom: 40px; padding-left: 15px;">
+    <h3 style="font-size: 22px; font-weight: 700;">Admin Panel</h3>
+    <p style="font-size: 13px; color: var(--text-muted);">Management Suite</p>
+  </div>
 
-            <a href="panel.html" className="nav-btn">
-              <i className="fas fa-house"></i>
-              <span>Admin Home</span>
-            </a>
+  <a href="panel" class="nav-btn">
+    <i class="fas fa-house"></i>
+    <span>Admin Home</span>
+  </a>
 
-            {/* This is the active page, so the highlight goes here! */}
-            <a href="request_join.html" className="nav-btn active">
-              <i className="fas fa-user-plus"></i>
-              <span>Request Join</span>
-            </a>
+  <a href="request_join" class="nav-btn">
+    <i class="fas fa-user-plus"></i>
+    <span>Request Join</span>
+  </a>
 
-            <a href="page_access.html" className="nav-btn">
-              <i className="fas fa-shield-halved"></i>
-              <span>Page Access</span>
-            </a>
-          </aside>
+  <a href="generator" class="nav-btn active">
+    <i class="fas fa-key"></i>
+    <span>Access Codes</span>
+  </a>
+
+  <a href="page_access" class="nav-btn">
+    <i class="fas fa-shield-halved"></i>
+    <span>Page Access</span>
+  </a>
+</aside>
 
           {/* =========================================
               MAIN CONTENT 
