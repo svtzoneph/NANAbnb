@@ -262,8 +262,21 @@
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--zv-liquid-bg); border: var(--zv-liquid-border); box-shadow: var(--zv-liquid-shadow); color: var(--text-main); padding: 14px 28px; border-radius: 30px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 12px; z-index: 9999; opacity: 0; pointer-events: none; backdrop-filter: var(--zv-liquid-blur); -webkit-backdrop-filter: var(--zv-liquid-blur); transition: all 0.6s ease; }
     .toast.show { bottom: 50px; opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .access-denied-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(3,3,5,0.85); display: flex; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
-    .access-card { background: var(--zv-liquid-bg); border: var(--zv-liquid-border); padding: 40px; border-radius: 30px; text-align: center; color: var(--text-main); max-width: 420px; width: 90%; box-shadow: var(--zv-liquid-shadow); }
+    /* =========================================
+       UPDATED: SOLID GRAY MODAL (Anti-Inspect)
+       ========================================= */
+    .access-denied-modal { 
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+        background: #050505; /* Solid Black Background to hide wiped content */
+        display: flex; align-items: center; justify-content: center; z-index: 10000; 
+    }
+    .access-card { 
+        background: #1c1c22; /* Solid Gray Box */
+        border: 1px solid rgba(255, 255, 255, 0.1); 
+        padding: 40px; border-radius: 30px; text-align: center; color: var(--text-main); 
+        max-width: 420px; width: 90%; 
+        box-shadow: 0 20px 40px rgba(0,0,0,0.8); 
+    }
     .access-icon-box { width: 70px; height: 70px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; border-top: 1px solid rgba(239, 68, 68, 0.5); }
     .access-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
     .access-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 25px; }
@@ -794,6 +807,7 @@
 
     // --- GLOBAL FLAG FOR MODALS ---
     window.isKickedOut = false;
+    let expirationTimer = null; // NEW: Timer variable
 
     // --- ANTI-INSPECT MODAL GENERATOR ---
     function showAccessDeniedModal(title, desc, extraHtml = '') {
@@ -801,8 +815,7 @@
         
         // 1. WIPE ENTIRE DOM CONTENT to prevent inspect element bypass
         document.body.innerHTML = `
-          <div class="bg-gradient"></div>
-          <div class="noise-overlay"></div>
+          <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: -2;"></div>
         `;
         
         const modal = document.createElement('div');
@@ -833,19 +846,19 @@
     function showExpiredModal(code, timestamp) {
         const expiryDate = new Date(timestamp).toLocaleString();
         const codeInfoHtml = `
-            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); text-align: left;">
-                <p style="margin-bottom: 5px; font-size: 13px; color: var(--text-muted);">Used Code:</p>
-                <p style="font-family: monospace; font-size: 16px; color: var(--code-accent); font-weight: bold; margin-bottom: 12px;">${code}</p>
+            <div style="background: #282830; padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                <p style="margin-bottom: 5px; font-size: 13px; color: #a1a1aa;">Used Code:</p>
+                <p style="font-family: monospace; font-size: 16px; color: #38bdf8; font-weight: bold; margin-bottom: 12px;">${code}</p>
                 
-                <p style="margin-bottom: 5px; font-size: 13px; color: var(--text-muted);">Expired On:</p>
-                <p style="font-size: 14px; color: var(--admin-color); font-weight: 600;">${expiryDate}</p>
+                <p style="margin-bottom: 5px; font-size: 13px; color: #a1a1aa;">Expired On:</p>
+                <p style="font-size: 14px; color: #ef4444; font-weight: 600;">${expiryDate}</p>
             </div>
         `;
         sessionStorage.clear();
         showAccessDeniedModal("Access Expired", "Your time-limited access to Zone Vault has ended. You must request a new code to continue.", codeInfoHtml);
     }
 
-    // --- AUTH & ACTIVE EXPIRATION CHECK ---
+    // --- AUTH & ACTIVE EXPIRATION CHECK WITH AUTO-TIMER ---
     auth.onAuthStateChanged(user => {
         if (user) {
             sessionStorage.setItem('internalAccess', 'true');
@@ -887,14 +900,28 @@
                             const usedCode = reqData.usedCode; 
 
                             if (usedCode) {
-                                db.ref(`validCodes/${usedCode}`).once('value').then(codeSnap => {
+                                db.ref(`validCodes/${usedCode}`).on('value', codeSnap => {
                                     if (codeSnap.exists()) {
                                         const codeData = codeSnap.val();
-                                        if (Date.now() > codeData.expiresAt) {
+                                        const timeLeft = codeData.expiresAt - Date.now();
+                                        
+                                        // Clear any existing timer so they don't overlap
+                                        if (expirationTimer) clearTimeout(expirationTimer);
+
+                                        if (timeLeft <= 0) {
+                                            // Expired already!
                                             showExpiredModal(usedCode, codeData.expiresAt);
                                             auth.signOut(); 
+                                        } else {
+                                            // Set a precise timer to auto-kick them the millisecond it expires
+                                            expirationTimer = setTimeout(() => {
+                                                showExpiredModal(usedCode, codeData.expiresAt);
+                                                auth.signOut();
+                                            }, timeLeft);
                                         }
                                     } else {
+                                        // Code deleted by admin
+                                        if (expirationTimer) clearTimeout(expirationTimer);
                                         showExpiredModal(usedCode, Date.now()); 
                                         auth.signOut();
                                     }
