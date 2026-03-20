@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Generate Access Code | Zone Vault</title>
+  <title>Admin Dashboard | Zone Vault</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,6 +21,7 @@
         --input-bg: rgba(255, 255, 255, 0.05);
         --active: #22c55e;
         --expired: #ef4444;
+        --used: #eab308; /* NEW: Yellow for Used Codes */
         --accent: #38bdf8;
         --sidebar-width: 280px;
     }
@@ -116,6 +117,8 @@
     tr:last-child td { border-bottom: none; }
     .status-active { color: var(--active); font-weight: 600; }
     .status-expired { color: var(--expired); font-weight: 600; }
+    .status-used { color: var(--used); font-weight: 600; } /* Added Status Used Style */
+
     .code-cell { font-family: monospace; font-size: 15px; display: flex; align-items: center; gap: 8px;}
     .btn-delete { background: transparent; color: var(--expired); padding: 6px 12px; font-size: 12px; border-radius: 8px; border: 1px solid var(--expired); }
     .btn-delete:hover { background: var(--expired); color: #fff; box-shadow: none; transform: none;}
@@ -229,7 +232,7 @@
                 <p class="subtitle" style="margin: 0;">View and manage active/expired codes.</p>
             </div>
             <button class="btn-danger-outline" onclick="clearExpiredCodes()">
-                <i class="fas fa-broom"></i> Clean Expired
+                <i class="fas fa-broom"></i> Clean Used & Expired
             </button>
         </div>
         
@@ -256,7 +259,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getDatabase, ref, set, onValue, remove, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  import { getDatabase, ref, set, onValue, remove, get, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   const firebaseConfig = {
@@ -349,7 +352,8 @@
     try {
       await set(ref(db, "validCodes/" + finalCode), {
         expiresAt: expiryTimestamp,
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        used: false // NEW: Initialize as unused
       });
       
       lastGeneratedCode = finalCode;
@@ -384,8 +388,20 @@
 
       codesArray.forEach((codeData) => {
         const isExpired = currentTime > codeData.expiresAt;
-        const statusClass = isExpired ? "status-expired" : "status-active";
-        const statusText = isExpired ? "Expired" : "Active";
+        const isUsed = codeData.used === true;
+        
+        let statusClass = "status-active";
+        let statusText = "Active";
+        
+        // NEW: Status logic for single-use codes
+        if (isUsed) {
+            statusClass = "status-used";
+            statusText = `Used by ${codeData.usedBy || 'User'}`;
+        } else if (isExpired) {
+            statusClass = "status-expired";
+            statusText = "Expired";
+        }
+
         const dateString = new Date(codeData.expiresAt).toLocaleString();
 
         const row = document.createElement("tr");
@@ -415,9 +431,9 @@
     }
   };
 
-  // === CLEAR ALL EXPIRED CODES ===
+  // === CLEAR ALL EXPIRED/USED CODES ===
   window.clearExpiredCodes = async function() {
-      if (!confirm("Delete all expired codes? This cannot be undone.")) return;
+      if (!confirm("Delete all expired and used codes? This cannot be undone.")) return;
 
       try {
           const snapshot = await get(ref(db, "validCodes"));
@@ -427,7 +443,9 @@
               const updates = {};
 
               snapshot.forEach((child) => {
-                  if (currentTime > child.val().expiresAt) {
+                  const codeData = child.val();
+                  // NEW: Sweeps up used codes as well
+                  if (currentTime > codeData.expiresAt || codeData.used === true) {
                       updates[child.key] = null; 
                       deleteCount++;
                   }
@@ -435,14 +453,14 @@
 
               if (deleteCount > 0) {
                   await update(ref(db, "validCodes"), updates);
-                  showToast(`Successfully deleted ${deleteCount} expired code(s).`);
+                  showToast(`Successfully deleted ${deleteCount} code(s).`);
               } else {
-                  showToast("No expired codes found to delete.");
+                  showToast("No expired or used codes found to delete.");
               }
           }
       } catch (error) {
-          console.error("Error clearing expired codes:", error);
-          alert("Failed to clear expired codes.");
+          console.error("Error clearing codes:", error);
+          alert("Failed to clear codes.");
       }
   };
 </script>
