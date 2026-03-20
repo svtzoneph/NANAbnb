@@ -443,7 +443,7 @@ document.getElementById("back-btn").addEventListener("click", () => {
   else { window.location.href = 'index.html'; }
 });
 
-// ---------- QUICK CODE LOGIN (THE BYPASS) ----------
+// ---------- QUICK CODE LOGIN (GUEST ENTRY / THE BYPASS) ----------
 window.quickCodeLogin = async function() {
   const code = document.getElementById("quick-code-input").value.trim();
   let nickname = document.getElementById("guest-name").value.trim();
@@ -461,6 +461,14 @@ window.quickCodeLogin = async function() {
 
     if (snapshot.exists()) {
       const codeData = snapshot.val();
+      
+      // NEW: Check if code is already used!
+      if (codeData.used === true) {
+         alert("❌ This code has already been used by someone else.");
+         btn.innerHTML = 'Unlock Vault'; btn.disabled = false;
+         return;
+      }
+
       if (Date.now() < codeData.expiresAt) {
         
         // --- BYPASS: Create a hidden email account ---
@@ -484,7 +492,13 @@ window.quickCodeLogin = async function() {
           status: "approved", accessID: newAccessID, timestamp: serverTimestamp() 
         });
 
-        await Promise.all([requestPromise, userProfilePromise]);
+        // NEW: Mark the Code as USED in the database!
+        const markCodeUsedPromise = update(ref(db, "validCodes/" + code), { 
+            used: true, 
+            usedBy: nickname 
+        });
+
+        await Promise.all([requestPromise, userProfilePromise, markCodeUsedPromise]);
 
         sessionStorage.setItem("internalAccess", "true");
         sessionStorage.setItem("fromIndex", "true");
@@ -614,6 +628,14 @@ window.submitRequest = async function() {
 
     if (snapshot.exists()) {
       const codeData = snapshot.val();
+      
+      // NEW: Check if code is already used!
+      if (codeData.used === true) {
+         alert("❌ This code has already been used by someone else.");
+         btn.innerHTML = 'Submit Code'; btn.disabled = false;
+         return;
+      }
+
       if (Date.now() < codeData.expiresAt) {
         
         const newAccessID = generateAccessID();
@@ -628,7 +650,13 @@ window.submitRequest = async function() {
           accessID: newAccessID, timestamp: serverTimestamp() 
         });
 
-        await Promise.all([requestPromise, userProfilePromise]);
+        // NEW: Mark the Code as USED in the database!
+        const markCodeUsedPromise = update(ref(db, "validCodes/" + accessCode), { 
+            used: true, 
+            usedBy: telegramUsername 
+        });
+
+        await Promise.all([requestPromise, userProfilePromise, markCodeUsedPromise]);
 
         sessionStorage.setItem("internalAccess", "true");
         sessionStorage.setItem("fromIndex", "true");
@@ -652,7 +680,7 @@ window.submitRequest = async function() {
   }
 };
 
-// ---------- AUTH STATE LISTENER (UPDATED FOR BYPASS) ----------
+// ---------- AUTH STATE LISTENER ----------
 onAuthStateChanged(auth, user => {
   if (user) {
     sessionStorage.setItem("currentUid", user.uid);
