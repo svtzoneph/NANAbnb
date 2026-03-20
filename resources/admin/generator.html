@@ -21,7 +21,7 @@
         --input-bg: rgba(255, 255, 255, 0.05);
         --active: #22c55e;
         --expired: #ef4444;
-        --used: #eab308; /* NEW: Yellow for Used Codes */
+        --used: #eab308; /* Yellow for Active but Used Codes */
         --accent: #38bdf8;
         --sidebar-width: 280px;
     }
@@ -115,9 +115,10 @@
     th, td { padding: 16px; text-align: left; border-bottom: var(--glass-border); }
     th { color: var(--text-muted); font-weight: 500; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;}
     tr:last-child td { border-bottom: none; }
+    
     .status-active { color: var(--active); font-weight: 600; }
     .status-expired { color: var(--expired); font-weight: 600; }
-    .status-used { color: var(--used); font-weight: 600; } /* Added Status Used Style */
+    .status-used { color: var(--used); font-weight: 600; }
 
     .code-cell { font-family: monospace; font-size: 15px; display: flex; align-items: center; gap: 8px;}
     .btn-delete { background: transparent; color: var(--expired); padding: 6px 12px; font-size: 12px; border-radius: 8px; border: 1px solid var(--expired); }
@@ -170,22 +171,22 @@
     <p style="font-size: 13px; color: var(--text-muted);">Management Suite</p>
   </div>
 
-  <a href="panel" class="nav-btn">
+  <a href="panel.html" class="nav-btn">
     <i class="fas fa-house"></i>
     <span>Admin Home</span>
   </a>
 
-  <a href="request_join" class="nav-btn">
+  <a href="request_join.html" class="nav-btn">
     <i class="fas fa-user-plus"></i>
     <span>Request Join</span>
   </a>
 
-  <a href="generator" class="nav-btn active">
+  <a href="admin-generator.html" class="nav-btn active">
     <i class="fas fa-key"></i>
     <span>Access Codes</span>
   </a>
 
-  <a href="page_access" class="nav-btn">
+  <a href="page_access.html" class="nav-btn">
     <i class="fas fa-shield-halved"></i>
     <span>Page Access</span>
   </a>
@@ -232,7 +233,7 @@
                 <p class="subtitle" style="margin: 0;">View and manage active/expired codes.</p>
             </div>
             <button class="btn-danger-outline" onclick="clearExpiredCodes()">
-                <i class="fas fa-broom"></i> Clean Used & Expired
+                <i class="fas fa-broom"></i> Clean Expired Codes
             </button>
         </div>
         
@@ -252,7 +253,8 @@
           </table>
         </div>
       </div>
-    </div> </div>
+    </div> 
+  </div>
 </main>
 
 <div id="toast">Code copied to clipboard!</div>
@@ -277,7 +279,6 @@
   const auth = getAuth(app);
   let lastGeneratedCode = "";
 
-  // === UI UTILS ===
   window.toggleSidebar = function() {
     document.querySelector('.sidebar').classList.toggle('active');
     document.querySelector('.sidebar-overlay').classList.toggle('active');
@@ -305,15 +306,11 @@
         const snapshot = await get(roleRef);
         
         if (snapshot.exists() && snapshot.val() === 'admin') {
-          // Success! Unlock UI
           overlay.classList.add('hidden');
           appContent.classList.remove('hidden');
           subtitle.innerHTML = `Logged in as Admin: <strong>${user.email}</strong>`;
-          
-          // ONLY load codes after we know they are an admin
           loadCodesTable(); 
         } else {
-          // Logged in, but NOT an admin
           authIcon.className = 'fas fa-shield-alt';
           authText.innerText = 'Access Restricted';
           authError.innerText = 'You do not have administrative privileges.';
@@ -325,7 +322,6 @@
         authError.innerText = error.message;
       }
     } else {
-      // Not logged in at all
       authIcon.className = 'fas fa-lock';
       authText.innerText = 'Authentication Required';
       authError.innerHTML = 'Please go back to the <a href="login.html" style="color:var(--accent);">Login page</a> and sign in.';
@@ -333,7 +329,6 @@
     }
   });
 
-  // === COPY FUNCTIONS ===
   window.copyToClipboard = function(text) {
       navigator.clipboard.writeText(text).then(() => showToast("Copied: " + text))
       .catch(err => console.error('Failed to copy: ', err));
@@ -353,7 +348,7 @@
       await set(ref(db, "validCodes/" + finalCode), {
         expiresAt: expiryTimestamp,
         createdAt: Date.now(),
-        used: false // NEW: Initialize as unused
+        used: false // Initialize as unused
       });
       
       lastGeneratedCode = finalCode;
@@ -391,15 +386,15 @@
         const isUsed = codeData.used === true;
         
         let statusClass = "status-active";
-        let statusText = "Active";
+        let statusText = "Active (Unused)";
         
-        // NEW: Status logic for single-use codes
-        if (isUsed) {
-            statusClass = "status-used";
-            statusText = `Used by ${codeData.usedBy || 'User'}`;
-        } else if (isExpired) {
+        // FIX: The status logic now correctly handles expired codes even if they are used
+        if (isExpired) {
             statusClass = "status-expired";
-            statusText = "Expired";
+            statusText = isUsed ? `Expired (Used by ${codeData.usedBy})` : "Expired (Unused)";
+        } else if (isUsed) {
+            statusClass = "status-used"; // Shows Yellow to indicate they are currently watching
+            statusText = `Active (Used by ${codeData.usedBy})`;
         }
 
         const dateString = new Date(codeData.expiresAt).toLocaleString();
@@ -431,9 +426,9 @@
     }
   };
 
-  // === CLEAR ALL EXPIRED/USED CODES ===
+  // === CLEAR ONLY EXPIRED CODES ===
   window.clearExpiredCodes = async function() {
-      if (!confirm("Delete all expired and used codes? This cannot be undone.")) return;
+      if (!confirm("Delete all expired codes? Active users will not be affected.")) return;
 
       try {
           const snapshot = await get(ref(db, "validCodes"));
@@ -444,8 +439,9 @@
 
               snapshot.forEach((child) => {
                   const codeData = child.val();
-                  // NEW: Sweeps up used codes as well
-                  if (currentTime > codeData.expiresAt || codeData.used === true) {
+                  
+                  // FIX: ONLY delete if the time is actually up. Do not delete active users!
+                  if (currentTime > codeData.expiresAt) {
                       updates[child.key] = null; 
                       deleteCount++;
                   }
@@ -453,9 +449,9 @@
 
               if (deleteCount > 0) {
                   await update(ref(db, "validCodes"), updates);
-                  showToast(`Successfully deleted ${deleteCount} code(s).`);
+                  showToast(`Successfully deleted ${deleteCount} expired code(s).`);
               } else {
-                  showToast("No expired or used codes found to delete.");
+                  showToast("No expired codes found to delete.");
               }
           }
       } catch (error) {
