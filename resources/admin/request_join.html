@@ -20,7 +20,7 @@
         --glass-border: 1px solid rgba(255, 255, 255, 0.08);
         --accent-approve: #22c55e;
         --accent-decline: #ef4444;
-        --sidebar-width: 280px; /* Added for sidebar */
+        --sidebar-width: 280px;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -44,7 +44,7 @@
     }
 
     /* =========================================
-       NEW: TOP NAV & SIDEBAR STYLES
+       TOP NAV & SIDEBAR STYLES
        ========================================= */
     .top-nav { width: 100%; padding: 20px 25px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 999; background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(15px); border-bottom: var(--glass-border); }
     .menu-trigger { font-size: 22px; cursor: pointer; color: var(--text-main); padding: 5px; }
@@ -67,7 +67,6 @@
       padding: 40px 20px; width: 100%; max-width: 1100px; margin: 0 auto;
     }
 
-    /* Typography & Header */
     header { text-align: center; margin-bottom: 40px; width: 100%; }
     h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
     p.subtitle { color: var(--text-muted); font-size: 16px; word-wrap: break-word; }
@@ -279,9 +278,7 @@
       return (
         <React.Fragment>
 
-          {/* =========================================
-              HEADER / TOP NAV
-              ========================================= */}
+          {/* === HEADER / TOP NAV === */}
           <nav className="top-nav">
             <div className="menu-trigger" onClick={() => setSidebarOpen(true)}>
               <i className="fas fa-bars-staggered"></i>
@@ -290,40 +287,36 @@
             <div style={{width: '24px'}}></div>
           </nav>
 
-          {/* =========================================
-              SIDEBAR 
-              ========================================= */}
+          {/* === SIDEBAR (FIXED JSX) === */}
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
-         <aside class="sidebar">
-  <div style="margin-bottom: 40px; padding-left: 15px;">
-    <h3 style="font-size: 22px; font-weight: 700;">Admin Panel</h3>
-    <p style="font-size: 13px; color: var(--text-muted);">Management Suite</p>
-  </div>
+          <aside className={`sidebar ${sidebarOpen ? 'active' : ''}`}>
+            <div style={{ marginBottom: '40px', paddingLeft: '15px' }}>
+              <h3 style={{ fontSize: '22px', fontWeight: '700' }}>Admin Panel</h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Management Suite</p>
+            </div>
 
-  <a href="panel" class="nav-btn">
-    <i class="fas fa-house"></i>
-    <span>Admin Home</span>
-  </a>
+            <a href="panel.html" className="nav-btn">
+              <i className="fas fa-house"></i>
+              <span>Admin Home</span>
+            </a>
 
-  <a href="request_join" class="nav-btn">
-    <i class="fas fa-user-plus"></i>
-    <span>Request Join</span>
-  </a>
+            <a href="request_join.html" className="nav-btn active">
+              <i className="fas fa-user-plus"></i>
+              <span>Request Join</span>
+            </a>
 
-  <a href="generator" class="nav-btn active">
-    <i class="fas fa-key"></i>
-    <span>Access Codes</span>
-  </a>
+            <a href="admin-generator.html" className="nav-btn">
+              <i className="fas fa-key"></i>
+              <span>Access Codes</span>
+            </a>
 
-  <a href="page_access" class="nav-btn">
-    <i class="fas fa-shield-halved"></i>
-    <span>Page Access</span>
-  </a>
-</aside>
+            <a href="page_access.html" className="nav-btn">
+              <i className="fas fa-shield-halved"></i>
+              <span>Page Access</span>
+            </a>
+          </aside>
 
-          {/* =========================================
-              MAIN CONTENT 
-              ========================================= */}
+          {/* === MAIN CONTENT === */}
           <main className="main-content">
             <header>
               <h1>Admin Dashboard</h1>
@@ -375,7 +368,6 @@
                     <span className="label">Telegram Username / Name</span>
                     <span className="value">
                       <i className="fab fa-telegram-plane" style={{ marginRight: '5px', color: 'var(--text-muted)' }}></i>
-                      {/* FIX: Check for the new telegramUsername variable, then fall back to name */}
                       {req.telegramUsername || req.name || 'N/A'}
                     </span>
                   </div>
@@ -389,7 +381,6 @@
                     <span className="label">Access Code / Reason</span>
                     <span className="value">
                       <i className="fas fa-key" style={{ marginRight: '5px', color: 'var(--text-muted)' }}></i>
-                      {/* FIX: Check for the new accessCode variable, then fall back to reason */}
                       {req.accessCode || req.reason || 'N/A'}
                     </span>
                   </div>
@@ -414,7 +405,7 @@
             </div>
           </main>
 
-          {/* Dynamic React Modal */}
+          {/* === MODAL === */}
           <div className={`modal-overlay ${modal.isOpen ? 'active' : ''}`}>
             <div className="modal-card">
               <i 
@@ -451,13 +442,11 @@
       );
     }
 
-    // This function guarantees React only mounts after Babel compiles it
     window.mountReactApp = () => {
       const root = ReactDOM.createRoot(document.getElementById('root'));
       root.render(<AdminDashboard />);
     };
 
-    // If Firebase module finished first, trigger the mount now
     if (window.firebaseIsReady) {
       window.mountReactApp();
     }
