@@ -405,7 +405,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getAuth, createUserWithEmailAndPassword, sendEmailVerification,
-  signInWithPopup, GoogleAuthProvider, signInAnonymously,
+  signInWithPopup, GoogleAuthProvider,
   onAuthStateChanged, reload, signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
@@ -443,7 +443,7 @@ document.getElementById("back-btn").addEventListener("click", () => {
   else { window.location.href = 'index.html'; }
 });
 
-// ---------- QUICK CODE LOGIN (GUEST ENTRY) ----------
+// ---------- QUICK CODE LOGIN (THE BYPASS) ----------
 window.quickCodeLogin = async function() {
   const code = document.getElementById("quick-code-input").value.trim();
   let nickname = document.getElementById("guest-name").value.trim();
@@ -463,17 +463,24 @@ window.quickCodeLogin = async function() {
       const codeData = snapshot.val();
       if (Date.now() < codeData.expiresAt) {
         
-        const userCred = await signInAnonymously(auth);
+        // --- BYPASS: Create a hidden email account ---
+        const randomNum = Math.floor(Math.random() * 1000000);
+        const dummyEmail = `guest_${randomNum}@zonevault.site`;
+        const dummyPassword = `GuestPass!${randomNum}`;
+
+        const userCred = await createUserWithEmailAndPassword(auth, dummyEmail, dummyPassword);
         const uid = userCred.user.uid;
+        // ---------------------------------------------
+
         const newAccessID = generateAccessID();
 
         const userProfilePromise = update(ref(db, "users/" + uid), {
-          name: nickname, telegramUsername: "Guest User", email: "No Email (Guest)",
+          name: nickname, telegramUsername: "Guest User", email: dummyEmail,
           bio: "I am a VIP guest.", status: "approved", role: "guest", accessID: newAccessID
         });
 
         const requestPromise = set(ref(db, "joinRequests/" + uid), {
-          telegramUsername: nickname, usedCode: code, email: "Guest", provider: "anonymous",
+          telegramUsername: nickname, usedCode: code, email: dummyEmail, provider: "password",
           status: "approved", accessID: newAccessID, timestamp: serverTimestamp() 
         });
 
@@ -495,7 +502,7 @@ window.quickCodeLogin = async function() {
     }
   } catch (error) {
     console.error(error);
-    alert("An error occurred. Please try again.");
+    alert("An error occurred. Please try again. " + error.message);
     btn.innerHTML = 'Unlock Vault'; btn.disabled = false;
   }
 };
@@ -528,7 +535,6 @@ window.register = function() {
 window.googleLogin = async function() {
   const privacyChecked = document.getElementById("privacy-check").checked;
   if (!privacyChecked) {
-      // Only show alert if they are on the actual register screen (not the quick code screen)
       if(!document.getElementById('auth-section').classList.contains('hidden')) {
           return alert("You must agree to the Privacy Policy before continuing with Google.");
       }
@@ -646,12 +652,16 @@ window.submitRequest = async function() {
   }
 };
 
-// ---------- AUTH STATE LISTENER ----------
+// ---------- AUTH STATE LISTENER (UPDATED FOR BYPASS) ----------
 onAuthStateChanged(auth, user => {
   if (user) {
     sessionStorage.setItem("currentUid", user.uid);
-    if (user.isAnonymous) {
-        checkJoinRequest(user);
+    
+    // --- BYPASS: Detect if the user is a generated guest ---
+    const isGuest = user.email && user.email.endsWith('@zonevault.site');
+
+    if (isGuest) {
+        checkJoinRequest(user); // Guests skip email verification completely
     } else {
         reload(user).then(() => {
           if (user.emailVerified || user.providerData.some(p => p.providerId === "google.com")) {
