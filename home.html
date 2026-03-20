@@ -792,22 +792,47 @@
         }
     }
 
-    // --- ACTIVE EXPIRATION MODAL SYSTEM ---
-    function showExpiredModal(code, timestamp) {
-        const expiryDate = new Date(timestamp).toLocaleString();
+    // --- GLOBAL FLAG FOR MODALS ---
+    window.isKickedOut = false;
+
+    // --- ANTI-INSPECT MODAL GENERATOR ---
+    function showAccessDeniedModal(title, desc, extraHtml = '') {
+        window.isKickedOut = true;
+        
+        // 1. WIPE ENTIRE DOM CONTENT to prevent inspect element bypass
+        document.body.innerHTML = `
+          <div class="bg-gradient"></div>
+          <div class="noise-overlay"></div>
+        `;
         
         const modal = document.createElement('div');
         modal.className = 'access-denied-modal';
-        modal.style.zIndex = "10005"; // Put it on top of everything
-
+        modal.style.zIndex = "10005";
+        
         const card = document.createElement('div');
         card.className = 'access-card';
         card.innerHTML = `
-            <div class="access-icon-box"><i class="fas fa-hourglass-end"></i></div>
-            <div class="access-title">Access Expired</div>
-            <div class="access-desc">
-                Your time-limited access to Zone Vault has ended. You must request a new code to continue.
-            </div>
+            <div class="access-icon-box"><i class="fas fa-lock"></i></div>
+            <div class="access-title">${title}</div>
+            <div class="access-desc">${desc}</div>
+            ${extraHtml}
+            <button class="access-btn" onclick="window.location.replace('index.html')">Return to Safety</button>
+            <div style="margin-top:15px; font-size:12px; color:var(--text-muted);">Redirecting automatically in 5 seconds...</div>
+        `;
+        modal.appendChild(card);
+        document.body.appendChild(modal);
+
+        // 2. HARD REDIRECT IN 5 SECONDS (Using replace to prevent back button)
+        setTimeout(() => { 
+            window.location.replace("index.html"); 
+            // Backup interval if they try to pause execution
+            setInterval(() => { window.location.replace("index.html"); }, 1000);
+        }, 5000);
+    }
+
+    function showExpiredModal(code, timestamp) {
+        const expiryDate = new Date(timestamp).toLocaleString();
+        const codeInfoHtml = `
             <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); text-align: left;">
                 <p style="margin-bottom: 5px; font-size: 13px; color: var(--text-muted);">Used Code:</p>
                 <p style="font-family: monospace; font-size: 16px; color: var(--code-accent); font-weight: bold; margin-bottom: 12px;">${code}</p>
@@ -815,24 +840,15 @@
                 <p style="margin-bottom: 5px; font-size: 13px; color: var(--text-muted);">Expired On:</p>
                 <p style="font-size: 14px; color: var(--admin-color); font-weight: 600;">${expiryDate}</p>
             </div>
-            <button class="access-btn" onclick="window.location.href='index.html'">Return to Login</button>
-            <div style="margin-top:15px; font-size:12px; color:var(--text-muted);">Redirecting automatically...</div>
         `;
-        modal.appendChild(card);
-        document.body.appendChild(modal);
-
-        // Clear their session storage so they can't force their way back in
         sessionStorage.clear();
-        setTimeout(() => { window.location.href = "index.html"; }, 5000);
+        showAccessDeniedModal("Access Expired", "Your time-limited access to Zone Vault has ended. You must request a new code to continue.", codeInfoHtml);
     }
 
     // --- AUTH & ACTIVE EXPIRATION CHECK ---
     auth.onAuthStateChanged(user => {
         if (user) {
             sessionStorage.setItem('internalAccess', 'true');
-            if (typeof window.redirectTimeout !== 'undefined') clearTimeout(window.redirectTimeout);
-            const modal = document.querySelector('.access-denied-modal');
-            if(modal) modal.remove();
 
             // 1. Fetch User Data for UI
             db.ref('users/' + user.uid).on('value', snapshot => {
@@ -843,17 +859,20 @@
                     const role = (data.role || "member").toLowerCase();
                     const isAdm = role === 'admin';
 
-                    document.getElementById("sidebar-name").innerText = name;
-                    document.getElementById("sidebar-email").innerText = user.email;
-                    document.getElementById("sidebar-pic").src = pic;
-                    
-                    document.getElementById("mobile-sidebar-name").innerText = name;
-                    document.getElementById("mobile-sidebar-email").innerText = user.email;
-                    document.getElementById("mobile-sidebar-pic").src = pic;
+                    // Update UI if they aren't kicked out
+                    if (!window.isKickedOut) {
+                        if(document.getElementById("sidebar-name")) document.getElementById("sidebar-name").innerText = name;
+                        if(document.getElementById("sidebar-email")) document.getElementById("sidebar-email").innerText = user.email;
+                        if(document.getElementById("sidebar-pic")) document.getElementById("sidebar-pic").src = pic;
+                        
+                        if(document.getElementById("mobile-sidebar-name")) document.getElementById("mobile-sidebar-name").innerText = name;
+                        if(document.getElementById("mobile-sidebar-email")) document.getElementById("mobile-sidebar-email").innerText = user.email;
+                        if(document.getElementById("mobile-sidebar-pic")) document.getElementById("mobile-sidebar-pic").src = pic;
 
-                    const statusTxt = isAdm ? "ADMIN ACCESS" : "MEMBER ACCESS";
-                    if(document.getElementById("status-text-pc")) document.getElementById("status-text-pc").innerText = statusTxt;
-                    if(document.getElementById("status-text-mobile")) document.getElementById("status-text-mobile").innerText = statusTxt;
+                        const statusTxt = isAdm ? "ADMIN ACCESS" : "MEMBER ACCESS";
+                        if(document.getElementById("status-text-pc")) document.getElementById("status-text-pc").innerText = statusTxt;
+                        if(document.getElementById("status-text-mobile")) document.getElementById("status-text-mobile").innerText = statusTxt;
+                    }
                     
                     if (isAdm) { 
                         sessionStorage.setItem('isAdmin', 'true'); 
@@ -861,24 +880,21 @@
                         return; // Admins skip the expiration check
                     }
 
-                    // 2. NEW: ACTIVE EXPIRATION CHECK FOR REGULAR USERS/GUESTS
+                    // 2. ACTIVE EXPIRATION CHECK FOR REGULAR USERS/GUESTS
                     db.ref(`joinRequests/${user.uid}`).once('value').then(reqSnap => {
                         if (reqSnap.exists()) {
                             const reqData = reqSnap.val();
-                            const usedCode = reqData.usedCode; // The code they entered at login
+                            const usedCode = reqData.usedCode; 
 
                             if (usedCode) {
-                                // Check the master code list
                                 db.ref(`validCodes/${usedCode}`).once('value').then(codeSnap => {
                                     if (codeSnap.exists()) {
                                         const codeData = codeSnap.val();
-                                        // If the current time is past the expiration time, kick them out
                                         if (Date.now() > codeData.expiresAt) {
                                             showExpiredModal(usedCode, codeData.expiresAt);
                                             auth.signOut(); 
                                         }
                                     } else {
-                                        // Optional: If you delete the code from the dashboard, it also kicks them out
                                         showExpiredModal(usedCode, Date.now()); 
                                         auth.signOut();
                                     }
@@ -889,12 +905,14 @@
                 }
             });
         } else {
-             // If they get signed out, instantly push them out
-             window.location.href = "index.html";
+             // If signed out, redirect instantly EXCEPT if reading the 5s modal
+             if (!window.isKickedOut) {
+                 window.location.replace("index.html");
+             }
         }
     });
 
-    window.logout = function() { if(confirm("Log out?")) auth.signOut().then(() => window.location.href = "index.html"); }
+    window.logout = function() { if(confirm("Log out?")) auth.signOut().then(() => window.location.replace("index.html")); }
 
     // --- THEME LOGIC ---
     function initTheme() {
@@ -923,6 +941,7 @@
     let current = 0;
 
     function switchImageByIndex(index) {
+        if(!mainImage) return;
         mainImage.style.opacity = '0';
         setTimeout(() => { mainImage.src = slideshowSources[index]; mainImage.style.opacity = '1'; }, 300);
         thumbnailBoxes.forEach(b => b.classList.remove('active'));
@@ -930,6 +949,7 @@
     }
     setInterval(() => { current = (current + 1) % slideshowSources.length; switchImageByIndex(current); }, 4000); 
     window.switchImage = function(box) {
+        if(!mainImage) return;
         const img = box.querySelector('img'); mainImage.style.opacity = '0';
         setTimeout(() => { mainImage.src = img.src; mainImage.style.opacity = '1'; }, 300);
         thumbnailBoxes.forEach(b => b.classList.remove('active')); box.classList.add('active');
@@ -938,7 +958,7 @@
 </script>
 
 <script>
-  // --- SECURITY LOGIC ---
+  // --- STANDARD SECURITY LOGIC ---
   const allowedPaths = ['/index.html','/home.html','/nanabnb.html','/newtour.html','/hxwfanconcert.html','/svtholiday.html','/arenatour.html','/svtjapanconcert.html','/touragain.html','/gallery.html','/profile.html','/soon.html','/videos.html', '/admin.html'];
   const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
   const currentPage = window.location.pathname;
@@ -951,19 +971,8 @@
   
   const hasCachedSession = Object.keys(localStorage).some(key => key.startsWith('firebase:authUser'));
 
-  if (!hasInternalAccess && !isIndexPage && !isAdmin && !hasCachedSession) { 
-      showAccessDeniedModal(); 
-  }
-
-  function showAccessDeniedModal() {
-    const modal = document.createElement('div');
-    modal.className = 'access-denied-modal';
-    const card = document.createElement('div');
-    card.className = 'access-card';
-    card.innerHTML = `<div class="access-icon-box"><i class="fas fa-lock"></i></div><div class="access-title">Access Restricted</div><div class="access-desc">You are not authorized to view this page directly. Please log in or return home.</div><button class="access-btn" onclick="window.location.href='index.html'">Return to Safety</button><div style="margin-top:15px; font-size:12px; color:#555;">Redirecting automatically...</div>`;
-    modal.appendChild(card);
-    document.body.appendChild(modal);
-    window.redirectTimeout = setTimeout(() => { window.location.href = "index.html"; }, 3000);
+  if (!hasInternalAccess && !isIndexPage && !isAdmin && !hasCachedSession && !window.isKickedOut) { 
+      showAccessDeniedModal("Access Restricted", "You are not authorized to view this page directly. Please log in or return home."); 
   }
 </script>
 
