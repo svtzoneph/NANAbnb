@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Register | Zone Vault</title>
+  <title>Enter | Zone Vault</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   
   <link rel="manifest" href="manifest.json">
@@ -25,9 +25,8 @@
         --card-bg: #121212;
         --glass-border: 1px solid rgba(255, 255, 255, 0.08);
         --input-bg: rgba(255, 255, 255, 0.05);
-        --accent: #ffffff;
+        --accent: #38bdf8;
         
-        /* Strength Colors */
         --color-weak: #ef4444;   
         --color-medium: #eab308; 
         --color-strong: #22c55e; 
@@ -114,7 +113,6 @@
     
     .telegram-input { padding-left: 56px !important; }
 
-    /* Only target text, email, and password inputs so the checkbox doesn't get distorted */
     input[type="text"], input[type="email"], input[type="password"] {
       width: 100%; padding: 14px 40px 14px 44px;
       background: var(--input-bg);
@@ -141,17 +139,13 @@
       color: var(--text-main); text-decoration: underline; font-weight: 600;
     }
 
-    /* === PASSWORD CRITERIA CHECKLIST === */
+    /* === PASSWORD CRITERIA === */
     .password-criteria {
       list-style: none; padding: 0; margin: -10px 0 15px 5px;
       font-size: 12px; display: none; 
     }
     .password-criteria.active { display: block; }
-    .password-criteria li {
-      color: var(--text-muted); margin-bottom: 5px; transition: color 0.3s; display: flex; align-items: center; gap: 6px;
-    }
-    .password-criteria li i { transition: 0.3s; }
-    
+    .password-criteria li { color: var(--text-muted); margin-bottom: 5px; transition: color 0.3s; display: flex; align-items: center; gap: 6px; }
     .password-criteria li.valid { color: var(--color-strong); }
     .password-criteria li.invalid i::before { content: "\f00d"; }
     .password-criteria li.valid i::before { content: "\f00c"; }
@@ -159,7 +153,6 @@
     /* === STRENGTH METER === */
     .strength-meter-container { margin-top: 5px; margin-bottom: 20px; padding: 0 4px; display: none; }
     .strength-meter-container.active { display: block; }
-    
     .strength-bars { display: flex; gap: 4px; margin-bottom: 6px; }
     .bar-segment { height: 3px; flex: 1; border-radius: 2px; background: rgba(255, 255, 255, 0.1); transition: background-color 0.3s ease; }
     .strength-text { text-align: right; font-size: 11px; font-weight: 600; color: var(--text-muted); }
@@ -170,23 +163,22 @@
     button {
       width: 100%; padding: 14px; border-radius: 50px;
       font-size: 14px; font-weight: 600; cursor: pointer;
-      transition: all 0.2s; border: none; font-family: inherit;
+      transition: all 0.2s; border: none; font-family: inherit; display: flex; justify-content: center; align-items: center; gap: 8px;
     }
 
     .action-btn { background: var(--text-main); color: #000; }
-    .action-btn:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+    .action-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+    .action-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
     .google-btn {
       background: transparent; color: var(--text-main);
       border: 1px solid var(--glass-border);
-      display: flex; align-items: center; justify-content: center; gap: 10px;
     }
-    .google-btn:hover { background: rgba(255,255,255,0.05); border-color: var(--text-main); }
+    .google-btn:hover:not(:disabled) { background: rgba(255,255,255,0.05); border-color: var(--text-main); }
     .google-btn img { height: 18px; }
 
-    /* === LINKS & UTILS === */
     .switch-link { font-size: 13px; color: var(--text-muted); text-align: center; margin-top: 20px; }
-    .switch-link a { color: var(--text-main); text-decoration: none; font-weight: 600; }
+    .switch-link a { color: var(--text-main); text-decoration: none; font-weight: 600; cursor: pointer;}
     .switch-link a:hover { text-decoration: underline; }
 
     .hidden { display: none !important; }
@@ -201,9 +193,9 @@
     #verify-section p, #waiting p, #approved p { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
 
     /* === APPROVED SPECIFIC === */
-    #approved h3 { font-size: 22px; font-weight: 700; margin-top: 15px; }
+    #approved h3 { font-size: 22px; font-weight: 700; margin-top: 15px; color: var(--color-strong); }
     #approved i { 
-        font-size: 40px; color: var(--text-main); 
+        font-size: 40px; color: var(--color-strong); 
         animation: unlockPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
         margin-bottom: 10px; display: inline-block;
     }
@@ -230,7 +222,42 @@
 
 <div class="glass-card">
   
-  <div id="auth-section">
+  <div id="choice-section">
+    <h2>Welcome to Zone Vault</h2>
+    <p class="subtitle">Choose how you want to enter.</p>
+    
+    <div class="button-stack" style="margin-top: 40px;">
+      <button class="action-btn" onclick="show('quick-code-section')">
+        <i class="fas fa-key"></i> I Have an Access Code
+      </button>
+      <button class="google-btn" onclick="show('auth-section')">
+        Create an Account
+      </button>
+    </div>
+    <p class="switch-link">Already have an account? <a href="login.html">Log In</a></p>
+  </div>
+
+  <div id="quick-code-section" class="hidden">
+    <h2>Quick Access</h2>
+    <p class="subtitle">Enter your code to unlock the vault instantly.</p>
+    
+    <div class="input-icon-group">
+      <i class="fas fa-user input-icon"></i>
+      <input type="text" id="guest-name" placeholder="Choose a Nickname (Optional)">
+    </div>
+
+    <div class="input-icon-group">
+      <i class="fas fa-unlock-alt input-icon"></i>
+      <input type="text" id="quick-code-input" placeholder="e.g. zonevault-XYZ" required>
+    </div>
+
+    <div class="button-stack">
+      <button class="action-btn" id="btn-quick-login" onclick="quickCodeLogin()">Unlock Vault</button>
+      <button class="google-btn" style="border: none;" onclick="show('choice-section')">Back</button>
+    </div>
+  </div>
+
+  <div id="auth-section" class="hidden">
     <h2>Join Zone Vault</h2>
     <p class="subtitle">Create your secure account.</p>
     
@@ -266,14 +293,13 @@
     </div>
 
     <div class="button-stack">
-      <button class="action-btn" onclick="register()">Create Account</button>
+      <button class="action-btn" id="btn-register" onclick="register()">Create Account</button>
       <button class="google-btn" onclick="googleLogin()">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
         Sign up with Google
       </button>
+      <button class="google-btn" style="border: none; margin-top: -5px;" onclick="show('choice-section')">Back</button>
     </div>
-    
-    <p class="switch-link">Already have an account? <a href="login.html">Log In</a></p>
   </div>
 
   <div id="verify-section" class="hidden">
@@ -295,24 +321,24 @@
     
     <div class="input-icon-group">
       <i class="fas fa-key input-icon"></i>
-      <input type="text" id="reason" placeholder="Access Code" required>
+      <input type="text" id="reason" placeholder="Access Code (e.g. zonevault-XYZ)" required>
     </div>
     
     <div class="button-stack">
-      <button class="action-btn" onclick="submitRequest()">Submit Request</button>
+      <button class="action-btn" id="btn-submit-code" onclick="submitRequest()">Submit Code</button>
     </div>
   </div>
 
   <div id="waiting" class="hidden">
     <span class="status-icon float">⏳</span>
     <h3>Pending Approval</h3>
-    <p>Your request is being reviewed by an admin. <br>Message <strong>Hoskwi_17</strong> on Telegram for faster approval.</p>
+    <p>Your request is being reviewed by an admin.</p>
     <button class="google-btn" onclick="location.reload()">Check Status</button>
   </div>
 
   <div id="approved" class="hidden">
     <div style="margin-bottom:15px; margin-top:20px;">
-        <i class="fas fa-unlock-alt"></i>
+        <i class="fas fa-check-circle"></i>
     </div>
     <h3>Access Granted</h3>
     <p>Entering the Vault...</p>
@@ -321,7 +347,7 @@
 </div>
 
 <script>
-  // === 1. TOGGLE PASSWORD VISIBILITY ===
+  // === UI SCRIPTS: PASSWORD VISIBILITY & STRENGTH ===
   const togglePassword = document.getElementById('togglePassword');
   const passwordInput = document.getElementById('password');
 
@@ -332,13 +358,11 @@
     this.classList.toggle('fa-eye-slash');
   });
 
-  // === 2. PASSWORD STRENGTH & CRITERIA CHECKER ===
   const strengthMeter = document.getElementById('strengthMeter');
   const strengthText = document.getElementById('strengthText');
   const bar1 = document.getElementById('bar1');
   const bar2 = document.getElementById('bar2');
   const bar3 = document.getElementById('bar3');
-  
   const criteriaList = document.getElementById('passwordCriteria');
   const reqLength = document.getElementById('req-length');
   const reqNumber = document.getElementById('req-number');
@@ -354,7 +378,6 @@
       strengthMeter.classList.remove('active');
       criteriaList.classList.remove('active');
       resetBars();
-      
       reqLength.classList.remove('valid'); reqLength.classList.add('invalid');
       reqNumber.classList.remove('valid'); reqNumber.classList.add('invalid');
       reqSpecial.classList.remove('valid'); reqSpecial.classList.add('invalid');
@@ -362,79 +385,31 @@
     }
 
     let score = 0;
-    
-    if (val.length >= 8) {
-      reqLength.classList.remove('invalid'); reqLength.classList.add('valid');
-      score++;
-    } else {
-      reqLength.classList.remove('valid'); reqLength.classList.add('invalid');
-    }
-
-    if (/\d/.test(val)) {
-      reqNumber.classList.remove('invalid'); reqNumber.classList.add('valid');
-      score++;
-    } else {
-      reqNumber.classList.remove('valid'); reqNumber.classList.add('invalid');
-    }
-
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(val)) {
-      reqSpecial.classList.remove('invalid'); reqSpecial.classList.add('valid');
-      score++;
-    } else {
-      reqSpecial.classList.remove('valid'); reqSpecial.classList.add('invalid');
-    }
+    if (val.length >= 8) { reqLength.classList.remove('invalid'); reqLength.classList.add('valid'); score++; } else { reqLength.classList.remove('valid'); reqLength.classList.add('invalid'); }
+    if (/\d/.test(val)) { reqNumber.classList.remove('invalid'); reqNumber.classList.add('valid'); score++; } else { reqNumber.classList.remove('valid'); reqNumber.classList.add('invalid'); }
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(val)) { reqSpecial.classList.remove('invalid'); reqSpecial.classList.add('valid'); score++; } else { reqSpecial.classList.remove('valid'); reqSpecial.classList.add('invalid'); }
 
     updateMeter(score);
   });
 
-  function resetBars() {
-    bar1.style.background = 'rgba(255, 255, 255, 0.1)';
-    bar2.style.background = 'rgba(255, 255, 255, 0.1)';
-    bar3.style.background = 'rgba(255, 255, 255, 0.1)';
-    strengthText.textContent = '';
-  }
-
+  function resetBars() { bar1.style.background = 'rgba(255, 255, 255, 0.1)'; bar2.style.background = 'rgba(255, 255, 255, 0.1)'; bar3.style.background = 'rgba(255, 255, 255, 0.1)'; strengthText.textContent = ''; }
   function updateMeter(score) {
     resetBars();
-    if (score === 1) {
-      bar1.style.background = 'var(--color-weak)';
-      strengthText.textContent = 'Weak';
-      strengthText.style.color = 'var(--color-weak)';
-    } else if (score === 2) {
-      bar1.style.background = 'var(--color-medium)';
-      bar2.style.background = 'var(--color-medium)';
-      strengthText.textContent = 'Medium';
-      strengthText.style.color = 'var(--color-medium)';
-    } else if (score >= 3) {
-      bar1.style.background = 'var(--color-strong)';
-      bar2.style.background = 'var(--color-strong)';
-      bar3.style.background = 'var(--color-strong)';
-      strengthText.textContent = 'Strong';
-      strengthText.style.color = 'var(--color-strong)';
-    }
+    if (score === 1) { bar1.style.background = 'var(--color-weak)'; strengthText.textContent = 'Weak'; strengthText.style.color = 'var(--color-weak)'; }
+    else if (score === 2) { bar1.style.background = 'var(--color-medium)'; bar2.style.background = 'var(--color-medium)'; strengthText.textContent = 'Medium'; strengthText.style.color = 'var(--color-medium)'; }
+    else if (score >= 3) { bar1.style.background = 'var(--color-strong)'; bar2.style.background = 'var(--color-strong)'; bar3.style.background = 'var(--color-strong)'; strengthText.textContent = 'Strong'; strengthText.style.color = 'var(--color-strong)'; }
   }
 </script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-  signInWithPopup,
-  GoogleAuthProvider,
-  onAuthStateChanged,
-  reload,
-  signOut
+  getAuth, createUserWithEmailAndPassword, sendEmailVerification,
+  signInWithPopup, GoogleAuthProvider, signInAnonymously,
+  onAuthStateChanged, reload, signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  getDatabase,
-  ref,
-  onValue,
-  set,
-  get,
-  update,
-  serverTimestamp
+  getDatabase, ref, onValue, set, get, update, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 // ---------- FIREBASE CONFIG ----------
@@ -454,87 +429,109 @@ const db = getDatabase(app);
 const provider = new GoogleAuthProvider();
 let currentUid = null;
 
-function show(id) {
-  document.querySelectorAll(".glass-card > div").forEach(div =>
-    div.classList.add("hidden")
-  );
+window.show = function(id) {
+  document.querySelectorAll(".glass-card > div").forEach(div => div.classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
 }
 
 function generateAccessID() {
-  return (
-    Math.random().toString(36).substring(2, 10) +
-    Math.random().toString(36).substring(2, 10) +
-    Math.random().toString(36).substring(2, 10)
-  );
+  return Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
 }
 
 document.getElementById("back-btn").addEventListener("click", () => {
-  const user = auth.currentUser;
-  if (user) {
-    signOut(auth).then(() => {
-      window.location.href = 'index.html';
-    });
-  } else {
-    window.location.href = 'index.html';
-  }
+  if (auth.currentUser) { signOut(auth).then(() => { window.location.href = 'index.html'; }); } 
+  else { window.location.href = 'index.html'; }
 });
 
-// ---------- HANDLE APPROVED USER ----------
-async function handleApprovedUser(reqRef, data) {
-  const accessID = generateAccessID();
+// ---------- QUICK CODE LOGIN (GUEST ENTRY) ----------
+window.quickCodeLogin = async function() {
+  const code = document.getElementById("quick-code-input").value.trim();
+  let nickname = document.getElementById("guest-name").value.trim();
+  const btn = document.getElementById("btn-quick-login");
   
-  await update(reqRef, { accessID });
+  if (!code) return alert("Please enter your access code.");
+  if (!nickname) nickname = "Guest_" + Math.floor(Math.random() * 10000);
 
-  const userRef = ref(db, "users/" + currentUid);
-  await update(userRef, {
-    status: "approved",
-    accessID: accessID
-  });
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+  btn.disabled = true;
 
-  sessionStorage.setItem("internalAccess", "true");
-  sessionStorage.setItem("fromIndex", "true");
-  sessionStorage.setItem("accessID", accessID);
+  try {
+    const codeRef = ref(db, "validCodes/" + code);
+    const snapshot = await get(codeRef);
 
-  show("approved");
-  setTimeout(() => {
-    window.location.href = `home.html?access=${accessID}`;
-  }, 1500);
-}
+    if (snapshot.exists()) {
+      const codeData = snapshot.val();
+      if (Date.now() < codeData.expiresAt) {
+        
+        const userCred = await signInAnonymously(auth);
+        const uid = userCred.user.uid;
+        const newAccessID = generateAccessID();
+
+        const userProfilePromise = update(ref(db, "users/" + uid), {
+          name: nickname, telegramUsername: "Guest User", email: "No Email (Guest)",
+          bio: "I am a VIP guest.", status: "approved", role: "guest", accessID: newAccessID
+        });
+
+        const requestPromise = set(ref(db, "joinRequests/" + uid), {
+          telegramUsername: nickname, usedCode: code, email: "Guest", provider: "anonymous",
+          status: "approved", accessID: newAccessID, timestamp: serverTimestamp() 
+        });
+
+        await Promise.all([requestPromise, userProfilePromise]);
+
+        sessionStorage.setItem("internalAccess", "true");
+        sessionStorage.setItem("fromIndex", "true");
+        sessionStorage.setItem("accessID", newAccessID);
+
+        show("approved");
+        setTimeout(() => { window.location.href = `home.html?access=${newAccessID}`; }, 1200);
+      } else {
+        alert("❌ This access code has expired. Please contact the admin.");
+        btn.innerHTML = 'Unlock Vault'; btn.disabled = false;
+      }
+    } else {
+      alert("❌ Invalid access code. Please check your spelling.");
+      btn.innerHTML = 'Unlock Vault'; btn.disabled = false;
+    }
+  } catch (error) {
+    console.error(error);
+    alert("An error occurred. Please try again.");
+    btn.innerHTML = 'Unlock Vault'; btn.disabled = false;
+  }
+};
 
 // ---------- REGISTER NEW USER ----------
 window.register = function() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
   const privacyChecked = document.getElementById("privacy-check").checked;
+  const btn = document.getElementById("btn-register");
   
-  // Verify Privacy Checkbox
-  if (!privacyChecked) {
-    return alert("You must agree to the Privacy Policy before registering.");
-  }
-
-  // Verify Password
-  if (password.length < 8 || !/\d/.test(password) || !/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    return alert("Please ensure your password meets all criteria (8 characters, 1 number, 1 special character).");
-  }
-
+  if (!privacyChecked) return alert("You must agree to the Privacy Policy.");
+  if (password.length < 8 || !/\d/.test(password) || !/[!@#$%^&*(),.?":{}|<>]/.test(password)) return alert("Password criteria not met.");
   if (!email || !password) return alert("Please enter email and password.");
 
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+  btn.disabled = true;
+
   createUserWithEmailAndPassword(auth, email, password)
-    .then(userCred => {
-      sendEmailVerification(userCred.user).then(() => {
-        show("verify-section");
-      });
+    .then(userCred => { 
+        sendEmailVerification(userCred.user).then(() => { show("verify-section"); }); 
     })
-    .catch(e => alert("Registration error: " + e.message));
+    .catch(e => {
+        alert("Registration error: " + e.message);
+        btn.innerHTML = 'Create Account'; btn.disabled = false;
+    });
 };
 
 // ---------- GOOGLE LOGIN ----------
 window.googleLogin = async function() {
   const privacyChecked = document.getElementById("privacy-check").checked;
-  
   if (!privacyChecked) {
-    return alert("You must agree to the Privacy Policy before continuing with Google.");
+      // Only show alert if they are on the actual register screen (not the quick code screen)
+      if(!document.getElementById('auth-section').classList.contains('hidden')) {
+          return alert("You must agree to the Privacy Policy before continuing with Google.");
+      }
   }
 
   try {
@@ -546,14 +543,9 @@ window.googleLogin = async function() {
 
     if (snapshot.exists()) {
       const data = snapshot.val();
-      if (data.status === "approved") {
-        await handleApprovedUser(reqRef, data);
-      } else if (data.status === "pending") {
-        show("waiting");
-      } else {
-        alert("❌ Your request was denied.");
-        signOut(auth).then(() => show("auth-section"));
-      }
+      if (data.status === "approved") await handleApprovedUser(reqRef, data);
+      else if (data.status === "pending") show("waiting");
+      else { alert("❌ Your request was denied."); signOut(auth).then(() => show("auth-section")); }
     } else {
       show("form-section");
     }
@@ -578,66 +570,97 @@ function checkJoinRequest(user) {
   onValue(reqRef, async snapshot => {
     const data = snapshot.val();
     if (!data) show("form-section");
-    else if (data.status === "approved") {
-      await handleApprovedUser(reqRef, data);
-    } else if (data.status === "pending") show("waiting");
-    else {
-      alert("❌ Your request was denied.");
-      signOut(auth).then(() => show("auth-section"));
-    }
+    else if (data.status === "approved") await handleApprovedUser(reqRef, data);
+    else if (data.status === "pending") show("waiting");
+    else { alert("❌ Your request was denied."); signOut(auth).then(() => show("choice-section")); }
   });
 }
 
-// ---------- SUBMIT REQUEST ----------
-window.submitRequest = function() {
+async function handleApprovedUser(reqRef, data) {
+  const accessID = generateAccessID();
+  await update(reqRef, { accessID });
+  await update(ref(db, "users/" + currentUid), { status: "approved", accessID: accessID });
+
+  sessionStorage.setItem("internalAccess", "true");
+  sessionStorage.setItem("fromIndex", "true");
+  sessionStorage.setItem("accessID", accessID);
+
+  show("approved");
+  setTimeout(() => { window.location.href = `home.html?access=${accessID}`; }, 1200);
+}
+
+// ---------- SUBMIT REQUEST WITH CODE VERIFICATION (FOR REGULAR ACCOUNTS) ----------
+window.submitRequest = async function() {
   let telegramUsername = document.getElementById("name").value.trim();
   const accessCode = document.getElementById("reason").value.trim();
   const user = auth.currentUser;
+  const btn = document.getElementById("btn-submit-code");
   
   if (!telegramUsername || !accessCode) return alert("Please fill out all fields.");
+  if (!telegramUsername.startsWith('@')) telegramUsername = '@' + telegramUsername;
 
-  if (!telegramUsername.startsWith('@')) {
-      telegramUsername = '@' + telegramUsername;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+  btn.disabled = true;
+
+  try {
+    const codeRef = ref(db, "validCodes/" + accessCode);
+    const snapshot = await get(codeRef);
+
+    if (snapshot.exists()) {
+      const codeData = snapshot.val();
+      if (Date.now() < codeData.expiresAt) {
+        
+        const newAccessID = generateAccessID();
+        const userProfilePromise = update(ref(db, "users/" + currentUid), {
+          telegramUsername: telegramUsername, name: telegramUsername, email: user.email,
+          bio: "No bio set.", status: "approved", role: "user", accessID: newAccessID
+        });
+
+        const requestPromise = set(ref(db, "joinRequests/" + currentUid), {
+          telegramUsername: telegramUsername, usedCode: accessCode, email: user.email,
+          provider: user.providerData[0]?.providerId || "password", status: "approved",
+          accessID: newAccessID, timestamp: serverTimestamp() 
+        });
+
+        await Promise.all([requestPromise, userProfilePromise]);
+
+        sessionStorage.setItem("internalAccess", "true");
+        sessionStorage.setItem("fromIndex", "true");
+        sessionStorage.setItem("accessID", newAccessID);
+
+        show("approved");
+        setTimeout(() => { window.location.href = `home.html?access=${newAccessID}`; }, 1200);
+
+      } else { 
+          alert("❌ This access code has expired. Please contact the admin for a new one."); 
+          btn.innerHTML = 'Submit Code'; btn.disabled = false;
+      }
+    } else { 
+        alert("❌ Invalid access code. Please check your spelling."); 
+        btn.innerHTML = 'Submit Code'; btn.disabled = false;
+    }
+  } catch (error) {
+    console.error(error);
+    alert("An error occurred. Please try again.");
+    btn.innerHTML = 'Submit Code'; btn.disabled = false;
   }
-
-  const requestPromise = set(ref(db, "joinRequests/" + currentUid), {
-    telegramUsername: telegramUsername,
-    accessCode: accessCode,
-    email: user.email,
-    provider: user.providerData[0]?.providerId || "password",
-    status: "pending",
-    timestamp: serverTimestamp() 
-  });
-
-  const userProfilePromise = update(ref(db, "users/" + currentUid), {
-    telegramUsername: telegramUsername,
-    name: telegramUsername, // ENSURES THE NAME APPEARS IN PROFILE.HTML
-    email: user.email,
-    bio: "No bio set.",
-    status: "pending", 
-    role: "user"       
-  });
-
-  Promise.all([requestPromise, userProfilePromise])
-    .then(() => {
-        show("waiting");
-    })
-    .catch((error) => {
-        console.error("Error saving data:", error);
-        alert("Error submitting request. Please try again.");
-    });
 };
 
+// ---------- AUTH STATE LISTENER ----------
 onAuthStateChanged(auth, user => {
   if (user) {
     sessionStorage.setItem("currentUid", user.uid);
-    reload(user).then(() => {
-      if (user.emailVerified || user.providerData.some(p => p.providerId === "google.com")) {
+    if (user.isAnonymous) {
         checkJoinRequest(user);
-      } else show("verify-section");
-    });
+    } else {
+        reload(user).then(() => {
+          if (user.emailVerified || user.providerData.some(p => p.providerId === "google.com")) {
+            checkJoinRequest(user);
+          } else show("verify-section");
+        });
+    }
   } else {
-    show("auth-section");
+    show("choice-section");
   }
 });
 </script>
