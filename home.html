@@ -19,7 +19,7 @@
     :root {
         /* EXACT ZONE VAULT LIQUID PILL EFFECT */
         --zv-liquid-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 100%);
-        --zv-liquid-blur: blur(12px); /* Unified & slightly reduced blur for all headers/sidebars */
+        --zv-liquid-blur: blur(12px); 
         --zv-liquid-border: 1px solid rgba(255, 255, 255, 0.3);
         --zv-liquid-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 2px 3px rgba(255, 255, 255, 0.5), inset 0 -1px 3px rgba(0, 0, 0, 0.2);
         --zv-liquid-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.1) 100%);
@@ -36,6 +36,7 @@
         --accent: #ffffff;
         --status-online: #22c55e;
         --admin-color: #ef4444; 
+        --code-accent: #38bdf8;
         
         --sidebar-width-collapsed: 64px; 
         --sidebar-width-expanded: 220px; 
@@ -48,7 +49,6 @@
         --glass-border: 1px solid rgba(0, 0, 0, 0.08);
         --sidebar-hover: #e2e8f0;
 
-        /* Adjusted Light Mode Liquid to be a Frosted White for better contrast */
         --zv-liquid-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 100%);
         --zv-liquid-border: 1px solid rgba(255, 255, 255, 0.8);
         --zv-liquid-shadow: 0 8px 20px rgba(0, 0, 0, 0.05), inset 0 2px 3px rgba(255, 255, 255, 0.8), inset 0 -1px 3px rgba(0, 0, 0, 0.05);
@@ -60,9 +60,6 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
 
-    /* =========================================
-       2. AMBIENT BACKGROUND
-       ========================================= */
     body { 
         background-color: var(--bg-color);
         color: var(--text-main);
@@ -78,7 +75,7 @@
     @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
 
     /* =========================================
-       3. LIQUID SIDEBAR BUBBLE & MENUS 
+       LIQUID SIDEBAR BUBBLE & MENUS 
        ========================================= */
     .sidebar-desktop {
         position: fixed; 
@@ -98,16 +95,8 @@
         transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s;
         overflow: hidden; 
         display: flex; flex-direction: column;
-        
-        /* HARDWARE ACCELERATION */
-        will-change: width;
-        -webkit-transform: translateZ(0);
     }
-    .sidebar-desktop:hover { 
-        width: var(--sidebar-width-expanded); 
-        background: var(--zv-liquid-hover); 
-    }
-
+    .sidebar-desktop:hover { width: var(--sidebar-width-expanded); background: var(--zv-liquid-hover); }
     .sidebar-container { display: flex; flex-direction: column; height: 100%; padding: 30px 0; width: 100%; }
 
     .sidebar-brand { display: flex; align-items: center; height: 40px; margin-bottom: 25px; width: 100%; white-space: nowrap; position: relative; padding-left: 0; justify-content: center; transition: padding 0.3s ease; }
@@ -141,7 +130,7 @@
     .sidebar-useremail { font-size: 10px; color: var(--text-muted); }
 
     /* =========================================
-       4. THE ZONE VAULT LIQUID BUTTONS & MODAL (DESKTOP)
+       THE ZONE VAULT LIQUID BUTTONS & MODAL
        ========================================= */
     .hero-notif-btn, .glass-btn {
         background: var(--zv-liquid-bg);
@@ -156,7 +145,6 @@
         text-decoration: none;
     }
     
-    /* DESKTOP NOTIF BUTTON - NAKA-STOCK SA HEADER (HINDI SASAMA SA SCROLL) */
     .hero-notif-btn { 
         position: absolute !important; 
         top: 30px; right: 40px; 
@@ -164,11 +152,7 @@
         width: 46px; height: 46px; border-radius: 50%; font-size: 18px; 
     }
     .glass-btn { width: 44px; height: 44px; border-radius: 50%; font-size: 18px; pointer-events: auto; position: relative; }
-    
-    .hero-notif-btn:hover, .glass-btn:hover { 
-        background: var(--zv-liquid-hover); 
-        transform: translateY(-2px); 
-    }
+    .hero-notif-btn:hover, .glass-btn:hover { background: var(--zv-liquid-hover); transform: translateY(-2px); }
     
     .hero-notif-btn .badge, .glass-btn .badge { 
         position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; 
@@ -177,18 +161,15 @@
     }
     .hero-notif-btn .badge.active, .glass-btn .badge.active { display: block; }
 
-    /* DESKTOP NOTIF MODAL - NAKA-STOCK SA HEADER (HINDI SASAMA SA SCROLL) */
     .notif-modal { 
         position: absolute !important; 
         top: 85px; right: 40px; 
         width: 340px; max-height: 400px; 
-        
         background: var(--zv-liquid-bg);
         backdrop-filter: var(--zv-liquid-blur); 
         -webkit-backdrop-filter: var(--zv-liquid-blur);
         border: var(--zv-liquid-border);
         box-shadow: var(--zv-liquid-shadow);
-        
         border-radius: 20px; display: none; flex-direction: column; z-index: 9999; overflow-y: auto; 
     }
     .notif-modal.active { display: flex; animation: liquidPop 0.3s ease; }
@@ -203,7 +184,7 @@
     .notif-empty { padding: 30px; text-align: center; color: var(--text-muted); font-size: 13px; }
 
     /* =========================================
-       4. HERO SECTION 
+       HERO SECTION 
        ========================================= */
     .main-wrapper { max-width: 1600px; margin: 0 auto; width: 100%; padding-bottom: 40px; position: relative;}
 
@@ -231,7 +212,7 @@
     .thumb-btn.active img, .thumb-btn:hover img { opacity: 1; }
 
     /* =========================================
-       5. SOLID CARDS 
+       SOLID CARDS 
        ========================================= */
     .section-header { padding: 0 40px; margin-top: 20px; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; color: var(--text-main); }
     .section-header h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
@@ -281,20 +262,20 @@
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--zv-liquid-bg); border: var(--zv-liquid-border); box-shadow: var(--zv-liquid-shadow); color: var(--text-main); padding: 14px 28px; border-radius: 30px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 12px; z-index: 9999; opacity: 0; pointer-events: none; backdrop-filter: var(--zv-liquid-blur); -webkit-backdrop-filter: var(--zv-liquid-blur); transition: all 0.6s ease; }
     .toast.show { bottom: 50px; opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .access-denied-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(3,3,5,0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
-    .access-card { background: var(--zv-liquid-bg); border: var(--zv-liquid-border); padding: 50px; border-radius: 30px; text-align: center; color: var(--text-main); max-width: 420px; width: 90%; box-shadow: var(--zv-liquid-shadow); backdrop-filter: blur(15px); }
-    .access-icon-box { width: 70px; height: 70px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; font-size: 28px; border-top: 1px solid rgba(239, 68, 68, 0.5); }
+    .access-denied-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(3,3,5,0.85); display: flex; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
+    .access-card { background: var(--zv-liquid-bg); border: var(--zv-liquid-border); padding: 40px; border-radius: 30px; text-align: center; color: var(--text-main); max-width: 420px; width: 90%; box-shadow: var(--zv-liquid-shadow); }
+    .access-icon-box { width: 70px; height: 70px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; border-top: 1px solid rgba(239, 68, 68, 0.5); }
     .access-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
-    .access-desc { font-size: 15px; color: var(--text-muted); line-height: 1.6; margin-bottom: 30px; }
-    .access-btn { background: var(--text-main); color: var(--bg-color); border: none; padding: 14px 35px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+    .access-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 25px; }
+    .access-btn { background: var(--text-main); color: var(--bg-color); border: none; padding: 14px 35px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; font-size: 15px;}
     .access-btn:hover { transform: scale(1.05) translateY(-2px); }
 
     /* =========================================
-       6. MOBILE RESPONSIVENESS
+       MOBILE RESPONSIVENESS
        ========================================= */
     .mobile-header { 
         display: none; padding: 20px 20px; align-items: flex-start; justify-content: space-between; 
-        position: fixed !important; /* MOBILE HEADER: SASAMA SA SCROLL */
+        position: fixed !important; 
         top: 0; left: 0; width: 100%; z-index: 900; background: transparent; border: none; pointer-events: none; 
     }
     
@@ -311,17 +292,13 @@
     }
     .mobile-logo-img { height: 26px; width: auto; }
 
-    /* MOBILE SIDEBAR - HARDWARE ACCELERATED AND AUTO-FIT */
     .mobile-sidebar-menu { 
         position: fixed; 
         top: 20px; 
         left: 20px;
         width: 280px; 
-        
-        /* THE MAGIC FIX: 100dvh auto fits screen size dynamically ignoring URL bar */
         height: calc(100vh - 40px);
         height: calc(100dvh - 40px); 
-        
         border-radius: 30px; 
         background: var(--zv-liquid-bg); 
         backdrop-filter: var(--zv-liquid-blur); 
@@ -329,54 +306,29 @@
         border: var(--zv-liquid-border);
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.3);
         z-index: 9999; 
-        
-        /* NO LAG FIX: Using GPU acceleration to prevent UI stalling */
         transform: translateX(calc(-100% - 40px));
         -webkit-transform: translateX(calc(-100% - 40px)) translateZ(0);
         transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease; 
         will-change: transform;
-        
-        display: flex; 
-        flex-direction: column; 
-        overflow: hidden; 
+        display: flex; flex-direction: column; overflow: hidden; 
     }
-    .mobile-sidebar-menu.open { 
-        transform: translateX(0); 
-        -webkit-transform: translateX(0) translateZ(0);
-    }
-    
-    .mobile-sidebar-menu .sidebar-container {
-        overflow-y: auto;
-        padding: 20px 20px;
-    }
-    .mobile-sidebar-menu .sidebar-container::-webkit-scrollbar {
-        display: none;
-    }
+    .mobile-sidebar-menu.open { transform: translateX(0); -webkit-transform: translateX(0) translateZ(0); }
+    .mobile-sidebar-menu .sidebar-container { overflow-y: auto; padding: 20px 20px; }
+    .mobile-sidebar-menu .sidebar-container::-webkit-scrollbar { display: none; }
 
     @media (max-width: 900px) {
         .sidebar-desktop { display: none; }
         .mobile-header { display: flex; }
         body { padding-left: 0; }
         
-        /* HIDE DESKTOP ABSOLUTE NOTIF BTN ON MOBILE */
         .hero-notif-btn { display: none !important; }
-        
         .hero-container { width: 100%; height: auto; min-height: 60vh; margin: 0 0 30px 0; border-radius: 0; align-items: flex-end; padding-bottom: 30px; }
         .hero-overlay { background: linear-gradient(to top, rgba(18,18,22,1) 0%, rgba(18,18,22,0.5) 60%, transparent 100%); }
         .hero-content-box { text-align: center; padding: 25px; display: flex; flex-direction: column; align-items: center; }
-        
         .hero-content-box h1 { display: none; }
-        
         .hero-content-box p { font-size: 1.05rem; max-width: 100%; margin-bottom: 25px; }
         
-        /* MOBILE NOTIF MODAL - FIXED (SASAMA SA SCROLL) */
-        .notif-modal { 
-            position: fixed !important; 
-            top: 75px !important; 
-            right: 20px !important; 
-            width: 320px; max-width: 90vw; z-index: 9999; left: auto; transform: none; 
-        }
-        
+        .notif-modal { position: fixed !important; top: 75px !important; right: 20px !important; width: 320px; max-width: 90vw; z-index: 9999; left: auto; transform: none; }
         .thumbnails-floating { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 5px; }
         .thumb-btn { width: 60px; height: 38px; }
         
@@ -840,7 +792,41 @@
         }
     }
 
-    // --- AUTH ---
+    // --- ACTIVE EXPIRATION MODAL SYSTEM ---
+    function showExpiredModal(code, timestamp) {
+        const expiryDate = new Date(timestamp).toLocaleString();
+        
+        const modal = document.createElement('div');
+        modal.className = 'access-denied-modal';
+        modal.style.zIndex = "10005"; // Put it on top of everything
+
+        const card = document.createElement('div');
+        card.className = 'access-card';
+        card.innerHTML = `
+            <div class="access-icon-box"><i class="fas fa-hourglass-end"></i></div>
+            <div class="access-title">Access Expired</div>
+            <div class="access-desc">
+                Your time-limited access to Zone Vault has ended. You must request a new code to continue.
+            </div>
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                <p style="margin-bottom: 5px; font-size: 13px; color: var(--text-muted);">Used Code:</p>
+                <p style="font-family: monospace; font-size: 16px; color: var(--code-accent); font-weight: bold; margin-bottom: 12px;">${code}</p>
+                
+                <p style="margin-bottom: 5px; font-size: 13px; color: var(--text-muted);">Expired On:</p>
+                <p style="font-size: 14px; color: var(--admin-color); font-weight: 600;">${expiryDate}</p>
+            </div>
+            <button class="access-btn" onclick="window.location.href='index.html'">Return to Login</button>
+            <div style="margin-top:15px; font-size:12px; color:var(--text-muted);">Redirecting automatically...</div>
+        `;
+        modal.appendChild(card);
+        document.body.appendChild(modal);
+
+        // Clear their session storage so they can't force their way back in
+        sessionStorage.clear();
+        setTimeout(() => { window.location.href = "index.html"; }, 5000);
+    }
+
+    // --- AUTH & ACTIVE EXPIRATION CHECK ---
     auth.onAuthStateChanged(user => {
         if (user) {
             sessionStorage.setItem('internalAccess', 'true');
@@ -848,6 +834,7 @@
             const modal = document.querySelector('.access-denied-modal');
             if(modal) modal.remove();
 
+            // 1. Fetch User Data for UI
             db.ref('users/' + user.uid).on('value', snapshot => {
                 if (snapshot.exists()) {
                     const data = snapshot.val();
@@ -868,9 +855,42 @@
                     if(document.getElementById("status-text-pc")) document.getElementById("status-text-pc").innerText = statusTxt;
                     if(document.getElementById("status-text-mobile")) document.getElementById("status-text-mobile").innerText = statusTxt;
                     
-                    if (isAdm) { sessionStorage.setItem('isAdmin', 'true'); sessionStorage.setItem('internalAccess', 'true'); }
+                    if (isAdm) { 
+                        sessionStorage.setItem('isAdmin', 'true'); 
+                        sessionStorage.setItem('internalAccess', 'true'); 
+                        return; // Admins skip the expiration check
+                    }
+
+                    // 2. NEW: ACTIVE EXPIRATION CHECK FOR REGULAR USERS/GUESTS
+                    db.ref(`joinRequests/${user.uid}`).once('value').then(reqSnap => {
+                        if (reqSnap.exists()) {
+                            const reqData = reqSnap.val();
+                            const usedCode = reqData.usedCode; // The code they entered at login
+
+                            if (usedCode) {
+                                // Check the master code list
+                                db.ref(`validCodes/${usedCode}`).once('value').then(codeSnap => {
+                                    if (codeSnap.exists()) {
+                                        const codeData = codeSnap.val();
+                                        // If the current time is past the expiration time, kick them out
+                                        if (Date.now() > codeData.expiresAt) {
+                                            showExpiredModal(usedCode, codeData.expiresAt);
+                                            auth.signOut(); 
+                                        }
+                                    } else {
+                                        // Optional: If you delete the code from the dashboard, it also kicks them out
+                                        showExpiredModal(usedCode, Date.now()); 
+                                        auth.signOut();
+                                    }
+                                });
+                            }
+                        }
+                    });
                 }
             });
+        } else {
+             // If they get signed out, instantly push them out
+             window.location.href = "index.html";
         }
     });
 
