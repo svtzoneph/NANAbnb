@@ -258,9 +258,10 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
 
+    // FIX 1: Removed the double comma here
     const PAGE_CATEGORIES = [
       { id: "wendy_world_tour", name: "2025-26 WENDY 1st WORLD TOUR [W:EALIVE] ENCORE", image: "https://res.cloudinary.com/dp6x9xmku/image/upload/v1772344056/2025-26_WENDY_1st_WORLD_TOUR_W_EALIVE_ENCORE_yb3aws.png" },
-      { id: "cxmdoubleup", name: "CxM [DOUBLE UP] LIVE PARTY in INCHEON", image: "https://uploads.onecompiler.io/43ddry4jt/449datfub/1765871658770_cxm_doubleup_ONLINE_pc.jpg" },,
+      { id: "cxmdoubleup", name: "CxM [DOUBLE UP] LIVE PARTY in INCHEON", image: "https://uploads.onecompiler.io/43ddry4jt/449datfub/1765871658770_cxm_doubleup_ONLINE_pc.jpg" },
       { id: "fukuokashow", name: "SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Fukuoka Show", image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png" },
       { id: "jpnnewtour", name: "SEVENTEEN WORLD TOUR [NEW_] IN JAPAN Osaka Show", image: "https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png" }
     ];
@@ -371,9 +372,7 @@
       return (
         <React.Fragment>
 
-          {/* =========================================
-              HEADER / TOP NAV
-              ========================================= */}
+          {/* === HEADER / TOP NAV === */}
           <nav className="top-nav">
             <div className="menu-trigger" onClick={() => setSidebarOpen(true)}>
               <i className="fas fa-bars-staggered"></i>
@@ -382,40 +381,36 @@
             <div style={{width: '24px'}}></div>
           </nav>
 
-          {/* =========================================
-              SIDEBAR 
-              ========================================= */}
+          {/* === SIDEBAR (FIX 2 & 3: Converted to proper JSX) === */}
           <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
-<aside class="sidebar">
-  <div style="margin-bottom: 40px; padding-left: 15px;">
-    <h3 style="font-size: 22px; font-weight: 700;">Admin Panel</h3>
-    <p style="font-size: 13px; color: var(--text-muted);">Management Suite</p>
-  </div>
+          <aside className={`sidebar ${sidebarOpen ? 'active' : ''}`}>
+            <div style={{ marginBottom: '40px', paddingLeft: '15px' }}>
+              <h3 style={{ fontSize: '22px', fontWeight: '700' }}>Admin Panel</h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Management Suite</p>
+            </div>
 
-  <a href="panel" class="nav-btn">
-    <i class="fas fa-house"></i>
-    <span>Admin Home</span>
-  </a>
+            <a href="panel.html" className="nav-btn">
+              <i className="fas fa-house"></i>
+              <span>Admin Home</span>
+            </a>
 
-  <a href="request_join" class="nav-btn">
-    <i class="fas fa-user-plus"></i>
-    <span>Request Join</span>
-  </a>
+            <a href="request_join.html" className="nav-btn">
+              <i className="fas fa-user-plus"></i>
+              <span>Request Join</span>
+            </a>
 
-  <a href="generator" class="nav-btn active">
-    <i class="fas fa-key"></i>
-    <span>Access Codes</span>
-  </a>
+            <a href="admin-generator.html" className="nav-btn">
+              <i className="fas fa-key"></i>
+              <span>Access Codes</span>
+            </a>
 
-  <a href="page_access" class="nav-btn">
-    <i class="fas fa-shield-halved"></i>
-    <span>Page Access</span>
-  </a>
-</aside>
+            <a href="page_access.html" className="nav-btn active">
+              <i className="fas fa-shield-halved"></i>
+              <span>Page Access</span>
+            </a>
+          </aside>
 
-          {/* =========================================
-              MAIN CONTENT 
-              ========================================= */}
+          {/* === MAIN CONTENT === */}
           <main className="main-content">
             <header>
               <h1>Page Access Control</h1>
@@ -468,9 +463,7 @@
             </div>
           </main>
 
-          {/* -----------------------------
-              MODAL 1: ACCESS CONTROL 
-              ----------------------------- */}
+          {/* === MODAL 1: ACCESS CONTROL === */}
           <div className={`modal-overlay ${selectedPage ? 'active' : ''}`}>
             {selectedPage && (
               <div className="modal-card">
@@ -523,9 +516,7 @@
             )}
           </div>
 
-          {/* -----------------------------
-              MODAL 2: ADD NEW PAGE 
-              ----------------------------- */}
+          {/* === MODAL 2: ADD NEW PAGE === */}
           <div className={`modal-overlay ${isAddModalOpen ? 'active' : ''}`}>
              <div className="modal-card" style={{maxHeight: 'none'}}>
                 <h3 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '20px', color: 'var(--text-main)' }}>
