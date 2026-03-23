@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Watch History | Zone Vault</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* === THEME VARIABLES === */
+    :root {
+        --bg-color: #050505;
+        --text-main: #ffffff;
+        --text-muted: #a1a1aa;
+        --card-bg: #121212;
+        --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+        --input-bg: rgba(255, 255, 255, 0.05);
+        --accent-approve: #22c55e;
+        --accent-decline: #ef4444;
+        --accent-blue: #38bdf8;
+        --sidebar-width: 280px; 
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Background Effects */
+    .bg-gradient {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+      background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.05), transparent 40%);
+    }
+    .noise-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+      z-index: -1; pointer-events: none;
+    }
+
+    /* TOP NAV & SIDEBAR STYLES */
+    .top-nav { width: 100%; padding: 20px 25px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 999; background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(15px); border-bottom: var(--glass-border); }
+    .menu-trigger { font-size: 22px; cursor: pointer; color: var(--text-main); padding: 5px; }
+    .logo { font-weight: 700; letter-spacing: -0.5px; font-size: 20px; }
+
+    .sidebar { position: fixed; top: 0; left: -100%; width: var(--sidebar-width); height: 100%; background: var(--card-bg); border-right: var(--glass-border); z-index: 1001; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); padding: 40px 20px; }
+    .sidebar.active { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.8); }
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s; }
+    .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+    .nav-btn { width: 100%; padding: 16px 20px; border-radius: 12px; color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; border: 1px solid transparent; background: transparent; font-size: 15px; text-decoration: none; }
+    .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: rgba(255,255,255,0.1); }
+    .nav-btn i { font-size: 18px; width: 20px; text-align: center; }
+
+    /* MAIN CONTENT */
+    .main-content {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 40px 20px; width: 100%; max-width: 1100px; margin: 0 auto;
+    }
+
+    header { position: relative; text-align: center; margin-bottom: 40px; width: 100%; }
+    h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
+    
+    .stats-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .diagnostic-box {
+      background: rgba(255,255,255,0.03); border: var(--glass-border); border-radius: 12px;
+      padding: 10px 20px; display: inline-flex; align-items: center; gap: 10px;
+    }
+    .diagnostic-box p { margin: 0; font-size: 14px; color: var(--text-muted); }
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+    .status-admin { background: rgba(34, 197, 94, 0.2); color: var(--accent-approve); }
+    .status-user { background: rgba(239, 68, 68, 0.2); color: var(--accent-decline); }
+
+    .active-count { background: rgba(56, 189, 248, 0.1); color: var(--accent-blue); border: 1px solid rgba(56, 189, 248, 0.3); }
+
+    /* Top Right Buttons */
+    .btn-danger-top {
+      position: absolute; top: 0; right: 0;
+      background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--accent-decline);
+      padding: 10px 20px; border-radius: 50px; cursor: pointer; font-size: 14px; font-weight: 600;
+      transition: all 0.2s ease; display: flex; align-items: center; gap: 8px;
+    }
+    .btn-danger-top:hover { background: var(--accent-decline); color: #fff; transform: translateY(-2px); }
+
+    /* History Cards Layout */
+    .history-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; width: 100%;
+    }
+
+    .user-history-card {
+      background: var(--card-bg); border: var(--glass-border); border-radius: 20px;
+      overflow: hidden; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      display: flex; flex-direction: column; animation: popIn 0.4s ease forwards;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .card-header {
+      padding: 20px; border-bottom: var(--glass-border); background: rgba(255,255,255,0.02);
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .user-ident { display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
+    .user-email { font-size: 16px; font-weight: 600; color: var(--text-main); white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+    .user-uid { font-size: 12px; color: var(--text-muted); font-family: monospace; }
+    
+    .btn-delete-small {
+      background: transparent; border: 1px solid rgba(239, 68, 68, 0.3); color: var(--accent-decline);
+      width: 32px; height: 32px; border-radius: 8px; cursor: pointer; transition: 0.2s;
+      display: flex; justify-content: center; align-items: center; flex-shrink: 0;
+    }
+    .btn-delete-small:hover { background: rgba(239, 68, 68, 0.2); }
+
+    .video-list { padding: 15px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+    
+    .video-item {
+      display: flex; gap: 15px; padding: 10px; border-radius: 12px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+      align-items: center; position: relative;
+    }
+    .video-thumb {
+      width: 80px; height: 50px; border-radius: 8px; object-fit: cover;
+      border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;
+    }
+    .video-info { display: flex; flex-direction: column; gap: 4px; overflow: hidden; flex: 1; }
+    .video-title { font-size: 14px; font-weight: 500; color: var(--text-main); white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+    .video-meta { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 10px; }
+    
+    .live-indicator {
+      display: inline-flex; align-items: center; gap: 5px; color: var(--accent-approve); font-size: 11px; font-weight: bold;
+    }
+    .pulse-dot {
+      width: 6px; height: 6px; background-color: var(--accent-approve); border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    .empty-state { text-align: center; color: var(--text-muted); padding: 60px 20px; width: 100%; }
+    .empty-state i { font-size: 40px; margin-bottom: 15px; opacity: 0.5; }
+
+    @media (max-width: 600px) {
+      .main-content { padding: 30px 15px; }
+      h1 { font-size: 26px; } 
+      .history-grid { grid-template-columns: 1fr; }
+      .btn-danger-top { position: relative; display: inline-flex; margin-top: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-gradient"></div>
+  <div class="noise-overlay"></div>
+  
+  <div id="root" style="width: 100%;"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, onValue, set, off, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+      authDomain: "tvnstream-b4497.firebaseapp.com",
+      databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+      projectId: "tvnstream-b4497",
+      storageBucket: "tvnstream-b4497.appspot.com",
+      messagingSenderId: "308384754214",
+      appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    window.db = getDatabase(app);
+    window.auth = getAuth(app);
+    window.fbRef = ref;
+    window.fbOnValue = onValue;
+    window.fbSet = set;
+    window.fbRemove = remove; // Added remove function
+    window.fbOff = off;
+    window.fbOnAuthStateChanged = onAuthStateChanged;
+
+    window.firebaseIsReady = true;
+    if (typeof window.mountReactApp === 'function') window.mountReactApp();
+  </script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    function WatchHistoryApp() {
+      const [sidebarOpen, setSidebarOpen] = useState(false);
+      const [user, setUser] = useState(null);
+      const [authLoading, setAuthLoading] = useState(true);
+      const [isAdmin, setIsAdmin] = useState(false);
+      
+      const [usersData, setUsersData] = useState({});
+      const [watchHistoryData, setWatchHistoryData] = useState({});
+
+      // Authentication & Data Fetching
+      useEffect(() => {
+        const unsubscribeAuth = window.fbOnAuthStateChanged(window.auth, (currentUser) => {
+          setUser(currentUser);
+          if (currentUser) {
+            const myProfileRef = window.fbRef(window.db, `users/${currentUser.uid}`);
+            window.fbOnValue(myProfileRef, (snap) => {
+              const myData = snap.val();
+              if (myData && myData.role === 'admin') {
+                setIsAdmin(true);
+                
+                // Fetch All Users (to map email to uid)
+                const usersRef = window.fbRef(window.db, 'users');
+                window.fbOnValue(usersRef, (usersSnap) => {
+                  setUsersData(usersSnap.val() || {});
+                });
+
+                // Fetch Watch History
+                const historyRef = window.fbRef(window.db, 'watchHistory');
+                window.fbOnValue(historyRef, (historySnap) => {
+                  setWatchHistoryData(historySnap.val() || {});
+                });
+
+              } else {
+                setIsAdmin(false);
+              }
+              setAuthLoading(false);
+            });
+          } else {
+            setAuthLoading(false);
+            setIsAdmin(false);
+          }
+        });
+        return () => unsubscribeAuth();
+      }, []);
+
+      // Format data and calculate active viewers
+      const { formattedHistory, activeViewersCount } = useMemo(() => {
+        let activeCount = 0;
+        const historyArray = Object.entries(watchHistoryData).map(([uid, videosObj]) => {
+          const userInfo = usersData[uid] || {};
+          
+          const videos = Object.entries(videosObj || {}).map(([videoId, vData]) => {
+            // Check if user is actively watching (assuming 'isActive' boolean exists, or > 0 mins)
+            // Fallback: If isActive is undefined, we assume they are active if they have history.
+            const isActive = vData.isActive === true || vData.status === 'active'; 
+            if (isActive) activeCount++;
+
+            return {
+              id: videoId,
+              title: vData.title || videoId,
+              image: vData.image || "https://placehold.co/100x60/121212/555?text=Video",
+              minutes: vData.minutes || vData.progress || 0,
+              isActive: isActive
+            };
+          });
+
+          return {
+            uid,
+            email: userInfo.email || 'Unknown User',
+            name: userInfo.name || '',
+            videos
+          };
+        });
+
+        return { formattedHistory: historyArray, activeViewersCount: activeCount };
+      }, [watchHistoryData, usersData]);
+
+      // Handlers
+      const handleDeleteUserHistory = (uid) => {
+        if(window.confirm("Are you sure you want to delete this user's watch history?")) {
+          const ref = window.fbRef(window.db, `watchHistory/${uid}`);
+          window.fbRemove(ref).catch(err => alert("Error deleting history"));
+        }
+      };
+
+      const handleClearAllHistory = () => {
+        if(window.confirm("WARNING: This will delete ALL watch history for everyone. Proceed?")) {
+          const ref = window.fbRef(window.db, `watchHistory`);
+          window.fbRemove(ref).catch(err => alert("Error clearing database"));
+        }
+      };
+
+      return (
+        <React.Fragment>
+          {/* === HEADER / TOP NAV === */}
+          <nav className="top-nav">
+            <div className="menu-trigger" onClick={() => setSidebarOpen(true)}>
+              <i className="fas fa-bars-staggered"></i>
+            </div>
+            <div className="logo">ZONE VAULT</div>
+            <div style={{width: '24px'}}></div>
+          </nav>
+
+          {/* === SIDEBAR === */}
+          <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}></div>
+          <aside className={`sidebar ${sidebarOpen ? 'active' : ''}`}>
+            <div style={{ marginBottom: '40px', paddingLeft: '15px' }}>
+              <h3 style={{ fontSize: '22px', fontWeight: '700' }}>Admin Panel</h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Management Suite</p>
+            </div>
+            <a href="panel" className="nav-btn"><i className="fas fa-house"></i><span>Admin Home</span></a>
+            <a href="request_join" className="nav-btn"><i className="fas fa-user-plus"></i><span>Request Join</span></a>
+            <a href="generator" className="nav-btn"><i className="fas fa-key"></i><span>Access Codes</span></a>
+            <a href="page_access" className="nav-btn"><i className="fas fa-shield-halved"></i><span>Page Access</span></a>
+            <a href="watch_history" className="nav-btn active"><i className="fas fa-history"></i><span>Watch History</span></a>
+          </aside>
+
+          {/* === MAIN CONTENT === */}
+          <main className="main-content">
+            <header>
+              <h1>User Watch History</h1>
+              
+              {isAdmin && (
+                <button className="btn-danger-top" onClick={handleClearAllHistory} title="Delete All History">
+                  <i className="fas fa-trash-can"></i> Clear All Records
+                </button>
+              )}
+
+              <div className="stats-container">
+                <div className="diagnostic-box">
+                  {authLoading ? (
+                     <p><i className="fas fa-spinner fa-spin"></i> Checking credentials...</p>
+                  ) : user ? (
+                     <p>
+                       <i className="fas fa-user-shield"></i> {user.email}
+                       <span className={`status-badge ${isAdmin ? 'status-admin' : 'status-user'}`} style={{marginLeft: '8px'}}>
+                         {isAdmin ? 'ADMIN' : 'NO ACCESS'}
+                       </span>
+                     </p>
+                  ) : (
+                     <p style={{color: "var(--accent-decline)"}}><i className="fas fa-lock"></i> Not logged in.</p>
+                  )}
+                </div>
+
+                {isAdmin && (
+                  <div className="diagnostic-box active-count">
+                    <p>
+                      <i className="fas fa-satellite-dish"></i> Active Streams: 
+                      <strong style={{marginLeft: '5px', fontSize: '16px'}}>{activeViewersCount}</strong>
+                    </p>
+                  </div>
+                )}
+              </div>
+            </header>
+
+            {/* Grid Layout for User Histories */}
+            {isAdmin && (
+              <div className="history-grid">
+                {formattedHistory.length === 0 ? (
+                  <div className="empty-state">
+                    <i className="fas fa-inbox"></i>
+                    <h2>No Watch History Found</h2>
+                    <p>Users haven't started watching anything yet.</p>
+                  </div>
+                ) : (
+                  formattedHistory.map((userObj) => (
+                    <div className="user-history-card" key={userObj.uid}>
+                      
+                      {/* Card Header: User Info & Delete */}
+                      <div className="card-header">
+                        <div className="user-ident">
+                          <span className="user-email" title={userObj.email}>{userObj.email}</span>
+                          <span className="user-uid">UID: {userObj.uid}</span>
+                        </div>
+                        <button 
+                          className="btn-delete-small" 
+                          onClick={() => handleDeleteUserHistory(userObj.uid)}
+                          title="Delete this user's history"
+                        >
+                          <i className="fas fa-trash"></i>
+                        </button>
+                      </div>
+
+                      {/* Video List */}
+                      <div className="video-list">
+                        {userObj.videos.length === 0 ? (
+                          <p style={{color: 'var(--text-muted)', fontSize: '13px'}}>No videos logged.</p>
+                        ) : (
+                          userObj.videos.map((vid, index) => (
+                            <div className="video-item" key={index}>
+                              <img src={vid.image} alt="thumbnail" className="video-thumb" onError={(e) => e.target.src='https://placehold.co/100x60/121212/555?text=No+Image'} />
+                              <div className="video-info">
+                                <span className="video-title" title={vid.title}>{vid.title}</span>
+                                <div className="video-meta">
+                                  <span><i className="far fa-clock"></i> {vid.minutes} mins</span>
+                                  {vid.isActive && (
+                                    <span className="live-indicator">
+                                      <div className="pulse-dot"></div> Active
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+            
+            {!isAdmin && !authLoading && (
+              <div className="empty-state">
+                <i className="fas fa-shield-lock" style={{color: 'var(--accent-decline)'}}></i>
+                <h2 style={{color: 'var(--accent-decline)'}}>Access Denied</h2>
+                <p>You need admin privileges to view this page.</p>
+              </div>
+            )}
+
+          </main>
+        </React.Fragment>
+      );
+    }
+
+    window.mountReactApp = () => {
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<WatchHistoryApp />);
+    };
+    if (window.firebaseIsReady) window.mountReactApp();
+  </script>
+</body>
+</html>
