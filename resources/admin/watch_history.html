@@ -92,6 +92,24 @@
     }
     .btn-danger-top:hover { background: var(--accent-decline); color: #fff; transform: translateY(-2px); }
 
+    /* === SCROLLABLE BOX CONTAINER === */
+    .scroll-container {
+      width: 100%;
+      max-height: 65vh; /* Limits the height so it doesn't stretch the page */
+      overflow-y: auto;
+      background: rgba(255, 255, 255, 0.02);
+      border: var(--glass-border);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Custom Scrollbar for the container */
+    .scroll-container::-webkit-scrollbar { width: 8px; }
+    .scroll-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
+    .scroll-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    .scroll-container::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
     /* History Cards Layout */
     .history-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; width: 100%;
@@ -159,6 +177,7 @@
       h1 { font-size: 26px; } 
       .history-grid { grid-template-columns: 1fr; }
       .btn-danger-top { position: relative; display: inline-flex; margin-top: 15px; }
+      .scroll-container { max-height: 70vh; padding: 15px; }
     }
   </style>
 </head>
@@ -245,7 +264,7 @@
 
       const { formattedHistory, activeViewersCount } = useMemo(() => {
         let activeCount = 0;
-        const now = Date.now(); // Get current time to compare against the database timestamp
+        const now = Date.now(); 
         
         const historyArray = Object.entries(watchHistoryData).map(([uid, videosObj]) => {
           const userInfo = usersData[uid] || {};
@@ -254,12 +273,9 @@
           if (videosObj && typeof videosObj === 'object') {
             videos = Object.entries(videosObj).map(([videoId, vData]) => {
               
-              // 1. FIX THE TIME: Convert 'currentTime' from seconds to minutes
               const totalSeconds = vData.currentTime || 0;
               const calcMinutes = Math.floor(totalSeconds / 60);
 
-              // 2. FIX ACTIVE STATUS: Compare 'timestamp' to Date.now()
-              // If the timestamp was updated in the last 3 minutes (180,000 ms), they are currently watching
               const lastUpdated = vData.timestamp || 0;
               const isCurrentlyWatching = lastUpdated > 0 && (now - lastUpdated) < 180000;
 
@@ -289,7 +305,6 @@
       const handleDeleteUserHistory = (uid) => {
         if(window.confirm("Are you sure you want to delete this user's watch history?")) {
           const ref = window.fbRef(window.db, `watchHistory/${uid}`);
-          // Added better error handling to show you the exact Firebase rejection
           window.fbRemove(ref).catch(err => alert("Error deleting history: " + err.message));
         }
       };
@@ -297,7 +312,6 @@
       const handleClearAllHistory = () => {
         if(window.confirm("WARNING: This will delete ALL watch history for everyone. Proceed?")) {
           const ref = window.fbRef(window.db, `watchHistory`);
-          // Added better error handling to show you the exact Firebase rejection
           window.fbRemove(ref).catch(err => alert("Error clearing database: " + err.message));
         }
       };
@@ -323,6 +337,7 @@
             <a href="generator" className="nav-btn"><i className="fas fa-key"></i><span>Access Codes</span></a>
             <a href="page_access" className="nav-btn"><i className="fas fa-shield-halved"></i><span>Page Access</span></a>
             <a href="watch_history" className="nav-btn active"><i className="fas fa-history"></i><span>Watch History</span></a>
+            <a href="user_directory" className="nav-btn"><i className="fas fa-address-book"></i><span>User Directory</span></a>
           </aside>
 
           <main className="main-content">
@@ -363,58 +378,60 @@
             </header>
 
             {isAdmin && (
-              <div className="history-grid">
-                {formattedHistory.length === 0 ? (
-                  <div className="empty-state">
-                    <i className="fas fa-inbox"></i>
-                    <h2>No Watch History Found</h2>
-                    <p>Users haven't started watching anything yet.</p>
-                  </div>
-                ) : (
-                  formattedHistory.map((userObj) => (
-                    <div className="user-history-card" key={userObj.uid}>
-                      
-                      <div className="card-header">
-                        <div className="user-ident">
-                          <span className="user-name" title={userObj.name}>{userObj.name}</span>
-                          <span className="user-email" title={userObj.email}>{userObj.email}</span>
-                          <span className="user-uid">UID: {userObj.uid}</span>
+              <div className="scroll-container">
+                <div className="history-grid">
+                  {formattedHistory.length === 0 ? (
+                    <div className="empty-state">
+                      <i className="fas fa-inbox"></i>
+                      <h2>No Watch History Found</h2>
+                      <p>Users haven't started watching anything yet.</p>
+                    </div>
+                  ) : (
+                    formattedHistory.map((userObj) => (
+                      <div className="user-history-card" key={userObj.uid}>
+                        
+                        <div className="card-header">
+                          <div className="user-ident">
+                            <span className="user-name" title={userObj.name}>{userObj.name}</span>
+                            <span className="user-email" title={userObj.email}>{userObj.email}</span>
+                            <span className="user-uid">UID: {userObj.uid}</span>
+                          </div>
+                          <button 
+                            className="btn-delete-small" 
+                            onClick={() => handleDeleteUserHistory(userObj.uid)}
+                            title="Delete this user's history"
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
                         </div>
-                        <button 
-                          className="btn-delete-small" 
-                          onClick={() => handleDeleteUserHistory(userObj.uid)}
-                          title="Delete this user's history"
-                        >
-                          <i className="fas fa-trash"></i>
-                        </button>
-                      </div>
 
-                      <div className="video-list">
-                        {userObj.videos.length === 0 ? (
-                          <p style={{color: 'var(--text-muted)', fontSize: '13px'}}>No videos logged.</p>
-                        ) : (
-                          userObj.videos.map((vid, index) => (
-                            <div className="video-item" key={index}>
-                              <img src={vid.image} alt="thumbnail" className="video-thumb" onError={(e) => e.target.src='https://placehold.co/100x60/121212/555?text=No+Image'} />
-                              <div className="video-info">
-                                <span className="video-title" title={vid.title}>{vid.title}</span>
-                                <div className="video-meta">
-                                  <span><i className="far fa-clock"></i> {vid.minutes} mins</span>
-                                  {vid.isActive && (
-                                    <span className="live-indicator">
-                                      <div className="pulse-dot"></div> Active
-                                    </span>
-                                  )}
+                        <div className="video-list">
+                          {userObj.videos.length === 0 ? (
+                            <p style={{color: 'var(--text-muted)', fontSize: '13px'}}>No videos logged.</p>
+                          ) : (
+                            userObj.videos.map((vid, index) => (
+                              <div className="video-item" key={index}>
+                                <img src={vid.image} alt="thumbnail" className="video-thumb" onError={(e) => e.target.src='https://placehold.co/100x60/121212/555?text=No+Image'} />
+                                <div className="video-info">
+                                  <span className="video-title" title={vid.title}>{vid.title}</span>
+                                  <div className="video-meta">
+                                    <span><i className="far fa-clock"></i> {vid.minutes} mins</span>
+                                    {vid.isActive && (
+                                      <span className="live-indicator">
+                                        <div className="pulse-dot"></div> Active
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
+                            ))
+                          )}
+                        </div>
 
-                    </div>
-                  ))
-                )}
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             )}
             
